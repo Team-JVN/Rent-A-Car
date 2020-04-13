@@ -13,7 +13,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @DiscriminatorValue("CLIENT")
-public class Client extends User{
+public class Client extends User {
 
     @OneToMany(mappedBy = "client", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<RentRequest> rentRequests = new HashSet<>();

@@ -21,10 +21,10 @@ public class PriceList {
     @Column(nullable = false)
     private Double pricePerDay;
 
-    @Column(nullable = false)
+    @Column
     private Double pricePerKm;
 
-    @Column(nullable = false)
+    @Column
     private Double priceForCDW;
 
     @OneToMany(mappedBy = "priceList", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

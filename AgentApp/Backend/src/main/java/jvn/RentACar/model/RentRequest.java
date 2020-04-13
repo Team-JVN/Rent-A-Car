@@ -32,7 +32,6 @@ public class RentRequest {
     @Column(nullable = false)
     private Double totalPrice;
 
-
     @ElementCollection
     @CollectionTable(name = "advertisement_cdw_mapping",
             joinColumns = {@JoinColumn(name = "rent_request_id", referencedColumnName = "id")})
@@ -42,4 +41,5 @@ public class RentRequest {
 
     @OneToOne
     private RentReport rentReport;
+
 }
