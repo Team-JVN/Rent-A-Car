@@ -19,7 +19,7 @@ public class FuelType {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String label;
+    private String name;
 
     @OneToMany(mappedBy = "fuelType", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Car> cars = new HashSet<>();
