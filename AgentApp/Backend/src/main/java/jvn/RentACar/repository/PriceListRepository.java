@@ -1,5 +1,6 @@
 package jvn.RentACar.repository;
 
+import jvn.RentACar.enumeration.LogicalStatus;
 import jvn.RentACar.model.PriceList;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -9,6 +10,6 @@ public interface PriceListRepository extends JpaRepository<PriceList, Long> {
 
     PriceList findOneById(Long id);
 
-    List<PriceList> findAll();
+    List<PriceList> findByStatus(LogicalStatus status);
 
 }

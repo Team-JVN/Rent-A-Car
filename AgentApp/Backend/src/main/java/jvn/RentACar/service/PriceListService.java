@@ -12,4 +12,8 @@ public interface PriceListService {
 
     PriceListDTO create(PriceListDTO priceListDTO);
 
+    PriceListDTO edit(Long id, PriceListDTO priceListDTO);
+
+    void delete(Long id);
+
 }

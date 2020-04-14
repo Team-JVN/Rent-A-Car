@@ -12,13 +12,15 @@ import { ToastrModule } from 'ngx-toastr';
 import { HttpClientModule } from '@angular/common/http';
 import { ListPriceListsComponent } from './component/list/list-price-lists/list-price-lists.component';
 import { AddPriceListComponent } from './component/add/add-price-list/add-price-list.component';
+import { EditPriceListComponent } from './component/edit/edit-price-list/edit-price-list.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
     ListPriceListsComponent,
-    AddPriceListComponent
+    AddPriceListComponent,
+    EditPriceListComponent
   ],
   imports: [
     BrowserModule,
@@ -39,6 +41,7 @@ import { AddPriceListComponent } from './component/add/add-price-list/add-price-
   ],
   entryComponents: [
     AddPriceListComponent,
+    EditPriceListComponent,
   ],
   providers: [],
   bootstrap: [AppComponent]

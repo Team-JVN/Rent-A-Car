@@ -22,7 +22,7 @@ public class PriceListController {
         this.priceListService = priceListService;
     }
 
-    @GetMapping(value = "/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<PriceListDTO> get(@PathVariable Long id) {
         return new ResponseEntity<>(priceListService.get(id), HttpStatus.OK);
     }
@@ -37,4 +37,14 @@ public class PriceListController {
         return new ResponseEntity<>(priceListService.create(priceListDTO), HttpStatus.CREATED);
     }
 
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PriceListDTO> edit(@PathVariable Long id, @Valid @RequestBody PriceListDTO priceListDTO) {
+        return new ResponseEntity<>(priceListService.edit(id, priceListDTO), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        priceListService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

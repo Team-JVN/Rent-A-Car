@@ -1,3 +1,4 @@
+import { EditPriceListComponent } from './../../edit/edit-price-list/edit-price-list.component';
 import { AddPriceListComponent } from './../../add/add-price-list/add-price-list.component';
 import { PriceListService } from './../../../service/price-list.service';
 import { PriceList } from './../../../model/priceList';
@@ -49,6 +50,22 @@ export class ListPriceListsComponent implements OnInit {
 
   openCreateDialog() {
     this.dialog.open(AddPriceListComponent);
+  }
+
+  edit(item: PriceList) {
+    this.dialog.open(EditPriceListComponent, { data: item });
+  }
+
+  delete(item: PriceList) {
+    this.priceListService.delete(item.id).subscribe(
+      () => {
+        this.fetchAll();
+        this.toastr.success('Success!', 'Delete Price List');
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Delete Price List');
+      }
+    );
   }
 
 }

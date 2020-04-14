@@ -19,7 +19,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(InvalidPriceListDataException.class)
-    protected ResponseEntity<Object> handleInvalidPriceListDataException(InvalidBodyStyleDataException ex) {
+    protected ResponseEntity<Object> handleInvalidPriceListDataException(InvalidPriceListDataException ex) {
         ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
         return buildResponseEntity(error);
     }

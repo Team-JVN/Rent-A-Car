@@ -24,7 +24,7 @@ public class PriceListDTO {
     @Positive(message = "Price per kilometer is not a positive number.")
     private Double pricePerKm;
 
-    @Positive(message = "Price for CWD is not a positive number.")
+    @Positive(message = "Price for CDW is not a positive number.")
     private Double priceForCDW;
 
     public PriceListDTO(PriceList priceList) {

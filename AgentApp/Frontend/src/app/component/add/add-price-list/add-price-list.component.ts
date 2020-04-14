@@ -26,7 +26,7 @@ export class AddPriceListComponent implements OnInit {
     this.createForm = this.formBuilder.group({
       pricePerDay: new FormControl(null, [Validators.required, Validators.min(1)]),
       pricePerKm: new FormControl(null, [Validators.min(1)]),
-      priceForCSW: new FormControl(null, [Validators.min(1)]),
+      priceForCDW: new FormControl(null, [Validators.min(1)]),
     })
   }
 
@@ -36,7 +36,7 @@ export class AddPriceListComponent implements OnInit {
       (data: PriceList) => {
         this.createForm.reset();
         this.dialogRef.close();
-        this.toastr.success('Successfully created new Price List.', 'Create Price List');
+        this.toastr.success('Success!', 'Create Price List');
         this.priceListService.createSuccessEmitter.next(data);
       },
       (httpErrorResponse: HttpErrorResponse) => {

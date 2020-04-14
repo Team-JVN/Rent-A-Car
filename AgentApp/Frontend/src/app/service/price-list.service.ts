@@ -22,4 +22,12 @@ export class PriceListService {
     return this.httpClient.get(this.url);
   }
 
+  public edit(priceList: PriceList) {
+    return this.httpClient.put(this.url + "/" + priceList.id, priceList);
+  }
+
+  public delete(id: number) {
+    return this.httpClient.delete(this.url + "/" + id);
+  }
+
 }
