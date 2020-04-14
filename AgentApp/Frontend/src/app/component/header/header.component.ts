@@ -1,6 +1,4 @@
 
-import { UserService } from './../../service/user.service';
-import { UserTokenState } from './../../model/userTokenState';
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
@@ -14,10 +12,7 @@ import { map, shareReplay } from 'rxjs/operators';
 })
 export class HeaderComponent implements OnInit {
 
-  user: UserTokenState
-
   constructor(
-    private userService: UserService,
     private router: Router,
     private breakpointObserver: BreakpointObserver
   ) { }
@@ -29,21 +24,8 @@ export class HeaderComponent implements OnInit {
     );
 
   ngOnInit() {
-    this.router.events.subscribe((event) => {
-      if (event instanceof NavigationEnd) {
-        if (this.isLoggedIn()) {
-          this.user = this.userService.getLoggedInUser();
-        }
-      }
-    });
+
   }
 
-  isLoggedIn() {
-    return this.userService.isLoggedIn();
-  }
-
-  logout() {
-    this.userService.logout();
-  }
 
 }

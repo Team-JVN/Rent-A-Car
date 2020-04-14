@@ -10,10 +10,18 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { LayoutModule } from '@angular/cdk/layout';
 import { ToastrModule } from 'ngx-toastr';
 import { HttpClientModule } from '@angular/common/http';
+import { ListBodyStylesComponent } from './component/list/list-body-styles/list-body-styles.component';
+import { HeaderComponent } from './component/header/header.component';
+import { AddBodyStyleComponent } from './component/add/add-body-style/add-body-style.component';
+import { EditBodyStyleComponent } from './component/edit/edit-body-style-component/edit-body-style-component.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ListBodyStylesComponent,
+    HeaderComponent,
+    AddBodyStyleComponent,
+    EditBodyStyleComponent,
   ],
   imports: [
     BrowserModule,
@@ -31,6 +39,11 @@ import { HttpClientModule } from '@angular/common/http';
     MaterialModule,
     HttpClientModule,
     MatDatepickerModule,
+  ],
+  entryComponents: [
+    ListBodyStylesComponent,
+    AddBodyStyleComponent,
+    EditBodyStyleComponent
   ],
   providers: [],
   bootstrap: [AppComponent]
