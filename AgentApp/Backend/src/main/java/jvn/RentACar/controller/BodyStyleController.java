@@ -1,7 +1,7 @@
 package jvn.RentACar.controller;
 
-import jvn.RentACar.dto.BodyStyleDTO;
-import jvn.RentACar.dto.CreateBodyStyleDTO;
+import jvn.RentACar.dto.both.BodyStyleDTO;
+import jvn.RentACar.dto.request.CreateBodyStyleDTO;
 import jvn.RentACar.service.BodyStyleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +17,6 @@ import java.util.List;
 @RequestMapping(value = "/api/body-style")
 public class BodyStyleController {
 
-    @Autowired
     private BodyStyleService bodyStyleService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -38,5 +37,10 @@ public class BodyStyleController {
     @DeleteMapping("/{id}")
     public ResponseEntity<BodyStyleDTO> delete(@PathVariable("id") Long id) throws Exception {
         return new ResponseEntity<>(bodyStyleService.delete(id), HttpStatus.ACCEPTED);
+    }
+
+    @Autowired
+    public BodyStyleController(BodyStyleService bodyStyleService) {
+        this.bodyStyleService = bodyStyleService;
     }
 }

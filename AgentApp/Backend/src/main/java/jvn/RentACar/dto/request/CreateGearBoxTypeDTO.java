@@ -1,4 +1,4 @@
-package jvn.RentACar.dto;
+package jvn.RentACar.dto.request;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,9 +9,8 @@ import javax.validation.constraints.NotEmpty;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CreateBodyStyleDTO {
+public class CreateGearBoxTypeDTO {
 
     @NotEmpty(message = "Name is empty.")
     private String name;
-
 }

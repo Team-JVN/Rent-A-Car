@@ -1,7 +1,7 @@
 package jvn.RentACar.serviceImpl;
 
-import jvn.RentACar.dto.BodyStyleDTO;
-import jvn.RentACar.dto.CreateBodyStyleDTO;
+import jvn.RentACar.dto.both.BodyStyleDTO;
+import jvn.RentACar.dto.request.CreateBodyStyleDTO;
 import jvn.RentACar.exceptionHandler.InvalidBodyStyleDataException;
 import jvn.RentACar.model.BodyStyle;
 import jvn.RentACar.repository.BodyStyleRepository;
@@ -16,7 +16,6 @@ import java.util.List;
 @Service
 public class BodyStyleServiceImpl implements BodyStyleService {
 
-    @Autowired
     private BodyStyleRepository bodyStyleRepository;
 
     @Override
@@ -60,5 +59,10 @@ public class BodyStyleServiceImpl implements BodyStyleService {
             return bodyStyle;
         }
         throw new InvalidBodyStyleDataException("There's at least one car with this body style so you can not edit it.", HttpStatus.BAD_REQUEST);
+    }
+
+    @Autowired
+    public BodyStyleServiceImpl(BodyStyleRepository bodyStyleRepository) {
+        this.bodyStyleRepository = bodyStyleRepository;
     }
 }

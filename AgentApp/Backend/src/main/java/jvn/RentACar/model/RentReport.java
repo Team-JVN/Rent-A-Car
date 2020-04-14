@@ -17,13 +17,13 @@ public class RentReport {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column
     private String comment;
 
     @OneToOne(mappedBy = "rentReport", cascade = CascadeType.ALL)
     private RentRequest rentRequest;
 
-    @Column(nullable = false)
+    @Column
     private Double additionalCost;
 
     @ElementCollection

@@ -1,7 +1,7 @@
 package jvn.RentACar.service;
 
-import jvn.RentACar.dto.BodyStyleDTO;
-import jvn.RentACar.dto.CreateBodyStyleDTO;
+import jvn.RentACar.dto.both.BodyStyleDTO;
+import jvn.RentACar.dto.request.CreateBodyStyleDTO;
 import jvn.RentACar.exceptionHandler.InvalidBodyStyleDataException;
 
 import java.util.List;

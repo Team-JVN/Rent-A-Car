@@ -1,7 +1,6 @@
-package jvn.RentACar.dto;
+package jvn.RentACar.dto.both;
 
-
-import jvn.RentACar.model.BodyStyle;
+import jvn.RentACar.model.FuelType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,7 +11,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 @NoArgsConstructor
-public class BodyStyleDTO {
+public class FuelTypeDTO {
 
     @NotNull(message = "Id is null.")
     private Long id;
@@ -20,8 +19,8 @@ public class BodyStyleDTO {
     @NotEmpty(message = "Name is empty.")
     private String name;
 
-    public BodyStyleDTO(BodyStyle bodyStyle) {
-        this.id = bodyStyle.getId();
-        this.name = bodyStyle.getName();
+    public FuelTypeDTO(FuelType fuelType) {
+        this.id = fuelType.getId();
+        this.name = fuelType.getName();
     }
 }

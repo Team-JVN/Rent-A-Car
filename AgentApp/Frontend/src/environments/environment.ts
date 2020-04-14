@@ -7,6 +7,8 @@ export const environment = {
   baseUrl: 'http://localhost:8080',
   advertisement: '/api/advertisement',
   bodyStyle: '/api/body-style',
+  fuelType: '/api/fuel-type',
+  gearBoxType: '/api/gearbox-type',
 };
 
 /*

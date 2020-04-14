@@ -14,6 +14,12 @@ import { ListBodyStylesComponent } from './component/list/list-body-styles/list-
 import { HeaderComponent } from './component/header/header.component';
 import { AddBodyStyleComponent } from './component/add/add-body-style/add-body-style.component';
 import { EditBodyStyleComponent } from './component/edit/edit-body-style-component/edit-body-style-component.component';
+import { EditFuelTypeComponent } from './component/edit/edit-fuel-type/edit-fuel-type.component';
+import { ListFuelTypeComponent } from './component/list/list-fuel-type/list-fuel-type.component';
+import { AddFuelTypeComponent } from './component/add/add-fuel-type/add-fuel-type.component';
+import { ListGearBoxTypesComponent } from './component/list/list-gear-box-types/list-gear-box-types.component';
+import { AddGearBoxTypeComponent } from './component/add/add-gear-box-type/add-gear-box-type.component';
+import { EditGearBoxTypeComponent } from './component/edit/edit-gear-box-type/edit-gear-box-type.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +28,12 @@ import { EditBodyStyleComponent } from './component/edit/edit-body-style-compone
     HeaderComponent,
     AddBodyStyleComponent,
     EditBodyStyleComponent,
+    EditFuelTypeComponent,
+    ListFuelTypeComponent,
+    AddFuelTypeComponent,
+    ListGearBoxTypesComponent,
+    AddGearBoxTypeComponent,
+    EditGearBoxTypeComponent
   ],
   imports: [
     BrowserModule,
@@ -43,7 +55,13 @@ import { EditBodyStyleComponent } from './component/edit/edit-body-style-compone
   entryComponents: [
     ListBodyStylesComponent,
     AddBodyStyleComponent,
-    EditBodyStyleComponent
+    EditBodyStyleComponent,
+    EditFuelTypeComponent,
+    ListFuelTypeComponent,
+    AddFuelTypeComponent,
+    ListGearBoxTypesComponent,
+    AddGearBoxTypeComponent,
+    EditGearBoxTypeComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

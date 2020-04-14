@@ -45,7 +45,7 @@ public class Car {
     private Boolean availableTracking;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private User user;
+    private User owner;
 
     @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Advertisement> advertisements = new HashSet<>();
