@@ -1,10 +1,8 @@
-import { environment } from './../../../../environments/environment';
-import { FileUploader } from 'ng2-file-upload';
 import { Car } from './../../../model/car';
 import { BodyStyle } from 'src/app/model/bodystyle';
 import { BodyStyleService } from './../../../service/bodyStyle.service';
 import { GearboxTypeService } from './../../../service/gearboxType.service';
-import { HttpErrorResponse, HttpClient } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { GearBoxType } from './../../../model/gearboxType';
 import { FuelType } from './../../../model/fuelType';
 import { FuelTypeService } from './../../../service/fuelType.service';
