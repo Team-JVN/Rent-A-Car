@@ -1,15 +1,10 @@
 mat-card {
-    max-width: 800px;
+    max-width: 600px;
     margin: 2em auto;
 }
 
-.create-btn {
-    color: white;
-    background-color: #00cc00;
-}
-
 .buttons-width {
-    width: 34%;
+    width: 105px;
 }
 
 .table td {

@@ -1,7 +1,7 @@
 <h1 mat-dialog-title>Edit Body Style</h1>
 <mat-dialog-content class="dialog-class">
     <form [formGroup]="editForm" class="form-full-width">
-        <mat-form-field class="form-full-width-td ml-2">
+        <mat-form-field class="form-full-width">
             <input matInput placeholder="Label" formControlName="name">
             <mat-error *ngIf="editForm.get('name').errors && editForm.get('name').errors['required']">
                 Please enter body style's name.
@@ -10,6 +10,6 @@
     </form>
 </mat-dialog-content>
 
-<mat-dialog-actions class="mt-3 mb-1">
-    <button mat-raised-button color="primary" (click)="edit()" [disabled]="!editForm.valid">Edit</button>
+<mat-dialog-actions align="end">
+    <button mat-raised-button color="primary" (click)="edit()" class="mb-3" [disabled]="!editForm.valid">Edit</button>
 </mat-dialog-actions>
