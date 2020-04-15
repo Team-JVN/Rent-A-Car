@@ -1,0 +1,37 @@
+mat-card {
+    max-width: 800px;
+    margin: 2em auto;
+}
+  
+  .table {
+    margin-bottom: 0;
+  }
+    
+  .form-full-width {
+    width: 100%;
+  }
+
+  .form-full-width-50 {
+    width: 50%;
+  }
+
+  .form-full-width-right {
+    width: 99%;
+  }
+  .form-full-width-body-style{
+    width: 84%;
+  }
+  .form-full-width-left {
+    width: 90%;
+  }
+  /* Hides arrow buttons in input type="number" */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}

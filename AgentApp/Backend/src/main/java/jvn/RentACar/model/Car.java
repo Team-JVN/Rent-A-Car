@@ -27,7 +27,7 @@ public class Car {
     private FuelType fuelType;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private GearBoxType gearBoxType;
+    private GearboxType gearBoxType;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private BodyStyle bodyStyle;

@@ -36,6 +36,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(error);
     }
 
+    @ExceptionHandler(InvalidCarDataException.class)
+    protected ResponseEntity<Object> handleInvalidCarDataException(InvalidCarDataException ex) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+        return buildResponseEntity(error);
+    }
+
     private ResponseEntity<Object> buildResponseEntity(ErrorResponse error) {
         return new ResponseEntity<>(error, error.getStatus());
     }

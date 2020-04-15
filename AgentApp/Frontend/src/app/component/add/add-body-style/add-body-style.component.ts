@@ -3,7 +3,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
-import { BodyStyle } from 'src/app/model/bodystyle';
+import { BodyStyle } from 'src/app/model/bodyStyle';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({

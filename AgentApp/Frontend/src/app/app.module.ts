@@ -20,7 +20,10 @@ import { AddFuelTypeComponent } from './component/add/add-fuel-type/add-fuel-typ
 import { ListGearBoxTypesComponent } from './component/list/list-gear-box-types/list-gear-box-types.component';
 import { AddGearBoxTypeComponent } from './component/add/add-gear-box-type/add-gear-box-type.component';
 import { EditGearBoxTypeComponent } from './component/edit/edit-gear-box-type/edit-gear-box-type.component';
-
+import { ListCarsComponent } from './component/list/list-cars/list-cars.component';
+import { EditCarComponent } from './component/edit/edit-car/edit-car.component';
+import { AddCarComponent } from './component/add/add-car/add-car.component';
+import { FileSelectDirective } from 'ng2-file-upload';
 @NgModule({
   declarations: [
     AppComponent,
@@ -33,7 +36,11 @@ import { EditGearBoxTypeComponent } from './component/edit/edit-gear-box-type/ed
     AddFuelTypeComponent,
     ListGearBoxTypesComponent,
     AddGearBoxTypeComponent,
-    EditGearBoxTypeComponent
+    EditGearBoxTypeComponent,
+    ListCarsComponent,
+    EditCarComponent,
+    AddCarComponent,
+    FileSelectDirective
   ],
   imports: [
     BrowserModule,
@@ -51,17 +58,17 @@ import { EditGearBoxTypeComponent } from './component/edit/edit-gear-box-type/ed
     MaterialModule,
     HttpClientModule,
     MatDatepickerModule,
+
   ],
   entryComponents: [
-    ListBodyStylesComponent,
     AddBodyStyleComponent,
     EditBodyStyleComponent,
     EditFuelTypeComponent,
-    ListFuelTypeComponent,
     AddFuelTypeComponent,
-    ListGearBoxTypesComponent,
     AddGearBoxTypeComponent,
-    EditGearBoxTypeComponent
+    EditGearBoxTypeComponent,
+    EditCarComponent,
+    AddCarComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

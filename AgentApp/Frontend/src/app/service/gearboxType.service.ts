@@ -1,7 +1,7 @@
 import { GearBoxType } from './../model/gearboxType';
 import { FuelType } from './../model/fuelType';
 import { Router } from '@angular/router';
-import { BodyStyle } from './../model/bodystyle';
+import { BodyStyle } from '../model/bodyStyle';
 import { environment } from './../../environments/environment';
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';

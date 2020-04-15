@@ -4,7 +4,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { BodyStyle } from 'src/app/model/bodystyle';
+import { BodyStyle } from 'src/app/model/bodyStyle';
 
 @Component({
   selector: 'app-edit-body-style-component',

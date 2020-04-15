@@ -26,6 +26,15 @@ public class FuelTypeServiceImpl implements FuelTypeService {
     }
 
     @Override
+    public FuelType get(Long id) {
+        FuelType fuelType = fuelTypeRepository.findOneById(id);
+        if (fuelType == null) {
+            throw new InvalidFuelTypeDataException("This fuel type doesn't exist.");
+        }
+        return fuelType;
+    }
+
+    @Override
     public List<FuelTypeDTO> get() throws InvalidFuelTypeDataException {
         List<FuelType> fuelTypes = fuelTypeRepository.findAll();
         List<FuelTypeDTO> fuelTypeDTOS = new ArrayList<>();
@@ -36,7 +45,7 @@ public class FuelTypeServiceImpl implements FuelTypeService {
     }
 
     @Override
-    public FuelTypeDTO edit(FuelTypeDTO fuelTypeDTO) throws InvalidFuelTypeDataException {
+    public FuelTypeDTO edit(FuelTypeDTO fuelTypeDTO) {
         if (fuelTypeRepository.findByNameAndIdNot(fuelTypeDTO.getName(), fuelTypeDTO.getId()) != null) {
             throw new InvalidFuelTypeDataException("This Fuel Type already exist.");
         }
@@ -46,14 +55,15 @@ public class FuelTypeServiceImpl implements FuelTypeService {
     }
 
     @Override
-    public FuelTypeDTO delete(Long id) throws InvalidFuelTypeDataException {
+    public FuelTypeDTO delete(Long id) {
         FuelType fuelType = isEditable(id);
         fuelTypeRepository.deleteById(id);
         return new FuelTypeDTO(fuelType);
     }
 
-    private FuelType isEditable(Long id) throws InvalidFuelTypeDataException {
-        FuelType fuelType = fuelTypeRepository.getById(id);
+    private FuelType isEditable(Long id) {
+        FuelType fuelType = get(id);
+
         if (fuelType.getCars().isEmpty()) {
             return fuelType;
         }

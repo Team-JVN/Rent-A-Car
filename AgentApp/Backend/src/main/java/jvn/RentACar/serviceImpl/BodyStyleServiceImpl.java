@@ -19,15 +19,24 @@ public class BodyStyleServiceImpl implements BodyStyleService {
     private BodyStyleRepository bodyStyleRepository;
 
     @Override
-    public BodyStyleDTO create(CreateBodyStyleDTO createBodyStyleDTO) throws InvalidBodyStyleDataException {
+    public BodyStyle create(CreateBodyStyleDTO createBodyStyleDTO) {
         if (bodyStyleRepository.findByName(createBodyStyleDTO.getName()) != null) {
             throw new InvalidBodyStyleDataException("This Body Style already exist.", HttpStatus.BAD_REQUEST);
         }
-        return new BodyStyleDTO(bodyStyleRepository.save(new BodyStyle(createBodyStyleDTO.getName())));
+        return bodyStyleRepository.save(new BodyStyle(createBodyStyleDTO.getName()));
     }
 
     @Override
-    public List<BodyStyleDTO> get() throws InvalidBodyStyleDataException {
+    public BodyStyle get(Long id) {
+        BodyStyle bodyStyle = bodyStyleRepository.findOneById(id);
+        if (bodyStyle == null) {
+            throw new InvalidBodyStyleDataException("This body style doesn't exist.", HttpStatus.BAD_REQUEST);
+        }
+        return bodyStyle;
+    }
+
+    @Override
+    public List<BodyStyleDTO> get() {
         List<BodyStyle> bodyStyles = bodyStyleRepository.findAll();
         List<BodyStyleDTO> bodyStyleDTOS = new ArrayList<>();
         for (BodyStyle bodyStyle : bodyStyles) {
@@ -37,7 +46,7 @@ public class BodyStyleServiceImpl implements BodyStyleService {
     }
 
     @Override
-    public BodyStyleDTO edit(BodyStyleDTO bodyStyleDTO) throws InvalidBodyStyleDataException {
+    public BodyStyleDTO edit(BodyStyleDTO bodyStyleDTO) {
         if (bodyStyleRepository.findByNameAndIdNot(bodyStyleDTO.getName(), bodyStyleDTO.getId()) != null) {
             throw new InvalidBodyStyleDataException("This Body Stale already exist.", HttpStatus.BAD_REQUEST);
         }
@@ -47,14 +56,15 @@ public class BodyStyleServiceImpl implements BodyStyleService {
     }
 
     @Override
-    public BodyStyleDTO delete(Long id) throws InvalidBodyStyleDataException {
+    public BodyStyleDTO delete(Long id) {
         BodyStyle bodyStyle = isEditable(id);
         bodyStyleRepository.deleteById(id);
         return new BodyStyleDTO(bodyStyle);
     }
 
-    private BodyStyle isEditable(Long id) throws InvalidBodyStyleDataException {
-        BodyStyle bodyStyle = bodyStyleRepository.getById(id);
+    private BodyStyle isEditable(Long id) {
+        BodyStyle bodyStyle = get(id);
+
         if (bodyStyle.getCars().isEmpty()) {
             return bodyStyle;
         }

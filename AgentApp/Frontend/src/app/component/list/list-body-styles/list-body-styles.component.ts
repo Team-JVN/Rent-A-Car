@@ -1,6 +1,6 @@
 import { element } from 'protractor';
 import { BodyStyleService } from './../../../service/bodyStyle.service';
-import { BodyStyle } from './../../../model/bodystyle';
+import { BodyStyle } from '../../../model/bodyStyle';
 import { Component, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';

@@ -2,17 +2,19 @@ package jvn.RentACar.service;
 
 import jvn.RentACar.dto.both.FuelTypeDTO;
 import jvn.RentACar.dto.request.CreateFuelTypeDTO;
-import jvn.RentACar.exceptionHandler.InvalidFuelTypeDataException;
+import jvn.RentACar.model.FuelType;
 
 import java.util.List;
 
 public interface FuelTypeService {
 
-    FuelTypeDTO create(CreateFuelTypeDTO createFuelTypeDTO) throws InvalidFuelTypeDataException;
+    FuelTypeDTO create(CreateFuelTypeDTO createFuelTypeDTO);
 
-    List<FuelTypeDTO> get() throws InvalidFuelTypeDataException;
+    FuelType get(Long id);
 
-    FuelTypeDTO edit(FuelTypeDTO fuelTypeDTO) throws InvalidFuelTypeDataException;
+    List<FuelTypeDTO> get();
 
-    FuelTypeDTO delete(Long id) throws InvalidFuelTypeDataException;
+    FuelTypeDTO edit(FuelTypeDTO fuelTypeDTO);
+
+    FuelTypeDTO delete(Long id);
 }

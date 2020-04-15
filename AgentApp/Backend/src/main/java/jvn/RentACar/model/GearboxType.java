@@ -12,7 +12,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-public class GearBoxType {
+public class GearboxType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +24,7 @@ public class GearBoxType {
     @OneToMany(mappedBy = "gearBoxType", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Car> cars = new HashSet<>();
 
-    public GearBoxType(String name) {
+    public GearboxType(String name) {
         this.name = name;
     }
 }

@@ -15,5 +15,5 @@ public interface FuelTypeRepository extends JpaRepository<FuelType, Long> {
 
     List<FuelType> findAll();
 
-    FuelType getById(Long id);
+    FuelType findOneById(Long id);
 }

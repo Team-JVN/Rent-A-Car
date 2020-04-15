@@ -21,4 +21,8 @@ public class Picture {
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Car car;
+
+    public Picture(String data) {
+        this.data = data;
+    }
 }

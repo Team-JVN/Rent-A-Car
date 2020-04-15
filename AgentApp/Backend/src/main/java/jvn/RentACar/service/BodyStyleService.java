@@ -2,17 +2,19 @@ package jvn.RentACar.service;
 
 import jvn.RentACar.dto.both.BodyStyleDTO;
 import jvn.RentACar.dto.request.CreateBodyStyleDTO;
-import jvn.RentACar.exceptionHandler.InvalidBodyStyleDataException;
+import jvn.RentACar.model.BodyStyle;
 
 import java.util.List;
 
 public interface BodyStyleService {
 
-    BodyStyleDTO create(CreateBodyStyleDTO createBodyStyleDTO) throws InvalidBodyStyleDataException;
+    BodyStyle create(CreateBodyStyleDTO createBodyStyleDTO);
 
-    List<BodyStyleDTO> get() throws InvalidBodyStyleDataException;
+    BodyStyle get(Long id);
 
-    BodyStyleDTO edit(BodyStyleDTO bodyStyleDTO) throws InvalidBodyStyleDataException;
+    List<BodyStyleDTO> get();
 
-    BodyStyleDTO delete(Long id) throws InvalidBodyStyleDataException;
+    BodyStyleDTO edit(BodyStyleDTO bodyStyleDTO);
+
+    BodyStyleDTO delete(Long id);
 }

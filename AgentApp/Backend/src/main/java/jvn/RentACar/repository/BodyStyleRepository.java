@@ -15,5 +15,5 @@ public interface BodyStyleRepository extends JpaRepository<BodyStyle, Long> {
 
     List<BodyStyle> findAll();
 
-    BodyStyle getById(Long id);
+    BodyStyle findOneById(Long id);
 }

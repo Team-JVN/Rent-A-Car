@@ -9,6 +9,7 @@ export const environment = {
   bodyStyle: '/api/body-style',
   fuelType: '/api/fuel-type',
   gearBoxType: '/api/gearbox-type',
+  car: '/api/car',
 };
 
 /*

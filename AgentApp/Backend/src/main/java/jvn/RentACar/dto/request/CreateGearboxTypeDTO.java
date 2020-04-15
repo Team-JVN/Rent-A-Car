@@ -9,7 +9,7 @@ import javax.validation.constraints.NotEmpty;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CreateGearBoxTypeDTO {
+public class CreateGearboxTypeDTO {
 
     @NotEmpty(message = "Name is empty.")
     private String name;

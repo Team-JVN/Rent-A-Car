@@ -1,4 +1,4 @@
-import { FuelType } from './../model/fuelType';
+import { Car } from './../model/car';
 import { Router } from '@angular/router';
 import { BodyStyle } from '../model/bodyStyle';
 import { environment } from './../../environments/environment';
@@ -9,27 +9,28 @@ import { HttpClient } from '@angular/common/http';
 @Injectable({
     providedIn: 'root'
 })
-export class FuelTypeService {
-    url = environment.baseUrl + environment.fuelType;
-    updateSuccessEmitter = new Subject<FuelType>();
-    createSuccessEmitter = new Subject<FuelType>();
+export class CarService {
+    url = environment.baseUrl + environment.car;
+    updateSuccessEmitter = new Subject<Car>();
+    createSuccessEmitter = new Subject<Car>();
 
     constructor(private httpClient: HttpClient, private router: Router) { }
 
-    public create(fuelType: FuelType): any {
-        return this.httpClient.post(this.url, fuelType);
+    public create(formData: FormData): any {
+        return this.httpClient.post(this.url, formData);
     }
 
-    public edit(fuelType: FuelType): any {
-        return this.httpClient.put(this.url, fuelType);
+    public edit(car: Car): any {
+        return this.httpClient.put(this.url, car);
     }
 
-    public getFuelTypes() {
+    public getCars() {
         return this.httpClient.get(this.url);
     }
 
     public delete(id: number): any {
         return this.httpClient.delete(this.url + '/' + id);
     }
+
 
 }
