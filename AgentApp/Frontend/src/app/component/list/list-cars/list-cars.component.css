@@ -24,7 +24,7 @@ th.mat-header-cell{
     vertical-align: bottom;
 }
 
-span {
+.theader {
     font-weight: 550;
     display: inline-flex;
     vertical-align: middle;
@@ -47,6 +47,21 @@ span {
     height: 200px;
     text-align: center;
     vertical-align: middle;
+}
+
+.car-card-header{
+    display:inline-block;
+    width:100%;
+    vertical-align: middle;
+}
+
+.car-card-title{
+    float: left;
+}
+
+.car-card-buttons{
+    float:right;
+    margin-top: -6px;
 }
 
 mat-card-content {
