@@ -1,7 +1,7 @@
 <h1 mat-dialog-title>Add new Fuel Type</h1>
 <mat-dialog-content class="dialog-class">
     <form [formGroup]="createForm" class="form-full-width">
-        <mat-form-field class="form-full-width-td ml-2">
+        <mat-form-field class="form-full-width">
             <input matInput placeholder="Label" formControlName="name">
             <mat-error *ngIf="createForm.get('name').errors && createForm.get('name').errors['required']">
                 Please enter fuel type's name.
@@ -10,6 +10,7 @@
     </form>
 </mat-dialog-content>
 
-<mat-dialog-actions class="mt-3 mb-1">
-    <button mat-raised-button color="primary" (click)="create()" [disabled]="!createForm.valid">Add</button>
+<mat-dialog-actions align="end">
+    <button mat-raised-button color="primary" (click)="create()" class="mb-3"
+        [disabled]="!createForm.valid">Add</button>
 </mat-dialog-actions>
