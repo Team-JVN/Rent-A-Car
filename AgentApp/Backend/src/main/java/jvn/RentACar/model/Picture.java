@@ -16,13 +16,14 @@ public class Picture {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String data;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Car car;
 
-    public Picture(String data) {
+    public Picture(String data, Car car) {
         this.data = data;
+        this.car = car;
     }
 }

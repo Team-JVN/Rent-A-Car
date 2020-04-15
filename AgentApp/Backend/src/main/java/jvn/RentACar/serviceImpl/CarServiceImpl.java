@@ -1,28 +1,22 @@
 package jvn.RentACar.serviceImpl;
 
 import jvn.RentACar.dto.both.CarDTO;
-import jvn.RentACar.exceptionHandler.InvalidCarDataException;
+import jvn.RentACar.dto.both.CarWithPicturesDTO;
+import jvn.RentACar.mapper.CarMapperImpl;
 import jvn.RentACar.model.Car;
 import jvn.RentACar.model.Picture;
 import jvn.RentACar.repository.CarRepository;
-import jvn.RentACar.service.BodyStyleService;
-import jvn.RentACar.service.CarService;
-import jvn.RentACar.service.FuelTypeService;
-import jvn.RentACar.service.GearboxTypeService;
+import jvn.RentACar.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class CarServiceImpl implements CarService {
@@ -36,20 +30,42 @@ public class CarServiceImpl implements CarService {
 
     private GearboxTypeService gearboxTypeService;
 
+    private PictureService pictureService;
+
+    private CarMapperImpl carMapper;
+
     @Override
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public Car create(Car car, List<MultipartFile> multipartFiles) {
         //TODO: Set owner.
         car.setBodyStyle(bodyStyleService.get(car.getBodyStyle().getId()));
         car.setFuelType(fuelTypeService.get(car.getFuelType().getId()));
         car.setGearBoxType(gearboxTypeService.get(car.getGearBoxType().getId()));
-        car.setPictures(savePictures(multipartFiles));
-        return carRepository.save(car);
+        Car savedCar = carRepository.saveAndFlush(car);
+        pictureService.savePictures(multipartFiles, PATH, savedCar);
+        return savedCar;
     }
 
     @Override
-    public List<CarDTO> get() {
-        return null;
+    public Resource get(String fileName) {
+        return pictureService.loadFileAsResource(fileName, PATH);
     }
+
+    @Override
+    public List<CarWithPicturesDTO> get() {
+        List<Car> cars = carRepository.findAll();
+        List<CarWithPicturesDTO> carDTOList = new ArrayList<>();
+        for (Car car : cars) {
+            CarDTO carDTO = carMapper.convertToCarDto(car);
+            List<String> pictures = new ArrayList<>();
+            for (Picture picture : car.getPictures()) {
+                pictures.add(picture.getData());
+            }
+            carDTOList.add(new CarWithPicturesDTO(carDTO, pictures));
+        }
+        return carDTOList;
+    }
+
 
     @Override
     public CarDTO edit(CarDTO carDTO, List<MultipartFile> multipartFiles) {
@@ -61,36 +77,15 @@ public class CarServiceImpl implements CarService {
 
     }
 
-    private Set<Picture> savePictures(List<MultipartFile> multipartFiles) {
-        Set<Picture> pictures = new HashSet<>();
-        for (MultipartFile picture : multipartFiles) {
-
-            pictures.add(new Picture(savePicture(picture)));
-        }
-        return pictures;
-    }
-
-    private String savePicture(MultipartFile picture) {
-        String fileName = StringUtils.cleanPath(picture.getOriginalFilename());
-        try {
-            if (fileName.contains("..")) {
-                throw new InvalidCarDataException("Sorry! Filename contains invalid path sequence " + fileName);
-            }
-            Path fileStorageLocation = Paths.get(PATH);
-            Path targetLocation = fileStorageLocation.resolve(fileName);
-            Files.copy(picture.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-
-            return fileName;
-        } catch (IOException ex) {
-            throw new InvalidCarDataException("Could not store file " + fileName + ". Please try again!");
-        }
-    }
-
     @Autowired
-    public CarServiceImpl(CarRepository carRepository, BodyStyleService bodyStyleService, FuelTypeService fuelTypeService, GearboxTypeService gearboxTypeService) {
+    public CarServiceImpl(CarRepository carRepository, BodyStyleService bodyStyleService,
+                          FuelTypeService fuelTypeService, GearboxTypeService gearboxTypeService,
+                          PictureService pictureService, CarMapperImpl carMapper) {
         this.carRepository = carRepository;
         this.bodyStyleService = bodyStyleService;
         this.fuelTypeService = fuelTypeService;
         this.gearboxTypeService = gearboxTypeService;
+        this.pictureService = pictureService;
+        this.carMapper = carMapper;
     }
 }

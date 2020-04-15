@@ -2,19 +2,17 @@ package jvn.RentACar.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.RentACar.dto.both.CarDTO;
+import jvn.RentACar.dto.both.CarWithPicturesDTO;
 import jvn.RentACar.dto.request.CreateCarDTO;
 import jvn.RentACar.exceptionHandler.InvalidCarDataException;
-import jvn.RentACar.model.Car;
+import jvn.RentACar.mapper.CarMapperImpl;
 import jvn.RentACar.service.CarService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.ConstraintViolation;
@@ -27,14 +25,14 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping(value = "/api/car", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/car")
 public class CarController {
 
     private CarService carService;
 
-    private ModelMapper modelMapper;
+    private CarMapperImpl carMapper;
 
-    @PostMapping
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CarDTO> create(@RequestParam("carData") String jsonString, @RequestParam("files") List<MultipartFile> multipartFiles) throws ParseException {
 
         ObjectMapper mapper = new ObjectMapper();
@@ -45,29 +43,24 @@ public class CarController {
         } catch (IOException e) {
             throw new InvalidCarDataException("Please enter valid data.");
         }
-        CarDTO carDTO = convertToCarDto(carService.create(convertToEntity(createCarDTO), multipartFiles));
+        CarDTO carDTO = carMapper.convertToCarDto(carService.create(carMapper.convertToEntity(createCarDTO), multipartFiles));
         return new ResponseEntity<>(carDTO, HttpStatus.CREATED);
     }
 
+    @GetMapping
+    public ResponseEntity<List<CarWithPicturesDTO>> get() {
+        return new ResponseEntity<>(carService.get(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{id}/picture", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
+    public ResponseEntity<Resource> get(@PathVariable Long id, @RequestParam(value = "fileName", required = true) String fileName) {
+        return new ResponseEntity<>(carService.get(fileName), HttpStatus.OK);
+    }
+
     @Autowired
-    public CarController(CarService carService, ModelMapper modelMapper) {
+    public CarController(CarService carService, CarMapperImpl carMapper) {
         this.carService = carService;
-        this.modelMapper = modelMapper;
-    }
-
-    private CreateCarDTO convertToDto(Car car) {
-        CreateCarDTO createCarDTO = modelMapper.map(car, CreateCarDTO.class);
-        return createCarDTO;
-    }
-
-    private CarDTO convertToCarDto(Car car) {
-        CarDTO carDTO = modelMapper.map(car, CarDTO.class);
-        return carDTO;
-    }
-
-    private Car convertToEntity(CreateCarDTO createCarDTO) throws ParseException {
-        Car car = modelMapper.map(createCarDTO, Car.class);
-        return car;
+        this.carMapper = carMapper;
     }
 
     private void validateCreateCarDTO(CreateCarDTO createCarDTO) {

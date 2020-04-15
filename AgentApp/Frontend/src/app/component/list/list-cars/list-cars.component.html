@@ -11,54 +11,62 @@
         </div>
 
         <table mat-table [dataSource]="carsDataSource" class="mat-elevation-z8 table mt-3">
+
+            <ng-container matColumnDef="image">
+                <th mat-header-cell *matHeaderCellDef>Make</th>
+                <td mat-cell *matCellDef="let element">
+                    <img [src]="element.image" *ngIf="!element.isImageLoading; else noImageFound">
+                </td>
+            </ng-container>
             <ng-container matColumnDef="make">
                 <th mat-header-cell *matHeaderCellDef>Make</th>
                 <td mat-cell *matCellDef="let element">
-                    {{element.make}}
+                    {{element.carDTO.make}}
                 </td>
             </ng-container>
             <ng-container matColumnDef="model">
                 <th mat-header-cell *matHeaderCellDef>Model</th>
                 <td mat-cell *matCellDef="let element">
-                    {{element.model}}
+                    {{element.carDTO.model}}
                 </td>
             </ng-container>
             <ng-container matColumnDef="fuelType">
                 <th mat-header-cell *matHeaderCellDef>Fuel type</th>
                 <td mat-cell *matCellDef="let element">
-                    {{element.fuelType.name}}
+                    {{element.carDTO.fuelType.name}}
                 </td>
             </ng-container>
             <ng-container matColumnDef="gearBoxType">
                 <th mat-header-cell *matHeaderCellDef>Gearbox type</th>
                 <td mat-cell *matCellDef="let element">
-                    {{element.gearBoxType.name}}
+                    {{element.carDTO.gearBoxType.name}}
                 </td>
             </ng-container>
             <ng-container matColumnDef="bodyStyle">
                 <th mat-header-cell *matHeaderCellDef>Body style</th>
                 <td mat-cell *matCellDef="let element">
-                    {{element.bodyStyle.name}}
+                    {{element.carDTO.bodyStyle.name}}
                 </td>
             </ng-container>
             <ng-container matColumnDef="mileageInKm">
                 <th mat-header-cell *matHeaderCellDef>Mileage in kilometres</th>
                 <td mat-cell *matCellDef="let element">
-                    {{element.mileageInKm}}
+                    {{element.carDTO.mileageInKm}}
                 </td>
             </ng-container>
             <ng-container matColumnDef="kidsSeats">
                 <th mat-header-cell *matHeaderCellDef>Number of kid's seats</th>
                 <td mat-cell *matCellDef="let element">
-                    {{element.kidsSeats}}
+                    {{element.carDTO.kidsSeats}}
                 </td>
             </ng-container>
             <ng-container matColumnDef="availableTracking">
                 <th mat-header-cell *matHeaderCellDef>Available tracking</th>
                 <td mat-cell *matCellDef="let element">
-                    {{element.availableTracking}}
+                    {{element.carDTO.availableTracking}}
                 </td>
             </ng-container>
+
             <ng-container matColumnDef="buttons">
                 <th mat-header-cell *matHeaderCellDef class="buttons-width">&nbsp;</th>
                 <td mat-cell *matCellDef="let element">
@@ -77,4 +85,5 @@
             </tr>
         </table>
     </mat-card-content>
+
 </mat-card>

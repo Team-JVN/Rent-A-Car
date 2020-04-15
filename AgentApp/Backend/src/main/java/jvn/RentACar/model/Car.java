@@ -38,7 +38,7 @@ public class Car {
     @Column(nullable = false)
     private Integer kidsSeats;
 
-    @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "car", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Picture> pictures = new HashSet<>();
 
     @Column(nullable = false)
@@ -50,4 +50,8 @@ public class Car {
     @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Advertisement> advertisements = new HashSet<>();
 
+    public void addPicture(Picture picture) {
+        picture.setCar(this);
+        pictures.add(picture);
+    }
 }

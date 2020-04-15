@@ -108,7 +108,6 @@ export class AddCarComponent implements OnInit {
     );
   }
 
-
   onSelect(event) {
     this.files.push(...event.addedFiles);
   }

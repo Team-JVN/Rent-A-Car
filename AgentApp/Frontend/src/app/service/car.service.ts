@@ -3,8 +3,8 @@ import { Router } from '@angular/router';
 import { BodyStyle } from '../model/bodyStyle';
 import { environment } from './../../environments/environment';
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { Subject, Observable } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 @Injectable({
     providedIn: 'root'
@@ -22,6 +22,16 @@ export class CarService {
 
     public edit(car: Car): any {
         return this.httpClient.put(this.url + '/' + car.id, car);
+    }
+
+    public getPicture(fileName: string, id: number): Observable<Blob> {
+        let params = new HttpParams();
+        params = params.append('fileName', fileName);
+
+        return this.httpClient.get(this.url + '/' + id + '/picture', {
+            params: params,
+            responseType: 'blob'
+        });
     }
 
     public getCars() {
