@@ -1,5 +1,6 @@
 package jvn.RentACar.model;
 
+import jvn.RentACar.enumeration.LogicalStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +17,9 @@ public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
+    private LogicalStatus logicalStatus = LogicalStatus.EXISTING;
 
     @Column(nullable = false)
     private String make;

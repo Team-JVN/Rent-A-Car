@@ -15,8 +15,7 @@ import { EditCarComponent } from '../../edit/edit-car/edit-car.component';
   styleUrls: ['./list-cars.component.css']
 })
 export class ListCarsComponent implements OnInit {
-  displayedColumns: string[] = ['image', 'make', 'model', 'fuelType', 'gearBoxType', 'bodyStyle',
-    'mileageInKm', 'kidsSeats', 'availableTracking', 'buttons'];
+  displayedColumns: string[] = ['image', 'make', 'model', 'fuelType', 'gearBoxType', 'bodyStyle', 'buttons'];
   carsDataSource: MatTableDataSource<CarWithPicturesDTO>;
   successCreated: Subscription;
 

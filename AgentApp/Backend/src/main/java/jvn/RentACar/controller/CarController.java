@@ -41,7 +41,7 @@ public class CarController {
             createCarDTO = mapper.readValue(jsonString, CreateCarDTO.class);
             validateCreateCarDTO(createCarDTO);
         } catch (IOException e) {
-            throw new InvalidCarDataException("Please enter valid data.");
+            throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
         CarDTO carDTO = carMapper.convertToCarDto(carService.create(carMapper.convertToEntity(createCarDTO), multipartFiles));
         return new ResponseEntity<>(carDTO, HttpStatus.CREATED);
@@ -57,6 +57,12 @@ public class CarController {
         return new ResponseEntity<>(carService.get(fileName), HttpStatus.OK);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+        carService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
     @Autowired
     public CarController(CarService carService, CarMapperImpl carMapper) {
         this.carService = carService;
@@ -68,7 +74,7 @@ public class CarController {
         Validator validator = factory.getValidator();
         Set<ConstraintViolation<CreateCarDTO>> violations = validator.validate(createCarDTO);
         if (!violations.isEmpty()) {
-            throw new InvalidCarDataException("Please enter valid data.");
+            throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
     }
 }

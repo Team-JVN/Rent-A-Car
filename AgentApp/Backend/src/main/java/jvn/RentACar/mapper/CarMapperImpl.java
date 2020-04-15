@@ -13,11 +13,6 @@ import java.text.ParseException;
 public class CarMapperImpl {
     public ModelMapper modelMapper;
 
-    public CreateCarDTO convertToDto(Car car) {
-        CreateCarDTO createCarDTO = modelMapper.map(car, CreateCarDTO.class);
-        return createCarDTO;
-    }
-
     public CarDTO convertToCarDto(Car car) {
         CarDTO carDTO = modelMapper.map(car, CarDTO.class);
         return carDTO;

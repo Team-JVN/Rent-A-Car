@@ -11,6 +11,8 @@ import java.util.List;
 public interface CarService {
     Car create(Car car, List<MultipartFile> multipartFiles);
 
+    Car get(Long id);
+
     Resource get(String fileName);
 
     List<CarWithPicturesDTO> get();

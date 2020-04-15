@@ -57,14 +57,14 @@ public class PictureServiceImpl implements PictureService {
         String fileName = StringUtils.cleanPath(picture.getOriginalFilename());
         try {
             if (fileName.contains("..")) {
-                throw new InvalidCarDataException("Sorry! Filename contains invalid path sequence " + fileName);
+                throw new InvalidCarDataException("Sorry! Filename contains invalid path sequence " + fileName, HttpStatus.BAD_REQUEST);
             }
             Path fileStorageLocation = Paths.get(path);
             Path targetLocation = fileStorageLocation.resolve(id + "_" + fileName);
             Files.copy(picture.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
             return id + "_" + fileName;
         } catch (IOException ex) {
-            throw new InvalidCarDataException("Could not store file " + fileName + ". Please try again!");
+            throw new InvalidCarDataException("Could not store file " + fileName + ". Please try again!", HttpStatus.BAD_REQUEST);
         }
     }
 
