@@ -23,8 +23,8 @@ import { EditGearBoxTypeComponent } from './component/edit/edit-gear-box-type/ed
 import { ListCarsComponent } from './component/list/list-cars/list-cars.component';
 import { EditCarComponent } from './component/edit/edit-car/edit-car.component';
 import { AddCarComponent } from './component/add/add-car/add-car.component';
-import { FileSelectDirective } from 'ng2-file-upload';
 import { NgxDropzoneModule } from 'ngx-dropzone';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -41,7 +41,6 @@ import { NgxDropzoneModule } from 'ngx-dropzone';
     ListCarsComponent,
     EditCarComponent,
     AddCarComponent,
-    FileSelectDirective
   ],
   imports: [
     BrowserModule,
@@ -59,7 +58,7 @@ import { NgxDropzoneModule } from 'ngx-dropzone';
     MaterialModule,
     HttpClientModule,
     MatDatepickerModule,
-    NgxDropzoneModule
+    NgxDropzoneModule,
   ],
   entryComponents: [
     AddBodyStyleComponent,

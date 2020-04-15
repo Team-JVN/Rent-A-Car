@@ -1,10 +1,9 @@
-mat-card {
-  margin: 2em auto;
+.dialog-class {
   width: 600px;
 }
 
 ngx-dropzone{
-  width: 550px;
+  width: 520px;
 }
   
   .table {
@@ -21,9 +20,6 @@ ngx-dropzone{
 
   .form-full-width-right {
     width: 99%;
-  }
-  .form-full-width-body-style{
-    width: 84%;
   }
   .form-full-width-left {
     width: 90%;
