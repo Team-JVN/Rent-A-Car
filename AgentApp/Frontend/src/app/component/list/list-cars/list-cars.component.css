@@ -7,6 +7,56 @@ mat-card {
     width: 105px;
 }
 
-.table td {
+td.mat-cell{
+    border-bottom-style: none;
+}
+
+th.mat-header-cell{
+    border-bottom-style: none;
+}
+
+.car-table tr {
+    border-bottom: 1px solid #ddd;
+}
+
+.car-table th, .table td {
+    font-size: 16px;
+    vertical-align: bottom;
+}
+
+span {
+    font-weight: 550;
+    display: inline-flex;
     vertical-align: middle;
 }
+
+.item-card {
+    max-width: 950px;
+    display: inline-flex;
+    background-color: #F5F5F5;
+}
+
+.image {
+    max-width: 300px;
+    max-height: 200px;
+    border-radius: 5px;
+}
+
+.image-div {
+    width: 300px;
+    height: 200px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+mat-card-content {
+    margin-left: 16px;
+    margin-bottom: 0;
+}
+
+mat-card-header mat-card-title {
+    font-size: 24px;
+    font-weight: 550;
+}
+
+  
