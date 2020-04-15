@@ -14,7 +14,7 @@ public interface BodyStyleService {
 
     List<BodyStyleDTO> get();
 
-    BodyStyleDTO edit(BodyStyleDTO bodyStyleDTO);
+    BodyStyleDTO edit(Long id, BodyStyleDTO bodyStyleDTO);
 
     BodyStyleDTO delete(Long id);
 }

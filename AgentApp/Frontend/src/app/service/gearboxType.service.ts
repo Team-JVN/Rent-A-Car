@@ -22,7 +22,7 @@ export class GearboxTypeService {
     }
 
     public edit(gearBoxType: GearBoxType): any {
-        return this.httpClient.put(this.url, gearBoxType);
+        return this.httpClient.put(this.url + '/' + gearBoxType.id, gearBoxType);
     }
 
     public getGearboxTypes() {

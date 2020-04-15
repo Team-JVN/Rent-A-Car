@@ -15,7 +15,7 @@ public interface GearboxTypeService {
 
     List<GearboxTypeDTO> get() throws InvalidGearBoxTypeDataException;
 
-    GearboxTypeDTO edit(GearboxTypeDTO gearBoxTypeDTO) throws InvalidGearBoxTypeDataException;
+    GearboxTypeDTO edit(Long id, GearboxTypeDTO gearBoxTypeDTO) throws InvalidGearBoxTypeDataException;
 
     GearboxTypeDTO delete(Long id) throws InvalidGearBoxTypeDataException;
 }

@@ -20,7 +20,7 @@ export class BodyStyleService {
     }
 
     public edit(bodyStyle: BodyStyle): any {
-        return this.httpClient.put(this.url, bodyStyle);
+        return this.httpClient.put(this.url + '/' + bodyStyle.id, bodyStyle);
     }
 
     public getBodyStyles() {

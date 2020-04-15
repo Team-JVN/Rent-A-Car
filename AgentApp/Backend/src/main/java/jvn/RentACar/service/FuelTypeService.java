@@ -14,7 +14,7 @@ public interface FuelTypeService {
 
     List<FuelTypeDTO> get();
 
-    FuelTypeDTO edit(FuelTypeDTO fuelTypeDTO);
+    FuelTypeDTO edit(Long id, FuelTypeDTO fuelTypeDTO);
 
     FuelTypeDTO delete(Long id);
 }

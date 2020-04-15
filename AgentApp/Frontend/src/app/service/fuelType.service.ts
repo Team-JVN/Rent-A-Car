@@ -21,7 +21,7 @@ export class FuelTypeService {
     }
 
     public edit(fuelType: FuelType): any {
-        return this.httpClient.put(this.url, fuelType);
+        return this.httpClient.put(this.url + '/' + fuelType.id, fuelType);
     }
 
     public getFuelTypes() {

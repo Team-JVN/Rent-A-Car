@@ -32,9 +32,9 @@ public class BodyStyleController {
         return new ResponseEntity<>(bodyStyleService.get(), HttpStatus.OK);
     }
 
-    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<BodyStyleDTO> edit(@Valid @RequestBody BodyStyleDTO bodyStyleDTO) {
-        return new ResponseEntity<>(bodyStyleService.edit(bodyStyleDTO), HttpStatus.OK);
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<BodyStyleDTO> edit(@PathVariable Long id, @Valid @RequestBody BodyStyleDTO bodyStyleDTO) {
+        return new ResponseEntity<>(bodyStyleService.edit(id, bodyStyleDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

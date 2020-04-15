@@ -28,9 +28,9 @@ public class FuelTypeController {
         return new ResponseEntity<>(fuelTypeService.get(), HttpStatus.OK);
     }
 
-    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<FuelTypeDTO> edit(@Valid @RequestBody FuelTypeDTO fuelTypeDTO) {
-        return new ResponseEntity<>(fuelTypeService.edit(fuelTypeDTO), HttpStatus.OK);
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<FuelTypeDTO> edit(@PathVariable Long id, @Valid @RequestBody FuelTypeDTO fuelTypeDTO) {
+        return new ResponseEntity<>(fuelTypeService.edit(id, fuelTypeDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

@@ -28,9 +28,9 @@ public class GearboxTypeController {
         return new ResponseEntity<>(gearBoxTypeService.get(), HttpStatus.OK);
     }
 
-    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GearboxTypeDTO> edit(@Valid @RequestBody GearboxTypeDTO gearBoxTypeDTO) {
-        return new ResponseEntity<>(gearBoxTypeService.edit(gearBoxTypeDTO), HttpStatus.OK);
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GearboxTypeDTO> edit(@PathVariable Long id, @Valid @RequestBody GearboxTypeDTO gearBoxTypeDTO) {
+        return new ResponseEntity<>(gearBoxTypeService.edit(id, gearBoxTypeDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

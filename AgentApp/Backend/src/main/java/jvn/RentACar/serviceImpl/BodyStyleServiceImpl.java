@@ -30,7 +30,7 @@ public class BodyStyleServiceImpl implements BodyStyleService {
     public BodyStyle get(Long id) {
         BodyStyle bodyStyle = bodyStyleRepository.findOneById(id);
         if (bodyStyle == null) {
-            throw new InvalidBodyStyleDataException("This body style doesn't exist.", HttpStatus.BAD_REQUEST);
+            throw new InvalidBodyStyleDataException("This body style doesn't exist.", HttpStatus.NOT_FOUND);
         }
         return bodyStyle;
     }
@@ -46,8 +46,8 @@ public class BodyStyleServiceImpl implements BodyStyleService {
     }
 
     @Override
-    public BodyStyleDTO edit(BodyStyleDTO bodyStyleDTO) {
-        if (bodyStyleRepository.findByNameAndIdNot(bodyStyleDTO.getName(), bodyStyleDTO.getId()) != null) {
+    public BodyStyleDTO edit(Long id, BodyStyleDTO bodyStyleDTO) {
+        if (bodyStyleRepository.findByNameAndIdNot(bodyStyleDTO.getName(), id) != null) {
             throw new InvalidBodyStyleDataException("This Body Stale already exist.", HttpStatus.BAD_REQUEST);
         }
         BodyStyle bodyStyle = isEditable(bodyStyleDTO.getId());
@@ -68,7 +68,7 @@ public class BodyStyleServiceImpl implements BodyStyleService {
         if (bodyStyle.getCars().isEmpty()) {
             return bodyStyle;
         }
-        throw new InvalidBodyStyleDataException("There's at least one car with this body style so you can not edit it.", HttpStatus.BAD_REQUEST);
+        throw new InvalidBodyStyleDataException("There's at least one car with this body style so you can not edit it.", HttpStatus.FORBIDDEN);
     }
 
     @Autowired

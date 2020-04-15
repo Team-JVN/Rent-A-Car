@@ -7,6 +7,7 @@ import jvn.RentACar.model.GearboxType;
 import jvn.RentACar.repository.GearboxTypeRepository;
 import jvn.RentACar.service.GearboxTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class GearboxTypeServiceImpl implements GearboxTypeService {
     @Override
     public GearboxTypeDTO create(CreateGearboxTypeDTO createGearBoxTypeDTO) {
         if (gearBoxTypeRepository.findByName(createGearBoxTypeDTO.getName()) != null) {
-            throw new InvalidGearBoxTypeDataException("This Body Style already exist.");
+            throw new InvalidGearBoxTypeDataException("This Body Style already exist.", HttpStatus.FORBIDDEN);
         }
         return new GearboxTypeDTO(gearBoxTypeRepository.save(new GearboxType(createGearBoxTypeDTO.getName())));
     }
@@ -29,7 +30,7 @@ public class GearboxTypeServiceImpl implements GearboxTypeService {
     public GearboxType get(Long id) {
         GearboxType gearBoxType = gearBoxTypeRepository.findOneById(id);
         if (gearBoxType == null) {
-            throw new InvalidGearBoxTypeDataException("This gearbox type doesn't exist.");
+            throw new InvalidGearBoxTypeDataException("This gearbox type doesn't exist.", HttpStatus.NOT_FOUND);
         }
         return gearBoxType;
     }
@@ -45,9 +46,9 @@ public class GearboxTypeServiceImpl implements GearboxTypeService {
     }
 
     @Override
-    public GearboxTypeDTO edit(GearboxTypeDTO gearBoxTypeDTO) {
-        if (gearBoxTypeRepository.findByNameAndIdNot(gearBoxTypeDTO.getName(), gearBoxTypeDTO.getId()) != null) {
-            throw new InvalidGearBoxTypeDataException("This Gearbox Type already exist.");
+    public GearboxTypeDTO edit(Long id, GearboxTypeDTO gearBoxTypeDTO) {
+        if (gearBoxTypeRepository.findByNameAndIdNot(gearBoxTypeDTO.getName(), id) != null) {
+            throw new InvalidGearBoxTypeDataException("This Gearbox Type already exist.", HttpStatus.FORBIDDEN);
         }
         GearboxType bodyStyle = isEditable(gearBoxTypeDTO.getId());
         bodyStyle.setName(gearBoxTypeDTO.getName());
@@ -66,7 +67,7 @@ public class GearboxTypeServiceImpl implements GearboxTypeService {
         if (gearBoxType.getCars().isEmpty()) {
             return gearBoxType;
         }
-        throw new InvalidGearBoxTypeDataException("There's at least one car with this gearbox type so you can not edit it.");
+        throw new InvalidGearBoxTypeDataException("There's at least one car with this gearbox type so you can not edit it.", HttpStatus.FORBIDDEN);
     }
 
     @Autowired

@@ -26,13 +26,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(InvalidFuelTypeDataException.class)
     protected ResponseEntity<Object> handleInvalidFuelTypeDataException(InvalidFuelTypeDataException ex) {
-        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+        ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
         return buildResponseEntity(error);
     }
 
     @ExceptionHandler(InvalidGearBoxTypeDataException.class)
     protected ResponseEntity<Object> handleInvalidGearBoxTypeDataException(InvalidGearBoxTypeDataException ex) {
-        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+        ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
         return buildResponseEntity(error);
     }
 

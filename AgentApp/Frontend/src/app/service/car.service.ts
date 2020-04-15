@@ -21,7 +21,7 @@ export class CarService {
     }
 
     public edit(car: Car): any {
-        return this.httpClient.put(this.url, car);
+        return this.httpClient.put(this.url + '/' + car.id, car);
     }
 
     public getCars() {
