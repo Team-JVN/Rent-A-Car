@@ -13,6 +13,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 public class Car {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,7 +28,7 @@ public class Car {
     private FuelType fuelType;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private GearBoxType gearBoxType;
+    private GearboxType gearBoxType;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private BodyStyle bodyStyle;
@@ -45,7 +46,7 @@ public class Car {
     private Boolean availableTracking;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private User user;
+    private User owner;
 
     @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Advertisement> advertisements = new HashSet<>();
