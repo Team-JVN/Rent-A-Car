@@ -24,9 +24,7 @@ export class AddCarComponent implements OnInit {
   fuelTypes: FuelType[] = [];
   gearBoxTypes: GearBoxType[] = [];
   bodyStyles: BodyStyle[] = [];
-  myFiles: string[] = [];
-  urls = [];
-
+  files: File[] = [];
   constructor(private toastr: ToastrService, private carService: CarService, private fuelTypeService: FuelTypeService, private gearboxTypeService: GearboxTypeService,
     private bodyStyleService: BodyStyleService, private dialogRef: MatDialogRef<AddCarComponent>, private formBuilder: FormBuilder, ) { }
 
@@ -87,7 +85,7 @@ export class AddCarComponent implements OnInit {
       this.toastr.error("Please enter valid data", 'Create car');
       return;
     }
-    if (this.myFiles.length == 0) {
+    if (this.files.length == 0) {
       this.toastr.error("You have to choose at least one picture.", 'Create Car');
       return;
     }
@@ -96,8 +94,8 @@ export class AddCarComponent implements OnInit {
       this.carForm.value.mileageInKm, this.carForm.value.kidsSeats, this.carForm.value.availableTracking);
     formData.append("carData", JSON.stringify(car));
 
-    for (var i = 0; i < this.myFiles.length; i++) {
-      formData.append("files", this.myFiles[i]);
+    for (var i = 0; i < this.files.length; i++) {
+      formData.append("files", this.files[i]);
     }
     this.carService.create(formData).subscribe(
       (data: Car) => {
@@ -112,21 +110,12 @@ export class AddCarComponent implements OnInit {
     );
   }
 
-  onFileChanged(event) {
-    if (event.target.files.length > 5) {
-      this.toastr.error("You can choose just 5 pictures.", 'Create Car');
-      return;
-    }
-    this.urls = [];
-    for (var i = 0; i < event.target.files.length; i++) {
-      this.myFiles.push(event.target.files[i]);
-      var reader = new FileReader();
-      reader.onload = (event: any) => {
-        this.urls.push(event.target.result);
-      }
 
-      reader.readAsDataURL(event.target.files[i]);
-    }
+  onSelect(event) {
+    this.files.push(...event.addedFiles);
   }
 
+  onRemove(event) {
+    this.files.splice(this.files.indexOf(event), 1);
+  }
 }

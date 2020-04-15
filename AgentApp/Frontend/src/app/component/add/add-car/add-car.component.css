@@ -1,6 +1,10 @@
 mat-card {
-    max-width: 800px;
-    margin: 2em auto;
+  margin: 2em auto;
+  width: 600px;
+}
+
+ngx-dropzone{
+  width: 550px;
 }
   
   .table {
