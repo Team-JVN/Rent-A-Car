@@ -1,3 +1,4 @@
+import { CarEdit } from './../model/carEdit';
 import { Car } from './../model/car';
 import { Router } from '@angular/router';
 import { BodyStyle } from '../model/bodyStyle';
@@ -20,8 +21,12 @@ export class CarService {
         return this.httpClient.post(this.url, formData);
     }
 
-    public edit(car: Car): any {
-        return this.httpClient.put(this.url + '/' + car.id, car);
+    public edit(formData: FormData, id: number): any {
+        return this.httpClient.put(this.url + '/' + id, formData);
+    }
+
+    public editPartial(formData: FormData, id: number): any {
+        return this.httpClient.put(this.url + '/' + id + '/partial', formData);
     }
 
     public getPicture(fileName: string, id: number): Observable<Blob> {
@@ -32,6 +37,10 @@ export class CarService {
             params: params,
             responseType: 'blob'
         });
+    }
+
+    public getEditType(id: number) {
+        return this.httpClient.get(this.url + '/' + id + '/edit');
     }
 
     public getCars() {

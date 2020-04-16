@@ -1,24 +1,24 @@
 .dialog-class {
-  width: 600px;
+    width: 600px;
+}
+  
+ngx-dropzone{
+width: 520px;
 }
 
-ngx-dropzone{
-  width: 520px;
-}
-  
 .table {
-  margin-bottom: 0;
+margin-bottom: 0;
 }
-  
+    
 .form-full-width {
-  width: 100%;
+    width: 100%;
 }
 
 .form-full-width-right {
-  width: 99%;
+    width: 99%;
 }
 .form-full-width-left {
-  width: 90%;
+    width: 90%;
 }
 /* Hides arrow buttons in input type="number" */
 /* Chrome, Safari, Edge, Opera */

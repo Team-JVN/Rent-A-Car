@@ -24,6 +24,7 @@ import { ListCarsComponent } from './component/list/list-cars/list-cars.componen
 import { EditCarComponent } from './component/edit/edit-car/edit-car.component';
 import { AddCarComponent } from './component/add/add-car/add-car.component';
 import { NgxDropzoneModule } from 'ngx-dropzone';
+import { EditCarPartialComponent } from './component/edit/edit-car-partial/edit-car-partial.component';
 
 @NgModule({
   declarations: [
@@ -41,6 +42,7 @@ import { NgxDropzoneModule } from 'ngx-dropzone';
     ListCarsComponent,
     EditCarComponent,
     AddCarComponent,
+    EditCarPartialComponent,
   ],
   imports: [
     BrowserModule,
@@ -68,7 +70,8 @@ import { NgxDropzoneModule } from 'ngx-dropzone';
     AddGearBoxTypeComponent,
     EditGearBoxTypeComponent,
     EditCarComponent,
-    AddCarComponent
+    AddCarComponent,
+    EditCarPartialComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

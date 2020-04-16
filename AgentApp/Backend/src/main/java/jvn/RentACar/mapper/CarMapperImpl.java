@@ -23,6 +23,10 @@ public class CarMapperImpl {
         return car;
     }
 
+    public Car convertToEntity(CarDTO carDTO) throws ParseException {
+        Car car = modelMapper.map(carDTO, Car.class);
+        return car;
+    }
 
     @Autowired
     public CarMapperImpl(ModelMapper modelMapper) {

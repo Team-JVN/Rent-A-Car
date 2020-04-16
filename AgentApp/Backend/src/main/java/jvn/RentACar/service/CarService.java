@@ -2,6 +2,8 @@ package jvn.RentACar.service;
 
 import jvn.RentACar.dto.both.CarDTO;
 import jvn.RentACar.dto.both.CarWithPicturesDTO;
+import jvn.RentACar.dto.request.CarEditDTO;
+import jvn.RentACar.enumeration.EditType;
 import jvn.RentACar.model.Car;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,7 +19,11 @@ public interface CarService {
 
     List<CarWithPicturesDTO> get();
 
-    CarDTO edit(CarDTO carDTO, List<MultipartFile> multipartFiles);
+    Car editAll(Long id, CarDTO carDTO, List<MultipartFile> multipartFiles);
+
+    Car editPartial(Long id, CarEditDTO carDTO, List<MultipartFile> multipartFiles);
 
     void delete(Long id);
+
+    EditType getEditType(Long id);
 }

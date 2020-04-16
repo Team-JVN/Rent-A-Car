@@ -1,3 +1,4 @@
+import { EditCarPartialComponent } from './../../edit/edit-car-partial/edit-car-partial.component';
 import { CarWithPicturesDTO } from './../../../model/carWithPictures';
 import { AddCarComponent } from './../../add/add-car/add-car.component';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -41,7 +42,7 @@ export class ListCarsComponent implements OnInit {
         carWithPicturesDTO.isImageLoading = false;
       },
       (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Create Car');
+        this.toastr.error(httpErrorResponse.error.message, 'Get picture');
       }
 
     );
@@ -75,7 +76,21 @@ export class ListCarsComponent implements OnInit {
   }
 
   edit(element: CarWithPicturesDTO) {
-    this.dialog.open(EditCarComponent, { data: element });
+    this.carService.getEditType(element.carDTO.id).subscribe(
+      (data: string) => {
+        if (data === "ALL") {
+          this.dialog.open(EditCarComponent, { data: element });
+        } else {
+          this.dialog.open(EditCarPartialComponent, { data: element });
+        }
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        const data: CarWithPicturesDTO[] = []
+        this.carsDataSource = new MatTableDataSource(data)
+        this.toastr.error(httpErrorResponse.error.message, 'Show Cars');
+      }
+    );
+
   }
 
   openDialog() {

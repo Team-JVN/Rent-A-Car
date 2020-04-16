@@ -2,6 +2,8 @@ package jvn.RentACar.serviceImpl;
 
 import jvn.RentACar.dto.both.CarDTO;
 import jvn.RentACar.dto.both.CarWithPicturesDTO;
+import jvn.RentACar.dto.request.CarEditDTO;
+import jvn.RentACar.enumeration.EditType;
 import jvn.RentACar.enumeration.LogicalStatus;
 import jvn.RentACar.exceptionHandler.InvalidCarDataException;
 import jvn.RentACar.mapper.CarMapperImpl;
@@ -42,6 +44,9 @@ public class CarServiceImpl implements CarService {
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public Car create(Car car, List<MultipartFile> multipartFiles) {
         //TODO: Set owner.
+        if (multipartFiles.size() > 5) {
+            throw new InvalidCarDataException("You can choose just 5 pictures.", HttpStatus.BAD_REQUEST);
+        }
         car.setBodyStyle(bodyStyleService.get(car.getBodyStyle().getId()));
         car.setFuelType(fuelTypeService.get(car.getFuelType().getId()));
         car.setGearBoxType(gearboxTypeService.get(car.getGearBoxType().getId()));
@@ -70,10 +75,41 @@ public class CarServiceImpl implements CarService {
         return carDTOList;
     }
 
+    @Override
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+    public Car editAll(Long id, CarDTO carDTO, List<MultipartFile> multipartFiles) {
+        isEditable(id);
+        if (multipartFiles.size() > 5) {
+            throw new InvalidCarDataException("You can choose just 5 pictures.", HttpStatus.BAD_REQUEST);
+        }
+        Car car = get(id);
+        car.setMake(carDTO.getMake());
+        car.setModel(carDTO.getModel());
+        car.setBodyStyle(bodyStyleService.get(carDTO.getBodyStyle().getId()));
+        car.setFuelType(fuelTypeService.get(carDTO.getFuelType().getId()));
+        car.setGearBoxType(gearboxTypeService.get(carDTO.getGearBoxType().getId()));
+        car.setMileageInKm(carDTO.getMileageInKm());
+        car.setKidsSeats(carDTO.getKidsSeats());
+        car.setAvailableTracking(carDTO.getAvailableTracking());
+        Car newCar = carRepository.save(car);
+        pictureService.editCarPictures(multipartFiles, PATH, car);
+        return newCar;
+    }
 
     @Override
-    public CarDTO edit(CarDTO carDTO, List<MultipartFile> multipartFiles) {
-        return null;
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+    public Car editPartial(Long id, CarEditDTO carDTO, List<MultipartFile> multipartFiles) {
+        isEditable(id);
+        if (multipartFiles.size() > 5) {
+            throw new InvalidCarDataException("You can choose just 5 pictures.", HttpStatus.BAD_REQUEST);
+        }
+        Car car = get(id);
+        car.setMileageInKm(carDTO.getMileageInKm());
+        car.setKidsSeats(carDTO.getKidsSeats());
+        car.setAvailableTracking(carDTO.getAvailableTracking());
+        Car newCar = carRepository.save(car);
+        pictureService.editCarPictures(multipartFiles, PATH, car);
+        return newCar;
     }
 
     @Override
@@ -82,6 +118,16 @@ public class CarServiceImpl implements CarService {
         Car car = get(id);
         car.setLogicalStatus(LogicalStatus.DELETED);
         carRepository.save(car);
+    }
+
+    @Override
+    public EditType getEditType(Long id) {
+        try {
+            isEditable(id);
+        } catch (InvalidCarDataException ex) {
+            return EditType.PARTIAL;
+        }
+        return EditType.ALL;
     }
 
     @Override

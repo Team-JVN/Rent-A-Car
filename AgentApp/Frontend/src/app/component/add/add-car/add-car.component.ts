@@ -83,8 +83,8 @@ export class AddCarComponent implements OnInit {
       this.toastr.error("Please enter valid data", 'Create car');
       return;
     }
-    if (this.files.length == 0) {
-      this.toastr.error("You have to choose at least one picture.", 'Create Car');
+    if (this.files.length == 0 || this.files.length > 5) {
+      this.toastr.error("You have to choose at least one picture.Max number of pictures is 5.", 'Create Car');
       return;
     }
     const formData = new FormData();

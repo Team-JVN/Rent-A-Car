@@ -3,7 +3,9 @@ package jvn.RentACar.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.RentACar.dto.both.CarDTO;
 import jvn.RentACar.dto.both.CarWithPicturesDTO;
+import jvn.RentACar.dto.request.CarEditDTO;
 import jvn.RentACar.dto.request.CreateCarDTO;
+import jvn.RentACar.enumeration.EditType;
 import jvn.RentACar.exceptionHandler.InvalidCarDataException;
 import jvn.RentACar.mapper.CarMapperImpl;
 import jvn.RentACar.service.CarService;
@@ -63,6 +65,42 @@ public class CarController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @GetMapping(value = "/{id}/edit", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<EditType> getEditType(@PathVariable Long id) {
+        return new ResponseEntity<>(carService.getEditType(id), HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CarDTO> editAll(@PathVariable Long id, @RequestParam("carData") String jsonString, @RequestParam("files")
+            List<MultipartFile> multipartFiles) throws ParseException {
+
+        ObjectMapper mapper = new ObjectMapper();
+        CarDTO carDTO = null;
+        try {
+            carDTO = mapper.readValue(jsonString, CarDTO.class);
+            validateCarDTO(carDTO);
+        } catch (IOException e) {
+            throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
+        }
+        CarDTO newCarDTO = carMapper.convertToCarDto(carService.editAll(id, carDTO, multipartFiles));
+        return new ResponseEntity<>(newCarDTO, HttpStatus.CREATED);
+    }
+
+    @PutMapping(value = "/{id}/partial", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CarDTO> editPartial(@PathVariable Long id, @RequestParam("carData") String jsonString, @RequestParam("files")
+            List<MultipartFile> multipartFiles) throws ParseException {
+        ObjectMapper mapper = new ObjectMapper();
+        CarEditDTO carEditDTO = null;
+        try {
+            carEditDTO = mapper.readValue(jsonString, CarEditDTO.class);
+            validateCarEditDTO(carEditDTO);
+        } catch (IOException e) {
+            throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
+        }
+        CarDTO newCarDTO = carMapper.convertToCarDto(carService.editPartial(id, carEditDTO, multipartFiles));
+        return new ResponseEntity<>(newCarDTO, HttpStatus.CREATED);
+    }
+
     @Autowired
     public CarController(CarService carService, CarMapperImpl carMapper) {
         this.carService = carService;
@@ -73,6 +111,24 @@ public class CarController {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
         Set<ConstraintViolation<CreateCarDTO>> violations = validator.validate(createCarDTO);
+        if (!violations.isEmpty()) {
+            throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private void validateCarDTO(CarDTO carDTO) {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+        Set<ConstraintViolation<CarDTO>> violations = validator.validate(carDTO);
+        if (!violations.isEmpty()) {
+            throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private void validateCarEditDTO(CarEditDTO carDTO) {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+        Set<ConstraintViolation<CarEditDTO>> violations = validator.validate(carDTO);
         if (!violations.isEmpty()) {
             throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
