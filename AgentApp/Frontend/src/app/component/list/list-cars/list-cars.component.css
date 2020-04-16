@@ -31,9 +31,10 @@ th.mat-header-cell{
 }
 
 .item-card {
-    max-width: 950px;
+    width: 100%;
     display: inline-flex;
-    background-color: #F5F5F5;
+    background-color: #F5F5F5;    
+    margin: 0.7em auto;
 }
 
 .image {
