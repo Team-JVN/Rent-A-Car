@@ -37,7 +37,7 @@ public class PictureServiceImpl implements PictureService {
             Path fileStorageLocation = Paths.get(path);
             Path filePath = fileStorageLocation.resolve(fileName).normalize();
             Resource resource = new UrlResource(filePath.toUri());
-
+            resource.getFilename();
             if (resource.exists()) {
                 return resource;
             } else {
@@ -62,7 +62,7 @@ public class PictureServiceImpl implements PictureService {
         Set<Picture> pictureForDeleting = car.getPictures();
         Long carId = car.getId();
         for (MultipartFile picture : multipartFiles) {
-            String fileName = carId + "_" + StringUtils.cleanPath(picture.getOriginalFilename());
+            String fileName = StringUtils.cleanPath(picture.getOriginalFilename());
             Picture pictureData = pictureRepository.findByDataAndCarId(fileName, carId);
             if (pictureData == null) {
                 pictureData = new Picture(savePictureOnDisk(picture, path, car.getId()), car);

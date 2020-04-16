@@ -38,6 +38,7 @@ export class ListCarsComponent implements OnInit {
   getPicture(carWithPicturesDTO: CarWithPicturesDTO) {
     this.carService.getPicture(carWithPicturesDTO.pictures[0], carWithPicturesDTO.carDTO.id).subscribe(
       (data) => {
+        console.log(data);
         this.createImageFromBlob(data, carWithPicturesDTO);
         carWithPicturesDTO.isImageLoading = false;
       },

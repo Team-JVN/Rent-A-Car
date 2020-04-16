@@ -155,9 +155,10 @@ export class EditCarComponent implements OnInit {
   fetchPictures() {
     this.selectedItem.pictures.forEach(element => {
       this.carService.getPicture(element, this.selectedItem.carDTO.id).subscribe(
-        (data: File) => {
-
-          this.files.push(data);
+        (data: Blob) => {
+          data.type
+          const file = new File([data], element, { type: data.type });
+          this.files.push(file);
         },
         (httpErrorResponse: HttpErrorResponse) => {
           this.toastr.error(httpErrorResponse.error.message, 'Get picture');
