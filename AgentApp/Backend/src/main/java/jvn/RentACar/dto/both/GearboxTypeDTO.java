@@ -1,6 +1,5 @@
 package jvn.RentACar.dto.both;
 
-import jvn.RentACar.model.GearboxType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,8 +17,4 @@ public class GearboxTypeDTO {
     @NotEmpty(message = "Name is empty.")
     private String name;
 
-    public GearboxTypeDTO(GearboxType gearBoxType) {
-        this.id = gearBoxType.getId();
-        this.name = gearBoxType.getName();
-    }
 }

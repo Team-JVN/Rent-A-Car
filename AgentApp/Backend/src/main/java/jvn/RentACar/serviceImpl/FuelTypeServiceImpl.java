@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,11 +18,11 @@ public class FuelTypeServiceImpl implements FuelTypeService {
     private FuelTypeRepository fuelTypeRepository;
 
     @Override
-    public FuelTypeDTO create(CreateFuelTypeDTO createFuelTypeDTO) throws InvalidFuelTypeDataException {
+    public FuelType create(CreateFuelTypeDTO createFuelTypeDTO) throws InvalidFuelTypeDataException {
         if (fuelTypeRepository.findByName(createFuelTypeDTO.getName()) != null) {
             throw new InvalidFuelTypeDataException("This Fuel Type already exist.", HttpStatus.FORBIDDEN);
         }
-        return new FuelTypeDTO(fuelTypeRepository.save(new FuelType(createFuelTypeDTO.getName())));
+        return fuelTypeRepository.save(new FuelType(createFuelTypeDTO.getName()));
     }
 
     @Override
@@ -36,30 +35,24 @@ public class FuelTypeServiceImpl implements FuelTypeService {
     }
 
     @Override
-    public List<FuelTypeDTO> get() throws InvalidFuelTypeDataException {
-        List<FuelType> fuelTypes = fuelTypeRepository.findAll();
-        List<FuelTypeDTO> fuelTypeDTOS = new ArrayList<>();
-        for (FuelType fuelType : fuelTypes) {
-            fuelTypeDTOS.add(new FuelTypeDTO(fuelType));
-        }
-        return fuelTypeDTOS;
+    public List<FuelType> get() throws InvalidFuelTypeDataException {
+        return fuelTypeRepository.findAll();
     }
 
     @Override
-    public FuelTypeDTO edit(Long id, FuelTypeDTO fuelTypeDTO) {
+    public FuelType edit(Long id, FuelTypeDTO fuelTypeDTO) {
         if (fuelTypeRepository.findByNameAndIdNot(fuelTypeDTO.getName(), id) != null) {
             throw new InvalidFuelTypeDataException("This Fuel Type already exist.", HttpStatus.FORBIDDEN);
         }
         FuelType fuelType = isEditable(fuelTypeDTO.getId());
         fuelType.setName(fuelTypeDTO.getName());
-        return new FuelTypeDTO(fuelTypeRepository.save(fuelType));
+        return fuelTypeRepository.save(fuelType);
     }
 
     @Override
-    public FuelTypeDTO delete(Long id) {
-        FuelType fuelType = isEditable(id);
+    public void delete(Long id) {
+        isEditable(id);
         fuelTypeRepository.deleteById(id);
-        return new FuelTypeDTO(fuelType);
     }
 
     private FuelType isEditable(Long id) {

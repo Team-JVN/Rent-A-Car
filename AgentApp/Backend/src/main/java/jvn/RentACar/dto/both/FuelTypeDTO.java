@@ -1,6 +1,5 @@
 package jvn.RentACar.dto.both;
 
-import jvn.RentACar.model.FuelType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,9 +17,4 @@ public class FuelTypeDTO {
 
     @NotEmpty(message = "Name is empty.")
     private String name;
-
-    public FuelTypeDTO(FuelType fuelType) {
-        this.id = fuelType.getId();
-        this.name = fuelType.getName();
-    }
 }

@@ -8,13 +8,13 @@ import java.util.List;
 
 public interface FuelTypeService {
 
-    FuelTypeDTO create(CreateFuelTypeDTO createFuelTypeDTO);
+    FuelType create(CreateFuelTypeDTO createFuelTypeDTO);
 
     FuelType get(Long id);
 
-    List<FuelTypeDTO> get();
+    List<FuelType> get();
 
-    FuelTypeDTO edit(Long id, FuelTypeDTO fuelTypeDTO);
+    FuelType edit(Long id, FuelTypeDTO fuelTypeDTO);
 
-    FuelTypeDTO delete(Long id);
+    void delete(Long id);
 }

@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,11 +18,11 @@ public class GearboxTypeServiceImpl implements GearboxTypeService {
     private GearboxTypeRepository gearBoxTypeRepository;
 
     @Override
-    public GearboxTypeDTO create(CreateGearboxTypeDTO createGearBoxTypeDTO) {
+    public GearboxType create(CreateGearboxTypeDTO createGearBoxTypeDTO) {
         if (gearBoxTypeRepository.findByName(createGearBoxTypeDTO.getName()) != null) {
             throw new InvalidGearBoxTypeDataException("This Body Style already exist.", HttpStatus.FORBIDDEN);
         }
-        return new GearboxTypeDTO(gearBoxTypeRepository.save(new GearboxType(createGearBoxTypeDTO.getName())));
+        return gearBoxTypeRepository.save(new GearboxType(createGearBoxTypeDTO.getName()));
     }
 
     @Override
@@ -36,30 +35,24 @@ public class GearboxTypeServiceImpl implements GearboxTypeService {
     }
 
     @Override
-    public List<GearboxTypeDTO> get() {
-        List<GearboxType> gearBoxTypes = gearBoxTypeRepository.findAll();
-        List<GearboxTypeDTO> gearBoxTypeDTOS = new ArrayList<>();
-        for (GearboxType bodyStyle : gearBoxTypes) {
-            gearBoxTypeDTOS.add(new GearboxTypeDTO(bodyStyle));
-        }
-        return gearBoxTypeDTOS;
+    public List<GearboxType> get() {
+        return gearBoxTypeRepository.findAll();
     }
 
     @Override
-    public GearboxTypeDTO edit(Long id, GearboxTypeDTO gearBoxTypeDTO) {
+    public GearboxType edit(Long id, GearboxTypeDTO gearBoxTypeDTO) {
         if (gearBoxTypeRepository.findByNameAndIdNot(gearBoxTypeDTO.getName(), id) != null) {
             throw new InvalidGearBoxTypeDataException("This Gearbox Type already exist.", HttpStatus.FORBIDDEN);
         }
         GearboxType bodyStyle = isEditable(gearBoxTypeDTO.getId());
         bodyStyle.setName(gearBoxTypeDTO.getName());
-        return new GearboxTypeDTO(gearBoxTypeRepository.save(bodyStyle));
+        return gearBoxTypeRepository.save(bodyStyle);
     }
 
     @Override
-    public GearboxTypeDTO delete(Long id) {
-        GearboxType gearBoxType = isEditable(id);
+    public void delete(Long id) {
+        isEditable(id);
         gearBoxTypeRepository.deleteById(id);
-        return new GearboxTypeDTO(gearBoxType);
     }
 
     private GearboxType isEditable(Long id) {

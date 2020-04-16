@@ -12,9 +12,9 @@ public interface BodyStyleService {
 
     BodyStyle get(Long id);
 
-    List<BodyStyleDTO> get();
+    List<BodyStyle> get();
 
-    BodyStyleDTO edit(Long id, BodyStyleDTO bodyStyleDTO);
+    BodyStyle edit(Long id, BodyStyleDTO bodyStyleDTO);
 
-    BodyStyleDTO delete(Long id);
+    void delete(Long id);
 }

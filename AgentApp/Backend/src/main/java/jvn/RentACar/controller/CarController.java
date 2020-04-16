@@ -7,7 +7,8 @@ import jvn.RentACar.dto.request.CarEditDTO;
 import jvn.RentACar.dto.request.CreateCarDTO;
 import jvn.RentACar.enumeration.EditType;
 import jvn.RentACar.exceptionHandler.InvalidCarDataException;
-import jvn.RentACar.mapper.CarMapperImpl;
+import jvn.RentACar.mapper.CarDtoMapper;
+import jvn.RentACar.mapper.CreateCarDtoMapper;
 import jvn.RentACar.service.CarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -32,7 +33,9 @@ public class CarController {
 
     private CarService carService;
 
-    private CarMapperImpl carMapper;
+    private CarDtoMapper carMapper;
+
+    private CreateCarDtoMapper createCarDtoMapper;
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CarDTO> create(@RequestParam("carData") String jsonString, @RequestParam("files") List<MultipartFile> multipartFiles) throws ParseException {
@@ -45,7 +48,7 @@ public class CarController {
         } catch (IOException e) {
             throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
-        CarDTO carDTO = carMapper.convertToCarDto(carService.create(carMapper.convertToEntity(createCarDTO), multipartFiles));
+        CarDTO carDTO = carMapper.toDto(carService.create(createCarDtoMapper.toEntity(createCarDTO), multipartFiles));
         return new ResponseEntity<>(carDTO, HttpStatus.CREATED);
     }
 
@@ -82,8 +85,8 @@ public class CarController {
         } catch (IOException e) {
             throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
-        CarDTO newCarDTO = carMapper.convertToCarDto(carService.editAll(id, carDTO, multipartFiles));
-        return new ResponseEntity<>(newCarDTO, HttpStatus.CREATED);
+        CarDTO newCarDTO = carMapper.toDto(carService.editAll(id, carDTO, multipartFiles));
+        return new ResponseEntity<>(newCarDTO, HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}/partial", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -97,15 +100,10 @@ public class CarController {
         } catch (IOException e) {
             throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
-        CarDTO newCarDTO = carMapper.convertToCarDto(carService.editPartial(id, carEditDTO, multipartFiles));
-        return new ResponseEntity<>(newCarDTO, HttpStatus.CREATED);
+        CarDTO newCarDTO = carMapper.toDto(carService.editPartial(id, carEditDTO, multipartFiles));
+        return new ResponseEntity<>(newCarDTO, HttpStatus.OK);
     }
 
-    @Autowired
-    public CarController(CarService carService, CarMapperImpl carMapper) {
-        this.carService = carService;
-        this.carMapper = carMapper;
-    }
 
     private void validateCreateCarDTO(CreateCarDTO createCarDTO) {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -132,5 +130,12 @@ public class CarController {
         if (!violations.isEmpty()) {
             throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @Autowired
+    public CarController(CarService carService, CarDtoMapper carMapper, CreateCarDtoMapper createCarDtoMapper) {
+        this.carService = carService;
+        this.carMapper = carMapper;
+        this.createCarDtoMapper = createCarDtoMapper;
     }
 }

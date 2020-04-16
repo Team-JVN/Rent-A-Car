@@ -6,7 +6,7 @@ import jvn.RentACar.dto.request.CarEditDTO;
 import jvn.RentACar.enumeration.EditType;
 import jvn.RentACar.enumeration.LogicalStatus;
 import jvn.RentACar.exceptionHandler.InvalidCarDataException;
-import jvn.RentACar.mapper.CarMapperImpl;
+import jvn.RentACar.mapper.CarDtoMapper;
 import jvn.RentACar.model.Car;
 import jvn.RentACar.model.Picture;
 import jvn.RentACar.repository.CarRepository;
@@ -38,7 +38,7 @@ public class CarServiceImpl implements CarService {
 
     private PictureService pictureService;
 
-    private CarMapperImpl carMapper;
+    private CarDtoMapper carMapper;
 
     @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
@@ -65,7 +65,7 @@ public class CarServiceImpl implements CarService {
         List<Car> cars = carRepository.findAllByLogicalStatusNot(LogicalStatus.DELETED);
         List<CarWithPicturesDTO> carDTOList = new ArrayList<>();
         for (Car car : cars) {
-            CarDTO carDTO = carMapper.convertToCarDto(car);
+            CarDTO carDTO = carMapper.toDto(car);
             List<String> pictures = new ArrayList<>();
             for (Picture picture : car.getPictures()) {
                 pictures.add(picture.getData());
@@ -148,7 +148,7 @@ public class CarServiceImpl implements CarService {
     @Autowired
     public CarServiceImpl(CarRepository carRepository, BodyStyleService bodyStyleService,
                           FuelTypeService fuelTypeService, GearboxTypeService gearboxTypeService,
-                          PictureService pictureService, CarMapperImpl carMapper) {
+                          PictureService pictureService, CarDtoMapper carMapper) {
         this.carRepository = carRepository;
         this.bodyStyleService = bodyStyleService;
         this.fuelTypeService = fuelTypeService;

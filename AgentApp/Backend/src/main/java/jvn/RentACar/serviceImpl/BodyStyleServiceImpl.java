@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -36,30 +35,24 @@ public class BodyStyleServiceImpl implements BodyStyleService {
     }
 
     @Override
-    public List<BodyStyleDTO> get() {
-        List<BodyStyle> bodyStyles = bodyStyleRepository.findAll();
-        List<BodyStyleDTO> bodyStyleDTOS = new ArrayList<>();
-        for (BodyStyle bodyStyle : bodyStyles) {
-            bodyStyleDTOS.add(new BodyStyleDTO(bodyStyle));
-        }
-        return bodyStyleDTOS;
+    public List<BodyStyle> get() {
+        return bodyStyleRepository.findAll();
     }
 
     @Override
-    public BodyStyleDTO edit(Long id, BodyStyleDTO bodyStyleDTO) {
+    public BodyStyle edit(Long id, BodyStyleDTO bodyStyleDTO) {
         if (bodyStyleRepository.findByNameAndIdNot(bodyStyleDTO.getName(), id) != null) {
             throw new InvalidBodyStyleDataException("This Body Stale already exist.", HttpStatus.BAD_REQUEST);
         }
         BodyStyle bodyStyle = isEditable(bodyStyleDTO.getId());
         bodyStyle.setName(bodyStyleDTO.getName());
-        return new BodyStyleDTO(bodyStyleRepository.save(bodyStyle));
+        return bodyStyleRepository.save(bodyStyle);
     }
 
     @Override
-    public BodyStyleDTO delete(Long id) {
-        BodyStyle bodyStyle = isEditable(id);
+    public void delete(Long id) {
+        isEditable(id);
         bodyStyleRepository.deleteById(id);
-        return new BodyStyleDTO(bodyStyle);
     }
 
     private BodyStyle isEditable(Long id) {

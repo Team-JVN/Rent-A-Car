@@ -59,7 +59,7 @@ export class EditCarComponent implements OnInit {
 
   selectfetchFuelType() {
     this.fuelTypes.forEach((element: FuelType) => {
-      if (element.id === this.selectedItem.carDTO.bodyStyle.id) {
+      if (element.id === this.selectedItem.carDTO.fuelType.id) {
         this.editForm.controls['fuelType'].setValue(element);
       }
     });
@@ -67,7 +67,7 @@ export class EditCarComponent implements OnInit {
 
   selectfetchGearboxType() {
     this.gearBoxTypes.forEach((element: GearBoxType) => {
-      if (element.id === this.selectedItem.carDTO.bodyStyle.id) {
+      if (element.id === this.selectedItem.carDTO.gearBoxType.id) {
         this.editForm.controls['gearBoxType'].setValue(element);
       }
     });

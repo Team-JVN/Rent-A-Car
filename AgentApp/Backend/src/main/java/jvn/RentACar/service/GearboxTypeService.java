@@ -9,13 +9,13 @@ import java.util.List;
 
 public interface GearboxTypeService {
 
-    GearboxTypeDTO create(CreateGearboxTypeDTO createGearBoxTypeDTO) throws InvalidGearBoxTypeDataException;
+    GearboxType create(CreateGearboxTypeDTO createGearBoxTypeDTO) throws InvalidGearBoxTypeDataException;
 
     GearboxType get(Long id);
 
-    List<GearboxTypeDTO> get() throws InvalidGearBoxTypeDataException;
+    List<GearboxType> get() throws InvalidGearBoxTypeDataException;
 
-    GearboxTypeDTO edit(Long id, GearboxTypeDTO gearBoxTypeDTO) throws InvalidGearBoxTypeDataException;
+    GearboxType edit(Long id, GearboxTypeDTO gearBoxTypeDTO) throws InvalidGearBoxTypeDataException;
 
-    GearboxTypeDTO delete(Long id) throws InvalidGearBoxTypeDataException;
+    void delete(Long id) throws InvalidGearBoxTypeDataException;
 }
