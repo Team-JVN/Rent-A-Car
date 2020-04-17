@@ -1,14 +1,15 @@
+import { CustomHammerConfig } from './custom-hummer-config';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MaterialModule } from './material-module';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { LayoutModule } from '@angular/cdk/layout';
 import { ToastrModule } from 'ngx-toastr';
+import { NgxGalleryModule } from 'ngx-gallery';
 import { HttpClientModule } from '@angular/common/http';
 import { ListBodyStylesComponent } from './component/list/list-body-styles/list-body-styles.component';
 import { HeaderComponent } from './component/header/header.component';
@@ -61,6 +62,7 @@ import { EditCarPartialComponent } from './component/edit/edit-car-partial/edit-
     HttpClientModule,
     MatDatepickerModule,
     NgxDropzoneModule,
+    NgxGalleryModule,
   ],
   entryComponents: [
     AddBodyStyleComponent,
@@ -73,7 +75,11 @@ import { EditCarPartialComponent } from './component/edit/edit-car-partial/edit-
     AddCarComponent,
     EditCarPartialComponent
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HAMMER_GESTURE_CONFIG, useClass: CustomHammerConfig
+    },
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

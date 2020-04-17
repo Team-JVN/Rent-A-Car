@@ -3,7 +3,7 @@
     <mat-horizontal-stepper [linear]="true" #stepper>
         <mat-step [stepControl]="editForm">
             <form [formGroup]="editForm">
-                <ng-template matStepLabel>Fill out info</ng-template>
+                <ng-template matStepLabel>Edit info</ng-template>
                 <table class="form-full-width mt-2" cellspacing="0">
                     <tr>
                         <td>
@@ -16,7 +16,7 @@
                                 </mat-error>
                                 <mat-error
                                     *ngIf="editForm.get('mileageInKm').errors && editForm.get('mileageInKm').errors['min']">
-                                    Mileage must be positive number.
+                                    Mileage must be a positive number.
                                 </mat-error>
                             </mat-form-field>
                         </td>
@@ -58,7 +58,7 @@
             </form>
         </mat-step>
         <mat-step [stepControl]="uploadPictures">
-            <ng-template matStepLabel>Edit pictures</ng-template>
+            <ng-template matStepLabel>Change pictures</ng-template>
             <ngx-dropzone (change)="onSelect($event)" [accept]="'image/*'" class="mt-2">
                 <ngx-dropzone-label>Drop images here or click to choose them.</ngx-dropzone-label>
                 <ngx-dropzone-image-preview ngProjectAs="ngx-dropzone-preview" *ngFor="let f of files" [file]="f"

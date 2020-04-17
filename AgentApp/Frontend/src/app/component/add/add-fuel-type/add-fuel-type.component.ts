@@ -29,7 +29,7 @@ export class AddFuelTypeComponent implements OnInit {
       (data: FuelType) => {
         this.createForm.reset();
         this.dialogRef.close();
-        this.toastr.success('Successfully added a new Fuel Type.', 'Create Fuel Type');
+        this.toastr.success('Success!', 'Create Fuel Type');
         this.fuelTypeService.createSuccessEmitter.next(data);
       },
       (httpErrorResponse: HttpErrorResponse) => {

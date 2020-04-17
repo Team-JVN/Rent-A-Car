@@ -84,7 +84,7 @@ export class AddCarComponent implements OnInit {
       return;
     }
     if (this.files.length == 0 || this.files.length > 5) {
-      this.toastr.error("You have to choose at least one picture.Max number of pictures is 5.", 'Create Car');
+      this.toastr.error("You have to choose at least one picture. Maximum is 5.", 'Create Car');
       return;
     }
     const formData = new FormData();
@@ -99,7 +99,7 @@ export class AddCarComponent implements OnInit {
       (data: Car) => {
         this.carForm.reset();
         this.dialogRef.close();
-        this.toastr.success('Successfully added a new car.', 'Create Car');
+        this.toastr.success('Success!', 'Create Car');
         this.carService.createSuccessEmitter.next(data);
       },
       (httpErrorResponse: HttpErrorResponse) => {

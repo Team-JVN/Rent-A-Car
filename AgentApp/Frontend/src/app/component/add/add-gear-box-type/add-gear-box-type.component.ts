@@ -29,11 +29,11 @@ export class AddGearBoxTypeComponent implements OnInit {
       (data: GearBoxType) => {
         this.createForm.reset();
         this.dialogRef.close();
-        this.toastr.success('Successfully added a new GearBox Type.', 'Create GearBox Type');
+        this.toastr.success('Success!', 'Create Gearbox Type');
         this.gearboxTypeServce.createSuccessEmitter.next(data);
       },
       (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Create GearBox Type');
+        this.toastr.error(httpErrorResponse.error.message, 'Create Gearbox Type');
       }
     );
   }

@@ -9,6 +9,7 @@ import { Subscription } from 'rxjs';
 import { MatTableDataSource } from '@angular/material/table';
 import { Component, OnInit } from '@angular/core';
 import { EditCarComponent } from '../../edit/edit-car/edit-car.component';
+import { NgxGalleryOptions, NgxGalleryImage, NgxGalleryAnimation } from 'ngx-gallery';
 
 @Component({
   selector: 'app-list-cars',
@@ -21,11 +22,57 @@ export class ListCarsComponent implements OnInit {
   carsDataSource: MatTableDataSource<CarWithPicturesDTO>;
   successCreated: Subscription;
 
+  galleryOptions: NgxGalleryOptions[];
+  galleryImages: NgxGalleryImage[];
+
   constructor(public dialog: MatDialog,
     private carService: CarService,
     private toastr: ToastrService) { }
 
   ngOnInit() {
+    this.galleryOptions = [
+      {
+        width: '600px',
+        height: '400px',
+        thumbnailsColumns: 4,
+        imageAnimation: NgxGalleryAnimation.Slide
+      },
+      // max-width 800
+      {
+        breakpoint: 800,
+        width: '100%',
+        height: '600px',
+        imagePercent: 80,
+        thumbnailsPercent: 20,
+        thumbnailsMargin: 20,
+        thumbnailMargin: 20
+      },
+      // max-width 400
+      {
+        breakpoint: 400,
+        preview: false
+      }
+    ];
+
+    this.galleryImages = [
+      {
+        small: 'https://images3.polovniautomobili.tv/user-images/thumbs/1511/15113417/a8af7a5084ba-800x600.jpg',
+        medium: 'https://images3.polovniautomobili.tv/user-images/thumbs/1511/15113417/a8af7a5084ba-800x600.jpg',
+        big: 'https://images3.polovniautomobili.tv/user-images/thumbs/1511/15113417/a8af7a5084ba-800x600.jpg'
+      },
+      {
+        small: 'https://www.car4rent.lv/images/3_prieksa_345x420.jpg',
+        medium: 'https://www.car4rent.lv/images/3_prieksa_345x420.jpg',
+        big: 'https://www.car4rent.lv/images/3_prieksa_345x420.jpg'
+      },
+      {
+        small: 'https://images3.polovniautomobili.tv/user-images/thumbs/1511/15113417/6bb27a955657-800x600.jpg',
+        medium: 'https://images3.polovniautomobili.tv/user-images/thumbs/1511/15113417/6bb27a955657-800x600.jpg',
+        big: 'https://images3.polovniautomobili.tv/user-images/thumbs/1511/15113417/6bb27a955657-800x600.jpg'
+      }
+    ];
+
+
     this.fetchCars();
     this.successCreated = this.carService.createSuccessEmitter.subscribe(
       () => {
