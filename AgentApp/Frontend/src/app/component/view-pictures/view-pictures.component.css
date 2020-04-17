@@ -1,0 +1,8 @@
+.dialog-class {
+    width: 750px;
+}
+
+.mat-dialog-content { 
+    max-width:  90vw;
+    max-height: 90vh; 
+}
