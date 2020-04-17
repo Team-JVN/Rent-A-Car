@@ -9,7 +9,28 @@ ngx-dropzone{
 .table {
   margin-bottom: 0;
 }
-  
+
+.car-table tr {
+  border-bottom: 1px solid #ddd;
+}
+
+.car-table th, .table td {
+  font-size: 16px;
+  vertical-align: bottom;
+}
+
+.theader {
+  font-weight: 550;
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.item-card {
+  width: 100%;
+  display: inline-flex;
+  background-color: #F5F5F5;    
+  margin: 0.7em auto;
+}
 .form-full-width {
   width: 100%;
 }

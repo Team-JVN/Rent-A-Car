@@ -1,3 +1,8 @@
+/* Angular Material fix for preview to work properly */
+.mat-sidenav-container, .mat-sidenav-content, .mat-tab-body-content {
+    transform: none !important;
+}
+
 mat-card {
     max-width: 1000px;
     margin: 2em auto;
@@ -49,30 +54,3 @@ th.mat-header-cell{
     text-align: center;
     vertical-align: middle;
 }
-
-.car-card-header{
-    display:inline-block;
-    width:100%;
-    vertical-align: middle;
-}
-
-.car-card-title{
-    float: left;
-}
-
-.car-card-buttons{
-    float:right;
-    margin-top: -6px;
-}
-
-mat-card-content {
-    margin-left: 16px;
-    margin-bottom: 0;
-}
-
-mat-card-header mat-card-title {
-    font-size: 24px;
-    font-weight: 550;
-}
-
-  

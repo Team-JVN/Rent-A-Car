@@ -1,0 +1,133 @@
+<h1 mat-dialog-title>Create New Advertisement</h1>
+<mat-dialog-content class="dialog-class">
+    <mat-horizontal-stepper [linear]="true" #stepper>
+        <mat-step [stepControl]="carForm">
+            <form [formGroup]="carForm">
+                <ng-template matStepLabel>Car</ng-template>
+                <div class="row">
+                    <div class="col-9">
+                        <mat-form-field class="form-full-width">
+                            <mat-label>Choose existing car</mat-label>
+                            <mat-select formControlName="car">
+                                <mat-option *ngFor="let car of cars" [value]="car">
+                                    {{car.carDTO.make}} {{car.carDTO.model}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-3" align="end">
+                        <button mat-raised-button color="primary" (click)="openAddCar()">Add
+                            car</button>
+                    </div>
+                </div>
+                <div *ngIf="getSelectedCar()">
+                    <mat-card class="item-card">
+
+                        <div>
+                            <mat-card-header class="car-card-header">
+                                <mat-card-title class="car-card-title">{{getSelectedCar().carDTO.make}}
+                                    {{getSelectedCar().carDTO.model}}
+                                </mat-card-title>
+
+                            </mat-card-header>
+                            <mat-card-content>
+                                <table class="table car-table">
+                                    <tbody>
+                                        <tr>
+                                            <th><span class="theader">
+                                                    <mat-icon class="mr-2">local_gas_station</mat-icon>Fuel Type:
+                                                </span></th>
+                                            <td>{{getSelectedCar().carDTO.fuelType.name}}</td>
+                                            <th><span class="theader">
+                                                    <mat-icon class="mr-2">speed</mat-icon>Mileage:
+                                                </span></th>
+                                            <td>{{getSelectedCar().carDTO.mileageInKm | number}} km</td>
+                                        </tr>
+                                        <tr>
+                                            <th><span class="theader">
+                                                    <mat-icon class="mr-2">settings</mat-icon>Gearbox:
+                                                </span></th>
+                                            <td>{{getSelectedCar().carDTO.gearBoxType.name}}</td>
+                                            <th><span class="theader">
+                                                    <mat-icon class="mr-2">airline_seat_recline_normal</mat-icon>Kid's
+                                                    seats:
+                                                </span></th>
+                                            <td>{{getSelectedCar().carDTO.kidsSeats}}</td>
+                                        </tr>
+                                        <tr>
+                                            <th><span class="theader">
+                                                    <mat-icon class="mr-2">airport_shuttle</mat-icon>Body Style:
+                                                </span></th>
+                                            <td>{{getSelectedCar().carDTO.bodyStyle.name}}</td>
+                                            <th><span class="theader">
+                                                    <mat-icon class="mr-2">navigation</mat-icon>Tracking:
+                                                </span></th>
+                                            <td>
+                                                <span *ngIf="getSelectedCar().carDTO.availableTracking">Available</span>
+                                                <span *ngIf="!getSelectedCar().carDTO.availableTracking">Not
+                                                    Available</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </mat-card-content>
+                        </div>
+                    </mat-card>
+                </div>
+                <div class="mt-3">
+                    <button mat-raised-button color="primary" [disabled]="!carForm.valid" matStepperNext>Next</button>
+                </div>
+            </form>
+        </mat-step>
+        <!-- <mat-step [stepControl]="priceListForm">
+            <form [formGroup]="priceListForm">
+                <ng-template matStepLabel>Fill out info</ng-template>
+                <table class="form-full-width mt-2" cellspacing="0">
+                    <tr>
+                        <td>
+                            <div class="col-9">
+                                <mat-form-field class="form-full-width">
+                                    <mat-label>Choose existing PriceList</mat-label>
+                                    <mat-select formControlName="priceList">
+                                        <mat-option *ngFor="let priceList of cars" [value]="priceList">
+                                            {{priceList.carDTO.make}} {{car.carDTO.model}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-3" align="end">
+                                <button mat-raised-button color="primary" (click)="openAddCar()">Add
+                                    car</button>
+                            </div>
+                        </td>
+                        <td>
+                            <mat-form-field class="form-full-width-right">
+                                <input matInput placeholder="Number of kid's seats" type="number"
+                                    formControlName="kidsSeats">
+                                <mat-error
+                                    *ngIf="carForm.get('kidsSeats').errors && carForm.get('kidsSeats').errors['required']">
+                                    Please enter number of kid's seats in km.
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="carForm.get('kidsSeats').errors && carForm.get('kidsSeats').errors['min']">
+                                    Number of kid's seats must be positive number.
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="carForm.get('kidsSeats').errors && carForm.get('kidsSeats').errors['max']">
+                                    Max number of kid's seats is 3.
+                                </mat-error>
+                            </mat-form-field>
+                        </td>
+                    </tr>
+                    
+                </table>
+               
+
+                <div align="end" class="mt-3">
+                    <button mat-raised-button color="primary" [disabled]="!priceListForm.valid"
+                        matStepperNext>Next</button>
+                </div>
+            </form>
+        </mat-step> -->
+    </mat-horizontal-stepper>
+</mat-dialog-content>

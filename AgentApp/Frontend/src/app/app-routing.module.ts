@@ -4,6 +4,7 @@ import { ListFuelTypeComponent } from './component/list/list-fuel-type/list-fuel
 import { ListBodyStylesComponent } from './component/list/list-body-styles/list-body-styles.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { ListAdvertisementsComponent } from './component/list/list-advertisements/list-advertisements.component';
 
 
 const routes: Routes = [
@@ -22,6 +23,10 @@ const routes: Routes = [
   {
     path: 'car',
     component: ListCarsComponent,
+  },
+  {
+    path: 'advertisement',
+    component: ListAdvertisementsComponent,
   },
 ];
 

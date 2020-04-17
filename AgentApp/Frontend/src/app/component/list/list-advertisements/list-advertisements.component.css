@@ -1,0 +1,43 @@
+mat-card {
+    max-width: 1000px;
+    margin: 2em auto;
+}
+
+.buttons-width {
+    width: 105px;
+}
+
+td.mat-cell{
+    border-bottom-style: none;
+}
+
+th.mat-header-cell{
+    border-bottom-style: none;
+}
+
+
+.image {
+    max-width: 300px;
+    max-height: 200px;
+    border-radius: 5px;
+}
+
+.image-div {
+    width: 300px;
+    height: 200px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+
+mat-card-content {
+    margin-left: 16px;
+    margin-bottom: 0;
+}
+
+mat-card-header mat-card-title {
+    font-size: 24px;
+    font-weight: 550;
+}
+
+  
