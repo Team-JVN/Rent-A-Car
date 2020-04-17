@@ -6,11 +6,11 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @Setter
-public class InvalidBodyStyleDataException extends RuntimeException {
+public class InvalidPriceListDataException extends RuntimeException {
 
     private HttpStatus httpStatus;
 
-    public InvalidBodyStyleDataException(String message, HttpStatus httpStatus) {
+    public InvalidPriceListDataException(String message, HttpStatus httpStatus) {
         super(message);
         this.httpStatus = httpStatus;
     }

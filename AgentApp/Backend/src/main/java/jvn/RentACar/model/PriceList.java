@@ -1,5 +1,6 @@
 package jvn.RentACar.model;
 
+import jvn.RentACar.enumeration.LogicalStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,4 +30,15 @@ public class PriceList {
 
     @OneToMany(mappedBy = "priceList", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Advertisement> advertisements = new HashSet<>();
+
+    @Column(nullable = false)
+    private LogicalStatus status;
+
+    public PriceList(Double pricePerDay, Double pricePerKm, Double priceForCDW) {
+        this.pricePerDay = pricePerDay;
+        this.pricePerKm = pricePerKm;
+        this.priceForCDW = priceForCDW;
+        this.status = LogicalStatus.EXISTING;
+    }
+
 }

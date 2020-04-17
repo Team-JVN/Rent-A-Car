@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @DiscriminatorValue("AGENT")
-public class Agent extends User{
+public class Agent extends User {
 
     @Column(nullable = false)
     private String address;

@@ -10,6 +10,7 @@ export const environment = {
   fuelType: '/api/fuel-type',
   gearBoxType: '/api/gearbox-type',
   car: '/api/car',
+  priceList: '/api/price-list',
 };
 
 /*

@@ -1,8 +1,8 @@
+import { HeaderComponent } from './component/header/header.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MaterialModule } from './material-module';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -11,7 +11,6 @@ import { LayoutModule } from '@angular/cdk/layout';
 import { ToastrModule } from 'ngx-toastr';
 import { HttpClientModule } from '@angular/common/http';
 import { ListBodyStylesComponent } from './component/list/list-body-styles/list-body-styles.component';
-import { HeaderComponent } from './component/header/header.component';
 import { AddBodyStyleComponent } from './component/add/add-body-style/add-body-style.component';
 import { EditBodyStyleComponent } from './component/edit/edit-body-style-component/edit-body-style-component.component';
 import { EditFuelTypeComponent } from './component/edit/edit-fuel-type/edit-fuel-type.component';
@@ -27,6 +26,9 @@ import { NgxDropzoneModule } from 'ngx-dropzone';
 import { EditCarPartialComponent } from './component/edit/edit-car-partial/edit-car-partial.component';
 import { AddAdvertisementComponent } from './component/add/add-advertisement/add-advertisement.component';
 import { ListAdvertisementsComponent } from './component/list/list-advertisements/list-advertisements.component';
+import { ListPriceListsComponent } from './component/list/list-price-lists/list-price-lists.component';
+import { AddPriceListComponent } from './component/add/add-price-list/add-price-list.component';
+import { EditPriceListComponent } from './component/edit/edit-price-list/edit-price-list.component';
 
 @NgModule({
   declarations: [
@@ -47,6 +49,10 @@ import { ListAdvertisementsComponent } from './component/list/list-advertisement
     EditCarPartialComponent,
     AddAdvertisementComponent,
     ListAdvertisementsComponent,
+    HeaderComponent,
+    ListPriceListsComponent,
+    AddPriceListComponent,
+    EditPriceListComponent
   ],
   imports: [
     BrowserModule,
@@ -77,6 +83,8 @@ import { ListAdvertisementsComponent } from './component/list/list-advertisement
     AddCarComponent,
     EditCarPartialComponent,
     AddAdvertisementComponent,
+    AddPriceListComponent,
+    EditPriceListComponent,
   ],
   providers: [],
   bootstrap: [AppComponent]

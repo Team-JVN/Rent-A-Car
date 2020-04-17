@@ -16,7 +16,7 @@ public class Picture {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String data;
 
     //Edit will not working when you put CascadeType.ALL and FetchType.EAGER

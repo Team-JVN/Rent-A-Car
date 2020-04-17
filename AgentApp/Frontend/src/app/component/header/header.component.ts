@@ -1,8 +1,7 @@
-
+import { Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
-import { Router } from '@angular/router';
 import { map, shareReplay } from 'rxjs/operators';
 
 @Component({
@@ -26,6 +25,5 @@ export class HeaderComponent implements OnInit {
   ngOnInit() {
 
   }
-
 
 }

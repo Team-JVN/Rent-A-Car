@@ -28,7 +28,7 @@ public class Advertisement {
     @Column(nullable = false)
     private LocalDate dateFrom;
 
-    @Column(nullable = false)
+    @Column
     private LocalDate dateTo;
 
     @Column
@@ -41,7 +41,9 @@ public class Advertisement {
     private Boolean CDW;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "advertisement_rent_requests", joinColumns = @JoinColumn(name = "advertisement_id", referencedColumnName = "id"),
+    @JoinTable(
+            name = "advertisement_rent_requests",
+            joinColumns = @JoinColumn(name = "advertisement_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "rent_request_id", referencedColumnName = "id"))
     private Set<RentRequest> rentRequests = new HashSet<RentRequest>();
 }
