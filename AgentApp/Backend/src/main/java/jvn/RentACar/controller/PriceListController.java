@@ -1,6 +1,7 @@
 package jvn.RentACar.controller;
 
 import jvn.RentACar.dto.both.PriceListDTO;
+import jvn.RentACar.mapper.PriceListDtoMapper;
 import jvn.RentACar.service.PriceListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/api/price-list", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -17,29 +19,28 @@ public class PriceListController {
 
     private PriceListService priceListService;
 
-    @Autowired
-    public PriceListController(PriceListService priceListService) {
-        this.priceListService = priceListService;
-    }
+    private PriceListDtoMapper priceListDtoMapper;
 
     @GetMapping("/{id}")
     public ResponseEntity<PriceListDTO> get(@PathVariable Long id) {
-        return new ResponseEntity<>(priceListService.get(id), HttpStatus.OK);
+        return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.get(id)), HttpStatus.OK);
     }
 
     @GetMapping
     public ResponseEntity<List<PriceListDTO>> getAll() {
-        return new ResponseEntity<>(priceListService.getAll(), HttpStatus.OK);
+        List<PriceListDTO> list = priceListService.getAll().stream().map(priceListDtoMapper::toDto).
+                collect(Collectors.toList());
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PriceListDTO> create(@Valid @RequestBody PriceListDTO priceListDTO) {
-        return new ResponseEntity<>(priceListService.create(priceListDTO), HttpStatus.CREATED);
+        return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.create(priceListDTO)), HttpStatus.CREATED);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PriceListDTO> edit(@PathVariable Long id, @Valid @RequestBody PriceListDTO priceListDTO) {
-        return new ResponseEntity<>(priceListService.edit(id, priceListDTO), HttpStatus.OK);
+        return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.edit(id, priceListDTO)), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -47,4 +48,11 @@ public class PriceListController {
         priceListService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @Autowired
+    public PriceListController(PriceListService priceListService, PriceListDtoMapper priceListDtoMapper) {
+        this.priceListService = priceListService;
+        this.priceListDtoMapper = priceListDtoMapper;
+    }
+
 }

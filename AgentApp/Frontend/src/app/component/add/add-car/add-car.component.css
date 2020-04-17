@@ -31,6 +31,7 @@ ngx-dropzone{
   background-color: #F5F5F5;    
   margin: 0.7em auto;
 }
+
 .form-full-width {
   width: 100%;
 }
@@ -38,9 +39,11 @@ ngx-dropzone{
 .form-full-width-right {
   width: 99%;
 }
+
 .form-full-width-left {
   width: 90%;
 }
+
 /* Hides arrow buttons in input type="number" */
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
