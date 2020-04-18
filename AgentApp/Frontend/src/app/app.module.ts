@@ -1,7 +1,8 @@
 import { HeaderComponent } from './component/header/header.component';
+import { CustomHammerConfig } from './custom-hummer-config';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MaterialModule } from './material-module';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -9,6 +10,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { LayoutModule } from '@angular/cdk/layout';
 import { ToastrModule } from 'ngx-toastr';
+import { NgxGalleryModule } from 'ngx-gallery';
 import { HttpClientModule } from '@angular/common/http';
 import { ListBodyStylesComponent } from './component/list/list-body-styles/list-body-styles.component';
 import { AddBodyStyleComponent } from './component/add/add-body-style/add-body-style.component';
@@ -29,6 +31,7 @@ import { ListAdvertisementsComponent } from './component/list/list-advertisement
 import { ListPriceListsComponent } from './component/list/list-price-lists/list-price-lists.component';
 import { AddPriceListComponent } from './component/add/add-price-list/add-price-list.component';
 import { EditPriceListComponent } from './component/edit/edit-price-list/edit-price-list.component';
+import { ViewPicturesComponent } from './component/view-pictures/view-pictures.component';
 
 @NgModule({
   declarations: [
@@ -52,7 +55,8 @@ import { EditPriceListComponent } from './component/edit/edit-price-list/edit-pr
     HeaderComponent,
     ListPriceListsComponent,
     AddPriceListComponent,
-    EditPriceListComponent
+    EditPriceListComponent,
+    ViewPicturesComponent,
   ],
   imports: [
     BrowserModule,
@@ -71,6 +75,7 @@ import { EditPriceListComponent } from './component/edit/edit-price-list/edit-pr
     HttpClientModule,
     MatDatepickerModule,
     NgxDropzoneModule,
+    NgxGalleryModule,
   ],
   entryComponents: [
     AddBodyStyleComponent,
@@ -85,8 +90,13 @@ import { EditPriceListComponent } from './component/edit/edit-price-list/edit-pr
     AddAdvertisementComponent,
     AddPriceListComponent,
     EditPriceListComponent,
+    ViewPicturesComponent,
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HAMMER_GESTURE_CONFIG, useClass: CustomHammerConfig
+    },
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

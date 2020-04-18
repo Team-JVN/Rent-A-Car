@@ -1,3 +1,4 @@
+import { ViewPicturesComponent } from './../../view-pictures/view-pictures.component';
 import { EditCarPartialComponent } from './../../edit/edit-car-partial/edit-car-partial.component';
 import { CarWithPicturesDTO } from './../../../model/carWithPictures';
 import { AddCarComponent } from './../../add/add-car/add-car.component';
@@ -109,4 +110,9 @@ export class ListCarsComponent implements OnInit {
       }
     );
   }
+
+  viewPictures(element: CarWithPicturesDTO) {
+    this.dialog.open(ViewPicturesComponent, { data: element });
+  }
+
 }

@@ -29,7 +29,7 @@ export class AddBodyStyleComponent implements OnInit {
       (data: BodyStyle) => {
         this.createForm.reset();
         this.dialogRef.close();
-        this.toastr.success('Successfully added a new Body Style.', 'Create Body Style');
+        this.toastr.success('Success!', 'Create Body Style');
         this.bodyStyleService.createSuccessEmitter.next(data);
       },
       (httpErrorResponse: HttpErrorResponse) => {
