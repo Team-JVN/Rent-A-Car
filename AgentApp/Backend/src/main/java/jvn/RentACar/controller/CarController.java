@@ -2,9 +2,9 @@ package jvn.RentACar.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.RentACar.dto.both.CarDTO;
-import jvn.RentACar.dto.both.CarWithPicturesDTO;
 import jvn.RentACar.dto.request.CarEditDTO;
 import jvn.RentACar.dto.request.CreateCarDTO;
+import jvn.RentACar.dto.response.CarWithPicturesDTO;
 import jvn.RentACar.enumeration.EditType;
 import jvn.RentACar.exceptionHandler.InvalidCarDataException;
 import jvn.RentACar.mapper.CarDtoMapper;

@@ -1,12 +1,12 @@
 .dialog-class {
     width: 700px;
-  }
+}
 
-.car-table tr {
+.table tr {
     border-bottom: 1px solid #ddd;
 }
 
-.car-table th, .table td {
+.table th, .table td {
     font-size: 16px;
     vertical-align: bottom;
 }
@@ -19,7 +19,6 @@
 
 .item-card {
     width: 100%;
-    display: inline-flex;
     background-color: #F5F5F5;    
     margin: 0.7em auto;
 }
@@ -34,36 +33,44 @@
     float: left;
 }
 
-.price-list-card{
-    width: 100%;
-    background-color: #F5F5F5;    
-}
-
 .car-card-buttons{
     float:right;
     margin-top: -6px;
 }
 
-.table-font {
-font-size: 110%;
-} 
 .table {
-margin-bottom: 0;
+    margin-bottom: 0;
 }
 
 .form-full-width {
-width: 100%;
+    width: 100%;
+}
+
+
+.form-full-width-left {
+    width: 45%;
 }
 
 .form-full-width-right {
-width: 99%;
+    width: 40%;
 }
-.form-full-width-left {
-width: 90%;
+
+.form-full-width-95 {
+    width: 95%;
 }
-.form-full-width-50 {
-    width: 50%;
+
+.first{
+    font-weight: 550;
 }
+
+.mat-card-title {
+    margin-left: -10px;
+}
+
+.mat-card-content{
+    margin-bottom: 0;
+}
+
 /* Hides arrow buttons in input type="number" */
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
@@ -74,12 +81,4 @@ margin: 0;
 /* Firefox */
 input[type=number] {
 -moz-appearance: textfield;
-}
-.first{
-    font-weight: 550;
-}
-
-.mat-card-header{
-    margin-left:0px;
-    margin-right: 0px;
 }

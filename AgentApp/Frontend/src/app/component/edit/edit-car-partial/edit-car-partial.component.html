@@ -8,11 +8,12 @@
                     <tr>
                         <td>
                             <mat-form-field class="form-full-width-left">
-                                <input matInput placeholder="Mileage in km" type="number" formControlName="mileageInKm">
-                                <span matSuffix class="ml-2">km</span>
+                                <input matInput placeholder="Mileage in Km" type="number" formControlName="mileageInKm"
+                                    min="0">
+                                <span matSuffix class="ml-2">Km</span>
                                 <mat-error
                                     *ngIf="editForm.get('mileageInKm').errors && editForm.get('mileageInKm').errors['required']">
-                                    Please enter mileage in km.
+                                    Please enter mileage in Km.
                                 </mat-error>
                                 <mat-error
                                     *ngIf="editForm.get('mileageInKm').errors && editForm.get('mileageInKm').errors['min']">
@@ -23,10 +24,10 @@
                         <td>
                             <mat-form-field class="form-full-width-right">
                                 <input matInput placeholder="Number of kid's seats" type="number"
-                                    formControlName="kidsSeats">
+                                    formControlName="kidsSeats" min="0" max="3">
                                 <mat-error
                                     *ngIf="editForm.get('kidsSeats').errors && editForm.get('kidsSeats').errors['required']">
-                                    Please enter number of kid's seats in km.
+                                    Please enter number of kid's seats.
                                 </mat-error>
                                 <mat-error
                                     *ngIf="editForm.get('kidsSeats').errors && editForm.get('kidsSeats').errors['min']">
