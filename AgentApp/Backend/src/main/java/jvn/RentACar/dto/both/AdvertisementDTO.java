@@ -22,7 +22,6 @@ public class AdvertisementDTO {
     @NotNull(message = "Price list is null.")
     private PriceListDTO priceList;
 
-    @NotNull(message = "Kilometres limit in km is null.")
     @Min(1)
     private Integer kilometresLimit;
 

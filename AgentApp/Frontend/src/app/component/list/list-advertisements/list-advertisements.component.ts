@@ -81,13 +81,21 @@ export class ListAdvertisementsComponent implements OnInit {
     this.dialog.open(AddAdvertisementComponent);
   }
 
-  edit(element: AdvertisementWithPictures) {
+  edit(element: AdvertisementWithPicturesDTO) {
     this.dialog.open(EditAdvertisementComponent, { data: element });
 
   }
 
   delete(element: AdvertisementWithPicturesDTO) {
-
+    this.advertisementService.delete(element.advertisementDTO.id).subscribe(
+      () => {
+        this.fetchAll();
+        this.toastr.success('Successfully deleted Advertisement!', 'Delete Advertisement');
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Delete Advertisement');
+      }
+    );
   }
 
 }

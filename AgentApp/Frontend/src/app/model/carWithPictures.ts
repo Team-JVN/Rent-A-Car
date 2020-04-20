@@ -1,10 +1,5 @@
 import { Car } from './car';
-<<<<<<< HEAD
 export class CarWithPictures {
-=======
-
-export class CarWithPicturesDTO {
->>>>>>> listAdvertisements
     carDTO: Car;
     pictures: string[];
     image: any;

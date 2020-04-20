@@ -39,6 +39,9 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         if (priceList.getPricePerKm() != null && createAdvertisementDTO.getKilometresLimit() == null) {
             throw new InvalidAdvertisementDataException("You have to set kilometres limit.", HttpStatus.BAD_REQUEST);
         }
+        if (priceList.getPricePerKm() == null) {
+            createAdvertisementDTO.setKilometresLimit(null);
+        }
         if (priceList.getPriceForCDW() != null) {
             createAdvertisementDTO.setCDW(true);
         } else {
@@ -57,6 +60,9 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         PriceList priceList = advertisement.getPriceList();
         if (priceList.getPricePerKm() != null && advertisement.getKilometresLimit() == null) {
             throw new InvalidAdvertisementDataException("You have to set kilometres limit.", HttpStatus.BAD_REQUEST);
+        }
+        if (priceList.getPricePerKm() == null) {
+            advertisement.setKilometresLimit(null);
         }
         if (priceList.getPriceForCDW() != null) {
             advertisement.setCDW(true);

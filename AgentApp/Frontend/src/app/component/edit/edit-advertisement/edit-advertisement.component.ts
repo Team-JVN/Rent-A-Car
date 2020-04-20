@@ -1,15 +1,14 @@
+import { AdvertisementWithPicturesDTO } from './../../../model/advertisementWithPictures';
 import { AddPriceListComponent } from './../../add/add-price-list/add-price-list.component';
 import { AddCarComponent } from './../../add/add-car/add-car.component';
 import { PriceList } from './../../../model/priceList';
 import { Subscription } from 'rxjs';
 import { CarService } from './../../../service/car.service';
-import { AdvertisementWithPictures } from './../../../model/advertisementWithPictures';
 import { AdvertisementService } from './../../../service/advertisement.service';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { BodyStyle } from 'src/app/model/bodyStyle';
 import { CarWithPictures } from 'src/app/model/carWithPictures';
 import { PriceListService } from 'src/app/service/price-list.service';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -31,10 +30,11 @@ export class EditAdvertisementComponent implements OnInit {
   successCreatedList: Subscription;
 
   constructor(private toastr: ToastrService, private carService: CarService, private priceListService: PriceListService, private advertisementService: AdvertisementService,
-    private dialogRef: MatDialogRef<EditAdvertisementComponent>, @Inject(MAT_DIALOG_DATA) public selectedItem: AdvertisementWithPictures,
+    private dialogRef: MatDialogRef<EditAdvertisementComponent>, @Inject(MAT_DIALOG_DATA) public selectedItem: AdvertisementWithPicturesDTO,
     private formBuilder: FormBuilder, public dialog: MatDialog) { }
 
   ngOnInit() {
+    console.log(new Date(this.selectedItem.advertisementDTO.dateFrom));
     this.carForm = this.formBuilder.group({
       car: new FormControl(null, Validators.required),
     })
@@ -44,9 +44,9 @@ export class EditAdvertisementComponent implements OnInit {
     })
 
     this.dateForm = this.formBuilder.group({
-      validFrom: new FormControl(null, Validators.required),
-      discount: new FormControl(null, [Validators.min(0), Validators.max(99)]),
-      kilometresLimit: new FormControl(null, Validators.min(1))
+      validFrom: new FormControl(new Date(this.selectedItem.advertisementDTO.dateFrom), Validators.required),
+      discount: new FormControl(this.selectedItem.advertisementDTO.discount, [Validators.min(0), Validators.max(99)]),
+      kilometresLimit: new FormControl(this.selectedItem.advertisementDTO.kilometresLimit, Validators.min(1))
     })
 
     this.successCreatedCar = this.carService.createSuccessEmitter.subscribe(
@@ -69,11 +69,7 @@ export class EditAdvertisementComponent implements OnInit {
     this.carService.getCars().subscribe(
       (data: CarWithPictures[]) => {
         this.cars = data;
-        this.carForm.patchValue(
-          {
-            'car': null
-          }
-        );
+        this.selectCar();
       },
       (httpErrorResponse: HttpErrorResponse) => {
         this.cars = [];
@@ -86,11 +82,7 @@ export class EditAdvertisementComponent implements OnInit {
     this.priceListService.getAll().subscribe(
       (data: PriceList[]) => {
         this.priceLists = data;
-        this.priceListForm.patchValue(
-          {
-            'priceList': null
-          }
-        );
+        this.selectPriceList();
       },
       (httpErrorResponse: HttpErrorResponse) => {
         const data: PriceList[] = []
@@ -102,7 +94,7 @@ export class EditAdvertisementComponent implements OnInit {
 
   selectPriceList() {
     this.priceLists.forEach((element: PriceList) => {
-      if (element.id === this.selectedItem.priceList.id) {
+      if (element.id === this.selectedItem.advertisementDTO.priceList.id) {
         this.priceListForm.controls['priceList'].setValue(element);
       }
     });
@@ -110,7 +102,7 @@ export class EditAdvertisementComponent implements OnInit {
 
   selectCar() {
     this.cars.forEach((element: CarWithPictures) => {
-      if (element.carDTO.id === this.selectedItem.carWithPicturesDTO.carDTO.id) {
+      if (element.carDTO.id === this.selectedItem.advertisementDTO.car.id) {
         this.carForm.controls['car'].setValue(element);
       }
     });
@@ -133,14 +125,18 @@ export class EditAdvertisementComponent implements OnInit {
   }
 
   edit() {
+
     if (this.getSelectedPriceList().pricePerKm && !this.dateForm.value.kilometresLimit) {
       this.toastr.error("Please enter Kilometres limit", 'Create Advertisement');
       return;
     }
     const validFrom = formatDate(this.dateForm.value.validFrom, 'dd-MM-yyyy', 'en-US')
-
+    var cdw = true;
+    if (!this.priceListForm.value.priceList.priceForCDW) {
+      cdw = false;
+    }
     const advertisement = new Advertisement(this.carForm.value.car.carDTO, this.priceListForm.value.priceList,
-      this.dateForm.value.discount, this.dateForm.value.kilometresLimit, validFrom, this.selectedItem.id);
+      this.dateForm.value.discount, this.dateForm.value.kilometresLimit, cdw, validFrom, this.selectedItem.advertisementDTO.id);
 
     this.advertisementService.edit(advertisement).subscribe(
       (data: Advertisement) => {
@@ -150,7 +146,6 @@ export class EditAdvertisementComponent implements OnInit {
         this.advertisementService.createSuccessEmitter.next(data);
       },
       (httpErrorResponse: HttpErrorResponse) => {
-        console.log(httpErrorResponse)
         this.toastr.error(httpErrorResponse.error.message, 'Edit Advertisement');
       }
     );

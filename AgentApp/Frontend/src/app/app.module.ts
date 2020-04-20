@@ -93,6 +93,7 @@ import { EditAdvertisementComponent } from './component/edit/edit-advertisement/
     AddPriceListComponent,
     EditPriceListComponent,
     ViewPicturesComponent,
+    EditAdvertisementComponent
   ],
   providers: [
     {
