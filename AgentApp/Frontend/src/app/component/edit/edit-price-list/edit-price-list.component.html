@@ -12,7 +12,7 @@
             </mat-error>
         </mat-form-field>
         <mat-form-field class="form-full-width">
-            <input matInput type="number" placeholder="Price Per Kilometer" formControlName="pricePerKm" min="1">
+            <input matInput type="number" placeholder="Price Per Kilometre" formControlName="pricePerKm" min="1">
             <span matSuffix class="ml-2">€</span>
             <mat-error *ngIf="editForm.get('pricePerKm').errors && editForm.get('pricePerKm').errors['min']">
                 Price must be a positive decimal number.

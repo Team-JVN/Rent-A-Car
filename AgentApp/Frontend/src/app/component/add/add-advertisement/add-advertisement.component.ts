@@ -115,7 +115,7 @@ export class AddAdvertisementComponent implements OnInit {
     const validFrom = formatDate(this.dateForm.value.validFrom, 'dd-MM-yyyy', 'en-US')
 
     const advertisement = new Advertisement(this.carForm.value.car.carDTO, this.priceListForm.value.priceList,
-      this.dateForm.value.discount, this.dateForm.value.kilometresLimit, validFrom);
+      this.dateForm.value.discount, this.dateForm.value.kilometresLimit, false, validFrom);
 
     this.advertisementService.create(advertisement).subscribe(
       (data: Advertisement) => {

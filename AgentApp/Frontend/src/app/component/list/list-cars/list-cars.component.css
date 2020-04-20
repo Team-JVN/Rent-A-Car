@@ -35,6 +35,7 @@ th.mat-header-cell{
     display: inline-flex;
     background-color: #F5F5F5;    
     margin: 0.7em auto;
+    align-items: center;
 }
 
 .image {

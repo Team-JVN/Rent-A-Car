@@ -8,6 +8,7 @@
                 <button mat-raised-button color="primary" (click)="openDialog()">Create New</button>
             </div>
         </div>
+        <br />
         <table mat-table [dataSource]="carsDataSource" class="car-list-table">
             <ng-container matColumnDef="car">
                 <td mat-cell *matCellDef="let element">
