@@ -12,7 +12,7 @@ import { ToastrService } from 'ngx-toastr';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { AddCarComponent } from '../add-car/add-car.component';
 import { AdvertisementService } from 'src/app/service/advertisement.service';
-import { formatDate } from '@angular/common';
+import { formatDate, DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-add-advertisement',
@@ -117,7 +117,7 @@ export class AddAdvertisementComponent implements OnInit {
     if (!this.priceListForm.value.priceList.priceForCDW) {
       cdw = false;
     }
-
+    console.log(this.dateForm.value.validFrom)
     const advertisement = new Advertisement(this.carForm.value.car.carDTO, this.priceListForm.value.priceList,
       this.dateForm.value.discount, this.dateForm.value.kilometresLimit, cdw, validFrom);
 

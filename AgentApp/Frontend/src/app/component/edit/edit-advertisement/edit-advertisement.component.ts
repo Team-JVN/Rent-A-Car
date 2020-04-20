@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import { AdvertisementWithPicturesDTO } from './../../../model/advertisementWithPictures';
 import { AddPriceListComponent } from './../../add/add-price-list/add-price-list.component';
 import { AddCarComponent } from './../../add/add-car/add-car.component';
@@ -12,8 +13,10 @@ import { ToastrService } from 'ngx-toastr';
 import { CarWithPictures } from 'src/app/model/carWithPictures';
 import { PriceListService } from 'src/app/service/price-list.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { formatDate } from '@angular/common';
+import { formatDate, DatePipe } from '@angular/common';
 import { Advertisement } from 'src/app/model/advertisement';
+import { parse } from 'querystring';
+import * as moment from 'moment';
 @Component({
   selector: 'app-edit-advertisement',
   templateUrl: './edit-advertisement.component.html',
@@ -34,7 +37,6 @@ export class EditAdvertisementComponent implements OnInit {
     private formBuilder: FormBuilder, public dialog: MatDialog) { }
 
   ngOnInit() {
-    console.log(new Date(this.selectedItem.advertisementDTO.dateFrom));
     this.carForm = this.formBuilder.group({
       car: new FormControl(null, Validators.required),
     })
@@ -44,10 +46,18 @@ export class EditAdvertisementComponent implements OnInit {
     })
 
     this.dateForm = this.formBuilder.group({
-      validFrom: new FormControl(new Date(this.selectedItem.advertisementDTO.dateFrom), Validators.required),
+      validFrom: new FormControl(null, Validators.required),
       discount: new FormControl(this.selectedItem.advertisementDTO.discount, [Validators.min(0), Validators.max(99)]),
       kilometresLimit: new FormControl(this.selectedItem.advertisementDTO.kilometresLimit, Validators.min(1))
     })
+    // const validFrom = formatDate(this.selectedItem.advertisementDTO.dateFrom, 'yyyy-MM-dd', 'en-US')
+    console.log(moment(this.selectedItem.advertisementDTO.dateFrom, 'dd-MM-yyyy'))
+    console.log(this.selectedItem.advertisementDTO.dateFrom)
+    // this.dateForm.patchValue(
+    //   {
+    //     'validFrom': new Date(moment(this.selectedItem.advertisementDTO.dateFrom, 'dd-MM-yyyy'))
+    //   }
+    // );
 
     this.successCreatedCar = this.carService.createSuccessEmitter.subscribe(
       () => {
@@ -125,11 +135,11 @@ export class EditAdvertisementComponent implements OnInit {
   }
 
   edit() {
-
     if (this.getSelectedPriceList().pricePerKm && !this.dateForm.value.kilometresLimit) {
       this.toastr.error("Please enter Kilometres limit", 'Create Advertisement');
       return;
     }
+
     const validFrom = formatDate(this.dateForm.value.validFrom, 'dd-MM-yyyy', 'en-US')
     var cdw = true;
     if (!this.priceListForm.value.priceList.priceForCDW) {
@@ -142,6 +152,7 @@ export class EditAdvertisementComponent implements OnInit {
       (data: Advertisement) => {
         this.carForm.reset();
         this.priceListForm.reset();
+        this.dialogRef.close();
         this.toastr.success('Success.', 'Edit Advertisement');
         this.advertisementService.createSuccessEmitter.next(data);
       },

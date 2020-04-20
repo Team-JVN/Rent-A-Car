@@ -8,8 +8,8 @@ export class Advertisement {
     kilometresLimit: number;
     discount: number;
     cdw: boolean;
-    dateFrom: DateTime;
-    constructor(car: Car, priceList: PriceList, discount: number, kilometresLimit: number, cdw: boolean, dateFrom: DateTime, id?: number) {
+    dateFrom: string;
+    constructor(car: Car, priceList: PriceList, discount: number, kilometresLimit: number, cdw: boolean, dateFrom: string, id?: number) {
         this.id = id;
         this.car = car;
         this.priceList = priceList;

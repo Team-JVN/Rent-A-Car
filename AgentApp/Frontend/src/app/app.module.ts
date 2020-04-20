@@ -33,6 +33,7 @@ import { AddPriceListComponent } from './component/add/add-price-list/add-price-
 import { EditPriceListComponent } from './component/edit/edit-price-list/edit-price-list.component';
 import { ViewPicturesComponent } from './component/view-pictures/view-pictures.component';
 import { EditAdvertisementComponent } from './component/edit/edit-advertisement/edit-advertisement.component';
+import { DatePipe } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -98,7 +99,7 @@ import { EditAdvertisementComponent } from './component/edit/edit-advertisement/
   providers: [
     {
       provide: HAMMER_GESTURE_CONFIG, useClass: CustomHammerConfig
-    },
+    }
   ],
   bootstrap: [AppComponent]
 })
