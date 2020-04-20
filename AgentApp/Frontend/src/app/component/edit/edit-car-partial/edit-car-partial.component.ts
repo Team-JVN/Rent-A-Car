@@ -1,5 +1,5 @@
 import { CarEdit } from './../../../model/carEdit';
-import { CarWithPicturesDTO } from './../../../model/carWithPictures';
+import { CarWithPictures } from './../../../model/carWithPictures';
 import { CarService } from './../../../service/car.service';
 import { Component, OnInit, Inject } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -19,7 +19,7 @@ export class EditCarPartialComponent implements OnInit {
 
   constructor(private toastr: ToastrService, private carService: CarService,
     private dialogRef: MatDialogRef<EditCarPartialComponent>, private formBuilder: FormBuilder,
-    @Inject(MAT_DIALOG_DATA) public selectedItem: CarWithPicturesDTO) { }
+    @Inject(MAT_DIALOG_DATA) public selectedItem: CarWithPictures) { }
 
   ngOnInit() {
     this.editForm = this.formBuilder.group({

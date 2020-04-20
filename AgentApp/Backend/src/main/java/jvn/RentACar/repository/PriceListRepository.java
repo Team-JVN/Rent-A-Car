@@ -8,8 +8,7 @@ import java.util.List;
 
 public interface PriceListRepository extends JpaRepository<PriceList, Long> {
 
-    PriceList findOneById(Long id);
+    PriceList findOneByIdAndStatusNot(Long id, LogicalStatus logicalStatus);
 
     List<PriceList> findByStatus(LogicalStatus status);
-
 }

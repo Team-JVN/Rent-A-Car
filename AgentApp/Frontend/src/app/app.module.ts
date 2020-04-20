@@ -32,6 +32,7 @@ import { ListPriceListsComponent } from './component/list/list-price-lists/list-
 import { AddPriceListComponent } from './component/add/add-price-list/add-price-list.component';
 import { EditPriceListComponent } from './component/edit/edit-price-list/edit-price-list.component';
 import { ViewPicturesComponent } from './component/view-pictures/view-pictures.component';
+import { EditAdvertisementComponent } from './component/edit/edit-advertisement/edit-advertisement.component';
 
 @NgModule({
   declarations: [
@@ -57,6 +58,7 @@ import { ViewPicturesComponent } from './component/view-pictures/view-pictures.c
     AddPriceListComponent,
     EditPriceListComponent,
     ViewPicturesComponent,
+    EditAdvertisementComponent,
   ],
   imports: [
     BrowserModule,

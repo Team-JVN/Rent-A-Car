@@ -1,5 +1,6 @@
 package jvn.RentACar.serviceImpl;
 
+import jvn.RentACar.enumeration.LogicalStatus;
 import jvn.RentACar.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.RentACar.model.Advertisement;
 import jvn.RentACar.model.PriceList;
@@ -34,8 +35,44 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         } else {
             createAdvertisementDTO.setCDW(false);
         }
-        //PROVERI DA LI JE TADA AUTO SLOBODAN
+
         return advertisementRepository.save(createAdvertisementDTO);
+    }
+
+    @Override
+    public Advertisement edit(Long id, Advertisement advertisement) {
+        //TODO: CHECK IF CAR IS AVAILABLE !!!!
+        //TODO: CHECK IF ADVERTISEMENT IS EDITABLE
+        advertisement.setCar(carService.get(advertisement.getCar().getId()));
+        advertisement.setPriceList(priceListService.get(advertisement.getPriceList().getId()));
+        PriceList priceList = advertisement.getPriceList();
+        if (priceList.getPricePerKm() != null && advertisement.getKilometresLimit() == null) {
+            throw new InvalidAdvertisementDataException("You have to set kilometres limit.", HttpStatus.BAD_REQUEST);
+        }
+        if (priceList.getPriceForCDW() != null) {
+            advertisement.setCDW(true);
+        } else {
+            advertisement.setCDW(false);
+        }
+
+        return advertisementRepository.save(advertisement);
+    }
+
+    @Override
+    public void delete(Long id) {
+        //TODO: CHECK
+        Advertisement advertisement = get(id);
+        advertisement.setLogicalStatus(LogicalStatus.DELETED);
+        advertisementRepository.save(advertisement);
+    }
+
+    @Override
+    public Advertisement get(Long id) {
+        Advertisement advertisement = advertisementRepository.findOneById(id);
+        if (advertisement == null) {
+            throw new InvalidAdvertisementDataException("This advertisement doesn't exist.", HttpStatus.NOT_FOUND);
+        }
+        return advertisement;
     }
 
     @Autowired

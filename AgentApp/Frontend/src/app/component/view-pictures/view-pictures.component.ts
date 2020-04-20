@@ -2,7 +2,7 @@ import { environment } from './../../../environments/environment';
 import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CarService } from './../../service/car.service';
-import { CarWithPicturesDTO } from './../../model/carWithPictures';
+import { CarWithPictures } from './../../model/carWithPictures';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { NgxGalleryOptions, NgxGalleryImage, NgxGalleryAnimation } from 'ngx-gallery';
@@ -19,7 +19,7 @@ export class ViewPicturesComponent implements OnInit {
   galleryImages: NgxGalleryImage[] = [];
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public selectedCar: CarWithPicturesDTO
+    @Inject(MAT_DIALOG_DATA) public selectedCar: CarWithPictures
   ) { }
 
   ngOnInit() {

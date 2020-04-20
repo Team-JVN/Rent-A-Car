@@ -5,7 +5,7 @@ import { BodyStyle } from './../../../model/bodystyle';
 import { GearBoxType } from './../../../model/gearboxType';
 import { FuelType } from './../../../model/fuelType';
 import { CarEdit } from './../../../model/carEdit';
-import { CarWithPicturesDTO } from './../../../model/carWithPictures';
+import { CarWithPictures } from './../../../model/carWithPictures';
 import { CarService } from './../../../service/car.service';
 import { Component, OnInit, Inject } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -29,7 +29,7 @@ export class EditCarComponent implements OnInit {
 
   constructor(private toastr: ToastrService, private carService: CarService, private fuelTypeService: FuelTypeService, private gearboxTypeService: GearboxTypeService,
     private bodyStyleService: BodyStyleService, private dialogRef: MatDialogRef<EditCarComponent>, private formBuilder: FormBuilder,
-    @Inject(MAT_DIALOG_DATA) public selectedItem: CarWithPicturesDTO) { }
+    @Inject(MAT_DIALOG_DATA) public selectedItem: CarWithPictures) { }
 
   ngOnInit() {
     this.fetchFuelTypes();
@@ -111,6 +111,7 @@ export class EditCarComponent implements OnInit {
       }
     );
   }
+
   edit() {
     if (this.editForm.invalid) {
       this.toastr.error("Please enter valid data", 'Create car');

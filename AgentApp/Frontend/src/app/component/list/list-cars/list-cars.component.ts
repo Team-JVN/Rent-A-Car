@@ -1,6 +1,6 @@
 import { ViewPicturesComponent } from './../../view-pictures/view-pictures.component';
 import { EditCarPartialComponent } from './../../edit/edit-car-partial/edit-car-partial.component';
-import { CarWithPicturesDTO } from './../../../model/carWithPictures';
+import { CarWithPictures } from './../../../model/carWithPictures';
 import { AddCarComponent } from './../../add/add-car/add-car.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CarService } from './../../../service/car.service';
@@ -19,7 +19,7 @@ import { EditCarComponent } from '../../edit/edit-car/edit-car.component';
 export class ListCarsComponent implements OnInit {
 
   displayedColumns: string[] = ['car'];
-  carsDataSource: MatTableDataSource<CarWithPicturesDTO>;
+  carsDataSource: MatTableDataSource<CarWithPictures>;
   successCreated: Subscription;
 
   constructor(public dialog: MatDialog,
@@ -36,7 +36,7 @@ export class ListCarsComponent implements OnInit {
 
   }
 
-  getPicture(carWithPicturesDTO: CarWithPicturesDTO) {
+  getPicture(carWithPicturesDTO: CarWithPictures) {
     this.carService.getPicture(carWithPicturesDTO.pictures[0], carWithPicturesDTO.carDTO.id).subscribe(
       (data) => {
         console.log(data);
@@ -50,7 +50,7 @@ export class ListCarsComponent implements OnInit {
     );
   }
 
-  createImageFromBlob(image: Blob, carWithPicturesDTO: CarWithPicturesDTO) {
+  createImageFromBlob(image: Blob, carWithPicturesDTO: CarWithPictures) {
     let reader = new FileReader();
     reader.addEventListener("load", () => {
       carWithPicturesDTO.image = reader.result;
@@ -63,21 +63,21 @@ export class ListCarsComponent implements OnInit {
 
   fetchCars() {
     this.carService.getCars().subscribe(
-      (data: CarWithPicturesDTO[]) => {
+      (data: CarWithPictures[]) => {
         data.forEach(carWithPicturesDTO => {
           this.getPicture(carWithPicturesDTO);
         });
         this.carsDataSource = new MatTableDataSource(data);
       },
       (httpErrorResponse: HttpErrorResponse) => {
-        const data: CarWithPicturesDTO[] = []
+        const data: CarWithPictures[] = []
         this.carsDataSource = new MatTableDataSource(data)
         this.toastr.error(httpErrorResponse.error.message, 'Show Cars');
       }
     );
   }
 
-  edit(element: CarWithPicturesDTO) {
+  edit(element: CarWithPictures) {
     this.carService.getEditType(element.carDTO.id).subscribe(
       (data: string) => {
         if (data === "ALL") {
@@ -87,7 +87,7 @@ export class ListCarsComponent implements OnInit {
         }
       },
       (httpErrorResponse: HttpErrorResponse) => {
-        const data: CarWithPicturesDTO[] = []
+        const data: CarWithPictures[] = []
         this.carsDataSource = new MatTableDataSource(data)
         this.toastr.error(httpErrorResponse.error.message, 'Show Cars');
       }
@@ -99,7 +99,7 @@ export class ListCarsComponent implements OnInit {
     this.dialog.open(AddCarComponent);
   }
 
-  delete(element: CarWithPicturesDTO) {
+  delete(element: CarWithPictures) {
     this.carService.delete(element.carDTO.id).subscribe(
       () => {
         this.fetchCars();
@@ -111,7 +111,7 @@ export class ListCarsComponent implements OnInit {
     );
   }
 
-  viewPictures(element: CarWithPicturesDTO) {
+  viewPictures(element: CarWithPictures) {
     this.dialog.open(ViewPicturesComponent, { data: element });
   }
 

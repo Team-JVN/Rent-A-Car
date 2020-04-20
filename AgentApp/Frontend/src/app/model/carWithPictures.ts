@@ -1,5 +1,5 @@
 import { Car } from './car';
-export class CarWithPicturesDTO {
+export class CarWithPictures {
     carDTO: Car;
     pictures: string[];
     image: any;

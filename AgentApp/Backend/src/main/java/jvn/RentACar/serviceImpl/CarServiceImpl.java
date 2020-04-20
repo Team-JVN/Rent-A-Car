@@ -140,7 +140,7 @@ public class CarServiceImpl implements CarService {
     }
 
     private void isEditable(Long id) {
-        if (!carRepository.findByIdAndAdvertisementsDateToAfter(id, LocalDate.now()).isEmpty()) {
+        if (carRepository.findByIdAndAdvertisementsLogicalStatusAndAdvertisementsDateFromLessThanEqual(id, LogicalStatus.EXISTING, LocalDate.now()) != null) {
             throw new InvalidCarDataException("Car is in use and therefore can not be deleted.", HttpStatus.FORBIDDEN);
         }
     }

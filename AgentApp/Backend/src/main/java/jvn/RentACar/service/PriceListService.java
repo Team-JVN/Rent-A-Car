@@ -1,6 +1,5 @@
 package jvn.RentACar.service;
 
-import jvn.RentACar.dto.both.PriceListDTO;
 import jvn.RentACar.model.PriceList;
 
 import java.util.List;
@@ -11,9 +10,9 @@ public interface PriceListService {
 
     List<PriceList> getAll();
 
-    PriceList create(PriceListDTO priceListDTO);
+    PriceList create(PriceList priceList);
 
-    PriceList edit(Long id, PriceListDTO priceListDTO);
+    PriceList edit(Long id, PriceList priceList);
 
     void delete(Long id);
 

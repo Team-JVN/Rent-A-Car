@@ -35,12 +35,12 @@ public class PriceListController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PriceListDTO> create(@Valid @RequestBody PriceListDTO priceListDTO) {
-        return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.create(priceListDTO)), HttpStatus.CREATED);
+        return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.create(priceListDtoMapper.toEntity(priceListDTO))), HttpStatus.CREATED);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PriceListDTO> edit(@PathVariable Long id, @Valid @RequestBody PriceListDTO priceListDTO) {
-        return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.edit(id, priceListDTO)), HttpStatus.OK);
+        return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.edit(id, priceListDtoMapper.toEntity(priceListDTO))), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

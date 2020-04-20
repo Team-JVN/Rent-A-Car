@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.text.ParseException;
@@ -37,6 +34,21 @@ public class AdvertisementController {
         } catch (ParseException e) {
             throw new InvalidAdvertisementDataException("Please choose valid date.", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AdvertisementDTO> edit(@PathVariable Long id, @Valid @RequestBody AdvertisementDTO advertisementDTO) {
+        try {
+            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.edit(id, advertisementDtoMapper.toEntity(advertisementDTO))), HttpStatus.OK);
+        } catch (ParseException e) {
+            throw new InvalidAdvertisementDataException("Please choose valid date.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+        advertisementService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Autowired
