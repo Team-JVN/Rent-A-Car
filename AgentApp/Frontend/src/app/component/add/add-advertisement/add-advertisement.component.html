@@ -1,9 +1,9 @@
-<h1 mat-dialog-title>Create New Advertisement</h1>
+<h1 mat-dialog-title>Create new Advertisement</h1>
 <mat-dialog-content class="dialog-class">
     <mat-horizontal-stepper [linear]="true" #stepper>
         <mat-step [stepControl]="carForm">
             <form [formGroup]="carForm">
-                <ng-template matStepLabel>Car</ng-template>
+                <ng-template matStepLabel>Choose car</ng-template>
                 <div class="row">
                     <div class="col-9">
                         <mat-form-field class="form-full-width">
@@ -15,7 +15,7 @@
                             </mat-select>
                         </mat-form-field>
                     </div>
-                    <div class="col-3" align="end">
+                    <div class="col-3 mt-2" align="end">
                         <button mat-raised-button color="primary" (click)="openAddCar()">Add
                             car</button>
                     </div>
@@ -29,7 +29,7 @@
                                 </mat-card-title>
                             </mat-card-header>
                             <mat-card-content>
-                                <table class="table car-table">
+                                <table class="table">
                                     <tbody>
                                         <tr>
                                             <th><span class="theader">
@@ -39,7 +39,7 @@
                                             <th><span class="theader">
                                                     <mat-icon class="mr-2">speed</mat-icon>Mileage:
                                                 </span></th>
-                                            <td>{{getSelectedCar().carDTO.mileageInKm | number}} km</td>
+                                            <td>{{getSelectedCar().carDTO.mileageInKm | number}} Km</td>
                                         </tr>
                                         <tr>
                                             <th><span class="theader">
@@ -79,26 +79,27 @@
         </mat-step>
         <mat-step [stepControl]="priceListForm">
             <form [formGroup]="priceListForm">
-                <ng-template matStepLabel>Price List info</ng-template>
+                <ng-template matStepLabel>Assign price list</ng-template>
                 <div class="row">
                     <div class="col-9">
                         <mat-form-field class="form-full-width">
-                            <mat-label>Choose existing Price List</mat-label>
+                            <mat-label>Choose existing price list</mat-label>
                             <mat-select formControlName="priceList">
                                 <mat-option *ngFor="let priceList of priceLists" [value]="priceList">
-                                    Per day: {{priceList.pricePerDay}} €, Per km:{{priceList.pricePerKm}} €, For
-                                    CDW: {{priceList.priceForCDW}} €
+                                    <span>Per day: {{priceList.pricePerDay}} €</span>
+                                    <span *ngIf="priceList.pricePerKm"> — Per Km: {{priceList.pricePerKm}} €</span>
+                                    <span *ngIf="priceList.priceForCDW"> — For CDW: {{priceList.priceForCDW}} €</span>
                                 </mat-option>
                             </mat-select>
                         </mat-form-field>
                     </div>
-                    <div class="col-3" align="end">
+                    <div class="col-3 mt-2" align="end">
                         <button mat-raised-button color="primary" (click)="openAddPriceList()">Add
-                            PriceList</button>
+                            Price List</button>
                     </div>
                 </div>
                 <div *ngIf="getSelectedPriceList()">
-                    <mat-card class="price-list-card">
+                    <mat-card class="item-card">
                         <mat-card-header>
                             <mat-card-title>Selected Price List
                             </mat-card-title>
@@ -109,18 +110,18 @@
                                     <tr>
                                         <th class="first">Price Per Day</th>
                                         <td>
-                                            {{getSelectedPriceList().pricePerDay | number : '1.2-2'}} €
+                                            {{getSelectedPriceList().pricePerDay | number: '1.2-2'}} €
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th class="first">Price Per Km</th>
+                                        <th class="first">Price Per Kilometre</th>
                                         <td> <span
                                                 *ngIf="getSelectedPriceList().pricePerKm">{{getSelectedPriceList().pricePerKm}}
                                                 €</span>
                                             <span *ngIf="!getSelectedPriceList().pricePerKm">—</span></td>
                                     </tr>
                                     <tr>
-                                        <th class="first">Price For CDW</th>
+                                        <th class="first">Price For Collision Damage Waiver</th>
                                         <td> <span
                                                 *ngIf="getSelectedPriceList().priceForCDW">{{getSelectedPriceList().priceForCDW}}
                                                 €</span>
@@ -141,12 +142,12 @@
         </mat-step>
         <mat-step [stepControl]="dateForm">
             <form [formGroup]="dateForm">
-                <ng-template matStepLabel>Date info</ng-template>
+                <ng-template matStepLabel>Define date and extras</ng-template>
                 <div>
                     <table class="form-full-width mt-2 " cellspacing="0">
                         <tr>
-                            <td class="form-full-width-50">
-                                <mat-form-field class="form-full-width-left">
+                            <td class="form-full-width-left">
+                                <mat-form-field class="form-full-width-95">
                                     <input matInput [matDatepicker]="pickerFrom" placeholder="Valid from"
                                         formControlName="validFrom" readonly [min]="minDate">
                                     <mat-datepicker-toggle matSuffix [for]="pickerFrom">
@@ -154,39 +155,37 @@
                                     <mat-datepicker #pickerFrom disabled="false"></mat-datepicker>
                                 </mat-form-field>
                             </td>
-                            <td class="form-full-width-50">
-                                <mat-form-field class="form-full-width-right">
+                            <td class="form-full-width-right">
+                                <mat-form-field class="form-full-width">
                                     <input matInput placeholder="Discount for 30+ days rent" type="number"
-                                        formControlName="discount">
+                                        formControlName="discount" min="0" max="99">
                                     <span matSuffix class="ml-2">%</span>
                                     <mat-error
                                         *ngIf="dateForm.get('discount').errors && dateForm.get('discount').errors['min']">
-                                        Discount must be positive number.
+                                        Discount must be a positive number.
                                     </mat-error>
                                     <mat-error
                                         *ngIf="dateForm.get('discount').errors && dateForm.get('discount').errors['max']">
-                                        Max discount is 99%.
+                                        Maximal discount is 99%.
                                     </mat-error>
                                 </mat-form-field>
                             </td>
                         </tr>
                         <tr>
-
-                            <td class="form-full-width-50">
+                            <td class="form-full-width-left">
                                 <div *ngIf="getSelectedPriceList() && getSelectedPriceList().pricePerKm">
-                                    <mat-form-field class="form-full-width-left">
-                                        <input matInput placeholder="Kilometres Limit"
-                                            formControlName="kilometresLimit">
+                                    <mat-form-field class="form-full-width-95">
+                                        <input matInput placeholder="Kilometres Limit" type="number"
+                                            formControlName="kilometresLimit" min="0">
+                                        <span matSuffix class="ml-2">Km</span>
                                         <mat-error
                                             *ngIf="dateForm.get('kilometresLimit').errors && dateForm.get('kilometresLimit').errors['min']">
-                                            Kilometres Limit must be positive number.
+                                            Kilometres Limit must be a positive number.
                                         </mat-error>
                                     </mat-form-field>
                                 </div>
-
                             </td>
                         </tr>
-
                     </table>
                 </div>
                 <div align="end" class="mt-3">

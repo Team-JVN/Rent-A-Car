@@ -2,6 +2,7 @@ package jvn.RentACar.controller;
 
 import jvn.RentACar.dto.both.AdvertisementDTO;
 import jvn.RentACar.dto.request.CreateAdvertisementDTO;
+import jvn.RentACar.dto.response.AdvertisementWithPicturesDTO;
 import jvn.RentACar.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.RentACar.mapper.AdvertisementDtoMapper;
 import jvn.RentACar.mapper.CreateAdvertisementDtoMapper;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.text.ParseException;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/advertisement", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -27,7 +29,6 @@ public class AdvertisementController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AdvertisementDTO> create(@Valid @RequestBody CreateAdvertisementDTO createAdvertisementDTO) {
-
         try {
             return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.create(createAdvertisementDtoMapper.toEntity(createAdvertisementDTO))),
                     HttpStatus.CREATED);
@@ -49,6 +50,11 @@ public class AdvertisementController {
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         advertisementService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<AdvertisementWithPicturesDTO>> get() {
+        return new ResponseEntity<>(advertisementService.getAll(), HttpStatus.OK);
     }
 
     @Autowired

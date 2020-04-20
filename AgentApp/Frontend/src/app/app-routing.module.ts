@@ -10,23 +10,23 @@ import { ListAdvertisementsComponent } from './component/list/list-advertisement
 
 const routes: Routes = [
   {
-    path: 'body-style',
+    path: 'body-styles',
     component: ListBodyStylesComponent,
   },
   {
-    path: 'fuel-type',
+    path: 'fuel-types',
     component: ListFuelTypeComponent,
   },
   {
-    path: 'gearbox-type',
+    path: 'gearbox-types',
     component: ListGearBoxTypesComponent,
   },
   {
-    path: 'car',
+    path: 'cars',
     component: ListCarsComponent,
   },
   {
-    path: 'advertisement',
+    path: '',
     component: ListAdvertisementsComponent
   },
   {

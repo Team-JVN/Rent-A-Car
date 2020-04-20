@@ -8,6 +8,7 @@
                 <button mat-raised-button color="primary" (click)="openDialog()">Create New</button>
             </div>
         </div>
+        <br />
         <table mat-table [dataSource]="carsDataSource" class="car-list-table">
             <ng-container matColumnDef="car">
                 <td mat-cell *matCellDef="let element">
@@ -39,7 +40,7 @@
                                             <th><span class="theader">
                                                     <mat-icon class="mr-2">speed</mat-icon>Mileage:
                                                 </span></th>
-                                            <td>{{element.carDTO.mileageInKm | number}} km</td>
+                                            <td>{{element.carDTO.mileageInKm | number}} Km</td>
                                         </tr>
                                         <tr>
                                             <th><span class="theader">

@@ -1,5 +1,5 @@
 mat-card {
-    max-width: 1000px;
+    max-width: 1050px;
     margin: 2em auto;
 }
 
@@ -15,6 +15,28 @@ th.mat-header-cell{
     border-bottom-style: none;
 }
 
+.car-table tr {
+    border-bottom: 1px solid #ddd;
+}
+
+.car-table th, .table td {
+    font-size: 16px;
+    vertical-align: bottom;
+}
+
+.theader {
+    font-weight: 550;
+    display: inline-flex;
+    vertical-align: middle;
+}
+
+.item-card {
+    width: 100%;
+    display: inline-flex;
+    background-color: #F5F5F5;    
+    margin: 0.7em auto;
+    align-items: center;
+}
 
 .image {
     max-width: 300px;
@@ -25,10 +47,30 @@ th.mat-header-cell{
 .image-div {
     width: 300px;
     height: 200px;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-div:hover {
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.car-card-header{
+    display:inline-block;
+    width:100%;
     vertical-align: middle;
 }
 
+.car-card-title{
+    float: left;
+}
+
+.car-card-buttons{
+    float:right;
+    margin-top: -6px;
+}
 
 mat-card-content {
     margin-left: 16px;
@@ -40,4 +82,27 @@ mat-card-header mat-card-title {
     font-weight: 550;
 }
 
-  
+.per-km {
+    font-weight: 550;
+}
+
+.price-header {
+    font-size: 23px;
+    font-weight: 550;
+}
+
+.price-text {    
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.price-table {
+    text-align: center;
+    margin-left: 25px;
+    margin-top: 10px;
+}
+
+.rent-btn {
+    margin-top: 20px;
+}
+

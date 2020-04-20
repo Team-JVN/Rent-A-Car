@@ -1,8 +1,8 @@
 package jvn.RentACar.serviceImpl;
 
 import jvn.RentACar.dto.both.CarDTO;
-import jvn.RentACar.dto.both.CarWithPicturesDTO;
 import jvn.RentACar.dto.request.CarEditDTO;
+import jvn.RentACar.dto.response.CarWithPicturesDTO;
 import jvn.RentACar.enumeration.EditType;
 import jvn.RentACar.enumeration.LogicalStatus;
 import jvn.RentACar.exceptionHandler.InvalidCarDataException;
@@ -45,7 +45,7 @@ public class CarServiceImpl implements CarService {
     public Car create(Car car, List<MultipartFile> multipartFiles) {
         //TODO: Set owner.
         if (multipartFiles.size() > 5) {
-            throw new InvalidCarDataException("You can choose just 5 pictures.", HttpStatus.BAD_REQUEST);
+            throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
         }
         car.setBodyStyle(bodyStyleService.get(car.getBodyStyle().getId()));
         car.setFuelType(fuelTypeService.get(car.getFuelType().getId()));
@@ -80,7 +80,7 @@ public class CarServiceImpl implements CarService {
     public Car editAll(Long id, CarDTO carDTO, List<MultipartFile> multipartFiles) {
         isEditable(id);
         if (multipartFiles.size() > 5) {
-            throw new InvalidCarDataException("You can choose just 5 pictures.", HttpStatus.BAD_REQUEST);
+            throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
         }
         Car car = get(id);
         car.setMake(carDTO.getMake());
@@ -101,7 +101,7 @@ public class CarServiceImpl implements CarService {
     public Car editPartial(Long id, CarEditDTO carDTO, List<MultipartFile> multipartFiles) {
         isEditable(id);
         if (multipartFiles.size() > 5) {
-            throw new InvalidCarDataException("You can choose just 5 pictures.", HttpStatus.BAD_REQUEST);
+            throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
         }
         Car car = get(id);
         car.setMileageInKm(carDTO.getMileageInKm());
