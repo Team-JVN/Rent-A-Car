@@ -15,6 +15,6 @@ import javax.persistence.Entity;
 @DiscriminatorValue("AGENT")
 public class Agent extends User {
 
-    @Column(nullable = false)
+    @Column
     private String taxIdNumber;
 }

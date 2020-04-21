@@ -43,8 +43,11 @@ public class PriceListServiceImpl implements PriceListService {
 
     @Override
     public PriceList edit(Long id, PriceList priceList) {
-        isEditable(id);
-        return priceListRepository.save(priceList);
+        PriceList dbPriceList = isEditable(id);
+        dbPriceList.setPriceForCDW(priceList.getPriceForCDW());
+        dbPriceList.setPricePerDay(priceList.getPricePerDay());
+        dbPriceList.setPricePerKm(priceList.getPricePerKm());
+        return priceListRepository.save(dbPriceList);
     }
 
     @Override

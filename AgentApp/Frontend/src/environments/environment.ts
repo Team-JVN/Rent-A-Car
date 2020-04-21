@@ -11,6 +11,7 @@ export const environment = {
   gearBoxType: '/api/gearbox-type',
   car: '/api/car',
   priceList: '/api/price-list',
+  client: '/api/client',
 };
 
 /*

@@ -55,22 +55,26 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     public Advertisement edit(Long id, Advertisement advertisement) {
         //TODO: CHECK IF CAR IS AVAILABLE !!!!
         //TODO: CHECK IF ADVERTISEMENT IS EDITABLE
-        advertisement.setCar(carService.get(advertisement.getCar().getId()));
-        advertisement.setPriceList(priceListService.get(advertisement.getPriceList().getId()));
-        PriceList priceList = advertisement.getPriceList();
+        Advertisement dbAdvertisement = get(advertisement.getId());
+        dbAdvertisement.setCar(carService.get(advertisement.getCar().getId()));
+        dbAdvertisement.setPriceList(priceListService.get(advertisement.getPriceList().getId()));
+        PriceList priceList = dbAdvertisement.getPriceList();
         if (priceList.getPricePerKm() != null && advertisement.getKilometresLimit() == null) {
             throw new InvalidAdvertisementDataException("You have to set kilometres limit.", HttpStatus.BAD_REQUEST);
         }
         if (priceList.getPricePerKm() == null) {
-            advertisement.setKilometresLimit(null);
+            dbAdvertisement.setKilometresLimit(null);
+        } else {
+            dbAdvertisement.setKilometresLimit(advertisement.getKilometresLimit());
         }
         if (priceList.getPriceForCDW() != null) {
-            advertisement.setCDW(true);
+            dbAdvertisement.setCDW(true);
         } else {
-            advertisement.setCDW(false);
+            dbAdvertisement.setCDW(false);
         }
-
-        return advertisementRepository.save(advertisement);
+        dbAdvertisement.setDateFrom(advertisement.getDateFrom());
+        dbAdvertisement.setDiscount(advertisement.getDiscount());
+        return advertisementRepository.save(dbAdvertisement);
     }
 
     @Override

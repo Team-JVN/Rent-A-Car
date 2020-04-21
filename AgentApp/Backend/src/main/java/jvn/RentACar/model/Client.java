@@ -15,7 +15,7 @@ import java.util.Set;
 @DiscriminatorValue("CLIENT")
 public class Client extends User {
 
-    @Column(columnDefinition = "VARCHAR(10)", unique = true, nullable = false)
+    @Column(columnDefinition = "VARCHAR(10)", unique = true)
     private String phoneNumber;
 
     @OneToMany(mappedBy = "client", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

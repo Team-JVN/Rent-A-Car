@@ -33,7 +33,9 @@ import { AddPriceListComponent } from './component/add/add-price-list/add-price-
 import { EditPriceListComponent } from './component/edit/edit-price-list/edit-price-list.component';
 import { ViewPicturesComponent } from './component/view-pictures/view-pictures.component';
 import { EditAdvertisementComponent } from './component/edit/edit-advertisement/edit-advertisement.component';
-import { DatePipe } from '@angular/common';
+import { ListClientsComponent } from './component/list/list-clients/list-clients.component';
+import { AddClientComponent } from './component/add/add-client/add-client.component';
+import { EditClientComponent } from './component/edit/edit-client/edit-client.component';
 
 @NgModule({
   declarations: [
@@ -60,6 +62,9 @@ import { DatePipe } from '@angular/common';
     EditPriceListComponent,
     ViewPicturesComponent,
     EditAdvertisementComponent,
+    ListClientsComponent,
+    AddClientComponent,
+    EditClientComponent,
   ],
   imports: [
     BrowserModule,
@@ -94,7 +99,9 @@ import { DatePipe } from '@angular/common';
     AddPriceListComponent,
     EditPriceListComponent,
     ViewPicturesComponent,
-    EditAdvertisementComponent
+    EditAdvertisementComponent,
+    AddClientComponent,
+    EditClientComponent,
   ],
   providers: [
     {

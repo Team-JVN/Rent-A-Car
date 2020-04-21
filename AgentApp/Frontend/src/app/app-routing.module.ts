@@ -1,3 +1,4 @@
+import { ListClientsComponent } from './component/list/list-clients/list-clients.component';
 import { ListCarsComponent } from './component/list/list-cars/list-cars.component';
 import { ListGearBoxTypesComponent } from './component/list/list-gear-box-types/list-gear-box-types.component';
 import { ListFuelTypeComponent } from './component/list/list-fuel-type/list-fuel-type.component';
@@ -26,12 +27,16 @@ const routes: Routes = [
     component: ListCarsComponent,
   },
   {
-    path: '',
-    component: ListAdvertisementsComponent
-  },
-  {
     path: 'price-lists',
     component: ListPriceListsComponent,
+  },
+  {
+    path: 'clients',
+    component: ListClientsComponent,
+  },
+  {
+    path: '',
+    component: ListAdvertisementsComponent
   },
 ];
 
