@@ -8,7 +8,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class GearboxTypeDtoMapper implements MapperInterface<GearboxType, GearboxTypeDTO> {
-    public ModelMapper modelMapper;
+
+    private ModelMapper modelMapper;
 
     @Override
     public GearboxType toEntity(GearboxTypeDTO dto) {

@@ -35,7 +35,13 @@ th.mat-header-cell{
     display: inline-flex;
     background-color: #F5F5F5;    
     margin: 0.7em auto;
-    align-items: center;
+    align-items: center;    
+    transition: all 0.1s ease-in-out;
+}
+
+.item-card:hover {
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
 }
 
 .image {
@@ -50,11 +56,6 @@ th.mat-header-cell{
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.image-div:hover {
-    cursor: pointer;
-    opacity: 0.8;
 }
 
 .car-card-header{
@@ -94,6 +95,7 @@ mat-card-header mat-card-title {
 .price-text {    
     font-size: 26px;
     font-weight: bold;
+    color: red;
 }
 
 .price-table {
@@ -104,5 +106,6 @@ mat-card-header mat-card-title {
 
 .rent-btn {
     margin-top: 20px;
+    font-size: 16px;
 }
 

@@ -1,0 +1,123 @@
+<mat-card *ngIf="selectedAdWithPictures">
+    <mat-card-content>
+        <h2>{{selectedAdWithPictures.advertisement.car.make}} {{selectedAdWithPictures.advertisement.car.model}}</h2>
+        <div class="row car-data-div">
+            <div class="col-7">
+                <ngx-gallery [options]="galleryOptions" [images]="galleryImages"></ngx-gallery>
+            </div>
+            <div class="col-5">
+                <h4>Car information:</h4>
+                <table class="table car-table">
+                    <tbody>
+                        <tr>
+                            <th><span class="theader">
+                                    <mat-icon class="mr-2">speed</mat-icon>Mileage:
+                                </span></th>
+                            <td>{{selectedAdWithPictures.advertisement.car.mileageInKm | number}} Km</td>
+                        </tr>
+                        <tr>
+                            <th><span class="theader">
+                                    <mat-icon class="mr-2">airline_seat_recline_normal</mat-icon>Kid's
+                                    seats:
+                                </span></th>
+                            <td>{{selectedAdWithPictures.advertisement.car.kidsSeats}}</td>
+                        </tr>
+                        <tr>
+                            <th><span class="theader">
+                                    <mat-icon class="mr-2">navigation</mat-icon>Tracking:
+                                </span></th>
+                            <td>
+                                <span
+                                    *ngIf="selectedAdWithPictures.advertisement.car.availableTracking">Available</span>
+                                <span *ngIf="!selectedAdWithPictures.advertisement.car.availableTracking">Not
+                                    Available</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><span class="theader">
+                                    <mat-icon class="mr-2">local_gas_station</mat-icon>Fuel Type:
+                                </span></th>
+                            <td>{{selectedAdWithPictures.advertisement.car.fuelType.name}}</td>
+                        </tr>
+                        <tr>
+                            <th><span class="theader">
+                                    <mat-icon class="mr-2">settings</mat-icon>Gearbox:
+                                </span></th>
+                            <td>{{selectedAdWithPictures.advertisement.car.gearBoxType.name}}</td>
+                        </tr>
+                        <tr>
+                            <th><span class="theader">
+                                    <mat-icon class="mr-2">airport_shuttle</mat-icon>Body Style:
+                                </span></th>
+                            <td>{{selectedAdWithPictures.advertisement.car.bodyStyle.name}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row ad-data-div">
+            <div class="col-9">
+                <h4>Rent information:</h4>
+                <table class="table car-table">
+                    <tbody>
+                        <tr>
+                            <th><span class="theader">
+                                    <mat-icon class="mr-2">today</mat-icon>Available Between:
+                                </span></th>
+                            <td>{{selectedAdWithPictures.advertisement.dateFrom}} — Unlimited</td>
+                        </tr>
+                        <tr>
+                            <th><span class="theader">
+                                    <mat-icon class="mr-2">speed</mat-icon>Kilometres Limit:
+                                </span></th>
+                            <td>
+                                <span *ngIf="selectedAdWithPictures.advertisement.kilometresLimit">
+                                    {{selectedAdWithPictures.advertisement.kilometresLimit}} Km &nbsp;
+                                    <span class="per-km">
+                                        ({{selectedAdWithPictures.advertisement.priceList.pricePerKm}} € per
+                                        Km)</span>
+                                </span>
+                                <span *ngIf="!selectedAdWithPictures.advertisement.kilometresLimit">Unlimited</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><span class="theader">
+                                    <mat-icon class="mr-2">commute</mat-icon>Collision Damage
+                                    Waiver:
+                                </span></th>
+                            <td>
+                                <span *ngIf="selectedAdWithPictures.advertisement.cdw">
+                                    {{selectedAdWithPictures.advertisement.priceList.priceForCDW}} €</span>
+                                <span *ngIf="!selectedAdWithPictures.advertisement.cdw">Not Available</span>
+                            </td>
+                        </tr>
+                        <tr
+                            *ngIf="selectedAdWithPictures.advertisement.discount && selectedAdWithPictures.advertisement.discount > 0">
+                            <th><span class="theader">
+                                    <mat-icon class="mr-2">money_off</mat-icon>30+ days Rent
+                                    Discount:
+                                </span></th>
+                            <td>{{selectedAdWithPictures.advertisement.discount}} %</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-3">
+                <table class="price-table">
+                    <tr>
+                        <td class="price-header">Price per day:</td>
+                    </tr>
+                    <tr>
+                        <td class="price-text">
+                            {{selectedAdWithPictures.advertisement.priceList.pricePerDay}} €</td>
+                    </tr>
+                    <tr><button *ngIf="selectedAdWithPictures.advertisement.active" mat-raised-button color="primary"
+                            class="rent-btn" (click)="rent()">Rent me!</button>
+                        <button *ngIf="!selectedAdWithPictures.advertisement.active" mat-flat-button color="warn"
+                            class="rented-out-btn">RENTED OUT</button></tr>
+
+                </table>
+            </div>
+        </div>
+    </mat-card-content>
+</mat-card>

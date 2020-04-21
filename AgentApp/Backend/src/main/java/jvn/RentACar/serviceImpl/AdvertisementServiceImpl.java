@@ -83,9 +83,9 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     @Override
     public Advertisement get(Long id) {
-        Advertisement advertisement = advertisementRepository.findOneById(id);
+        Advertisement advertisement = advertisementRepository.findByIdAndLogicalStatus(id, LogicalStatus.EXISTING);
         if (advertisement == null) {
-            throw new InvalidAdvertisementDataException("This advertisement doesn't exist.", HttpStatus.NOT_FOUND);
+            throw new InvalidAdvertisementDataException("Requested advertisement does not exist.", HttpStatus.NOT_FOUND);
         }
         return advertisement;
     }

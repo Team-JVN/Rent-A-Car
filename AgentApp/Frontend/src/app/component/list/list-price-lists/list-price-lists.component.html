@@ -20,14 +20,14 @@
             <ng-container matColumnDef="pricePerKm">
                 <th mat-header-cell *matHeaderCellDef>Price Per Km</th>
                 <td mat-cell *matCellDef="let element">
-                    <span *ngIf="element.pricePerKm">{{element.pricePerKm}} €</span>
+                    <span *ngIf="element.pricePerKm">{{element.pricePerKm | number : '1.2-2'}} €</span>
                     <span *ngIf="!element.pricePerKm">—</span>
                 </td>
             </ng-container>
             <ng-container matColumnDef="priceForCDW">
                 <th mat-header-cell *matHeaderCellDef>Price For CDW</th>
                 <td mat-cell *matCellDef="let element">
-                    <span *ngIf="element.priceForCDW">{{element.priceForCDW}} €</span>
+                    <span *ngIf="element.priceForCDW">{{element.priceForCDW | number : '1.2-2'}} €</span>
                     <span *ngIf="!element.priceForCDW">—</span>
                 </td>
             </ng-container>

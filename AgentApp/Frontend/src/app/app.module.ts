@@ -34,6 +34,7 @@ import { EditPriceListComponent } from './component/edit/edit-price-list/edit-pr
 import { ViewPicturesComponent } from './component/view-pictures/view-pictures.component';
 import { EditAdvertisementComponent } from './component/edit/edit-advertisement/edit-advertisement.component';
 import { DatePipe } from '@angular/common';
+import { AdvertisementDetailsComponent } from './component/advertisement-details/advertisement-details.component';
 
 @NgModule({
   declarations: [
@@ -60,6 +61,7 @@ import { DatePipe } from '@angular/common';
     EditPriceListComponent,
     ViewPicturesComponent,
     EditAdvertisementComponent,
+    AdvertisementDetailsComponent,
   ],
   imports: [
     BrowserModule,

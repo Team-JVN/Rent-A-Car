@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface AdvertisementRepository extends JpaRepository<Advertisement, Long> {
 
-    Advertisement findOneById(Long id);
+    Advertisement findByIdAndLogicalStatus(Long id, LogicalStatus logicalStatus);
 
     List<Advertisement> findAllByLogicalStatusNot(LogicalStatus logicalStatus);
 }

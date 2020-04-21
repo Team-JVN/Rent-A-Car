@@ -8,7 +8,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class FuelTypeDtoMapper implements MapperInterface<FuelType, FuelTypeDTO> {
-    public ModelMapper modelMapper;
+
+    private ModelMapper modelMapper;
 
     @Override
     public FuelType toEntity(FuelTypeDTO dto) {

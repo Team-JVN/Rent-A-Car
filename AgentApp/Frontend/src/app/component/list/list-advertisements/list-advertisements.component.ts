@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CarService } from './../../../service/car.service';
 import { AdvertisementService } from './../../../service/advertisement.service';
@@ -22,6 +23,7 @@ export class ListAdvertisementsComponent implements OnInit {
   createSuccess: Subscription;
 
   constructor(
+    public router: Router,
     public dialog: MatDialog,
     private advertisementService: AdvertisementService,
     private carService: CarService,
@@ -38,9 +40,8 @@ export class ListAdvertisementsComponent implements OnInit {
   }
 
   fetchAll() {
-    this.advertisementService.getAdvertisements().subscribe(
+    this.advertisementService.getAll().subscribe(
       (data: AdvertisementWithPicturesDTO[]) => {
-        console.log(data);
         data.forEach(adWithPicturesDTO => {
           this.getPicture(adWithPicturesDTO);
         });
@@ -55,7 +56,7 @@ export class ListAdvertisementsComponent implements OnInit {
   }
 
   getPicture(adWithPicturesDTO: AdvertisementWithPicturesDTO) {
-    this.carService.getPicture(adWithPicturesDTO.pictures[0], adWithPicturesDTO.advertisementDTO.car.id).subscribe(
+    this.carService.getPicture(adWithPicturesDTO.pictures[0], adWithPicturesDTO.advertisement.car.id).subscribe(
       (data) => {
         this.createImageFromBlob(data, adWithPicturesDTO);
         adWithPicturesDTO.isImageLoading = false;
@@ -87,7 +88,7 @@ export class ListAdvertisementsComponent implements OnInit {
   }
 
   delete(element: AdvertisementWithPicturesDTO) {
-    this.advertisementService.delete(element.advertisementDTO.id).subscribe(
+    this.advertisementService.delete(element.advertisement.id).subscribe(
       () => {
         this.fetchAll();
         this.toastr.success('Successfully deleted Advertisement!', 'Delete Advertisement');
@@ -96,6 +97,14 @@ export class ListAdvertisementsComponent implements OnInit {
         this.toastr.error(httpErrorResponse.error.message, 'Delete Advertisement');
       }
     );
+  }
+
+  rent(element: AdvertisementWithPicturesDTO) {
+
+  }
+
+  viewDetails(element: AdvertisementWithPicturesDTO) {
+    this.router.navigate(['/advertisement/' + element.advertisement.id]);
   }
 
 }

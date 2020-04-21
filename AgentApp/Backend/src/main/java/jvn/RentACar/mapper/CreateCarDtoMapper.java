@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CreateCarDtoMapper implements MapperInterface<Car, CreateCarDTO> {
 
-    public ModelMapper modelMapper;
+    private ModelMapper modelMapper;
 
     @Override
     public Car toEntity(CreateCarDTO dto) {
