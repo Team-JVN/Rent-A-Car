@@ -1,3 +1,4 @@
+import { AddRentRequestComponent } from './../../add/add-rent-request/add-rent-request.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CarService } from './../../../service/car.service';
 import { AdvertisementService } from './../../../service/advertisement.service';
@@ -55,7 +56,7 @@ export class ListAdvertisementsComponent implements OnInit {
   }
 
   getPicture(adWithPicturesDTO: AdvertisementWithPicturesDTO) {
-    this.carService.getPicture(adWithPicturesDTO.pictures[0], adWithPicturesDTO.advertisementDTO.car.id).subscribe(
+    this.carService.getPicture(adWithPicturesDTO.pictures[0], adWithPicturesDTO.advertisement.car.id).subscribe(
       (data) => {
         this.createImageFromBlob(data, adWithPicturesDTO);
         adWithPicturesDTO.isImageLoading = false;
@@ -87,7 +88,7 @@ export class ListAdvertisementsComponent implements OnInit {
   }
 
   delete(element: AdvertisementWithPicturesDTO) {
-    this.advertisementService.delete(element.advertisementDTO.id).subscribe(
+    this.advertisementService.delete(element.advertisement.id).subscribe(
       () => {
         this.fetchAll();
         this.toastr.success('Successfully deleted Advertisement!', 'Delete Advertisement');
@@ -96,6 +97,10 @@ export class ListAdvertisementsComponent implements OnInit {
         this.toastr.error(httpErrorResponse.error.message, 'Delete Advertisement');
       }
     );
+  }
+
+  rent(element: AdvertisementWithPicturesDTO) {
+    this.dialog.open(AddRentRequestComponent, { data: element.advertisement });
   }
 
 }

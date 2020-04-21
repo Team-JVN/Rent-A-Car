@@ -35,4 +35,6 @@ public class AdvertisementDTO {
 
     @NotEmpty(message = "Date from is empty.")
     private String dateFrom;
+
+    private Boolean active;
 }

@@ -19,8 +19,8 @@
                         </div>
                         <div>
                             <mat-card-header class="car-card-header">
-                                <mat-card-title class="car-card-title">{{element.advertisementDTO.car.make}}
-                                    {{element.advertisementDTO.car.model}}
+                                <mat-card-title class="car-card-title">{{element.advertisement.car.make}}
+                                    {{element.advertisement.car.model}}
                                 </mat-card-title>
                                 <div class="car-card-buttons">
                                     <button mat-icon-button aria-label="Edit" color="primary" (click)="edit(element)">
@@ -38,20 +38,20 @@
                                             <th><span class="theader">
                                                     <mat-icon class="mr-2">today</mat-icon>Available Between:
                                                 </span></th>
-                                            <td>{{element.advertisementDTO.dateFrom}} — Unlimited</td>
+                                            <td>{{element.advertisement.dateFrom}} — Unlimited</td>
                                         </tr>
                                         <tr>
                                             <th><span class="theader">
                                                     <mat-icon class="mr-2">speed</mat-icon>Kilometres Limit:
                                                 </span></th>
                                             <td>
-                                                <span *ngIf="element.advertisementDTO.kilometresLimit">
-                                                    {{element.advertisementDTO.kilometresLimit}} Km &nbsp;
+                                                <span *ngIf="element.advertisement.kilometresLimit">
+                                                    {{element.advertisement.kilometresLimit}} Km &nbsp;
                                                     <span class="per-km">
-                                                        ({{element.advertisementDTO.priceList.pricePerKm}} € per
+                                                        ({{element.advertisement.priceList.pricePerKm}} € per
                                                         Km)</span>
                                                 </span>
-                                                <span *ngIf="!element.advertisementDTO.kilometresLimit">Unlimited</span>
+                                                <span *ngIf="!element.advertisement.kilometresLimit">Unlimited</span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -60,18 +60,18 @@
                                                     Waiver:
                                                 </span></th>
                                             <td>
-                                                <span *ngIf="element.advertisementDTO.cdw">
-                                                    {{element.advertisementDTO.priceList.priceForCDW}} €</span>
-                                                <span *ngIf="!element.advertisementDTO.cdw">Not Available</span>
+                                                <span *ngIf="element.advertisement.cdw">
+                                                    {{element.advertisement.priceList.priceForCDW}} €</span>
+                                                <span *ngIf="!element.advertisement.cdw">Not Available</span>
                                             </td>
                                         </tr>
                                         <tr
-                                            *ngIf="element.advertisementDTO.discount && element.advertisementDTO.discount > 0">
+                                            *ngIf="element.advertisement.discount && element.advertisement.discount > 0">
                                             <th><span class="theader">
                                                     <mat-icon class="mr-2">money_off</mat-icon>30+ days Rent
                                                     Discount:
                                                 </span></th>
-                                            <td>{{element.advertisementDTO.discount}} %</td>
+                                            <td>{{element.advertisement.discount}} %</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -83,9 +83,11 @@
                             </tr>
                             <tr>
                                 <td class="price-text" style="color: red;">
-                                    {{element.advertisementDTO.priceList.pricePerDay}} €</td>
+                                    {{element.advertisement.priceList.pricePerDay}} €</td>
                             </tr>
-                            <tr><button mat-raised-button color="primary" class="rent-btn" (click)="rent()">Rent a
+                            <tr><button *ngIf="element.advertisement.active" mat-raised-button color="primary"
+                                    class="rent-btn" (click)="rent(element)">Rent
+                                    a
                                     Car</button></tr>
                         </table>
                     </mat-card>

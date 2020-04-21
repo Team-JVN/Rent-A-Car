@@ -12,6 +12,7 @@ export const environment = {
   car: '/api/car',
   priceList: '/api/price-list',
   client: '/api/client',
+  rentRequest: '/api/rent-request',
 };
 
 /*

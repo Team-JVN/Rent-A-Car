@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class AdvertisementWithPicturesDTO {
     @NotNull(message = "Advertisement info is null.")
-    private AdvertisementDTO advertisementDTO;
+    private AdvertisementDTO advertisement;
 
     @NotNull(message = "Pictures are null.")
     private List<String> pictures;

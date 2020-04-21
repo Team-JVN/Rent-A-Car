@@ -28,7 +28,7 @@ public class RentRequest {
     @Column(nullable = false)
     private Double totalPrice;
 
-    @OneToMany(mappedBy = "rentRequest", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "rentRequest", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<RentInfo> rentInfos = new HashSet<RentInfo>();
 
     @OneToOne

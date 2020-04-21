@@ -47,12 +47,12 @@ export class EditAdvertisementComponent implements OnInit {
 
     this.dateForm = this.formBuilder.group({
       validFrom: new FormControl(null, Validators.required),
-      discount: new FormControl(this.selectedItem.advertisementDTO.discount, [Validators.min(0), Validators.max(99)]),
-      kilometresLimit: new FormControl(this.selectedItem.advertisementDTO.kilometresLimit, Validators.min(1))
+      discount: new FormControl(this.selectedItem.advertisement.discount, [Validators.min(0), Validators.max(99)]),
+      kilometresLimit: new FormControl(this.selectedItem.advertisement.kilometresLimit, Validators.min(1))
     })
     // const validFrom = formatDate(this.selectedItem.advertisementDTO.dateFrom, 'yyyy-MM-dd', 'en-US')
-    console.log(moment(this.selectedItem.advertisementDTO.dateFrom, 'dd-MM-yyyy'))
-    console.log(this.selectedItem.advertisementDTO.dateFrom)
+    console.log(moment(this.selectedItem.advertisement.dateFrom, 'dd-MM-yyyy'))
+    console.log(this.selectedItem.advertisement.dateFrom)
     // this.dateForm.patchValue(
     //   {
     //     'validFrom': new Date(moment(this.selectedItem.advertisementDTO.dateFrom, 'dd-MM-yyyy'))
@@ -104,7 +104,7 @@ export class EditAdvertisementComponent implements OnInit {
 
   selectPriceList() {
     this.priceLists.forEach((element: PriceList) => {
-      if (element.id === this.selectedItem.advertisementDTO.priceList.id) {
+      if (element.id === this.selectedItem.advertisement.priceList.id) {
         this.priceListForm.controls['priceList'].setValue(element);
       }
     });
@@ -112,7 +112,7 @@ export class EditAdvertisementComponent implements OnInit {
 
   selectCar() {
     this.cars.forEach((element: CarWithPictures) => {
-      if (element.carDTO.id === this.selectedItem.advertisementDTO.car.id) {
+      if (element.carDTO.id === this.selectedItem.advertisement.car.id) {
         this.carForm.controls['car'].setValue(element);
       }
     });
@@ -146,7 +146,7 @@ export class EditAdvertisementComponent implements OnInit {
       cdw = false;
     }
     const advertisement = new Advertisement(this.carForm.value.car.carDTO, this.priceListForm.value.priceList,
-      this.dateForm.value.discount, this.dateForm.value.kilometresLimit, cdw, validFrom, this.selectedItem.advertisementDTO.id);
+      this.dateForm.value.discount, this.dateForm.value.kilometresLimit, cdw, validFrom, this.selectedItem.advertisement.active, this.selectedItem.advertisement.id);
 
     this.advertisementService.edit(advertisement).subscribe(
       (data: Advertisement) => {

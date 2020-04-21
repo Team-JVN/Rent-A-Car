@@ -1,3 +1,4 @@
+import { AddRentRequestComponent } from './component/add/add-rent-request/add-rent-request.component';
 import { HeaderComponent } from './component/header/header.component';
 import { CustomHammerConfig } from './custom-hummer-config';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -65,6 +66,7 @@ import { EditClientComponent } from './component/edit/edit-client/edit-client.co
     ListClientsComponent,
     AddClientComponent,
     EditClientComponent,
+    AddRentRequestComponent,
   ],
   imports: [
     BrowserModule,
@@ -102,6 +104,7 @@ import { EditClientComponent } from './component/edit/edit-client/edit-client.co
     EditAdvertisementComponent,
     AddClientComponent,
     EditClientComponent,
+    AddRentRequestComponent
   ],
   providers: [
     {

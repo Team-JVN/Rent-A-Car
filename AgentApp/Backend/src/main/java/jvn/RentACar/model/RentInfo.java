@@ -23,13 +23,13 @@ public class RentInfo {
     private LocalDateTime dateTimeTo;
 
     @Column(nullable = false)
-    private String location;
+    private String pickUpPoint;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Advertisement advertisement;
 
-    @Column(nullable = false)
-    private Boolean optedForCDWMap;
+    @Column
+    private Boolean optedForCDW;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private RentRequest rentRequest;
