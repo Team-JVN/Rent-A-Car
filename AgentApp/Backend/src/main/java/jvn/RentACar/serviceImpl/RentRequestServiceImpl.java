@@ -9,6 +9,7 @@ import jvn.RentACar.model.RentRequest;
 import jvn.RentACar.repository.RentRequestRepository;
 import jvn.RentACar.service.AdvertisementService;
 import jvn.RentACar.service.ClientService;
+import jvn.RentACar.service.RentInfoService;
 import jvn.RentACar.service.RentRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,10 +32,11 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     private RentRequestRepository rentRequestRepository;
 
+    private RentInfoService rentInfoService;
+
     @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public RentRequest create(RentRequest rentRequest) {
-
         rentRequest.setClient(clientService.get(rentRequest.getClient().getId()));
         rentRequest.setRentRequestStatus(RentRequestStatus.PAID);
         rentRequest.setTotalPrice(0.0);
@@ -52,6 +54,33 @@ public class RentRequestServiceImpl implements RentRequestService {
             return rentRequestRepository.findAll();
         }
         return rentRequestRepository.findByRentRequestStatus(getRentRequestStatus(status));
+    }
+
+    @Override
+    public RentRequest get(Long id) {
+        RentRequest rentRequest = rentRequestRepository.findOneById(id);
+        if (rentRequest == null) {
+            throw new InvalidRentRequestDataException("Requested rent request does not exist.", HttpStatus.NOT_FOUND);
+        }
+        return rentRequest;
+    }
+
+    @Override
+    public void delete(Long id) {
+        RentRequest rentRequest = get(id);
+        if (!rentRequest.getRentRequestStatus().equals(RentRequestStatus.CANCELED)) {
+            throw new InvalidRentRequestDataException("This rent request is not canceled so you can not delete it.", HttpStatus.NOT_FOUND);
+        }
+        rentRequest.setClient(null);
+        Set<RentInfo> rentInfos = rentRequest.getRentInfos();
+        rentRequest.setRentInfos(new HashSet<>());
+        rentInfoService.delete(rentInfos);
+        rentRequestRepository.deleteById(id);
+    }
+
+    @Override
+    public RentRequest edit(Long id, RentRequest rentRequest) {
+        return null;
     }
 
     private double setRentInfosData(RentRequest rentRequest, Set<RentInfo> rentInfos, Boolean activeAdvertisement) {
@@ -117,9 +146,10 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     @Autowired
     public RentRequestServiceImpl(ClientService clientService, AdvertisementService advertisementService,
-                                  RentRequestRepository rentRequestRepository) {
+                                  RentRequestRepository rentRequestRepository, RentInfoService rentInfoService) {
         this.clientService = clientService;
         this.advertisementService = advertisementService;
         this.rentRequestRepository = rentRequestRepository;
+        this.rentInfoService = rentInfoService;
     }
 }

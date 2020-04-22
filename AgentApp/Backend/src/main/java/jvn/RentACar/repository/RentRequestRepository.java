@@ -12,5 +12,8 @@ public interface RentRequestRepository extends JpaRepository<RentRequest, Long> 
 
     List<RentRequest> findAll();
 
+    RentRequest findOneById(Long id);
+
     List<RentRequest> findByRentRequestStatus(RentRequestStatus rentRequestStatus);
+
 }

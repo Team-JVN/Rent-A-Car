@@ -23,7 +23,7 @@ import { trigger, state, transition, style, animate } from '@angular/animations'
   ],
 })
 export class ListRentRequestsComponent implements OnInit {
-  displayedColumns: string[] = ['client', 'totalPrice'];
+  displayedColumns: string[] = ['client', 'totalPrice', 'buttons'];
   expandedElement: RentRequest | null;
   rentRequestsDataSource: MatTableDataSource<RentRequest>;
   createSuccess: Subscription;
@@ -58,10 +58,10 @@ export class ListRentRequestsComponent implements OnInit {
     );
   }
 
-  // edit(element: AdvertisementWithPicturesDTO) {
-  //   this.dialog.open(EditAdvertisementComponent, { data: element });
+  edit(element: RentRequest) {
+    // this.dialog.open(EditAdvertisementComponent, { data: element });
 
-  // }
+  }
 
   delete(element: RentRequest) {
     this.rentRequestService.delete(element.id).subscribe(

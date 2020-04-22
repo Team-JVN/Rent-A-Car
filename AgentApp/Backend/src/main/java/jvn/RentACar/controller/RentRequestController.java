@@ -40,6 +40,17 @@ public class RentRequestController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<RentRequestDTO> edit(@PathVariable Long id, @Valid @RequestBody RentRequestDTO rentRequestDTO) {
+        return new ResponseEntity<>(rentRequestDtoMapper.toDto(rentRequestService.edit(id, rentRequestDtoMapper.toEntity(rentRequestDTO))), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        rentRequestService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
     @Autowired
     public RentRequestController(RentRequestService rentRequestService, RentRequestDtoMapper rentRequestDtoMapper) {
         this.rentRequestService = rentRequestService;

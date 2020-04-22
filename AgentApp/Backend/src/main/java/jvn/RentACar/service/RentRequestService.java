@@ -8,4 +8,10 @@ public interface RentRequestService {
     RentRequest create(RentRequest rentRequestDTO);
 
     List<RentRequest> get(String status);
+
+    RentRequest get(Long id);
+
+    void delete(Long id);
+
+    RentRequest edit(Long id, RentRequest rentRequest);
 }

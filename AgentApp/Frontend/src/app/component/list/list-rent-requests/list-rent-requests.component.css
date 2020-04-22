@@ -77,3 +77,7 @@ tr.element-row:not(.expanded-row):active {
 .second-column{
     width: 150px;
 }
+
+.buttons-width {
+    width: 105px;
+}
