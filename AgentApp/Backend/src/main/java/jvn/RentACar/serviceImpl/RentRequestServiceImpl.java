@@ -36,7 +36,7 @@ public class RentRequestServiceImpl implements RentRequestService {
     @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public RentRequest create(RentRequest rentRequest) {
-        //TODO: You need to refuse all other requests
+        // TODO: You need to refuse all other requests
         rentRequest.setClient(clientService.get(rentRequest.getClient().getId()));
         rentRequest.setRentRequestStatus(RentRequestStatus.PAID);
         rentRequest.setTotalPrice(0.0);
@@ -69,7 +69,8 @@ public class RentRequestServiceImpl implements RentRequestService {
     public void delete(Long id) {
         RentRequest rentRequest = get(id);
         if (!rentRequest.getRentRequestStatus().equals(RentRequestStatus.CANCELED)) {
-            throw new InvalidRentRequestDataException("This rent request is not CANCELED so you can not delete it.", HttpStatus.FORBIDDEN);
+            throw new InvalidRentRequestDataException("This rent request is not CANCELED so you can not delete it.",
+                    HttpStatus.FORBIDDEN);
         }
         rentRequest.setClient(null);
         Set<RentInfo> rentInfos = rentRequest.getRentInfos();
@@ -82,7 +83,8 @@ public class RentRequestServiceImpl implements RentRequestService {
     public RentRequest edit(Long id, RentRequest rentRequest) {
         RentRequest dbRentRequest = get(id);
         if (!dbRentRequest.getRentRequestStatus().equals(RentRequestStatus.PENDING)) {
-            throw new InvalidRentRequestDataException("This rent request is not in status PENDING so you can not edit it.", HttpStatus.FORBIDDEN);
+            throw new InvalidRentRequestDataException(
+                    "This rent request is not in status PENDING so you can not edit it.", HttpStatus.FORBIDDEN);
         }
 
         dbRentRequest.setClient(clientService.get(rentRequest.getClient().getId()));
@@ -94,7 +96,8 @@ public class RentRequestServiceImpl implements RentRequestService {
         double totalPrice = 0;
         List<RentInfo> dbRentInfos = new ArrayList<>(dbRentRequest.getRentInfos().size());
         dbRentInfos.addAll(dbRentRequest.getRentInfos());
-        Map<Long, RentInfo> rentInfos = rentRequest.getRentInfos().stream().collect(Collectors.toMap(RentInfo::getId, x -> x));
+        Map<Long, RentInfo> rentInfos = rentRequest.getRentInfos().stream()
+                .collect(Collectors.toMap(RentInfo::getId, x -> x));
 
         for (RentInfo dbRentInfo : dbRentInfos) {
             RentInfo rentInfo = rentInfos.get(dbRentInfo.getId());
@@ -105,8 +108,8 @@ public class RentRequestServiceImpl implements RentRequestService {
             Advertisement advertisement = advertisementService.get(dbRentInfo.getAdvertisement().getId());
 
             if (!advertisement.getActive()) {
-                throw new InvalidRentRequestDataException("Car " + advertisement.getCar().getMake() + " " + advertisement.getCar().getModel() +
-                        " is already booked.", HttpStatus.FORBIDDEN);
+                throw new InvalidRentRequestDataException("Car " + advertisement.getCar().getMake() + " "
+                        + advertisement.getCar().getModel() + " is already booked.", HttpStatus.FORBIDDEN);
             }
             checkDate(advertisement, rentInfo.getDateTimeFrom().toLocalDate(), rentInfo.getDateTimeTo().toLocalDate());
             dbRentInfo.setDateTimeFrom(rentInfo.getDateTimeFrom());
@@ -150,12 +153,14 @@ public class RentRequestServiceImpl implements RentRequestService {
     private void checkDate(Advertisement advertisement, LocalDate rentInfoDateFrom, LocalDate rentInfoDateTo) {
         LocalDate advertisementDateFrom = advertisement.getDateFrom();
         if (rentInfoDateFrom.isBefore(advertisementDateFrom) || rentInfoDateTo.isBefore(advertisementDateFrom)) {
-            throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.", HttpStatus.NOT_FOUND);
+            throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
+                    HttpStatus.NOT_FOUND);
         }
         LocalDate advertisementDateTo = advertisement.getDateTo();
         if (advertisementDateTo != null) {
             if (rentInfoDateFrom.isAfter(advertisementDateTo) || rentInfoDateTo.isAfter(advertisementDateTo)) {
-                throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.", HttpStatus.NOT_FOUND);
+                throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
+                        HttpStatus.NOT_FOUND);
             }
         }
     }
@@ -166,10 +171,11 @@ public class RentRequestServiceImpl implements RentRequestService {
         long numberOfHours = ChronoUnit.HOURS.between(rentInfo.getDateTimeFrom(), rentInfo.getDateTimeTo());
         double numberOfDays = Math.ceil(numberOfHours / 24.0);
         if (rentInfo.getOptedForCDW() != null && rentInfo.getOptedForCDW()) {
-            price += priceList.getPriceForCDW();
+            price += (numberOfDays * priceList.getPriceForCDW());
         }
         if (numberOfDays > 30 && rentInfo.getAdvertisement().getDiscount() != null) {
-            double newPricePerDay = priceList.getPricePerDay() - (priceList.getPricePerDay() * (rentInfo.getAdvertisement().getDiscount() / 100.0));
+            double newPricePerDay = priceList.getPricePerDay()
+                    - (priceList.getPricePerDay() * (rentInfo.getAdvertisement().getDiscount() / 100.0));
             price += (numberOfDays * newPricePerDay);
         } else {
             price += (numberOfDays * priceList.getPricePerDay());
@@ -181,13 +187,14 @@ public class RentRequestServiceImpl implements RentRequestService {
         try {
             return RentRequestStatus.valueOf(status.toUpperCase());
         } catch (Exception e) {
-            throw new InvalidRentRequestDataException("Please choose some of existing rent request's status.", HttpStatus.NOT_FOUND);
+            throw new InvalidRentRequestDataException("Please choose some of existing rent request's status.",
+                    HttpStatus.NOT_FOUND);
         }
     }
 
     @Autowired
     public RentRequestServiceImpl(ClientService clientService, AdvertisementService advertisementService,
-                                  RentRequestRepository rentRequestRepository, RentInfoService rentInfoService) {
+            RentRequestRepository rentRequestRepository, RentInfoService rentInfoService) {
         this.clientService = clientService;
         this.advertisementService = advertisementService;
         this.rentRequestRepository = rentRequestRepository;

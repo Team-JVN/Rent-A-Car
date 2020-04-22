@@ -109,6 +109,10 @@ mat-card-header mat-card-title {
     font-size: 16px;
 }
 
-.mat-select-status{
-    margin:0;
+.status-filter {    
+    font-size: 110%;
+}
+
+.filter-span {
+    margin-right: 20px;
 }

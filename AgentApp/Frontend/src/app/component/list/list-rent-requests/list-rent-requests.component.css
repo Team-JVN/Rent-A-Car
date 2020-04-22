@@ -82,3 +82,11 @@ tr.element-row:not(.expanded-row):active {
 .buttons-width {
     width: 105px;
 }
+
+.status-filter {    
+    font-size: 110%;
+}
+
+.filter-span {
+    margin-right: 20px;
+}

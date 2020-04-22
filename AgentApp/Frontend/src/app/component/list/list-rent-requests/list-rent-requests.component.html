@@ -1,23 +1,18 @@
 <mat-card>
     <mat-card-content>
-
-        <div class="row">
-            <div class="col-7 mt-2">
-                <h2>Rent requests with status </h2>
-            </div>
-            <div class="col-5 mb-4 ml-0" class="mat-select-status">
-                <mat-form-field class="full-width-field">
-                    <mat-select [(ngModel)]="status" (selectionChange)="fetchRentRequests(status)">
-                        <mat-option value="all" selected>- All -</mat-option>
-                        <mat-option value="pending">Pending</mat-option>
-                        <mat-option value="reserved">Reserved</mat-option>
-                        <mat-option value="paid">Paid</mat-option>
-                        <mat-option value="canceled">Canceled</mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div>
+        <h2>Rent requests</h2>
+        <div class="status-filter">
+            <span class="filter-span">Filter by status:</span>
+            <mat-form-field>
+                <mat-select [(ngModel)]="status" (selectionChange)="fetchRentRequests(status)">
+                    <mat-option value="all" selected>- All -</mat-option>
+                    <mat-option value="pending">Pending</mat-option>
+                    <mat-option value="reserved">Reserved</mat-option>
+                    <mat-option value="paid">Paid</mat-option>
+                    <mat-option value="canceled">Canceled</mat-option>
+                </mat-select>
+            </mat-form-field>
         </div>
-        <br />
         <table mat-table [dataSource]="rentRequestsDataSource" multiTemplateDataRows
             class="mat-elevation-z8 expendable-table mt-3" matSort>
             <ng-container matColumnDef="client">
