@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -69,7 +70,7 @@ public class RentRequestServiceImpl implements RentRequestService {
     public void delete(Long id) {
         RentRequest rentRequest = get(id);
         if (!rentRequest.getRentRequestStatus().equals(RentRequestStatus.CANCELED)) {
-            throw new InvalidRentRequestDataException("This rent request is not canceled so you can not delete it.", HttpStatus.NOT_FOUND);
+            throw new InvalidRentRequestDataException("This rent request is not CANCELED so you can not delete it.", HttpStatus.FORBIDDEN);
         }
         rentRequest.setClient(null);
         Set<RentInfo> rentInfos = rentRequest.getRentInfos();
@@ -80,7 +81,49 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     @Override
     public RentRequest edit(Long id, RentRequest rentRequest) {
-        return null;
+        RentRequest dbRentRequest = get(id);
+        if (!dbRentRequest.getRentRequestStatus().equals(RentRequestStatus.PENDING)) {
+            throw new InvalidRentRequestDataException("This rent request is not in status PENDING so you can not edit it.", HttpStatus.FORBIDDEN);
+        }
+
+        dbRentRequest.setClient(clientService.get(rentRequest.getClient().getId()));
+        dbRentRequest.setTotalPrice(changeRentInfosData(dbRentRequest, rentRequest));
+        return rentRequestRepository.save(dbRentRequest);
+    }
+
+    private double changeRentInfosData(RentRequest dbRentRequest, RentRequest rentRequest) {
+        List<RentInfo> dbRentInfos = new ArrayList<>(dbRentRequest.getRentInfos().size());
+        dbRentInfos.addAll(dbRentRequest.getRentInfos());
+
+        List<RentInfo> rentInfos = new ArrayList<>(rentRequest.getRentInfos().size());
+        rentInfos.addAll(rentRequest.getRentInfos());
+
+        double totalPrice = 0;
+        for (int i = 0; i < rentInfos.size(); i++) {
+            RentInfo dbRentInfo = dbRentInfos.get(i);
+            RentInfo rentInfo = rentInfos.get(i);
+            if (rentInfo.getId() != dbRentInfo.getId()) {
+                throw new InvalidRentRequestDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
+            }
+
+            Advertisement advertisement = advertisementService.get(dbRentInfo.getAdvertisement().getId());
+
+//            if (!advertisement.getActive()) {
+//                throw new InvalidRentRequestDataException("This car is already booked.", HttpStatus.FORBIDDEN);
+//            }
+            checkDate(advertisement, rentInfo.getDateTimeFrom().toLocalDate(), rentInfo.getDateTimeTo().toLocalDate());
+            dbRentInfo.setDateTimeFrom(rentInfo.getDateTimeFrom());
+            dbRentInfo.setDateTimeTo(rentInfo.getDateTimeTo());
+            dbRentInfo.setPickUpPoint(rentInfo.getPickUpPoint());
+            dbRentInfo.setOptedForCDW(rentInfo.getOptedForCDW());
+            if (!advertisement.getCDW()) {
+                dbRentInfo.setOptedForCDW(null);
+            }
+            totalPrice += countPrice(rentInfo);
+
+        }
+
+        return totalPrice;
     }
 
     private double setRentInfosData(RentRequest rentRequest, Set<RentInfo> rentInfos, Boolean activeAdvertisement) {
@@ -90,7 +133,7 @@ public class RentRequestServiceImpl implements RentRequestService {
             Advertisement advertisement = advertisementService.get(rentInfo.getAdvertisement().getId());
 
             if (!advertisement.getActive()) {
-                throw new InvalidRentRequestDataException("This car is already booked.", HttpStatus.NOT_FOUND);
+                throw new InvalidRentRequestDataException("This car is already booked.", HttpStatus.FORBIDDEN);
             }
 
             if (!activeAdvertisement) {

@@ -1,3 +1,4 @@
+import { EditRentRequestComponent } from './../../edit/edit-rent-request/edit-rent-request.component';
 import { RentInfo } from './../../../model/rentInfo';
 import { RentRequestService } from 'src/app/service/rent-request.service';
 import { RentRequest } from './../../../model/rentRequest';
@@ -59,7 +60,7 @@ export class ListRentRequestsComponent implements OnInit {
   }
 
   edit(element: RentRequest) {
-    // this.dialog.open(EditAdvertisementComponent, { data: element });
+    this.dialog.open(EditRentRequestComponent, { data: element });
 
   }
 
