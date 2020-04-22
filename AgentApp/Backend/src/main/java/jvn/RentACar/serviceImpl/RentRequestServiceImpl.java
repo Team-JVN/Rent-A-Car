@@ -19,10 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class RentRequestServiceImpl implements RentRequestService {
@@ -93,17 +91,14 @@ public class RentRequestServiceImpl implements RentRequestService {
     }
 
     private double changeRentInfosData(RentRequest dbRentRequest, RentRequest rentRequest) {
+        double totalPrice = 0;
         List<RentInfo> dbRentInfos = new ArrayList<>(dbRentRequest.getRentInfos().size());
         dbRentInfos.addAll(dbRentRequest.getRentInfos());
+        Map<Long, RentInfo> rentInfos = rentRequest.getRentInfos().stream().collect(Collectors.toMap(RentInfo::getId, x -> x));
 
-        List<RentInfo> rentInfos = new ArrayList<>(rentRequest.getRentInfos().size());
-        rentInfos.addAll(rentRequest.getRentInfos());
-
-        double totalPrice = 0;
-        for (int i = 0; i < rentInfos.size(); i++) {
-            RentInfo dbRentInfo = dbRentInfos.get(i);
-            RentInfo rentInfo = rentInfos.get(i);
-            if (rentInfo.getId() != dbRentInfo.getId()) {
+        for (RentInfo dbRentInfo : dbRentInfos) {
+            RentInfo rentInfo = rentInfos.get(dbRentInfo.getId());
+            if (rentInfo == null) {
                 throw new InvalidRentRequestDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
             }
 
@@ -126,6 +121,7 @@ public class RentRequestServiceImpl implements RentRequestService {
         }
 
         return totalPrice;
+
     }
 
     private double setRentInfosData(RentRequest rentRequest, Set<RentInfo> rentInfos, Boolean activeAdvertisement) {

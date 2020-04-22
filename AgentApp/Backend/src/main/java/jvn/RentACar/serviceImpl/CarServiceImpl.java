@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class CarServiceImpl implements CarService {
@@ -88,7 +89,8 @@ public class CarServiceImpl implements CarService {
             throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
         }
         Car car = get(id);
-        if (car.getAdvertisements() != null) {
+        Set<Advertisement> advertisements = get(id).getAdvertisements();
+        if (advertisements != null || !advertisements.isEmpty()) {
             throw new InvalidCarDataException("Car is in use and therefore can not be edited.", HttpStatus.FORBIDDEN);
         }
         car.setMake(carDTO.getMake());
@@ -136,7 +138,8 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public EditType getEditType(Long id) {
-        if (get(id).getAdvertisements() == null) {
+        Set<Advertisement> advertisements = get(id).getAdvertisements();
+        if (advertisements == null || advertisements.isEmpty()) {
             return EditType.ALL;
         }
         return EditType.PARTIAL;

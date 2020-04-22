@@ -40,6 +40,9 @@ export class AddRentRequestComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public selectedItem: Advertisement) { }
 
   ngOnInit() {
+    if (this.minDate < new Date(this.selectedItem.dateFrom)) {
+      this.minDate = new Date(this.selectedItem.dateFrom);
+    }
     this.clientForm = this.formBuilder.group({
       client: new FormControl(null, Validators.required),
     })
