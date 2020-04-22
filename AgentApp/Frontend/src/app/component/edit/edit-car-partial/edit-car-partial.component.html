@@ -65,6 +65,7 @@
                 <ngx-dropzone-image-preview ngProjectAs="ngx-dropzone-preview" *ngFor="let f of files" [file]="f"
                     [removable]="true" (removed)="onRemove(f)"></ngx-dropzone-image-preview>
             </ngx-dropzone>
+            <span class="note">Note: Duplicate pictures will be omitted.</span>
             <div align="end" class="mt-3">
                 <button mat-raised-button color="primary" class="mr-3" matStepperPrevious>Back</button>
                 <button mat-raised-button color="primary" [disabled]="!editForm.valid" matStepperNext

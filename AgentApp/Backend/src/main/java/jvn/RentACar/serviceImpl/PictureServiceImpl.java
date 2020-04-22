@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -51,27 +52,40 @@ public class PictureServiceImpl implements PictureService {
     @Override
     @Transactional(readOnly = false, propagation = Propagation.MANDATORY)
     public void savePictures(List<MultipartFile> multipartFiles, String path, Car car) {
+        List<String> uniquePictures = new ArrayList<>();
         for (MultipartFile picture : multipartFiles) {
-            pictureRepository.save(new Picture(savePictureOnDisk(picture, path, car.getId()), car));
+            String fileName = StringUtils.cleanPath(picture.getOriginalFilename());
+            if (!uniquePictures.contains(fileName)) {
+                uniquePictures.add(fileName);
+                pictureRepository.save(new Picture(savePictureOnDisk(picture, path, car.getId()), car));
+            }
         }
     }
 
     @Override
     @Transactional(readOnly = false, propagation = Propagation.MANDATORY)
     public void editCarPictures(List<MultipartFile> multipartFiles, String path, Car car) {
-        Set<Picture> pictureForDeleting = car.getPictures();
+        Set<Picture> removedPictures = car.getPictures();
+        List<String> uniquePictures = new ArrayList<>();
         Long carId = car.getId();
         for (MultipartFile picture : multipartFiles) {
             String fileName = StringUtils.cleanPath(picture.getOriginalFilename());
             Picture pictureData = pictureRepository.findByDataAndCarId(fileName, carId);
             if (pictureData == null) {
-                pictureData = new Picture(savePictureOnDisk(picture, path, car.getId()), car);
-                pictureRepository.save(pictureData);
+                fileName = carId + "_" + fileName;
+                pictureData = pictureRepository.findByDataAndCarId(fileName, carId);
+                if (pictureData == null) {
+                    if (!uniquePictures.contains(fileName)) {
+                        uniquePictures.add(fileName);
+                        pictureData = new Picture(savePictureOnDisk(picture, path, carId), car);
+                        pictureRepository.save(pictureData);
+                    }
+                }
             } else {
-                pictureForDeleting.remove(pictureData);
+                removedPictures.remove(pictureData);
             }
         }
-        deleteUnusedPictures(pictureForDeleting, path);
+        deleteUnusedPictures(removedPictures, path);
     }
 
     private String savePictureOnDisk(MultipartFile picture, String path, Long id) {

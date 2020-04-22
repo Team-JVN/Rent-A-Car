@@ -108,11 +108,15 @@ export class AddCarComponent implements OnInit {
     );
   }
 
-  onSelect(event) {
+  onSelect(event: any) {
+    if (event.rejectedFiles.length > 0) {
+      this.toastr.warning("Maximum picture size is 2MB. Pictures larger than that are being automatically discarded.", "Add pictures");
+    }
+
     this.files.push(...event.addedFiles);
   }
 
-  onRemove(event) {
+  onRemove(event: any) {
     this.files.splice(this.files.indexOf(event), 1);
   }
 }

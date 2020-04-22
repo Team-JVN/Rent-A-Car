@@ -47,6 +47,12 @@ public class CarServiceImpl implements CarService {
         if (multipartFiles.size() > 5) {
             throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
         }
+        for (MultipartFile file : multipartFiles) {
+            if (file.getSize() > 2097152) {
+                throw new InvalidCarDataException("Picture exceeds maximum size of 2MB.", HttpStatus.PAYLOAD_TOO_LARGE);
+            }
+        }
+
         car.setBodyStyle(bodyStyleService.get(car.getBodyStyle().getId()));
         car.setFuelType(fuelTypeService.get(car.getFuelType().getId()));
         car.setGearBoxType(gearboxTypeService.get(car.getGearBoxType().getId()));
