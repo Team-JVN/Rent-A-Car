@@ -82,18 +82,15 @@ public class RentRequestServiceImpl implements RentRequestService {
     }
 
     private double countPrice(RentInfo rentInfo) {
-        //vidi da li je ok
         double price = 0;
         PriceList priceList = rentInfo.getAdvertisement().getPriceList();
-        long numberOfDays = ChronoUnit.DAYS.between(rentInfo.getDateTimeFrom(), rentInfo.getDateTimeTo());
-        //uzmi u obzir diskount ako je preslo 30 dana i onda je to popust po danu !!!!
-        //price per day * kolikoIma dana
-        //price for cdw ako je cekiran
+        long numberOfHours = ChronoUnit.HOURS.between(rentInfo.getDateTimeFrom(), rentInfo.getDateTimeTo());
+        double numberOfDays = Math.ceil(numberOfHours / 24.0);
         if (rentInfo.getOptedForCDW() != null && rentInfo.getOptedForCDW()) {
             price += priceList.getPriceForCDW();
         }
         if (numberOfDays > 30 && rentInfo.getAdvertisement().getDiscount() != null) {
-            double newPricePerDay = priceList.getPricePerDay() - (priceList.getPricePerDay() * (rentInfo.getAdvertisement().getDiscount() / 100));
+            double newPricePerDay = priceList.getPricePerDay() - (priceList.getPricePerDay() * (rentInfo.getAdvertisement().getDiscount() / 100.0));
             price += (numberOfDays * newPricePerDay);
         } else {
             price += (numberOfDays * priceList.getPricePerDay());
