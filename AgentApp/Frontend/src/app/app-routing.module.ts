@@ -1,8 +1,6 @@
-<<<<<<< HEAD
+import { ListRentRequestsComponent } from './component/list/list-rent-requests/list-rent-requests.component';
 import { ListClientsComponent } from './component/list/list-clients/list-clients.component';
-=======
 import { AdvertisementDetailsComponent } from './component/advertisement-details/advertisement-details.component';
->>>>>>> feature/advertisementDetails
 import { ListCarsComponent } from './component/list/list-cars/list-cars.component';
 import { ListGearBoxTypesComponent } from './component/list/list-gear-box-types/list-gear-box-types.component';
 import { ListFuelTypeComponent } from './component/list/list-fuel-type/list-fuel-type.component';
@@ -36,11 +34,7 @@ const routes: Routes = [
   },
   {
     path: 'cars',
-<<<<<<< HEAD
-    component: ListCarsComponent,
-=======
     component: ListCarsComponent
->>>>>>> feature/advertisementDetails
   },
   {
     path: 'price-lists',
@@ -49,6 +43,10 @@ const routes: Routes = [
   {
     path: 'clients',
     component: ListClientsComponent,
+  },
+  {
+    path: 'rent-requests',
+    component: ListRentRequestsComponent,
   },
   {
     path: '',

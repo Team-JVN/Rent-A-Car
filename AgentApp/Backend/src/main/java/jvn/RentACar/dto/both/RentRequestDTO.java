@@ -20,6 +20,7 @@ public class RentRequestDTO {
     @NotNull(message = "Set of rent info is null.")
     private Set<RentInfoDTO> rentInfos;
 
-
     private Double totalPrice;
+
+    private String rentRequestStatus;
 }

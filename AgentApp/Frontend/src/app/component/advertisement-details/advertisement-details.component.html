@@ -112,10 +112,9 @@
                             {{selectedAdWithPictures.advertisement.priceList.pricePerDay}} €</td>
                     </tr>
                     <tr><button *ngIf="selectedAdWithPictures.advertisement.active" mat-raised-button color="primary"
-                            class="rent-btn" (click)="rent()">Rent me!</button>
+                            class="rent-btn" (click)="rent(selectedAdWithPictures)">Rent me!</button>
                         <button *ngIf="!selectedAdWithPictures.advertisement.active" mat-flat-button color="warn"
                             class="rented-out-btn">RENTED OUT</button></tr>
-
                 </table>
             </div>
         </div>

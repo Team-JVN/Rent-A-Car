@@ -15,11 +15,11 @@ th.mat-header-cell{
     border-bottom-style: none;
 }
 
-.car-table tr {
+.advertisement-table tr {
     border-bottom: 1px solid #ddd;
 }
 
-.car-table th, .table td {
+.advertisement-table th, .table td {
     font-size: 16px;
     vertical-align: bottom;
 }
@@ -58,17 +58,17 @@ th.mat-header-cell{
     align-items: center;
 }
 
-.car-card-header{
+.advertisement-card-header{
     display:inline-block;
     width:100%;
     vertical-align: middle;
 }
 
-.car-card-title{
+.advertisement-card-title{
     float: left;
 }
 
-.car-card-buttons{
+.advertisement-card-buttons{
     float:right;
     margin-top: -6px;
 }

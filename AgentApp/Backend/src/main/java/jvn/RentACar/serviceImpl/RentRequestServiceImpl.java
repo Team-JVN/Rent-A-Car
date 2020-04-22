@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -43,6 +44,14 @@ public class RentRequestServiceImpl implements RentRequestService {
         rentRequest.setTotalPrice(setRentInfosData(savedRequest, rentInfos, false));
         savedRequest.setRentInfos(rentInfos);
         return rentRequestRepository.save(savedRequest);
+    }
+
+    @Override
+    public List<RentRequest> get(String status) {
+        if (status.equals("all")) {
+            return rentRequestRepository.findAll();
+        }
+        return rentRequestRepository.findByRentRequestStatus(getRentRequestStatus(status));
     }
 
     private double setRentInfosData(RentRequest rentRequest, Set<RentInfo> rentInfos, Boolean activeAdvertisement) {
@@ -96,6 +105,14 @@ public class RentRequestServiceImpl implements RentRequestService {
             price += (numberOfDays * priceList.getPricePerDay());
         }
         return price;
+    }
+
+    private RentRequestStatus getRentRequestStatus(String status) {
+        try {
+            return RentRequestStatus.valueOf(status.toUpperCase());
+        } catch (Exception e) {
+            throw new InvalidRentRequestDataException("Please choose some of existing rent request's status.", HttpStatus.NOT_FOUND);
+        }
     }
 
     @Autowired

@@ -38,6 +38,7 @@ import { ListClientsComponent } from './component/list/list-clients/list-clients
 import { AddClientComponent } from './component/add/add-client/add-client.component';
 import { EditClientComponent } from './component/edit/edit-client/edit-client.component';
 import { AdvertisementDetailsComponent } from './component/advertisement-details/advertisement-details.component';
+import { ListRentRequestsComponent } from './component/list/list-rent-requests/list-rent-requests.component';
 
 @NgModule({
   declarations: [
@@ -69,6 +70,7 @@ import { AdvertisementDetailsComponent } from './component/advertisement-details
     EditClientComponent,
     AddRentRequestComponent,
     AdvertisementDetailsComponent,
+    ListRentRequestsComponent,
   ],
   imports: [
     BrowserModule,

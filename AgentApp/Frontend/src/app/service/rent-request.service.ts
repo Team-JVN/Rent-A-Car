@@ -22,8 +22,8 @@ export class RentRequestService {
     return this.httpClient.put(this.url + '/' + rentRequest.id, rentRequest);
   }
 
-  public getClients() {
-    return this.httpClient.get(this.url);
+  public getRentRequests(status: string) {
+    return this.httpClient.get(this.url + '/' + status);
   }
 
   public delete(id: number): any {

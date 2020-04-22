@@ -6,6 +6,8 @@ import { AdvertisementWithPicturesDTO } from './../../model/advertisementWithPic
 import { AdvertisementService } from './../../service/advertisement.service';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { AddRentRequestComponent } from '../add/add-rent-request/add-rent-request.component';
 
 @Component({
   selector: 'app-advertisement-details',
@@ -26,6 +28,7 @@ export class AdvertisementDetailsComponent implements OnInit {
     private router: Router,
     private toastr: ToastrService,
     private advertisementService: AdvertisementService,
+    public dialog: MatDialog,
   ) { }
 
   ngOnInit() {
@@ -55,6 +58,11 @@ export class AdvertisementDetailsComponent implements OnInit {
         }
       )
     });
+  }
+
+  rent(element: AdvertisementWithPicturesDTO) {
+    this.dialog.open(AddRentRequestComponent, { data: element.advertisement });
+
   }
 
   fetchPictures() {

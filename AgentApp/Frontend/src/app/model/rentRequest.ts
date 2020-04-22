@@ -1,5 +1,4 @@
 import { RentInfo } from './rentInfo';
-import { Advertisement } from './advertisement';
 import { Client } from './client';
 
 export class RentRequest {
@@ -7,11 +6,12 @@ export class RentRequest {
     client: Client;
     rentInfos: RentInfo[];
     totalPrice: number;
-
-    constructor(client: Client, rentInfos: RentInfo[], totalPrice?: number, id?: number) {
+    rentRequestStatus: string;
+    constructor(client: Client, rentInfos: RentInfo[], totalPrice?: number, rentRequestStatus?: string, id?: number) {
         this.client = client;
         this.rentInfos = rentInfos;
         this.totalPrice = totalPrice;
+        this.rentRequestStatus = rentRequestStatus;
         this.id = id;
     }
 
