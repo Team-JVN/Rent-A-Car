@@ -30,12 +30,12 @@ public class CreateAdvertisementDtoMapper implements MapperInterface<Advertiseme
     }
 
     public LocalDate getDateConverted(String date) throws ParseException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return LocalDate.parse(date, formatter);
     }
 
     public String getDateConverted(LocalDate date) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return LocalDate.parse(date.toString(), formatter).toString();
     }
 

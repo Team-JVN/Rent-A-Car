@@ -46,18 +46,10 @@ export class EditAdvertisementComponent implements OnInit {
     })
 
     this.dateForm = this.formBuilder.group({
-      validFrom: new FormControl(null, Validators.required),
+      validFrom: new FormControl(new Date(this.selectedItem.advertisement.dateFrom), Validators.required),
       discount: new FormControl(this.selectedItem.advertisement.discount, [Validators.min(0), Validators.max(99)]),
       kilometresLimit: new FormControl(this.selectedItem.advertisement.kilometresLimit, Validators.min(1))
     })
-    // const validFrom = formatDate(this.selectedItem.advertisementDTO.dateFrom, 'yyyy-MM-dd', 'en-US')
-    console.log(moment(this.selectedItem.advertisement.dateFrom, 'dd-MM-yyyy'))
-    console.log(this.selectedItem.advertisement.dateFrom)
-    // this.dateForm.patchValue(
-    //   {
-    //     'validFrom': new Date(moment(this.selectedItem.advertisementDTO.dateFrom, 'dd-MM-yyyy'))
-    //   }
-    // );
 
     this.successCreatedCar = this.carService.createSuccessEmitter.subscribe(
       () => {
@@ -140,7 +132,7 @@ export class EditAdvertisementComponent implements OnInit {
       return;
     }
 
-    const validFrom = formatDate(this.dateForm.value.validFrom, 'dd-MM-yyyy', 'en-US')
+    const validFrom = formatDate(this.dateForm.value.validFrom, 'yyyy-MM-dd', 'en-US')
     var cdw = true;
     if (!this.priceListForm.value.priceList.priceForCDW) {
       cdw = false;

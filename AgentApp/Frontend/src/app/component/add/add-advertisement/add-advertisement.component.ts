@@ -112,7 +112,7 @@ export class AddAdvertisementComponent implements OnInit {
       this.toastr.error("Please enter Kilometres limit", 'Create Advertisement');
       return;
     }
-    const validFrom = formatDate(this.dateForm.value.validFrom, 'dd-MM-yyyy', 'en-US')
+    const validFrom = formatDate(this.dateForm.value.validFrom, 'yyyy-MM-dd', 'en-US')
     var cdw = true;
     if (!this.priceListForm.value.priceList.priceForCDW) {
       cdw = false;

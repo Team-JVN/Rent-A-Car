@@ -11,6 +11,8 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
 
     Client findByPhoneNumber(String phoneNumber);
 
+    Client findByPhoneNumberAndIdNot(String phoneNumber, Long id);
+
     List<Client> findAll();
 
     Client findOneById(Long id);

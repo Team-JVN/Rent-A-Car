@@ -42,12 +42,12 @@ export class EditRentRequestComponent implements OnInit {
     this.clientForm = this.formBuilder.group({
       client: new FormControl(this.selectedItem.client, Validators.required),
     })
-
+    console.log(new Date(this.selectedItem.rentInfos[0].dateTimeFrom).getHours() + ':' + new Date(this.selectedItem.rentInfos[0].dateTimeFrom).getMinutes())
     this.informationForm = this.formBuilder.group({
-      dateFrom: new FormControl(null, Validators.required),
-      timeFrom: new FormControl(null, [Validators.required]),
-      dateTo: new FormControl(null, [Validators.required]),
-      timeTo: new FormControl(null, [Validators.required]),
+      dateFrom: new FormControl(new Date(this.selectedItem.rentInfos[0].dateTimeFrom.substring(0, 10)), Validators.required),
+      timeFrom: new FormControl(this.selectedItem.rentInfos[0].dateTimeFrom.slice(-5), [Validators.required]),
+      dateTo: new FormControl(new Date(this.selectedItem.rentInfos[0].dateTimeTo.substring(0, 10)), [Validators.required]),
+      timeTo: new FormControl(this.selectedItem.rentInfos[0].dateTimeTo.slice(-5), [Validators.required]),
       pickUpPoint: new FormControl(this.selectedItem.rentInfos[0].pickUpPoint, Validators.required),
       optedForCDW: new FormControl(this.selectedItem.rentInfos[0].optedForCDW)
     }, {
@@ -94,10 +94,11 @@ export class EditRentRequestComponent implements OnInit {
       this.toastr.error("Please enter valid date and time", 'Edit Rent Request');
       return;
     }
-    const dateFrom = formatDate(this.informationForm.value.dateFrom, 'dd-MM-yyyy', 'en-US')
-    const dateTimeFrom = this.informationForm.value.timeFrom + ' ' + dateFrom;
-    const dateTo = formatDate(this.informationForm.value.dateTo, 'dd-MM-yyyy', 'en-US')
-    const dateTimeTo = this.informationForm.value.timeTo + ' ' + dateTo;
+
+    const dateFrom = formatDate(this.informationForm.value.dateFrom, 'yyyy-MM-dd', 'en-US')
+    const dateTimeFrom = dateFrom + ' ' + this.informationForm.value.timeFrom;
+    const dateTo = formatDate(this.informationForm.value.dateTo, 'yyyy-MM-dd', 'en-US')
+    const dateTimeTo = dateTo + ' ' + this.informationForm.value.timeTo;
 
     var cdw = this.informationForm.value.optedForCDW;
     if (!this.selectedItem.rentInfos[0].advertisement.cdw) {

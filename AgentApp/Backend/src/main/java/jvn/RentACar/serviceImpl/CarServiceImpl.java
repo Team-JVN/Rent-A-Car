@@ -7,6 +7,7 @@ import jvn.RentACar.enumeration.EditType;
 import jvn.RentACar.enumeration.LogicalStatus;
 import jvn.RentACar.exceptionHandler.InvalidCarDataException;
 import jvn.RentACar.mapper.CarDtoMapper;
+import jvn.RentACar.model.Advertisement;
 import jvn.RentACar.model.Car;
 import jvn.RentACar.model.Picture;
 import jvn.RentACar.repository.CarRepository;
@@ -20,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,8 +114,11 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public void delete(Long id) {
-        isEditable(id);
         Car car = get(id);
+
+        if (carRepository.findByIdAndAdvertisementsLogicalStatus(id, LogicalStatus.EXISTING) != null) {
+            throw new InvalidCarDataException("Car is in use and therefore can not be deleted.", HttpStatus.FORBIDDEN);
+        }
         car.setLogicalStatus(LogicalStatus.DELETED);
         carRepository.save(car);
     }
@@ -140,8 +143,10 @@ public class CarServiceImpl implements CarService {
     }
 
     private void isEditable(Long id) {
-        if (carRepository.findByIdAndAdvertisementsLogicalStatusAndAdvertisementsDateFromLessThanEqual(id, LogicalStatus.EXISTING, LocalDate.now()) != null) {
-            throw new InvalidCarDataException("Car is in use and therefore can not be deleted.", HttpStatus.FORBIDDEN);
+        for (Advertisement advertisement : get(id).getAdvertisements()) {
+            if (advertisement.getLogicalStatus().equals(LogicalStatus.EXISTING) && !advertisement.getRentInfos().isEmpty()) {
+                throw new InvalidCarDataException("Car is in use and therefore can not be edited.", HttpStatus.FORBIDDEN);
+            }
         }
     }
 

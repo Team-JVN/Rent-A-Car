@@ -61,7 +61,7 @@ public class FuelTypeServiceImpl implements FuelTypeService {
         if (fuelType.getCars().isEmpty()) {
             return fuelType;
         }
-        throw new InvalidFuelTypeDataException("There's at least one car with this fuel type so you can not edit it.", HttpStatus.FORBIDDEN);
+        throw new InvalidFuelTypeDataException("There's at least one car with this fuel type so you can not edit/delete it.", HttpStatus.FORBIDDEN);
     }
 
     @Autowired

@@ -47,9 +47,9 @@ public class RentRequestDtoMapper implements MapperInterface<RentRequest, RentRe
     }
 
     private LocalDateTime getLocalDateTime(String date) throws DateTimeParseException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        LocalDate localDate = LocalDate.parse(date.substring(6), formatter);
-        LocalTime localTime = LocalTime.parse(date.substring(0, 5), DateTimeFormatter.ofPattern("HH:mm"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(date.substring(0, 10), formatter);
+        LocalTime localTime = LocalTime.parse(date.substring(11), DateTimeFormatter.ofPattern("HH:mm"));
         return LocalDateTime.of(localDate, localTime);
     }
 

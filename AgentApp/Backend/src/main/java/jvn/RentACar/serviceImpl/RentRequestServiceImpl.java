@@ -38,6 +38,7 @@ public class RentRequestServiceImpl implements RentRequestService {
     @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public RentRequest create(RentRequest rentRequest) {
+        //TODO: You need to refuse all other requests
         rentRequest.setClient(clientService.get(rentRequest.getClient().getId()));
         rentRequest.setRentRequestStatus(RentRequestStatus.PAID);
         rentRequest.setTotalPrice(0.0);
@@ -108,9 +109,10 @@ public class RentRequestServiceImpl implements RentRequestService {
 
             Advertisement advertisement = advertisementService.get(dbRentInfo.getAdvertisement().getId());
 
-//            if (!advertisement.getActive()) {
-//                throw new InvalidRentRequestDataException("This car is already booked.", HttpStatus.FORBIDDEN);
-//            }
+            if (!advertisement.getActive()) {
+                throw new InvalidRentRequestDataException("Car " + advertisement.getCar().getMake() + " " + advertisement.getCar().getModel() +
+                        " is already booked.", HttpStatus.FORBIDDEN);
+            }
             checkDate(advertisement, rentInfo.getDateTimeFrom().toLocalDate(), rentInfo.getDateTimeTo().toLocalDate());
             dbRentInfo.setDateTimeFrom(rentInfo.getDateTimeFrom());
             dbRentInfo.setDateTimeTo(rentInfo.getDateTimeTo());

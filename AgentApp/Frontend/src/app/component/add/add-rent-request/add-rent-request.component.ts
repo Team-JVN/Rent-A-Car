@@ -86,10 +86,11 @@ export class AddRentRequestComponent implements OnInit {
       this.toastr.error("Please enter valid date and time", 'Create Rent Request');
       return;
     }
-    const dateFrom = formatDate(this.informationForm.value.dateFrom, 'dd-MM-yyyy', 'en-US')
-    const dateTimeFrom = this.informationForm.value.timeFrom + ' ' + dateFrom;
-    const dateTo = formatDate(this.informationForm.value.dateTo, 'dd-MM-yyyy', 'en-US')
-    const dateTimeTo = this.informationForm.value.timeTo + ' ' + dateTo;
+
+    const dateFrom = formatDate(this.informationForm.value.dateFrom, 'yyyy-MM-dd', 'en-US')
+    const dateTimeFrom = dateFrom + ' ' + this.informationForm.value.timeFrom;
+    const dateTo = formatDate(this.informationForm.value.dateTo, 'yyyy-MM-dd', 'en-US')
+    const dateTimeTo = dateTo + ' ' + this.informationForm.value.timeTo;
 
     var cdw = this.informationForm.value.optedForCDW;
     if (!this.selectedItem.cdw) {

@@ -48,5 +48,5 @@ public class Advertisement {
     private Boolean active = true; //active=false when one rentRequest has status PAID
 
     @OneToMany(mappedBy = "advertisement", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<RentInfo> rentInfos = new HashSet<RentInfo>();
+    private Set<RentInfo> rentInfos = new HashSet<>();
 }

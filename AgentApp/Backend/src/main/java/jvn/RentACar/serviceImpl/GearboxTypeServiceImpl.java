@@ -20,7 +20,7 @@ public class GearboxTypeServiceImpl implements GearboxTypeService {
     @Override
     public GearboxType create(CreateGearboxTypeDTO createGearBoxTypeDTO) {
         if (gearBoxTypeRepository.findByName(createGearBoxTypeDTO.getName()) != null) {
-            throw new InvalidGearBoxTypeDataException("This Body Style already exist.", HttpStatus.FORBIDDEN);
+            throw new InvalidGearBoxTypeDataException("This Gearbox Type already exist.", HttpStatus.FORBIDDEN);
         }
         return gearBoxTypeRepository.save(new GearboxType(createGearBoxTypeDTO.getName()));
     }
@@ -60,7 +60,7 @@ public class GearboxTypeServiceImpl implements GearboxTypeService {
         if (gearBoxType.getCars().isEmpty()) {
             return gearBoxType;
         }
-        throw new InvalidGearBoxTypeDataException("There's at least one car with this gearbox type so you can not edit it.", HttpStatus.FORBIDDEN);
+        throw new InvalidGearBoxTypeDataException("There's at least one car with this gearbox type so you can not edit/delete it.", HttpStatus.FORBIDDEN);
     }
 
     @Autowired
