@@ -22,11 +22,13 @@
                                 <mat-card-title class="advertisement-card-title">{{element.advertisement.car.make}}
                                     {{element.advertisement.car.model}}
                                 </mat-card-title>
-                                <div class="advertisement-card-buttons">
-                                    <button mat-icon-button aria-label="Edit" color="primary" (click)="edit(element)">
+                                <div class="car-card-buttons">
+                                    <button mat-icon-button aria-label="Edit" color="primary"
+                                        (click)="edit(element);$event.stopPropagation()">
                                         <mat-icon>edit</mat-icon>
                                     </button>
-                                    <button mat-icon-button aria-label="Delete" color="warn" (click)="delete(element)">
+                                    <button mat-icon-button aria-label="Delete" color="warn"
+                                        (click)="delete(element);$event.stopPropagation()">
                                         <mat-icon>delete</mat-icon>
                                     </button>
                                 </div>
@@ -69,8 +71,7 @@
                                         <tr
                                             *ngIf="element.advertisement.discount && element.advertisement.discount > 0">
                                             <th><span class="theader">
-                                                    <mat-icon class="mr-2">money_off</mat-icon>30+ days Rent
-                                                    Discount:
+                                                    <mat-icon class="mr-2">money_off</mat-icon>30+ days Rent Discount:
                                                 </span></th>
                                             <td>{{element.advertisement.discount}} %</td>
                                         </tr>
@@ -87,7 +88,7 @@
                                     {{element.advertisement.priceList.pricePerDay}} €</td>
                             </tr>
                             <tr><button *ngIf="element.advertisement.active" mat-raised-button color="primary"
-                                    class="rent-btn" (click)="rent(element)">Rent me!</button></tr>
+                                    class="rent-btn" (click)="rent();$event.stopPropagation()">Rent me!</button></tr>
                         </table>
                     </mat-card>
                 </td>

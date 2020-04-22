@@ -3,7 +3,7 @@
   }
   
   ngx-dropzone{
-    width: 520px;
+    width: 510px;
   }
     
   .table {
@@ -17,9 +17,16 @@
   .form-full-width-right {
     width: 99%;
   }
+  
   .form-full-width-left {
     width: 90%;
   }
+
+  .note {
+    font-size: 85%;
+    color: #717386;
+  }
+
   /* Hides arrow buttons in input type="number" */
   /* Chrome, Safari, Edge, Opera */
   input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
