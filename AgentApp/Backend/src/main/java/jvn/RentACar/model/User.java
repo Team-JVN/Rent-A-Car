@@ -27,8 +27,11 @@ public abstract class User {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column
     private String password;
+
+    @Column(nullable = false)
+    private String address;
 
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Car> cars = new HashSet<>();

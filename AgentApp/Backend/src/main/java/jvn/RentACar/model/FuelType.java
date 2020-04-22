@@ -24,4 +24,7 @@ public class FuelType {
     @OneToMany(mappedBy = "fuelType", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Car> cars = new HashSet<>();
 
+    public FuelType(String name) {
+        this.name = name;
+    }
 }

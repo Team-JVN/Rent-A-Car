@@ -6,7 +6,13 @@ export const environment = {
   production: false,
   baseUrl: 'http://localhost:8080',
   advertisement: '/api/advertisement',
+  bodyStyle: '/api/body-style',
+  fuelType: '/api/fuel-type',
+  gearBoxType: '/api/gearbox-type',
+  car: '/api/car',
   priceList: '/api/price-list',
+  client: '/api/client',
+  rentRequest: '/api/rent-request',
 };
 
 /*

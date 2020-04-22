@@ -23,7 +23,7 @@ public class RentReport {
     @OneToOne(mappedBy = "rentReport", cascade = CascadeType.ALL)
     private RentRequest rentRequest;
 
-    @Column(nullable = false)
+    @Column
     private Double additionalCost;
 
     @ElementCollection

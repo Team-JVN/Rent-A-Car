@@ -1,0 +1,111 @@
+<mat-card>
+    <mat-card-content>
+        <div class="row">
+            <div class="col-9">
+                <h2>Advertisements</h2>
+            </div>
+            <div class="col-3" align="end">
+                <button mat-raised-button color="primary" (click)="openDialog()">Create New</button>
+            </div>
+        </div>
+        <div class="status-filter">
+            <span class="filter-span">Filter by status:</span>
+            <mat-form-field>
+                <mat-select [(ngModel)]="status" (selectionChange)="fetchAll(status)">
+                    <mat-option value="all" selected>- All -</mat-option>
+                    <mat-option value="active">Active</mat-option>
+                    <mat-option value="inactive">Inactive</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <br />
+        <table mat-table [dataSource]="advertisementsDataSource" class="advertisement-list-table">
+            <ng-container matColumnDef="advertisement">
+                <td mat-cell *matCellDef="let element">
+                    <mat-card class="item-card" (click)="viewDetails(element)">
+                        <div class="image-div">
+                            <img [src]="element.image" *ngIf="!element.isImageLoading; else noImageFound" class="image">
+                        </div>
+                        <div>
+                            <mat-card-header class="advertisement-card-header">
+                                <mat-card-title class="advertisement-card-title">{{element.advertisement.car.make}}
+                                    {{element.advertisement.car.model}}
+                                </mat-card-title>
+                                <div class="advertisement-card-buttons">
+                                    <button mat-icon-button aria-label="Edit" color="primary"
+                                        (click)="edit(element);$event.stopPropagation()">
+                                        <mat-icon>edit</mat-icon>
+                                    </button>
+                                    <button mat-icon-button aria-label="Delete" color="warn"
+                                        (click)="delete(element);$event.stopPropagation()">
+                                        <mat-icon>delete</mat-icon>
+                                    </button>
+                                </div>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <table class="table advertisement-table">
+                                    <tbody>
+                                        <tr>
+                                            <th><span class="theader">
+                                                    <mat-icon class="mr-2">today</mat-icon>Available Between:
+                                                </span></th>
+                                            <td>{{element.advertisement.dateFrom  | date:"dd.MM.yyyy."}} — Unlimited
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th><span class="theader">
+                                                    <mat-icon class="mr-2">speed</mat-icon>Kilometres Limit:
+                                                </span></th>
+                                            <td>
+                                                <span *ngIf="element.advertisement.kilometresLimit">
+                                                    {{element.advertisement.kilometresLimit}} Km &nbsp;
+                                                    <span class="per-km">
+                                                        ({{element.advertisement.priceList.pricePerKm}} € per
+                                                        Km)</span>
+                                                </span>
+                                                <span *ngIf="!element.advertisement.kilometresLimit">Unlimited</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th><span class="theader">
+                                                    <mat-icon class="mr-2">commute</mat-icon>Collision Damage
+                                                    Waiver:
+                                                </span></th>
+                                            <td>
+                                                <span *ngIf="element.advertisement.cdw">
+                                                    {{element.advertisement.priceList.priceForCDW}} €</span>
+                                                <span *ngIf="!element.advertisement.cdw">Not Available</span>
+                                            </td>
+                                        </tr>
+                                        <tr
+                                            *ngIf="element.advertisement.discount && element.advertisement.discount > 0">
+                                            <th><span class="theader">
+                                                    <mat-icon class="mr-2">money_off</mat-icon>30+ days Rent Discount:
+                                                </span></th>
+                                            <td>{{element.advertisement.discount}} %</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </mat-card-content>
+                        </div>
+                        <table class="price-table">
+                            <tr>
+                                <td class="price-header">Price per day:</td>
+                            </tr>
+                            <tr>
+                                <td class="price-text">
+                                    {{element.advertisement.priceList.pricePerDay}} €</td>
+                            </tr>
+                            <tr><button *ngIf="element.advertisement.active" mat-raised-button color="primary"
+                                    class="rent-btn" (click)="rent(element);$event.stopPropagation()">Rent
+                                    me!</button></tr>
+                        </table>
+                    </mat-card>
+                </td>
+            </ng-container>
+
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+    </mat-card-content>
+</mat-card>

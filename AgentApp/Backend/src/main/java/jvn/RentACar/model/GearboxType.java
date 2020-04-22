@@ -24,4 +24,7 @@ public class GearboxType {
     @OneToMany(mappedBy = "gearBoxType", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Car> cars = new HashSet<>();
 
+    public GearboxType(String name) {
+        this.name = name;
+    }
 }

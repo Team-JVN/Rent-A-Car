@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
@@ -11,6 +12,7 @@ import { map, shareReplay } from 'rxjs/operators';
 export class HeaderComponent implements OnInit {
 
   constructor(
+    private router: Router,
     private breakpointObserver: BreakpointObserver
   ) { }
 
@@ -21,6 +23,7 @@ export class HeaderComponent implements OnInit {
     );
 
   ngOnInit() {
+
   }
 
 }

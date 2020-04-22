@@ -18,15 +18,57 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(error);
     }
 
+    @ExceptionHandler(NullPointerException.class)
+    protected ResponseEntity<Object> handleNullPointerException(NullPointerException ex) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST, "Please try again.");
+        return buildResponseEntity(error);
+    }
+
+    @ExceptionHandler(InvalidFuelTypeDataException.class)
+    protected ResponseEntity<Object> handleInvalidFuelTypeDataException(InvalidFuelTypeDataException ex) {
+        ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
+        return buildResponseEntity(error);
+    }
+
+    @ExceptionHandler(InvalidGearBoxTypeDataException.class)
+    protected ResponseEntity<Object> handleInvalidGearBoxTypeDataException(InvalidGearBoxTypeDataException ex) {
+        ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
+        return buildResponseEntity(error);
+    }
+
+    @ExceptionHandler(InvalidCarDataException.class)
+    protected ResponseEntity<Object> handleInvalidCarDataException(InvalidCarDataException ex) {
+        ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
+        return buildResponseEntity(error);
+    }
+
+    @ExceptionHandler(FileNotFoundException.class)
+    protected ResponseEntity<Object> handleFileNotFoundException(FileNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
+        return buildResponseEntity(error);
+    }
+
     @ExceptionHandler(InvalidPriceListDataException.class)
     protected ResponseEntity<Object> handleInvalidPriceListDataException(InvalidPriceListDataException ex) {
         ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
         return buildResponseEntity(error);
     }
 
-    @ExceptionHandler(NullPointerException.class)
-    protected ResponseEntity<Object> handleNullPointerException(NullPointerException ex) {
-        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST, "Please try again.");
+    @ExceptionHandler(InvalidAdvertisementDataException.class)
+    protected ResponseEntity<Object> handleInvalidAdvertisementDataException(InvalidAdvertisementDataException ex) {
+        ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
+        return buildResponseEntity(error);
+    }
+
+    @ExceptionHandler(InvalidClientDataException.class)
+    protected ResponseEntity<Object> handleInvalidClientDataException(InvalidClientDataException ex) {
+        ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
+        return buildResponseEntity(error);
+    }
+
+    @ExceptionHandler(InvalidRentRequestDataException.class)
+    protected ResponseEntity<Object> handleInvalidRentRequestDataException(InvalidRentRequestDataException ex) {
+        ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
         return buildResponseEntity(error);
     }
 

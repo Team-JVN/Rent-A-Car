@@ -4,3 +4,4 @@ public enum LogicalStatus {
     EXISTING,
     DELETED
 }
+

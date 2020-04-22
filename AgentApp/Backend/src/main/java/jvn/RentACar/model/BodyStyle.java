@@ -23,4 +23,8 @@ public class BodyStyle {
 
     @OneToMany(mappedBy = "bodyStyle", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Car> cars = new HashSet<>();
+
+    public BodyStyle(String name) {
+        this.name = name;
+    }
 }

@@ -1,0 +1,12 @@
+mat-card {
+    max-width: 600px;
+    margin: 2em auto;
+}
+
+.buttons-width {
+    width: 105px;
+}
+
+.table td {
+    vertical-align: middle;
+}

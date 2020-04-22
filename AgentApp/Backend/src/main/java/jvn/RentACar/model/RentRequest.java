@@ -7,7 +7,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 @Entity
@@ -26,18 +25,11 @@ public class RentRequest {
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Client client;
 
-    @ManyToMany(mappedBy = "rentRequests", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<Advertisement> advertisements = new HashSet<>();
-
     @Column(nullable = false)
     private Double totalPrice;
 
-    @ElementCollection
-    @CollectionTable(name = "advertisement_cdw_mapping",
-            joinColumns = {@JoinColumn(name = "rent_request_id", referencedColumnName = "id")})
-    @MapKeyColumn(name = "advertisement_id")
-    @Column(name = "cdw")
-    private Map<Long, Boolean> optedForCDWMap;
+    @OneToMany(mappedBy = "rentRequest", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<RentInfo> rentInfos = new HashSet<RentInfo>();
 
     @OneToOne
     private RentReport rentReport;

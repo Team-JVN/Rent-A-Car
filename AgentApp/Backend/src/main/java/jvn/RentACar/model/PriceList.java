@@ -32,13 +32,6 @@ public class PriceList {
     private Set<Advertisement> advertisements = new HashSet<>();
 
     @Column(nullable = false)
-    private LogicalStatus status;
-
-    public PriceList(Double pricePerDay, Double pricePerKm, Double priceForCDW) {
-        this.pricePerDay = pricePerDay;
-        this.pricePerKm = pricePerKm;
-        this.priceForCDW = priceForCDW;
-        this.status = LogicalStatus.EXISTING;
-    }
+    private LogicalStatus status = LogicalStatus.EXISTING;
 
 }

@@ -1,6 +1,5 @@
 package jvn.RentACar.dto.both;
 
-import jvn.RentACar.model.PriceList;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,9 +25,5 @@ public class PriceListDTO {
 
     @Positive(message = "Price for CDW is not a positive number.")
     private Double priceForCDW;
-
-    public PriceListDTO(PriceList priceList) {
-        this(priceList.getId(), priceList.getPricePerDay(), priceList.getPricePerKm(), priceList.getPriceForCDW());
-    }
 
 }

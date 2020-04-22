@@ -1,5 +1,6 @@
 package jvn.RentACar.model;
 
+import jvn.RentACar.enumeration.LogicalStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,6 +18,9 @@ public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
+    private LogicalStatus logicalStatus = LogicalStatus.EXISTING;
 
     @Column(nullable = false)
     private String make;
@@ -39,7 +43,8 @@ public class Car {
     @Column(nullable = false)
     private Integer kidsSeats;
 
-    @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    //Edit will not working when you put CascadeType.ALL and FetchType.EAGER
+    @OneToMany(mappedBy = "car")
     private Set<Picture> pictures = new HashSet<>();
 
     @Column(nullable = false)

@@ -1,5 +1,6 @@
 package jvn.RentACar.model;
 
+import jvn.RentACar.enumeration.LogicalStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,6 +19,9 @@ public class Advertisement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
+    private LogicalStatus logicalStatus = LogicalStatus.EXISTING;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Car car;
@@ -40,10 +44,9 @@ public class Advertisement {
     @Column
     private Boolean CDW;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "advertisement_rent_requests",
-            joinColumns = @JoinColumn(name = "advertisement_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "rent_request_id", referencedColumnName = "id"))
-    private Set<RentRequest> rentRequests = new HashSet<RentRequest>();
+    @Column
+    private Boolean active = true; //active=false when one rentRequest has status PAID
+
+    @OneToMany(mappedBy = "advertisement", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<RentInfo> rentInfos = new HashSet<>();
 }
