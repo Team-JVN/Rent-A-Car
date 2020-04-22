@@ -103,7 +103,7 @@ public class RentRequestServiceImpl implements RentRequestService {
         for (int i = 0; i < rentInfos.size(); i++) {
             RentInfo dbRentInfo = dbRentInfos.get(i);
             RentInfo rentInfo = rentInfos.get(i);
-            if (rentInfo.getId() != dbRentInfo.getId()) {
+            if (!rentInfo.getId().equals(dbRentInfo.getId())) {
                 throw new InvalidRentRequestDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
             }
 
@@ -170,7 +170,7 @@ public class RentRequestServiceImpl implements RentRequestService {
         long numberOfHours = ChronoUnit.HOURS.between(rentInfo.getDateTimeFrom(), rentInfo.getDateTimeTo());
         double numberOfDays = Math.ceil(numberOfHours / 24.0);
         if (rentInfo.getOptedForCDW() != null && rentInfo.getOptedForCDW()) {
-            price += priceList.getPriceForCDW();
+            price += (numberOfDays * priceList.getPriceForCDW());
         }
         if (numberOfDays > 30 && rentInfo.getAdvertisement().getDiscount() != null) {
             double newPricePerDay = priceList.getPricePerDay() - (priceList.getPricePerDay() * (rentInfo.getAdvertisement().getDiscount() / 100.0));

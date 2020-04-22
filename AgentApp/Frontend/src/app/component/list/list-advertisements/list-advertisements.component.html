@@ -1,23 +1,23 @@
 <mat-card>
     <mat-card-content>
         <div class="row">
-            <div class="col-3 mt-2">
+            <div class="col-9">
                 <h2>Advertisements</h2>
             </div>
-            <div class="col-3 mb-4 ml-0" class="mat-select-status">
-                <mat-form-field class="full-width-field">
-                    <mat-select [(ngModel)]="status" (selectionChange)="fetchAll(status)">
-                        <mat-option value="all" selected>- All -</mat-option>
-                        <mat-option value="active">Active</mat-option>
-                        <mat-option value="nonActive">Non active</mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div>
-            <div class="col-6" align="end">
+            <div class="col-3" align="end">
                 <button mat-raised-button color="primary" (click)="openDialog()">Create New</button>
             </div>
         </div>
-
+        <div class="status-filter">
+            <span class="filter-span">Filter by status:</span>
+            <mat-form-field>
+                <mat-select [(ngModel)]="status" (selectionChange)="fetchAll(status)">
+                    <mat-option value="all" selected>- All -</mat-option>
+                    <mat-option value="active">Active</mat-option>
+                    <mat-option value="inactive">Inactive</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
         <br />
         <table mat-table [dataSource]="advertisementsDataSource" class="advertisement-list-table">
             <ng-container matColumnDef="advertisement">
