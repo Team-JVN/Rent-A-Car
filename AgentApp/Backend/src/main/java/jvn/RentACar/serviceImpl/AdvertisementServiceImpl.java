@@ -118,7 +118,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         if (!advertisementRepository.findByCarIdAndActiveAndLogicalStatus(carId, true, LogicalStatus.EXISTING).isEmpty()) {
             if (advertisementId != null) {
                 List<Advertisement> advertisements = advertisementRepository.findByCarIdAndActiveAndLogicalStatus(carId, true, LogicalStatus.EXISTING);
-                if (advertisements.size() != 1 || advertisements.get(0).getId() != advertisementId) {
+                if (advertisements.size() != 1 || !advertisements.get(0).getId().equals(advertisementId)) {
                     throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
                 }
             } else {

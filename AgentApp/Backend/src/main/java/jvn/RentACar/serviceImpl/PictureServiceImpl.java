@@ -70,7 +70,7 @@ public class PictureServiceImpl implements PictureService {
         Long carId = car.getId();
         for (MultipartFile picture : multipartFiles) {
             String fileName = StringUtils.cleanPath(picture.getOriginalFilename());
-            Picture pictureData = pictureRepository.findByDataAndCarId(carId + "_" + fileName, carId);
+            Picture pictureData = pictureRepository.findByDataAndCarId(fileName, carId);
             if (pictureData == null) {
                 fileName = carId + "_" + fileName;
                 pictureData = pictureRepository.findByDataAndCarId(fileName, carId);

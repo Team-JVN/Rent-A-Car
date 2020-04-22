@@ -84,11 +84,13 @@ public class CarServiceImpl implements CarService {
     @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public Car editAll(Long id, CarDTO carDTO, List<MultipartFile> multipartFiles) {
-        isEditable(id);
         if (multipartFiles.size() > 5) {
             throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
         }
         Car car = get(id);
+        if (car.getAdvertisements() != null) {
+            throw new InvalidCarDataException("Car is in use and therefore can not be edited.", HttpStatus.FORBIDDEN);
+        }
         car.setMake(carDTO.getMake());
         car.setModel(carDTO.getModel());
         car.setBodyStyle(bodyStyleService.get(carDTO.getBodyStyle().getId()));
@@ -105,11 +107,15 @@ public class CarServiceImpl implements CarService {
     @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public Car editPartial(Long id, CarEditDTO carDTO, List<MultipartFile> multipartFiles) {
-        isEditable(id);
         if (multipartFiles.size() > 5) {
             throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
         }
         Car car = get(id);
+        for (Advertisement advertisement : get(id).getAdvertisements()) {
+            if (advertisement.getLogicalStatus().equals(LogicalStatus.EXISTING) && !advertisement.getRentInfos().isEmpty()) {
+                throw new InvalidCarDataException("Car is in use and therefore can not be edited.", HttpStatus.FORBIDDEN);
+            }
+        }
         car.setMileageInKm(carDTO.getMileageInKm());
         car.setKidsSeats(carDTO.getKidsSeats());
         car.setAvailableTracking(carDTO.getAvailableTracking());
@@ -121,7 +127,6 @@ public class CarServiceImpl implements CarService {
     @Override
     public void delete(Long id) {
         Car car = get(id);
-
         if (carRepository.findByIdAndAdvertisementsLogicalStatus(id, LogicalStatus.EXISTING) != null) {
             throw new InvalidCarDataException("Car is in use and therefore can not be deleted.", HttpStatus.FORBIDDEN);
         }
@@ -131,12 +136,10 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public EditType getEditType(Long id) {
-        try {
-            isEditable(id);
-        } catch (InvalidCarDataException ex) {
-            return EditType.PARTIAL;
+        if (get(id).getAdvertisements() == null) {
+            return EditType.ALL;
         }
-        return EditType.ALL;
+        return EditType.PARTIAL;
     }
 
     @Override
@@ -146,14 +149,6 @@ public class CarServiceImpl implements CarService {
             throw new InvalidCarDataException("This car doesn't exist.", HttpStatus.NOT_FOUND);
         }
         return car;
-    }
-
-    private void isEditable(Long id) {
-        for (Advertisement advertisement : get(id).getAdvertisements()) {
-            if (advertisement.getLogicalStatus().equals(LogicalStatus.EXISTING) && !advertisement.getRentInfos().isEmpty()) {
-                throw new InvalidCarDataException("Car is in use and therefore can not be edited.", HttpStatus.FORBIDDEN);
-            }
-        }
     }
 
     @Autowired
