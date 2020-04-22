@@ -5,6 +5,7 @@ import jvn.RentACar.dto.request.CreateAdvertisementDTO;
 import jvn.RentACar.dto.response.AdvertisementWithPicturesDTO;
 import jvn.RentACar.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.RentACar.mapper.AdvertisementDtoMapper;
+import jvn.RentACar.mapper.AdvertisementWithPicturesDtoMapper;
 import jvn.RentACar.mapper.CreateAdvertisementDtoMapper;
 import jvn.RentACar.service.AdvertisementService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ public class AdvertisementController {
     private CreateAdvertisementDtoMapper createAdvertisementDtoMapper;
 
     private AdvertisementDtoMapper advertisementDtoMapper;
+    private AdvertisementWithPicturesDtoMapper adWithPicturesDtoMapper;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AdvertisementDTO> create(@Valid @RequestBody CreateAdvertisementDTO createAdvertisementDTO) {
@@ -53,15 +55,21 @@ public class AdvertisementController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AdvertisementWithPicturesDTO>> get() {
+    public ResponseEntity<List<AdvertisementWithPicturesDTO>> getAll() {
         return new ResponseEntity<>(advertisementService.getAll(), HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<AdvertisementWithPicturesDTO> get(@PathVariable Long id) {
+        return new ResponseEntity<>(adWithPicturesDtoMapper.toDto(advertisementService.get(id)), HttpStatus.OK);
     }
 
     @Autowired
     public AdvertisementController(AdvertisementService advertisementService, CreateAdvertisementDtoMapper createAdvertisementDtoMapper,
-                                   AdvertisementDtoMapper advertisementDtoMapper) {
+                                   AdvertisementDtoMapper advertisementDtoMapper, AdvertisementWithPicturesDtoMapper adWithPicturesDtoMapper) {
         this.advertisementService = advertisementService;
         this.createAdvertisementDtoMapper = createAdvertisementDtoMapper;
         this.advertisementDtoMapper = advertisementDtoMapper;
+        this.adWithPicturesDtoMapper = adWithPicturesDtoMapper;
     }
 }

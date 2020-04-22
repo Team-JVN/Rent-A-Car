@@ -8,7 +8,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PriceListDtoMapper implements MapperInterface<PriceList, PriceListDTO> {
-    public ModelMapper modelMapper;
+
+    private ModelMapper modelMapper;
 
     @Override
     public PriceList toEntity(PriceListDTO dto) {

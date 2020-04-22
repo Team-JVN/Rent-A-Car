@@ -8,7 +8,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class BodyStyleDtoMapper implements MapperInterface<BodyStyle, BodyStyleDTO> {
-    public ModelMapper modelMapper;
+
+    private ModelMapper modelMapper;
 
     @Override
     public BodyStyle toEntity(BodyStyleDTO dto) {

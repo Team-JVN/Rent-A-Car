@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { AddRentRequestComponent } from './../../add/add-rent-request/add-rent-request.component';
+=======
+import { Router } from '@angular/router';
+>>>>>>> feature/advertisementDetails
 import { HttpErrorResponse } from '@angular/common/http';
 import { CarService } from './../../../service/car.service';
 import { AdvertisementService } from './../../../service/advertisement.service';
@@ -23,6 +27,7 @@ export class ListAdvertisementsComponent implements OnInit {
   createSuccess: Subscription;
 
   constructor(
+    public router: Router,
     public dialog: MatDialog,
     private advertisementService: AdvertisementService,
     private carService: CarService,
@@ -39,9 +44,8 @@ export class ListAdvertisementsComponent implements OnInit {
   }
 
   fetchAll() {
-    this.advertisementService.getAdvertisements().subscribe(
+    this.advertisementService.getAll().subscribe(
       (data: AdvertisementWithPicturesDTO[]) => {
-        console.log(data);
         data.forEach(adWithPicturesDTO => {
           this.getPicture(adWithPicturesDTO);
         });
@@ -100,7 +104,15 @@ export class ListAdvertisementsComponent implements OnInit {
   }
 
   rent(element: AdvertisementWithPicturesDTO) {
+<<<<<<< HEAD
     this.dialog.open(AddRentRequestComponent, { data: element.advertisement });
+=======
+
+  }
+
+  viewDetails(element: AdvertisementWithPicturesDTO) {
+    this.router.navigate(['/advertisement/' + element.advertisement.id]);
+>>>>>>> feature/advertisementDetails
   }
 
 }

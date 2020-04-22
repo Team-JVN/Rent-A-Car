@@ -21,8 +21,12 @@ export class AdvertisementService {
     return this.httpClient.put(this.url + '/' + advertisement.id, advertisement);
   }
 
-  public getAdvertisements() {
+  public getAll() {
     return this.httpClient.get(this.url);
+  }
+
+  public get(id: number) {
+    return this.httpClient.get(this.url + "/" + id);
   }
 
   public delete(id: number): any {

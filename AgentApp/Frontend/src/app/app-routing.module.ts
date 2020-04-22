@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { ListClientsComponent } from './component/list/list-clients/list-clients.component';
+=======
+import { AdvertisementDetailsComponent } from './component/advertisement-details/advertisement-details.component';
+>>>>>>> feature/advertisementDetails
 import { ListCarsComponent } from './component/list/list-cars/list-cars.component';
 import { ListGearBoxTypesComponent } from './component/list/list-gear-box-types/list-gear-box-types.component';
 import { ListFuelTypeComponent } from './component/list/list-fuel-type/list-fuel-type.component';
@@ -11,24 +15,36 @@ import { ListAdvertisementsComponent } from './component/list/list-advertisement
 
 const routes: Routes = [
   {
+    path: '',
+    component: ListAdvertisementsComponent
+  },
+  {
+    path: 'advertisement/:id',
+    component: AdvertisementDetailsComponent
+  },
+  {
     path: 'body-styles',
-    component: ListBodyStylesComponent,
+    component: ListBodyStylesComponent
   },
   {
     path: 'fuel-types',
-    component: ListFuelTypeComponent,
+    component: ListFuelTypeComponent
   },
   {
     path: 'gearbox-types',
-    component: ListGearBoxTypesComponent,
+    component: ListGearBoxTypesComponent
   },
   {
     path: 'cars',
+<<<<<<< HEAD
     component: ListCarsComponent,
+=======
+    component: ListCarsComponent
+>>>>>>> feature/advertisementDetails
   },
   {
     path: 'price-lists',
-    component: ListPriceListsComponent,
+    component: ListPriceListsComponent
   },
   {
     path: 'clients',

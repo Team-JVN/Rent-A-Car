@@ -37,6 +37,7 @@ import { EditAdvertisementComponent } from './component/edit/edit-advertisement/
 import { ListClientsComponent } from './component/list/list-clients/list-clients.component';
 import { AddClientComponent } from './component/add/add-client/add-client.component';
 import { EditClientComponent } from './component/edit/edit-client/edit-client.component';
+import { AdvertisementDetailsComponent } from './component/advertisement-details/advertisement-details.component';
 
 @NgModule({
   declarations: [
@@ -67,6 +68,7 @@ import { EditClientComponent } from './component/edit/edit-client/edit-client.co
     AddClientComponent,
     EditClientComponent,
     AddRentRequestComponent,
+    AdvertisementDetailsComponent,
   ],
   imports: [
     BrowserModule,

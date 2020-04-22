@@ -12,7 +12,8 @@ import java.time.format.DateTimeFormatter;
 
 @Component
 public class AdvertisementDtoMapper implements MapperInterface<Advertisement, AdvertisementDTO> {
-    public ModelMapper modelMapper;
+
+    private ModelMapper modelMapper;
 
     @Override
     public Advertisement toEntity(AdvertisementDTO dto) throws ParseException {

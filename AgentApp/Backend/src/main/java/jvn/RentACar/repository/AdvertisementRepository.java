@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface AdvertisementRepository extends JpaRepository<Advertisement, Long> {
 
-    Advertisement findOneByIdAndLogicalStatus(Long id, LogicalStatus logicalStatus);
+    Advertisement findByIdAndLogicalStatus(Long id, LogicalStatus logicalStatus);
 
     List<Advertisement> findAllByLogicalStatusNot(LogicalStatus logicalStatus);
 

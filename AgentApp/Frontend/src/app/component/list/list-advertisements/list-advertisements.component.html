@@ -13,8 +13,8 @@
         <table mat-table [dataSource]="advertisementsDataSource" class="car-list-table">
             <ng-container matColumnDef="advertisement">
                 <td mat-cell *matCellDef="let element">
-                    <mat-card class="item-card">
-                        <div class="image-div" (click)="viewPictures(element)">
+                    <mat-card class="item-card" (click)="viewDetails(element)">
+                        <div class="image-div">
                             <img [src]="element.image" *ngIf="!element.isImageLoading; else noImageFound" class="image">
                         </div>
                         <div>
@@ -82,6 +82,7 @@
                                 <td class="price-header">Price per day:</td>
                             </tr>
                             <tr>
+<<<<<<< HEAD
                                 <td class="price-text" style="color: red;">
                                     {{element.advertisement.priceList.pricePerDay}} €</td>
                             </tr>
@@ -89,6 +90,13 @@
                                     class="rent-btn" (click)="rent(element)">Rent
                                     a
                                     Car</button></tr>
+=======
+                                <td class="price-text">
+                                    {{element.advertisement.priceList.pricePerDay}} €</td>
+                            </tr>
+                            <tr><button *ngIf="element.advertisement.active" mat-raised-button color="primary"
+                                    class="rent-btn" (click)="rent()">Rent me!</button></tr>
+>>>>>>> feature/advertisementDetails
                         </table>
                     </mat-card>
                 </td>
