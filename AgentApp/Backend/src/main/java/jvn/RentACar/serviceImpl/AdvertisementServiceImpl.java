@@ -100,8 +100,15 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         return advertisement;
     }
 
-    public List<AdvertisementWithPicturesDTO> getAll() {
-        List<Advertisement> ads = advertisementRepository.findAllByLogicalStatusNot(LogicalStatus.DELETED);
+    public List<AdvertisementWithPicturesDTO> getAll(String status) {
+        List<Advertisement> ads = null;
+        if (status.equals("all")) {
+            ads = advertisementRepository.findAllByLogicalStatusNot(LogicalStatus.DELETED);
+        } else if (status.equals("active")) {
+            ads = advertisementRepository.findAllByLogicalStatusNotAndActive(LogicalStatus.DELETED, true);
+        } else {
+            ads = advertisementRepository.findAllByLogicalStatusNotAndActive(LogicalStatus.DELETED, false);
+        }
         List<AdvertisementWithPicturesDTO> adsDTOList = new ArrayList<>();
         for (Advertisement ad : ads) {
             AdvertisementDTO advertisementDTO = advertisementMapper.toDto(ad);
@@ -136,7 +143,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     private void isEditable(Advertisement advertisement) {
         if (!advertisement.getRentInfos().isEmpty() && advertisementRepository.findByIdAndRentInfosRentRequestRentRequestStatusNotAndLogicalStatus(advertisement.getId(), RentRequestStatus.CANCELED, LogicalStatus.EXISTING) != null) {
-            throw new InvalidAdvertisementDataException("This advertisement is in use and therefore can not be edited/deleted.!", HttpStatus.BAD_REQUEST);
+            throw new InvalidAdvertisementDataException("This advertisement is in use and therefore can not be edited/deleted.", HttpStatus.BAD_REQUEST);
         }
     }
 

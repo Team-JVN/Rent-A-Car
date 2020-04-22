@@ -70,6 +70,7 @@ tr.element-row:not(.expanded-row):active {
     font-weight: 500;
     font-size: 20px;
 }
+
 .first-column{
     width: 110px;
 }

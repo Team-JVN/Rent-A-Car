@@ -116,14 +116,14 @@
                                     <tr>
                                         <th class="first">Price Per Kilometre</th>
                                         <td> <span
-                                                *ngIf="getSelectedPriceList().pricePerKm">{{getSelectedPriceList().pricePerKm}}
+                                                *ngIf="getSelectedPriceList().pricePerKm">{{getSelectedPriceList().pricePerKm | number: '1.2-2'}}
                                                 €</span>
                                             <span *ngIf="!getSelectedPriceList().pricePerKm">—</span></td>
                                     </tr>
                                     <tr>
                                         <th class="first">Price For Collision Damage Waiver</th>
                                         <td> <span
-                                                *ngIf="getSelectedPriceList().priceForCDW">{{getSelectedPriceList().priceForCDW}}
+                                                *ngIf="getSelectedPriceList().priceForCDW">{{getSelectedPriceList().priceForCDW | number: '1.2-2'}}
                                                 €</span>
                                             <span *ngIf="!getSelectedPriceList().priceForCDW">—</span></td>
                                     </tr>

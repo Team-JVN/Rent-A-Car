@@ -14,5 +14,5 @@ public interface AdvertisementService {
 
     Advertisement get(Long id);
 
-    List<AdvertisementWithPicturesDTO> getAll();
+    List<AdvertisementWithPicturesDTO> getAll(String status);
 }

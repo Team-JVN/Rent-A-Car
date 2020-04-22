@@ -15,6 +15,8 @@ public interface AdvertisementRepository extends JpaRepository<Advertisement, Lo
 
     List<Advertisement> findAllByLogicalStatusNot(LogicalStatus logicalStatus);
 
+    List<Advertisement> findAllByLogicalStatusNotAndActive(LogicalStatus logicalStatus, Boolean active);
+
     List<Advertisement> findByCarIdAndActiveAndLogicalStatus(Long id, Boolean active, LogicalStatus status);
 
     Advertisement findByIdAndRentInfosRentRequestRentRequestStatusNotAndLogicalStatus(Long id, RentRequestStatus status, LogicalStatus logicalStatus);

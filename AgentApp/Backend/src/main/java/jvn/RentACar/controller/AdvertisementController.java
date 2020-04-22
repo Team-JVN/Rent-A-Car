@@ -54,9 +54,9 @@ public class AdvertisementController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping
-    public ResponseEntity<List<AdvertisementWithPicturesDTO>> getAll() {
-        return new ResponseEntity<>(advertisementService.getAll(), HttpStatus.OK);
+    @GetMapping("/all/{status}")
+    public ResponseEntity<List<AdvertisementWithPicturesDTO>> getAll(@PathVariable(value = "status", required = false) String status) {
+        return new ResponseEntity<>(advertisementService.getAll(status), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
