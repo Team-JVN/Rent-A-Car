@@ -31,7 +31,5 @@ public class RentRequest {
     @OneToMany(mappedBy = "rentRequest", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<RentInfo> rentInfos = new HashSet<RentInfo>();
 
-    @OneToOne
-    private RentReport rentReport;
 
 }
