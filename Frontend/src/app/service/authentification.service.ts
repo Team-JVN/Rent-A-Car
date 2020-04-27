@@ -43,4 +43,30 @@ export class AuthentificationService {
     localStorage.removeItem('LoggedInUser');
     this.router.navigate(['/login']);
   }
+
+  getLoggedInUser(): LoggedInUser {
+    return this.loggedInUserSubject.value;
+  }
+
+  isLoggedIn() {
+    return localStorage.getItem('LoggedInUser') !== null;
+  }
+
+  isAdmin() {
+    if (this.isLoggedIn()) {
+      return this.loggedInUserSubject.value.role === "ADMIN";
+    }
+  }
+
+  isAgent() {
+    if (this.isLoggedIn()) {
+      return this.loggedInUserSubject.value.role === "AGENT";
+    }
+  }
+
+  isClient() {
+    if (this.isLoggedIn()) {
+      return this.loggedInUserSubject.value.role === "CLIENT";
+    }
+  }
 }

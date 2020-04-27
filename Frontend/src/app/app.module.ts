@@ -46,6 +46,8 @@ import { ClientRegistrationComponent } from './component/authentification/client
 import { ClientPendingApprovalComponent } from './component/authentification/client-pending-approval/client-pending-approval.component';
 import { AddAgentComponent } from './component/add/add-agent/add-agent.component';
 import { AddAdminComponent } from './component/add/add-admin/add-admin.component';
+import { NonAuthorizedErrorPageComponent } from './error/non-authorized-error-page/non-authorized-error-page.component';
+import { NonAuthenticatedErrorPageComponent } from './error/non-authenticated-error-page/non-authenticated-error-page.component';
 
 @NgModule({
   declarations: [
@@ -85,6 +87,8 @@ import { AddAdminComponent } from './component/add/add-admin/add-admin.component
     ClientPendingApprovalComponent,
     AddAgentComponent,
     AddAdminComponent,
+    NonAuthorizedErrorPageComponent,
+    NonAuthenticatedErrorPageComponent,
   ],
   imports: [
     BrowserModule,

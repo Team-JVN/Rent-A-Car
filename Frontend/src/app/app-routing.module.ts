@@ -1,3 +1,4 @@
+import { NonAuthenticatedErrorPageComponent } from './error/non-authenticated-error-page/non-authenticated-error-page.component';
 import { ClientPendingApprovalComponent } from './component/authentification/client-pending-approval/client-pending-approval.component';
 import { ClientRegistrationComponent } from './component/authentification/client-registration/client-registration.component';
 import { RegistrationClient } from 'src/app/model/registrationClient';
@@ -15,13 +16,10 @@ import { ListPriceListsComponent } from './component/list/list-price-lists/list-
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { ListAdvertisementsComponent } from './component/list/list-advertisements/list-advertisements.component';
+import { NonAuthorizedErrorPageComponent } from './error/non-authorized-error-page/non-authorized-error-page.component';
 
 
 const routes: Routes = [
-  {
-    path: '',
-    component: ListAdvertisementsComponent
-  },
   {
     path: 'advertisement/:id',
     component: AdvertisementDetailsComponent
@@ -55,10 +53,6 @@ const routes: Routes = [
     component: ListRentRequestsComponent,
   },
   {
-    path: '',
-    component: ListAdvertisementsComponent
-  },
-  {
     path: 'login',
     component: LoginComponent
   },
@@ -73,6 +67,19 @@ const routes: Routes = [
   {
     path: 'client/pending-approval',
     component: ClientPendingApprovalComponent
+  },
+  //******************* ERROR PAGES ************************
+  {
+    path: 'error/non-authenticated',
+    component: NonAuthenticatedErrorPageComponent,
+  },
+  {
+    path: 'error/non-authorized',
+    component: NonAuthorizedErrorPageComponent
+  },
+  {
+    path: '',
+    component: ListAdvertisementsComponent
   },
 ];
 
