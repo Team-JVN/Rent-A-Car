@@ -13,6 +13,9 @@ export const environment = {
   priceList: '/api/price-list',
   client: '/api/client',
   rentRequest: '/api/rent-request',
+  auth: '/api/auth',
+  agent: '/api/agent',
+  admin: '/api/admin'
 };
 
 /*

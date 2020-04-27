@@ -1,3 +1,10 @@
+import { NonAuthenticatedErrorPageComponent } from './error/non-authenticated-error-page/non-authenticated-error-page.component';
+import { ClientPendingApprovalComponent } from './component/authentification/client-pending-approval/client-pending-approval.component';
+import { ClientRegistrationComponent } from './component/authentification/client-registration/client-registration.component';
+import { RegistrationClient } from 'src/app/model/registrationClient';
+import { ChangePasswordComponent } from './component/authentification/change-password/change-password.component';
+import { ChangePassword } from './model/changePassword';
+import { LoginComponent } from './component/authentification/login/login.component';
 import { ListRentRequestsComponent } from './component/list/list-rent-requests/list-rent-requests.component';
 import { ListClientsComponent } from './component/list/list-clients/list-clients.component';
 import { AdvertisementDetailsComponent } from './component/advertisement-details/advertisement-details.component';
@@ -9,13 +16,10 @@ import { ListPriceListsComponent } from './component/list/list-price-lists/list-
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { ListAdvertisementsComponent } from './component/list/list-advertisements/list-advertisements.component';
+import { NonAuthorizedErrorPageComponent } from './error/non-authorized-error-page/non-authorized-error-page.component';
 
 
 const routes: Routes = [
-  {
-    path: '',
-    component: ListAdvertisementsComponent
-  },
   {
     path: 'advertisement/:id',
     component: AdvertisementDetailsComponent
@@ -47,6 +51,31 @@ const routes: Routes = [
   {
     path: 'rent-requests',
     component: ListRentRequestsComponent,
+  },
+  {
+    path: 'login',
+    component: LoginComponent
+  },
+  {
+    path: 'change-password',
+    component: ChangePasswordComponent
+  },
+  {
+    path: 'client/registration',
+    component: ClientRegistrationComponent
+  },
+  {
+    path: 'client/pending-approval',
+    component: ClientPendingApprovalComponent
+  },
+  //******************* ERROR PAGES ************************
+  {
+    path: 'error/non-authenticated',
+    component: NonAuthenticatedErrorPageComponent,
+  },
+  {
+    path: 'error/non-authorized',
+    component: NonAuthorizedErrorPageComponent
   },
   {
     path: '',

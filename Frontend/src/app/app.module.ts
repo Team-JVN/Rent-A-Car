@@ -40,6 +40,14 @@ import { EditClientComponent } from './component/edit/edit-client/edit-client.co
 import { AdvertisementDetailsComponent } from './component/advertisement-details/advertisement-details.component';
 import { ListRentRequestsComponent } from './component/list/list-rent-requests/list-rent-requests.component';
 import { EditRentRequestComponent } from './component/edit/edit-rent-request/edit-rent-request.component';
+import { LoginComponent } from './component/authentification/login/login.component';
+import { ChangePasswordComponent } from './component/authentification/change-password/change-password.component';
+import { ClientRegistrationComponent } from './component/authentification/client-registration/client-registration.component';
+import { ClientPendingApprovalComponent } from './component/authentification/client-pending-approval/client-pending-approval.component';
+import { AddAgentComponent } from './component/add/add-agent/add-agent.component';
+import { AddAdminComponent } from './component/add/add-admin/add-admin.component';
+import { NonAuthorizedErrorPageComponent } from './error/non-authorized-error-page/non-authorized-error-page.component';
+import { NonAuthenticatedErrorPageComponent } from './error/non-authenticated-error-page/non-authenticated-error-page.component';
 
 @NgModule({
   declarations: [
@@ -73,6 +81,14 @@ import { EditRentRequestComponent } from './component/edit/edit-rent-request/edi
     AdvertisementDetailsComponent,
     ListRentRequestsComponent,
     EditRentRequestComponent,
+    LoginComponent,
+    ChangePasswordComponent,
+    ClientRegistrationComponent,
+    ClientPendingApprovalComponent,
+    AddAgentComponent,
+    AddAdminComponent,
+    NonAuthorizedErrorPageComponent,
+    NonAuthenticatedErrorPageComponent,
   ],
   imports: [
     BrowserModule,
@@ -111,7 +127,9 @@ import { EditRentRequestComponent } from './component/edit/edit-rent-request/edi
     AddClientComponent,
     EditClientComponent,
     AddRentRequestComponent,
-    EditRentRequestComponent
+    EditRentRequestComponent,
+    AddAgentComponent,
+    AddAdminComponent
   ],
   providers: [
     {
