@@ -1,3 +1,4 @@
+import { LoginComponent } from './component/authentification/login/login.component';
 import { ListRentRequestsComponent } from './component/list/list-rent-requests/list-rent-requests.component';
 import { ListClientsComponent } from './component/list/list-clients/list-clients.component';
 import { AdvertisementDetailsComponent } from './component/advertisement-details/advertisement-details.component';
@@ -51,6 +52,10 @@ const routes: Routes = [
   {
     path: '',
     component: ListAdvertisementsComponent
+  },
+  {
+    path: 'login',
+    component: LoginComponent
   },
 ];
 
