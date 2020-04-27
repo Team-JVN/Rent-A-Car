@@ -1,0 +1,40 @@
+.dialog-class {
+    width: 600px;
+  }
+  
+  ngx-dropzone{
+    width: 510px;
+  }
+    
+  .table {
+    margin-bottom: 0;
+  }
+    
+  .form-full-width {
+    width: 100%;
+  }
+  
+  .form-full-width-right {
+    width: 99%;
+  }
+  
+  .form-full-width-left {
+    width: 90%;
+  }
+
+  .note {
+    font-size: 85%;
+    color: #717386;
+  }
+
+  /* Hides arrow buttons in input type="number" */
+  /* Chrome, Safari, Edge, Opera */
+  input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+  }
+  
+  /* Firefox */
+  input[type=number] {
+  -moz-appearance: textfield;
+  }

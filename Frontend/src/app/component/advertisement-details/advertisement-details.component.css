@@ -1,0 +1,75 @@
+mat-card {
+    width: 1000px;
+    margin: 2em auto;
+}
+
+mat-card-content {
+    margin-right: 20px;
+}
+
+:host ::ng-deep ngx-gallery ngx-gallery-image {
+    z-index: 0;
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+td.mat-cell{
+    border-bottom-style: none;
+}
+
+th.mat-header-cell{
+    border-bottom-style: none;
+}
+
+.car-table tr {
+    border-bottom: 1px solid #ddd;
+}
+
+.car-table th, .table td {
+    font-size: 16px;
+    vertical-align: bottom;
+}
+
+.theader {
+    font-weight: 550;
+    display: inline-flex;
+    vertical-align: middle;
+}
+
+.ad-data-div {
+    margin-top: 20px;
+}
+
+.per-km {
+    font-weight: 550;
+}
+
+.price-header {
+    font-size: 23px;
+    font-weight: 550;
+}
+
+.price-text {    
+    font-size: 26px;
+    font-weight: bold;
+    color: red;
+}
+
+.price-table {
+    text-align: center;
+    margin-left: 50px;
+    margin-top: 45px;
+}
+
+.rent-btn {
+    margin-top: 15px;
+    font-size: 16px;
+}
+
+.rented-out-btn {
+    margin-top: 15px;
+    font-size: 18px;
+    pointer-events: none;
+}
