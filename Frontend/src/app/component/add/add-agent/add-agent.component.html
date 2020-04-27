@@ -1,0 +1,61 @@
+<h1 mat-dialog-title>Registrate Agent/Company</h1>
+<mat-dialog-content class="dialog-class">
+    <form [formGroup]="addForm" class="form-full-width">
+        <mat-form-field class="form-full-width">
+            <input matInput placeholder="Email" formControlName="email">
+            <mat-error *ngIf="addForm.get('email').errors && addForm.get('email').errors['required']">
+                Please enter email address.
+            </mat-error>
+            <mat-error *ngIf="addForm.get('email').errors && addForm.get('email').errors['email']">
+                Please enter a valid email address.
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field class="form-full-width mt-3">
+            <input matInput placeholder="Name" formControlName="name">
+            <mat-error *ngIf="addForm.get('name').errors && addForm.get('name').errors['required']">
+                Please enter name.
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field class="form-full-width">
+            <input matInput placeholder="Taxpayer identification number" formControlName="taxIdNumber">
+            <mat-error *ngIf="addForm.get('taxIdNumber').errors && addForm.get('taxIdNumber').errors['required']">
+                Please enter taxpayer identification number.
+            </mat-error>
+            <mat-error *ngIf="addForm.get('taxIdNumber').errors && addForm.get('taxIdNumber').errors['minlength']">
+                Taxpayer identification number must have 9 digits.
+            </mat-error>
+            <mat-error *ngIf="addForm.get('taxIdNumber').errors && addForm.get('taxIdNumber').errors['maxlength']">
+                Taxpayer identification number must have 9 digits.
+            </mat-error>
+            <mat-error *ngIf="addForm.get('taxIdNumber').errors && addForm.get('taxIdNumber').errors['pattern']">
+                Please enter a valid Taxpayer identification number.
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field class="form-full-width">
+            <input matInput placeholder="Address" formControlName="address">
+            <mat-error *ngIf="addForm.get('address').errors && addForm.get('address').errors['required']">
+                Please enter address.
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field class="form-full-width">
+            <input matInput placeholder="Phone number" formControlName="phoneNumber">
+            <mat-error *ngIf="addForm.get('phoneNumber').errors && addForm.get('phoneNumber').errors['required']">
+                Please enter phone number.
+            </mat-error>
+            <mat-error *ngIf="addForm.get('phoneNumber').errors && addForm.get('phoneNumber').errors['minlength']">
+                Phone number must have between 9 and 10 digits.
+            </mat-error>
+            <mat-error *ngIf="addForm.get('phoneNumber').errors && addForm.get('phoneNumber').errors['maxlength']">
+                Phone number must have between 9 and 10 digits.
+            </mat-error>
+            <mat-error *ngIf="addForm.get('phoneNumber').errors && addForm.get('phoneNumber').errors['pattern']">
+                Please enter a valid phone number.
+            </mat-error>
+        </mat-form-field>
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-raised-button color="primary" (click)="register()" class="mb-3"
+        [disabled]="!addForm.valid">Register</button>
+</mat-dialog-actions>

@@ -82,11 +82,11 @@
                     Please enter phone number.
                 </mat-error>
                 <mat-error
-                    *ngIf="registrationForm.get('phoneNumber').errors && registrationForm.get('phoneNumber').errors['minLength']">
+                    *ngIf="registrationForm.get('phoneNumber').errors && registrationForm.get('phoneNumber').errors['minlength']">
                     Phone number must have between 9 and 10 digits.
                 </mat-error>
                 <mat-error
-                    *ngIf="registrationForm.get('phoneNumber').errors && registrationForm.get('phoneNumber').errors['maxLength']">
+                    *ngIf="registrationForm.get('phoneNumber').errors && registrationForm.get('phoneNumber').errors['maxlength']">
                     Phone number must have between 9 and 10 digits.
                 </mat-error>
                 <mat-error

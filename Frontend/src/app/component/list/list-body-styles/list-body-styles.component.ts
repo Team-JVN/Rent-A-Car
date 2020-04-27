@@ -1,3 +1,4 @@
+import { AddAgentComponent } from './../../add/add-agent/add-agent.component';
 import { element } from 'protractor';
 import { BodyStyleService } from './../../../service/bodyStyle.service';
 import { BodyStyle } from '../../../model/bodyStyle';
