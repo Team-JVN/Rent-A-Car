@@ -14,7 +14,8 @@ export const environment = {
   client: '/api/client',
   rentRequest: '/api/rent-request',
   auth: '/api/auth',
-  agent: '/api/agent'
+  agent: '/api/agent',
+  admin: '/api/admin'
 };
 
 /*

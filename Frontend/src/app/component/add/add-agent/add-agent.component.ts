@@ -3,11 +3,7 @@ import { AgentService } from './../../../service/agent.service';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { AuthentificationService } from 'src/app/service/authentification.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { PasswordMatch } from 'src/app/validator/passwordMatch';
-import { Router } from '@angular/router';
-import { RegistrationClient } from 'src/app/model/registrationClient';
 import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({

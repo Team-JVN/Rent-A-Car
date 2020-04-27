@@ -45,6 +45,7 @@ import { ChangePasswordComponent } from './component/authentification/change-pas
 import { ClientRegistrationComponent } from './component/authentification/client-registration/client-registration.component';
 import { ClientPendingApprovalComponent } from './component/authentification/client-pending-approval/client-pending-approval.component';
 import { AddAgentComponent } from './component/add/add-agent/add-agent.component';
+import { AddAdminComponent } from './component/add/add-admin/add-admin.component';
 
 @NgModule({
   declarations: [
@@ -83,6 +84,7 @@ import { AddAgentComponent } from './component/add/add-agent/add-agent.component
     ClientRegistrationComponent,
     ClientPendingApprovalComponent,
     AddAgentComponent,
+    AddAdminComponent,
   ],
   imports: [
     BrowserModule,
@@ -122,7 +124,8 @@ import { AddAgentComponent } from './component/add/add-agent/add-agent.component
     EditClientComponent,
     AddRentRequestComponent,
     EditRentRequestComponent,
-    AddAgentComponent
+    AddAgentComponent,
+    AddAdminComponent
   ],
   providers: [
     {
