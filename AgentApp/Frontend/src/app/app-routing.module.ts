@@ -1,3 +1,5 @@
+import { ListModelsComponent } from './component/list/list-models/list-models.component';
+import { ListMakesComponent } from './component/list/list-makes/list-makes.component';
 import { ListRentRequestsComponent } from "./component/list/list-rent-requests/list-rent-requests.component";
 import { ListClientsComponent } from "./component/list/list-clients/list-clients.component";
 import { AdvertisementDetailsComponent } from "./component/advertisement-details/advertisement-details.component";
@@ -56,10 +58,18 @@ const routes: Routes = [
     path: "rent-reports",
     component: ListRentReportsComponent,
   },
+  {
+    path: "makes",
+    component: ListMakesComponent,
+  },
+  {
+    path: "models/:id",
+    component: ListModelsComponent,
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

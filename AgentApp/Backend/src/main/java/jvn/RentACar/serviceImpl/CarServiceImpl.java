@@ -93,8 +93,8 @@ public class CarServiceImpl implements CarService {
         if (advertisements != null || !advertisements.isEmpty()) {
             throw new InvalidCarDataException("Car is in use and therefore can not be edited.", HttpStatus.FORBIDDEN);
         }
-        car.setMake(carDTO.getMake());
-        car.setModel(carDTO.getModel());
+//        car.setMake(carDTO.getMake());
+//        car.setModel(carDTO.getModel());
         car.setBodyStyle(bodyStyleService.get(carDTO.getBodyStyle().getId()));
         car.setFuelType(fuelTypeService.get(carDTO.getFuelType().getId()));
         car.setGearBoxType(gearboxTypeService.get(carDTO.getGearBoxType().getId()));

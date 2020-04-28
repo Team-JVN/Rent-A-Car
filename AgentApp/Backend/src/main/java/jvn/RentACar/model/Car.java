@@ -22,11 +22,11 @@ public class Car {
     @Column(nullable = false)
     private LogicalStatus logicalStatus = LogicalStatus.EXISTING;
 
-    @Column(nullable = false)
-    private String make;
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Make make;
 
-    @Column(nullable = false)
-    private String model;
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Model model;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private FuelType fuelType;

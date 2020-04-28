@@ -1,8 +1,6 @@
 package jvn.RentACar.dto.request;
 
-import jvn.RentACar.dto.both.BodyStyleDTO;
-import jvn.RentACar.dto.both.FuelTypeDTO;
-import jvn.RentACar.dto.both.GearboxTypeDTO;
+import jvn.RentACar.dto.both.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,10 +16,10 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class CreateCarDTO implements Serializable {
     @NotEmpty(message = "Make is empty.")
-    private String make;
+    private MakeDTO make;
 
     @NotEmpty(message = "Model is empty.")
-    private String model;
+    private ModelDTO model;
 
     @NotNull(message = "Fuel type is null.")
     private FuelTypeDTO fuelType;

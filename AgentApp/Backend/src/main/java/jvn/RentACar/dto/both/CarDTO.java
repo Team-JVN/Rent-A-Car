@@ -17,10 +17,10 @@ public class CarDTO {
     private Long id;
 
     @NotEmpty(message = "Make is empty.")
-    private String make;
+    private MakeDTO make;
 
     @NotEmpty(message = "Model is empty.")
-    private String model;
+    private ModelDTO model;
 
     @NotNull(message = "Fuel type is null.")
     private FuelTypeDTO fuelType;
