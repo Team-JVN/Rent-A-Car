@@ -104,7 +104,8 @@ export class EditRentRequestComponent implements OnInit {
     if (!this.selectedItem.rentInfos[0].advertisement.cdw) {
       cdw = null;
     }
-    const rentInfo = new RentInfo(dateTimeFrom, dateTimeTo, this.informationForm.value.pickUpPoint, cdw, this.selectedItem.rentInfos[0].advertisement, this.selectedItem.rentInfos[0].id);
+
+    const rentInfo = new RentInfo(dateTimeFrom, dateTimeTo, this.informationForm.value.pickUpPoint, cdw, this.selectedItem.rentInfos[0].advertisement, null, this.selectedItem.rentInfos[0].id);
     var rentInfos = [];
     rentInfos.push(rentInfo);
     const rentRequest = new RentRequest(this.clientForm.value.client, rentInfos, this.selectedItem.totalPrice, this.selectedItem.rentRequestStatus, this.selectedItem.id);

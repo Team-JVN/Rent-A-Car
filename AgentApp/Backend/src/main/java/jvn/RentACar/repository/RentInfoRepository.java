@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface RentInfoRepository extends JpaRepository<RentInfo, Long> {
     List<RentInfo> findByAdvertisementCarIdAndRentRequestRentRequestStatusOrderByDateTimeToDesc(Long carId, RentRequestStatus rentRequestStatus);
+
+    RentInfo findOneById(Long id);
 }

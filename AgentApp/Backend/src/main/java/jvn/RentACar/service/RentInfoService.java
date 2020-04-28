@@ -9,4 +9,6 @@ public interface RentInfoService {
     List<RentInfo> getPaidRentInfos(Long carId);
 
     void delete(Set<RentInfo> rentInfos);
+
+    RentInfo get(Long id);
 }

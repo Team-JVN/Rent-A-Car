@@ -1,10 +1,12 @@
 package jvn.RentACar.serviceImpl;
 
 import jvn.RentACar.enumeration.RentRequestStatus;
+import jvn.RentACar.exceptionHandler.InvalidCarDataException;
 import jvn.RentACar.model.RentInfo;
 import jvn.RentACar.repository.RentInfoRepository;
 import jvn.RentACar.service.RentInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,6 +33,14 @@ public class RentInfoServiceImpl implements RentInfoService {
         rentInfo.setAdvertisement(null);
         rentInfo.setRentRequest(null);
         rentInfoRepository.deleteById(rentInfo.getId());
+    }
+
+    public RentInfo get(Long id) {
+        RentInfo rentInfo = rentInfoRepository.findOneById(id);
+        if (rentInfo == null) {
+            throw new InvalidCarDataException("This RentInfo doesn't exist.", HttpStatus.NOT_FOUND);
+        }
+        return rentInfo;
     }
 
     @Autowired

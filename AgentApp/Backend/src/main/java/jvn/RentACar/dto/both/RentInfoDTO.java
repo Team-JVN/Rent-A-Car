@@ -26,4 +26,6 @@ public class RentInfoDTO {
 
     @NotNull(message = "Advertisement is null.")
     private AdvertisementDTO advertisement;
+
+//    private RentReportDTO rentReport;
 }

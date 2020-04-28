@@ -20,16 +20,13 @@ public class RentReport {
     @Column
     private String comment;
 
-    @OneToOne(mappedBy = "rentReport", cascade = CascadeType.ALL)
-    private RentRequest rentRequest;
+//    @OneToOne(mappedBy = "rentReport", cascade = CascadeType.ALL)
+    @OneToOne
+    private RentInfo rentInfo;
 
     @Column
     private Double additionalCost;
 
-    @ElementCollection
-    @CollectionTable(name = "advertisement_mileage_mapping",
-            joinColumns = {@JoinColumn(name = "rent_report_id", referencedColumnName = "id")})
-    @MapKeyColumn(name = "advertisement_id")
-    @Column(name = "km")
-    private Map<Long, Integer> madeMileagePerAd;
+    @Column
+    private Integer madeMileage;
 }
