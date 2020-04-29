@@ -41,6 +41,10 @@ public class CarServiceImpl implements CarService {
 
     private CarDtoMapper carMapper;
 
+    private ModelService modelService;
+
+    private MakeService makeService;
+
     @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public Car create(Car car, List<MultipartFile> multipartFiles) {
@@ -53,7 +57,8 @@ public class CarServiceImpl implements CarService {
                 throw new InvalidCarDataException("Picture exceeds maximum size of 2MB.", HttpStatus.PAYLOAD_TOO_LARGE);
             }
         }
-
+        car.setMake(makeService.get(car.getMake().getId()));
+        car.setModel(modelService.get(car.getModel().getId(), car.getMake().getId()));
         car.setBodyStyle(bodyStyleService.get(car.getBodyStyle().getId()));
         car.setFuelType(fuelTypeService.get(car.getFuelType().getId()));
         car.setGearBoxType(gearboxTypeService.get(car.getGearBoxType().getId()));
@@ -90,11 +95,11 @@ public class CarServiceImpl implements CarService {
         }
         Car car = get(id);
         Set<Advertisement> advertisements = get(id).getAdvertisements();
-        if (advertisements != null || !advertisements.isEmpty()) {
+        if (advertisements != null && !advertisements.isEmpty()) {
             throw new InvalidCarDataException("Car is in use and therefore can not be edited.", HttpStatus.FORBIDDEN);
         }
-        car.setMake(carDTO.getMake());
-        car.setModel(carDTO.getModel());
+        car.setMake(makeService.get(carDTO.getMake().getId()));
+        car.setModel(modelService.get(carDTO.getModel().getId(), carDTO.getMake().getId()));
         car.setBodyStyle(bodyStyleService.get(carDTO.getBodyStyle().getId()));
         car.setFuelType(fuelTypeService.get(carDTO.getFuelType().getId()));
         car.setGearBoxType(gearboxTypeService.get(carDTO.getGearBoxType().getId()));
@@ -157,12 +162,14 @@ public class CarServiceImpl implements CarService {
     @Autowired
     public CarServiceImpl(CarRepository carRepository, BodyStyleService bodyStyleService,
                           FuelTypeService fuelTypeService, GearboxTypeService gearboxTypeService,
-                          PictureService pictureService, CarDtoMapper carMapper) {
+                          PictureService pictureService, CarDtoMapper carMapper, ModelService modelService, MakeService makeService) {
         this.carRepository = carRepository;
         this.bodyStyleService = bodyStyleService;
         this.fuelTypeService = fuelTypeService;
         this.gearboxTypeService = gearboxTypeService;
         this.pictureService = pictureService;
         this.carMapper = carMapper;
+        this.modelService = modelService;
+        this.makeService = makeService;
     }
 }

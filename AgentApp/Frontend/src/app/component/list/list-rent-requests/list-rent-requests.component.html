@@ -52,8 +52,8 @@
                       <mat-card-title>
                         Rent info for
                         <span (click)="advertisementDetails(rentInfo)" class="btn-adv-details">
-                          {{rentInfo.advertisement.car.make }}
-                          {{rentInfo.advertisement.car.model}}
+                          {{rentInfo.advertisement.car.make.name }}
+                          {{rentInfo.advertisement.car.model.name}}
                         </span>
                       </mat-card-title>
                     </mat-card-header>
@@ -62,8 +62,8 @@
                   <div class="col-3 mt-0" align="end">
                     <button mat-raised-button *ngIf="
                                       element.rentRequestStatus == 'PAID' &&
-                                      rentInfo.availableCreatingRentReport
-                                    " color="primary" (click)="createRentReport(rentInfo)">
+                                      rentInfo.availableCreatingRentReport" color="primary"
+                      (click)="createRentReport(rentInfo)">
                       Create Report
                     </button>
                   </div>

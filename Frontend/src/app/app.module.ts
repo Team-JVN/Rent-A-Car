@@ -1,3 +1,4 @@
+
 import { AddRentRequestComponent } from './component/add/add-rent-request/add-rent-request.component';
 import { HeaderComponent } from './component/header/header.component';
 import { CustomHammerConfig } from './custom-hummer-config';
@@ -48,6 +49,13 @@ import { AddAgentComponent } from './component/add/add-agent/add-agent.component
 import { AddAdminComponent } from './component/add/add-admin/add-admin.component';
 import { NonAuthorizedErrorPageComponent } from './error/non-authorized-error-page/non-authorized-error-page.component';
 import { NonAuthenticatedErrorPageComponent } from './error/non-authenticated-error-page/non-authenticated-error-page.component';
+import { AddModelComponent } from './component/add/add-model/add-model.component';
+import { EditModelComponent } from './component/edit/edit-model/edit-model.component';
+import { EditMakeComponent } from './component/edit/edit-make/edit-make.component';
+import { AddMakeComponent } from './component/add/add-make/add-make.component';
+import { ListMakesComponent } from './component/list/list-makes/list-makes.component';
+import { ListModelsComponent } from './component/list/list-models/list-models.component';
+import { ConfirmDialogDeleteMakeComponent } from './component/confirm-dialog/confirm-dialog-delete-make/confirm-dialog-delete-make.component';
 
 @NgModule({
   declarations: [
@@ -89,6 +97,13 @@ import { NonAuthenticatedErrorPageComponent } from './error/non-authenticated-er
     AddAdminComponent,
     NonAuthorizedErrorPageComponent,
     NonAuthenticatedErrorPageComponent,
+    AddModelComponent,
+    AddMakeComponent,
+    EditModelComponent,
+    EditMakeComponent,
+    ListMakesComponent,
+    ListModelsComponent,
+    ConfirmDialogDeleteMakeComponent,
   ],
   imports: [
     BrowserModule,
@@ -129,7 +144,11 @@ import { NonAuthenticatedErrorPageComponent } from './error/non-authenticated-er
     AddRentRequestComponent,
     EditRentRequestComponent,
     AddAgentComponent,
-    AddAdminComponent
+    AddAdminComponent,
+    AddModelComponent,
+    AddMakeComponent,
+    EditModelComponent,
+    EditMakeComponent,
   ],
   providers: [
     {

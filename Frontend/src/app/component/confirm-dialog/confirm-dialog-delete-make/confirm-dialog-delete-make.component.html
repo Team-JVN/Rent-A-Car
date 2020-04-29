@@ -1,0 +1,9 @@
+<h1 mat-dialog-title class="dialog-class">Delete make</h1>
+<mat-dialog-content class="dialog-class">
+    All existing models of this make will also be deleted. Continue?
+</mat-dialog-content>
+<mat-dialog-actions class="mt-2 mb-1">
+    <button mat-raised-button id="approve-request-to-register-confirm-btn" color="primary"
+        (click)="delete()">Yes</button>
+    <button mat-raised-button id="cancel" mat-dialog-close>No</button>
+</mat-dialog-actions>

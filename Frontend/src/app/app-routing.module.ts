@@ -17,6 +17,8 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { ListAdvertisementsComponent } from './component/list/list-advertisements/list-advertisements.component';
 import { NonAuthorizedErrorPageComponent } from './error/non-authorized-error-page/non-authorized-error-page.component';
+import { ListMakesComponent } from './component/list/list-makes/list-makes.component';
+import { ListModelsComponent } from './component/list/list-models/list-models.component';
 
 
 const routes: Routes = [
@@ -67,6 +69,14 @@ const routes: Routes = [
   {
     path: 'client/pending-approval',
     component: ClientPendingApprovalComponent
+  },
+  {
+    path: "makes",
+    component: ListMakesComponent,
+  },
+  {
+    path: "models/:id",
+    component: ListModelsComponent,
   },
   //******************* ERROR PAGES ************************
   {

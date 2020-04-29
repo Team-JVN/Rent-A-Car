@@ -14,6 +14,8 @@ export const environment = {
   client: "/api/client",
   rentRequest: "/api/rent-request",
   rentReport: "/api/rent-report",
+  make: "/api/make",
+  model: "/api/model",
 };
 
 /*

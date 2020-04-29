@@ -15,7 +15,9 @@ export const environment = {
   rentRequest: '/api/rent-request',
   auth: '/api/auth',
   agent: '/api/agent',
-  admin: '/api/admin'
+  admin: '/api/admin',
+  make: "/api/make",
+  model: "/api/model",
 };
 
 /*

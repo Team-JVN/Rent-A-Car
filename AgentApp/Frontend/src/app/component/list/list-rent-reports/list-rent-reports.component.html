@@ -7,18 +7,13 @@
     </div>
     <br />
 
-    <table
-      mat-table
-      [dataSource]="rentReportsDataSource"
-      multiTemplateDataRows
-      class="mat-elevation-z8 expendable-table mt-3"
-      matSort
-    >
+    <table mat-table [dataSource]="rentReportsDataSource" multiTemplateDataRows
+      class="mat-elevation-z8 expendable-table mt-3" matSort>
       <ng-container matColumnDef="car">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Car</th>
         <td mat-cell *matCellDef="let element">
-          {{ element.rentInfo.advertisement.car.make }}
-          {{ element.rentInfo.advertisement.car.model }}
+          {{ element.rentInfo.advertisement.car.make.name }}
+          {{ element.rentInfo.advertisement.car.model.name }}
         </td>
       </ng-container>
 
@@ -32,17 +27,10 @@
       </ng-container>
 
       <ng-container matColumnDef="expandedDetail">
-        <td
-          mat-cell
-          *matCellDef="let element"
-          [attr.colspan]="displayedColumns.length"
-        >
-          <div
-            class="element-detail"
-            [@detailExpand]="
+        <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+          <div class="element-detail" [@detailExpand]="
               element == expandedElement ? 'expanded' : 'collapsed'
-            "
-          >
+            ">
             <mat-card class="item-card">
               <div class="row">
                 <div class="col-9">
@@ -122,18 +110,10 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-      <tr
-        mat-row
-        *matRowDef="let element; columns: displayedColumns"
-        class="element-row"
+      <tr mat-row *matRowDef="let element; columns: displayedColumns" class="element-row"
         [class.expanded-row]="expandedElement === element"
-        (click)="expandedElement = expandedElement === element ? null : element"
-      ></tr>
-      <tr
-        mat-row
-        *matRowDef="let row; columns: ['expandedDetail']"
-        class="detail-row"
-      ></tr>
+        (click)="expandedElement = expandedElement === element ? null : element"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
     </table>
   </mat-card-content>
 </mat-card>

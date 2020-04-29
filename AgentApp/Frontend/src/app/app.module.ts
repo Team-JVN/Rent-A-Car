@@ -1,3 +1,7 @@
+import { EditModelComponent } from './component/edit/edit-model/edit-model.component';
+import { EditMakeComponent } from './component/edit/edit-make/edit-make.component';
+import { AddModelComponent } from './component/add/add-model/add-model.component';
+import { AddMakeComponent } from './component/add/add-make/add-make.component';
 import { AddRentRequestComponent } from "./component/add/add-rent-request/add-rent-request.component";
 import { HeaderComponent } from "./component/header/header.component";
 import { CustomHammerConfig } from "./custom-hummer-config";
@@ -42,6 +46,9 @@ import { ListRentRequestsComponent } from "./component/list/list-rent-requests/l
 import { AddRentReportComponent } from "./component/add/add-rent-report/add-rent-report.component";
 import { ListRentReportsComponent } from "./component/list/list-rent-reports/list-rent-reports.component";
 import { EditRentRequestComponent } from './component/edit/edit-rent-request/edit-rent-request.component';
+import { ListMakesComponent } from './component/list/list-makes/list-makes.component';
+import { ListModelsComponent } from './component/list/list-models/list-models.component';
+import { ConfirmDialogDeleteMakeComponent } from './component/confirm-dialog/confirm-dialog-delete-make/confirm-dialog-delete-make.component';
 
 @NgModule({
   declarations: [
@@ -77,6 +84,13 @@ import { EditRentRequestComponent } from './component/edit/edit-rent-request/edi
     EditRentRequestComponent,
     AddRentReportComponent,
     ListRentReportsComponent,
+    ListMakesComponent,
+    ListModelsComponent,
+    AddMakeComponent,
+    AddModelComponent,
+    EditMakeComponent,
+    EditModelComponent,
+    ConfirmDialogDeleteMakeComponent,
   ],
   imports: [
     BrowserModule,
@@ -117,6 +131,11 @@ import { EditRentRequestComponent } from './component/edit/edit-rent-request/edi
     AddRentRequestComponent,
     EditRentRequestComponent,
     AddRentReportComponent,
+    AddMakeComponent,
+    AddModelComponent,
+    EditMakeComponent,
+    EditModelComponent,
+    ConfirmDialogDeleteMakeComponent,
   ],
   providers: [
     {

@@ -1,18 +1,20 @@
+import { Model } from './model';
+import { Make } from './make';
 import { BodyStyle } from 'src/app/model/bodyStyle';
 import { GearBoxType } from './gearboxType';
 import { FuelType } from './fuelType';
 
 export class Car {
     id: number;
-    make: string;
-    model: string;
+    make: Make;
+    model: Model;
     fuelType: FuelType;
     gearBoxType: GearBoxType;
     bodyStyle: BodyStyle;
     mileageInKm: number;
     kidsSeats: number;
     availableTracking: boolean;
-    constructor(make: string, model: string, fuelType: FuelType, gearBoxType: GearBoxType, bodyStyle: BodyStyle,
+    constructor(make: Make, model: Model, fuelType: FuelType, gearBoxType: GearBoxType, bodyStyle: BodyStyle,
         mileageInKm: number, kidsSeats: number, availableTracking: boolean, id?: number) {
         this.make = make;
         this.model = model;
