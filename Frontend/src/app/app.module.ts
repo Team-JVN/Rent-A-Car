@@ -56,6 +56,8 @@ import { AddMakeComponent } from './component/add/add-make/add-make.component';
 import { ListMakesComponent } from './component/list/list-makes/list-makes.component';
 import { ListModelsComponent } from './component/list/list-models/list-models.component';
 import { ConfirmDialogDeleteMakeComponent } from './component/confirm-dialog/confirm-dialog-delete-make/confirm-dialog-delete-make.component';
+import { RentRequestDetailsComponent } from './component/details/rent-request-details/rent-request-details.component';
+import { ViewMessagesComponent } from './component/view-messages/view-messages.component';
 
 @NgModule({
   declarations: [
@@ -104,6 +106,8 @@ import { ConfirmDialogDeleteMakeComponent } from './component/confirm-dialog/con
     ListMakesComponent,
     ListModelsComponent,
     ConfirmDialogDeleteMakeComponent,
+    RentRequestDetailsComponent,
+    ViewMessagesComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,3 +1,11 @@
+import { Car } from 'src/app/model/car';
+import { BodyStyle } from './../../../model/bodystyle';
+import { GearBoxType } from './../../../model/gearboxType';
+import { FuelType } from './../../../model/fuelType';
+import { Model } from './../../../model/model';
+import { Make } from 'src/app/model/make';
+import { Advertisement } from './../../../model/advertisement';
+import { element } from 'protractor';
 import { EditRentRequestComponent } from './../../edit/edit-rent-request/edit-rent-request.component';
 import { RentInfo } from './../../../model/rentInfo';
 import { RentRequestService } from 'src/app/service/rent-request.service';
@@ -10,6 +18,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
 import { trigger, state, transition, style, animate } from '@angular/animations';
+import { PriceList } from 'src/app/model/priceList';
+import { Client } from 'src/app/model/client';
 
 @Component({
   selector: 'app-list-rent-requests',
@@ -24,6 +34,7 @@ import { trigger, state, transition, style, animate } from '@angular/animations'
   ],
 })
 export class ListRentRequestsComponent implements OnInit {
+  //CLIENT AND AGENT HAVE ACCESS TO THIS PAGE
   displayedColumns: string[] = ['client', 'totalPrice', 'buttons'];
   expandedElement: RentRequest | null;
   rentRequestsDataSource: MatTableDataSource<RentRequest>;
@@ -38,7 +49,17 @@ export class ListRentRequestsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.fetchRentRequests('all');
+    const data1: RentRequest[] = []
+    const make = new Make("Opel", 1);
+    const model = new Model("Poze");
+    const car = new Car(make, model, new FuelType("fuel"), new GearBoxType("gear"), null, 1000, 2, true);
+    const advestisement = new Advertisement(car, new PriceList(1, 2, 2), 20, 2500, true, "20.05.2020.", true);
+    const rentInfo = new RentInfo("22.05.2020.", "22.06.2021.", "Beograd", true, advestisement);
+    const rentInfos = [];
+    rentInfos.push(rentInfo)
+    data1.push(new RentRequest(new Client("pera", "pera@uns.ac.rs", "Beograd", "066666666"), rentInfos, 200, "PAID"))
+    this.rentRequestsDataSource = new MatTableDataSource(data1);
+    //   this.fetchRentRequests('all');
     this.createSuccess = this.rentRequestService.createSuccessEmitter.subscribe(
       () => {
         this.fetchRentRequests(this.status)
@@ -55,6 +76,7 @@ export class ListRentRequestsComponent implements OnInit {
         const data: RentRequest[] = []
         this.rentRequestsDataSource = new MatTableDataSource(data)
         this.toastr.error(httpErrorResponse.error.message, 'Show Rent Requests');
+
       }
     );
   }
@@ -82,5 +104,9 @@ export class ListRentRequestsComponent implements OnInit {
 
   advertisementDetails(rentInfo: RentInfo) {
     this.router.navigate(['/advertisement/' + rentInfo.advertisement.id]);
+  }
+
+  viewDetails(element: RentRequest) {
+    this.router.navigate(['/rent-request/' + element.id]);
   }
 }

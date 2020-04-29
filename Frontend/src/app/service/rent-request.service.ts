@@ -26,6 +26,10 @@ export class RentRequestService {
     return this.httpClient.get(this.url + '/' + status);
   }
 
+  public get(id: number) {
+    return this.httpClient.get(this.url + "/" + id);
+  }
+
   public delete(id: number): any {
     return this.httpClient.delete(this.url + '/' + id);
   }
