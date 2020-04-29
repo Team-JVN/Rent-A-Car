@@ -10,7 +10,7 @@
                             <mat-label>Choose existing car</mat-label>
                             <mat-select formControlName="car">
                                 <mat-option *ngFor="let car of cars" [value]="car">
-                                    {{car.carDTO.make}} {{car.carDTO.model}}
+                                    {{car.carDTO.make.name}} {{car.carDTO.model.name}}
                                 </mat-option>
                             </mat-select>
                         </mat-form-field>
@@ -24,8 +24,8 @@
                     <mat-card class="item-card">
                         <div>
                             <mat-card-header class="car-card-header">
-                                <mat-card-title class="car-card-title">{{getSelectedCar().carDTO.make}}
-                                    {{getSelectedCar().carDTO.model}}
+                                <mat-card-title class="car-card-title">{{getSelectedCar().carDTO.make.name}}
+                                    {{getSelectedCar().carDTO.model.name}}
                                 </mat-card-title>
                             </mat-card-header>
                             <mat-card-content>

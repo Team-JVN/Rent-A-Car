@@ -8,20 +8,22 @@
                     <tr>
                         <td>
                             <mat-form-field class="form-full-width-left">
-                                <input matInput placeholder="Make" formControlName="make">
-                                <mat-error
-                                    *ngIf="editForm.get('make').errors && editForm.get('make').errors['required']">
-                                    Please enter make.
-                                </mat-error>
+                                <mat-label>Choose existing Make</mat-label>
+                                <mat-select formControlName="make" (selectionChange)="fetchModels()">
+                                    <mat-option *ngFor="let make of makes" [value]="make">
+                                        {{make.name}}
+                                    </mat-option>
+                                </mat-select>
                             </mat-form-field>
                         </td>
                         <td>
-                            <mat-form-field class="form-full-width-right">
-                                <input matInput placeholder="Model" formControlName="model">
-                                <mat-error
-                                    *ngIf="editForm.get('model').errors && editForm.get('model').errors['required']">
-                                    Please enter model.
-                                </mat-error>
+                            <mat-form-field class="form-full-width-left">
+                                <mat-label>Choose existing Model</mat-label>
+                                <mat-select formControlName="model">
+                                    <mat-option *ngFor="let model of models" [value]="model">
+                                        {{model.name}}
+                                    </mat-option>
+                                </mat-select>
                             </mat-form-field>
                         </td>
                     </tr>

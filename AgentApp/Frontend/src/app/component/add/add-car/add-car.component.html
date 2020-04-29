@@ -9,7 +9,7 @@
                         <td>
                             <mat-form-field class="form-full-width-left">
                                 <mat-label>Choose existing Make</mat-label>
-                                <mat-select formControlName="make" (selectionChange)="fetchModels(make)">
+                                <mat-select formControlName="make" (selectionChange)="fetchModels()">
                                     <mat-option *ngFor="let make of makes" [value]="make">
                                         {{make.name}}
                                     </mat-option>
