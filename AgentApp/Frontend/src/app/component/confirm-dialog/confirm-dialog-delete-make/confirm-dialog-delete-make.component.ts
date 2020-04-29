@@ -28,6 +28,7 @@ export class ConfirmDialogDeleteMakeComponent implements OnInit {
       },
       (httpErrorResponse: HttpErrorResponse) => {
         this.toastr.error(httpErrorResponse.error.message, 'Delete Make');
+        this.dialogRef.close();
       }
     );
   }

@@ -1,3 +1,6 @@
+import { MakeService } from './../../../service/make.service';
+import { Model } from 'src/app/model/model';
+import { Make } from './../../../model/make';
 import { GearboxTypeService } from './../../../service/gearboxType.service';
 import { BodyStyleService } from './../../../service/bodyStyle.service';
 import { FuelTypeService } from './../../../service/fuelType.service';
@@ -26,15 +29,15 @@ export class EditCarComponent implements OnInit {
   fuelTypes: FuelType[] = [];
   gearBoxTypes: GearBoxType[] = [];
   bodyStyles: BodyStyle[] = [];
+  makes: Make[] = [];
+  models: Model[] = [];
 
   constructor(private toastr: ToastrService, private carService: CarService, private fuelTypeService: FuelTypeService, private gearboxTypeService: GearboxTypeService,
-    private bodyStyleService: BodyStyleService, private dialogRef: MatDialogRef<EditCarComponent>, private formBuilder: FormBuilder,
+    private bodyStyleService: BodyStyleService, private dialogRef: MatDialogRef<EditCarComponent>, private formBuilder: FormBuilder, private makeService: MakeService,
     @Inject(MAT_DIALOG_DATA) public selectedItem: CarWithPictures) { }
 
   ngOnInit() {
-    this.fetchFuelTypes();
-    this.fetchGearboxTypes();
-    this.fetchBodyStyles();
+
     this.editForm = this.formBuilder.group({
       make: new FormControl(this.selectedItem.carDTO.make, Validators.required),
       model: new FormControl(this.selectedItem.carDTO.model, Validators.required),
@@ -46,6 +49,11 @@ export class EditCarComponent implements OnInit {
       availableTracking: new FormControl(this.selectedItem.carDTO.availableTracking, Validators.required),
     })
 
+    this.fetchFuelTypes();
+    this.fetchGearboxTypes();
+    this.fetchBodyStyles();
+    this.fetchMakes();
+    this.fetchModels();
     this.fetchPictures();
   }
 
@@ -69,6 +77,22 @@ export class EditCarComponent implements OnInit {
     this.gearBoxTypes.forEach((element: GearBoxType) => {
       if (element.id === this.selectedItem.carDTO.gearBoxType.id) {
         this.editForm.controls['gearBoxType'].setValue(element);
+      }
+    });
+  }
+
+  selectMake() {
+    this.makes.forEach((element: Make) => {
+      if (element.id === this.selectedItem.carDTO.make.id) {
+        this.editForm.controls['make'].setValue(element);
+      }
+    });
+  }
+
+  selectModel() {
+    this.models.forEach((element: Model) => {
+      if (element.id === this.selectedItem.carDTO.model.id) {
+        this.editForm.controls['model'].setValue(element);
       }
     });
   }
@@ -108,6 +132,32 @@ export class EditCarComponent implements OnInit {
       (httpErrorResponse: HttpErrorResponse) => {
         this.gearBoxTypes = [];
         this.toastr.error(httpErrorResponse.error.message, 'Show Gearbox Types');
+      }
+    );
+  }
+
+  fetchMakes() {
+    this.makeService.getMakes().subscribe(
+      (data: Make[]) => {
+        this.makes = data;
+        this.selectMake();
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.makes = [];
+        this.toastr.error(httpErrorResponse.error.message, 'Show Makes');
+      }
+    );
+  }
+
+  fetchModels() {
+    this.makeService.getModels(this.editForm.value.make.id).subscribe(
+      (data: Model[]) => {
+        this.models = data;
+        this.selectModel();
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.models = [];
+        this.toastr.error(httpErrorResponse.error.message, 'Show Models');
       }
     );
   }

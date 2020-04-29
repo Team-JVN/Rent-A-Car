@@ -1,3 +1,6 @@
+import { Make } from './../../../model/make';
+import { Model } from './../../../model/model';
+import { MakeService } from './../../../service/make.service';
 import { Car } from './../../../model/car';
 import { BodyStyle } from 'src/app/model/bodystyle';
 import { BodyStyleService } from './../../../service/bodyStyle.service';
@@ -22,9 +25,13 @@ export class AddCarComponent implements OnInit {
   fuelTypes: FuelType[] = [];
   gearBoxTypes: GearBoxType[] = [];
   bodyStyles: BodyStyle[] = [];
+  makes: Make[] = [];
+  models: Model[] = [];
   files: File[] = [];
+
   constructor(private toastr: ToastrService, private carService: CarService, private fuelTypeService: FuelTypeService, private gearboxTypeService: GearboxTypeService,
-    private bodyStyleService: BodyStyleService, private dialogRef: MatDialogRef<AddCarComponent>, private formBuilder: FormBuilder, ) { }
+    private bodyStyleService: BodyStyleService, private dialogRef: MatDialogRef<AddCarComponent>, private formBuilder: FormBuilder,
+    private makeService: MakeService) { }
 
   ngOnInit() {
     this.carForm = this.formBuilder.group({
@@ -40,6 +47,7 @@ export class AddCarComponent implements OnInit {
     this.fetchFuelTypes();
     this.fetchGearboxTypes();
     this.fetchBodyStyles();
+    this.fetchMakes();
   }
 
   fetchBodyStyles() {
@@ -78,6 +86,29 @@ export class AddCarComponent implements OnInit {
     );
   }
 
+  fetchMakes() {
+    this.makeService.getMakes().subscribe(
+      (data: Make[]) => {
+        this.makes = data;
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.makes = [];
+        this.toastr.error(httpErrorResponse.error.message, 'Show Makes');
+      }
+    );
+  }
+
+  fetchModels() {
+    this.makeService.getModels(this.carForm.value.make.id).subscribe(
+      (data: Model[]) => {
+        this.models = data;
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.models = [];
+        this.toastr.error(httpErrorResponse.error.message, 'Show Models');
+      }
+    );
+  }
   create() {
     if (this.carForm.invalid) {
       this.toastr.error("Please enter valid data", 'Create car');
@@ -88,6 +119,7 @@ export class AddCarComponent implements OnInit {
       return;
     }
     const formData = new FormData();
+
     const car = new Car(this.carForm.value.make, this.carForm.value.model, this.carForm.value.fuelType, this.carForm.value.gearBoxType, this.carForm.value.bodyStyle,
       this.carForm.value.mileageInKm, this.carForm.value.kidsSeats, this.carForm.value.availableTracking);
     formData.append("carData", JSON.stringify(car));

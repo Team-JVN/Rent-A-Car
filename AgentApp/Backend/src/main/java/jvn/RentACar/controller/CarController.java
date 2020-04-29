@@ -10,6 +10,8 @@ import jvn.RentACar.exceptionHandler.InvalidCarDataException;
 import jvn.RentACar.mapper.CarDtoMapper;
 import jvn.RentACar.mapper.CreateCarDtoMapper;
 import jvn.RentACar.service.CarService;
+import jvn.RentACar.service.MakeService;
+import jvn.RentACar.service.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -36,6 +38,10 @@ public class CarController {
     private CarDtoMapper carMapper;
 
     private CreateCarDtoMapper createCarDtoMapper;
+
+    private ModelService modelService;
+
+    private MakeService makeService;
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CarDTO> create(@RequestParam("carData") String jsonString, @RequestParam("files") List<MultipartFile> multipartFiles) throws ParseException {

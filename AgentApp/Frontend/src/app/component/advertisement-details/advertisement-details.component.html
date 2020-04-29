@@ -1,6 +1,7 @@
 <mat-card *ngIf="selectedAdWithPictures">
     <mat-card-content>
-        <h2>{{selectedAdWithPictures.advertisement.car.make}} {{selectedAdWithPictures.advertisement.car.model}}</h2>
+        <h2>{{selectedAdWithPictures.advertisement.car.make.name}}
+            {{selectedAdWithPictures.advertisement.car.model.name}}</h2>
         <div class="row car-data-div">
             <div class="col-7">
                 <ngx-gallery [options]="galleryOptions" [images]="galleryImages"></ngx-gallery>

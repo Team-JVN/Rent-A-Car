@@ -8,19 +8,22 @@
                     <tr>
                         <td>
                             <mat-form-field class="form-full-width-left">
-                                <input matInput placeholder="Make" formControlName="make">
-                                <mat-error *ngIf="carForm.get('make').errors && carForm.get('make').errors['required']">
-                                    Please enter make.
-                                </mat-error>
+                                <mat-label>Choose existing Make</mat-label>
+                                <mat-select formControlName="make" (selectionChange)="fetchModels(make)">
+                                    <mat-option *ngFor="let make of makes" [value]="make">
+                                        {{make.name}}
+                                    </mat-option>
+                                </mat-select>
                             </mat-form-field>
                         </td>
                         <td>
-                            <mat-form-field class="form-full-width-right">
-                                <input matInput placeholder="Model" formControlName="model">
-                                <mat-error
-                                    *ngIf="carForm.get('model').errors && carForm.get('model').errors['required']">
-                                    Please enter model.
-                                </mat-error>
+                            <mat-form-field class="form-full-width-left">
+                                <mat-label>Choose existing Model</mat-label>
+                                <mat-select formControlName="model">
+                                    <mat-option *ngFor="let model of models" [value]="model">
+                                        {{model.name}}
+                                    </mat-option>
+                                </mat-select>
                             </mat-form-field>
                         </td>
                     </tr>
