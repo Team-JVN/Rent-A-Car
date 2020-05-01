@@ -1,0 +1,51 @@
+<mat-card>
+  <mat-card-content>
+    <div class="row">
+      <div class="col-9">
+        <h2>Edit personal info</h2>
+      </div>
+    </div>
+
+    <form [formGroup]="editForm" class="form-full-width">
+      <mat-form-field class="form-full-width mt-3">
+        <input matInput placeholder="First Name" formControlName="firstName" />
+        <mat-error
+          *ngIf="
+            editForm.get('firstName').errors &&
+            editForm.get('firstName').errors['required']
+          "
+        >
+          Please enter First name.
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="form-full-width mt-3">
+        <input matInput placeholder="Last Name" formControlName="lastName" />
+        <mat-error
+          *ngIf="
+            editForm.get('lastName').errors &&
+            editForm.get('lastName').errors['required']
+          "
+        >
+          Please enter password.
+        </mat-error>
+      </mat-form-field>
+
+      <div class="row mt-3">
+        <div class="col-8">
+          &nbsp;
+        </div>
+        <div class="col-4" align="end">
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="editAdmin()"
+            [disabled]="!editForm.valid"
+          >
+            Save changes
+          </button>
+        </div>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>
