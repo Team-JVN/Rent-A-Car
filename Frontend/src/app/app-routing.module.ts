@@ -1,90 +1,109 @@
-import { NonAuthenticatedErrorPageComponent } from './error/non-authenticated-error-page/non-authenticated-error-page.component';
-import { ClientPendingApprovalComponent } from './component/authentification/client-pending-approval/client-pending-approval.component';
-import { ClientRegistrationComponent } from './component/authentification/client-registration/client-registration.component';
-import { RegistrationClient } from 'src/app/model/registrationClient';
-import { ChangePasswordComponent } from './component/authentification/change-password/change-password.component';
-import { ChangePassword } from './model/changePassword';
-import { LoginComponent } from './component/authentification/login/login.component';
-import { ListRentRequestsComponent } from './component/list/list-rent-requests/list-rent-requests.component';
-import { ListClientsComponent } from './component/list/list-clients/list-clients.component';
-import { AdvertisementDetailsComponent } from './component/advertisement-details/advertisement-details.component';
-import { ListCarsComponent } from './component/list/list-cars/list-cars.component';
-import { ListGearBoxTypesComponent } from './component/list/list-gear-box-types/list-gear-box-types.component';
-import { ListFuelTypeComponent } from './component/list/list-fuel-type/list-fuel-type.component';
-import { ListBodyStylesComponent } from './component/list/list-body-styles/list-body-styles.component';
-import { ListPriceListsComponent } from './component/list/list-price-lists/list-price-lists.component';
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { ListAdvertisementsComponent } from './component/list/list-advertisements/list-advertisements.component';
-import { NonAuthorizedErrorPageComponent } from './error/non-authorized-error-page/non-authorized-error-page.component';
-
+import { NonAuthenticatedErrorPageComponent } from "./error/non-authenticated-error-page/non-authenticated-error-page.component";
+import { ClientPendingApprovalComponent } from "./component/authentification/client-pending-approval/client-pending-approval.component";
+import { ClientRegistrationComponent } from "./component/authentification/client-registration/client-registration.component";
+import { RegistrationClient } from "src/app/model/registrationClient";
+import { ChangePasswordComponent } from "./component/authentification/change-password/change-password.component";
+import { ChangePassword } from "./model/changePassword";
+import { LoginComponent } from "./component/authentification/login/login.component";
+import { ListRentRequestsComponent } from "./component/list/list-rent-requests/list-rent-requests.component";
+import { ListClientsComponent } from "./component/list/list-clients/list-clients.component";
+import { AdvertisementDetailsComponent } from "./component/advertisement-details/advertisement-details.component";
+import { ListCarsComponent } from "./component/list/list-cars/list-cars.component";
+import { ListGearBoxTypesComponent } from "./component/list/list-gear-box-types/list-gear-box-types.component";
+import { ListFuelTypeComponent } from "./component/list/list-fuel-type/list-fuel-type.component";
+import { ListBodyStylesComponent } from "./component/list/list-body-styles/list-body-styles.component";
+import { ListPriceListsComponent } from "./component/list/list-price-lists/list-price-lists.component";
+import { NgModule } from "@angular/core";
+import { Routes, RouterModule } from "@angular/router";
+import { ListAdvertisementsComponent } from "./component/list/list-advertisements/list-advertisements.component";
+import { NonAuthorizedErrorPageComponent } from "./error/non-authorized-error-page/non-authorized-error-page.component";
+import { ManageUsersComponent } from "./component/manage-users/manage-users.component";
+import { EditClientInfoComponent } from "./component/edit/edit-personal-info/edit-client/edit-client-info.component";
+import { EditAgentComponent } from "./component/edit/edit-personal-info/edit-agent/edit-agent.component";
+import { EditAdminComponent } from "./component/edit/edit-personal-info/edit-admin/edit-admin.component";
 
 const routes: Routes = [
   {
-    path: 'advertisement/:id',
-    component: AdvertisementDetailsComponent
+    path: "advertisement/:id",
+    component: AdvertisementDetailsComponent,
   },
   {
-    path: 'body-styles',
-    component: ListBodyStylesComponent
+    path: "body-styles",
+    component: ListBodyStylesComponent,
   },
   {
-    path: 'fuel-types',
-    component: ListFuelTypeComponent
+    path: "fuel-types",
+    component: ListFuelTypeComponent,
   },
   {
-    path: 'gearbox-types',
-    component: ListGearBoxTypesComponent
+    path: "gearbox-types",
+    component: ListGearBoxTypesComponent,
   },
   {
-    path: 'cars',
-    component: ListCarsComponent
+    path: "cars",
+    component: ListCarsComponent,
   },
   {
-    path: 'price-lists',
-    component: ListPriceListsComponent
+    path: "price-lists",
+    component: ListPriceListsComponent,
   },
   {
-    path: 'clients',
+    path: "clients",
     component: ListClientsComponent,
   },
   {
-    path: 'rent-requests',
+    path: "rent-requests",
     component: ListRentRequestsComponent,
   },
   {
-    path: 'login',
-    component: LoginComponent
+    path: "login",
+    component: LoginComponent,
   },
   {
-    path: 'change-password',
-    component: ChangePasswordComponent
+    path: "change-password",
+    component: ChangePasswordComponent,
   },
   {
-    path: 'client/registration',
-    component: ClientRegistrationComponent
+    path: "client/registration",
+    component: ClientRegistrationComponent,
   },
   {
-    path: 'client/pending-approval',
-    component: ClientPendingApprovalComponent
+    path: "client/pending-approval",
+    component: ClientPendingApprovalComponent,
+  },
+  {
+    path: "manage-users",
+    component: ManageUsersComponent,
+  },
+  {
+    path: "edit-client-info",
+    component: EditClientInfoComponent,
+  },
+  {
+    path: "edit-agent-info",
+    component: EditAgentComponent,
+  },
+  {
+    path: "edit-admin-info",
+    component: EditAdminComponent,
   },
   //******************* ERROR PAGES ************************
   {
-    path: 'error/non-authenticated',
+    path: "error/non-authenticated",
     component: NonAuthenticatedErrorPageComponent,
   },
   {
-    path: 'error/non-authorized',
-    component: NonAuthorizedErrorPageComponent
+    path: "error/non-authorized",
+    component: NonAuthorizedErrorPageComponent,
   },
   {
-    path: '',
-    component: ListAdvertisementsComponent
+    path: "",
+    component: ListAdvertisementsComponent,
   },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}
