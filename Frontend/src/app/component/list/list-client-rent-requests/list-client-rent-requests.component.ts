@@ -1,3 +1,4 @@
+import { LeaveFeedbackComponent } from './../../add/leave-feedback/leave-feedback.component';
 import { Car } from 'src/app/model/car';
 import { BodyStyle } from './../../../model/bodystyle';
 import { GearBoxType } from './../../../model/gearboxType';
@@ -20,11 +21,10 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { trigger, state, transition, style, animate } from '@angular/animations';
 import { PriceList } from 'src/app/model/priceList';
 import { Client } from 'src/app/model/client';
-
 @Component({
-  selector: 'app-list-rent-requests',
-  templateUrl: './list-rent-requests.component.html',
-  styleUrls: ['./list-rent-requests.component.css'],
+  selector: 'app-list-client-rent-requests',
+  templateUrl: './list-client-rent-requests.component.html',
+  styleUrls: ['./list-client-rent-requests.component.css'],
   animations: [
     trigger('detailExpand', [
       state('collapsed', style({ height: '0px', minHeight: '0' })),
@@ -33,8 +33,8 @@ import { Client } from 'src/app/model/client';
     ]),
   ],
 })
-export class ListRentRequestsComponent implements OnInit {
-  //CLIENT AND AGENT HAVE ACCESS TO THIS PAGE
+export class ListClientRentRequestsComponent implements OnInit {
+  //CLIENT  HAVE ACCESS TO THIS PAGE
   displayedColumns: string[] = ['client', 'totalPrice', 'buttons'];
   expandedElement: RentRequest | null;
   rentRequestsDataSource: MatTableDataSource<RentRequest>;
@@ -68,7 +68,7 @@ export class ListRentRequestsComponent implements OnInit {
   }
 
   fetchRentRequests(status: string) {
-    this.rentRequestService.getRentRequests(status).subscribe(
+    this.rentRequestService.getClientRentRequests(status).subscribe(
       (data: RentRequest[]) => {
         this.rentRequestsDataSource = new MatTableDataSource(data);
       },
@@ -98,15 +98,23 @@ export class ListRentRequestsComponent implements OnInit {
     );
   }
 
-  createRentReport(rentRequest: RentRequest, rentInfo: RentInfo) {
-    // this.dialog.open(AddRentRequestComponent, { data: element.advertisement });
-  }
-
   advertisementDetails(rentInfo: RentInfo) {
     this.router.navigate(['/advertisement/' + rentInfo.advertisement.id]);
   }
 
   viewDetails(element: RentRequest) {
-    this.router.navigate(['/rent-request/' + element.id]);
+    this.router.navigate(['/client-rent-request/' + element.id]);
+  }
+
+  checkIfCanLeaveFeedback(rentInfo: RentInfo, rentRequest: RentRequest) {
+    const dateTimeTo = new Date(rentInfo.dateTimeTo.substring(0, 10));
+    if (rentRequest.rentRequestStatus == 'PAID' && dateTimeTo <= new Date()) {
+      return true;
+    }
+    return false;
+  }
+
+  leaveFeedback(rentInfo, element) {
+    this.dialog.open(LeaveFeedbackComponent, { data: { rentInfo: rentInfo, rentRequest: element } });
   }
 }

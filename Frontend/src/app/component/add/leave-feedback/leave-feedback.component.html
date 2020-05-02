@@ -1,0 +1,26 @@
+<h1 mat-dialog-title>Leave feedback</h1>
+<mat-dialog-content class="dialog-class">
+    <div class="row">
+        <div class="col-3">
+            <label class="labelRaiting page-title">Rating</label>
+        </div>
+        <div class="col-9">
+            <star-rating class="rating-style" totalstars="5" checkedcolor="#87C7F3" uncheckedcolor="black" size="35px"
+                [(value)]="rating">
+            </star-rating>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-3">
+            <label class="page-title">Comment</label>
+        </div>
+        <div class="col-9 mt-1 mr-0">
+            <textarea matInput [(ngModel)]="comment" rows="3" cols="49"></textarea>
+        </div>
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-raised-button color="primary" class="mb-3" (click)="leaveFeedback()" [disabled]="!rating">Leave
+        feedback</button>
+</mat-dialog-actions>

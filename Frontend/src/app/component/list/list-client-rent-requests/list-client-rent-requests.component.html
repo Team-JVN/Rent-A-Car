@@ -64,9 +64,9 @@
                                     </div>
 
                                     <div class="col-3 mt-0" align="end">
-                                        <button mat-raised-button *ngIf="element.rentRequestStatus == 'PAID'"
-                                            color="primary" (click)="createRentReport()">Create
-                                            Report</button>
+                                        <button mat-raised-button *ngIf="checkIfCanLeaveFeedback(rentInfo,element)"
+                                            color="primary" (click)="leaveFeedback(rentInfo,element)">Leave feedback
+                                        </button>
                                     </div>
                                 </div>
 

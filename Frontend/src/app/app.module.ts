@@ -1,4 +1,3 @@
-
 import { AddRentRequestComponent } from './component/add/add-rent-request/add-rent-request.component';
 import { HeaderComponent } from './component/header/header.component';
 import { CustomHammerConfig } from './custom-hummer-config';
@@ -58,6 +57,13 @@ import { ListModelsComponent } from './component/list/list-models/list-models.co
 import { ConfirmDialogDeleteMakeComponent } from './component/confirm-dialog/confirm-dialog-delete-make/confirm-dialog-delete-make.component';
 import { SearchAdvertisementsComponent } from './component/list/search-advertisements/search-advertisements.component';
 import { RatingModule } from 'ng-starrating';
+import { RentRequestDetailsComponent } from './component/details/rent-request-details/rent-request-details.component';
+import { ViewMessagesComponent } from './component/view-messages/view-messages.component';
+import { ReviewFeedbackComponent } from './component/review-feedback/review-feedback.component';
+import { ListClientRentRequestsComponent } from './component/list/list-client-rent-requests/list-client-rent-requests.component';
+import { ClientRentRequestDetailsComponent } from './component/details/client-rent-request-details/client-rent-request-details.component';
+import { LeaveFeedbackComponent } from './component/add/leave-feedback/leave-feedback.component';
+
 
 @NgModule({
   declarations: [
@@ -107,6 +113,12 @@ import { RatingModule } from 'ng-starrating';
     ListModelsComponent,
     ConfirmDialogDeleteMakeComponent,
     SearchAdvertisementsComponent,
+    RentRequestDetailsComponent,
+    ViewMessagesComponent,
+    ReviewFeedbackComponent,
+    ListClientRentRequestsComponent,
+    ClientRentRequestDetailsComponent,
+    LeaveFeedbackComponent,
   ],
   imports: [
     BrowserModule,
@@ -153,6 +165,8 @@ import { RatingModule } from 'ng-starrating';
     AddMakeComponent,
     EditModelComponent,
     EditMakeComponent,
+    ReviewFeedbackComponent,
+    LeaveFeedbackComponent,
   ],
   providers: [
     {
