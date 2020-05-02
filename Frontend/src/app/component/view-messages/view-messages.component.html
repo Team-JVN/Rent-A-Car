@@ -14,7 +14,7 @@
             message.id == 1
               ? 'row-reverse'
               : 'row'">
-                <img src="/assets/user.png" width="36px" height="37px" />
+                <mat-icon style="margin-bottom: 5px;">person</mat-icon>
                 <span [ngClass]="
                 message.id == 1
                 ? 'speech-bubble-own'
@@ -27,5 +27,10 @@
         <input placeholder="Type a message..." #messageInput (keydown.enter)="
           onSendMessage(messageInput.value); messageInput.value = ''
         " />
+        <button mat-icon-button color="primary" aria-label="Send" (click)="
+            onSendMessage(messageInput.value); messageInput.value = ''
+            ">
+            <mat-icon>send</mat-icon>
+        </button>
     </div>
 </div>
