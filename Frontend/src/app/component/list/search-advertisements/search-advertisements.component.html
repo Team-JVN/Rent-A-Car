@@ -1,0 +1,324 @@
+<mat-card>
+    <mat-card-content>
+        <div class="row">
+            <div class="col-9">
+                <h2>Search Advertisements</h2>
+            </div>
+            <div class="col-3" align="end">
+                <button mat-button color="warn" (click)="clearSearch()">
+                    <mat-icon>clear</mat-icon>
+                    Clear Search
+                </button>
+            </div>
+        </div>
+        <form [formGroup]="searchForm">
+            <mat-card class="basic-search">
+                <mat-card-content>
+                    <div class="basic-search-title">Basic Search</div>
+                    <table class="form-full-width" cellspacing="0">
+                        <tr>
+                            <td class="form-width-30">
+                                <mat-form-field class="form-full-width-90">
+                                    <input matInput [matDatepicker]="pickerFrom" placeholder="Date from"
+                                        formControlName="dateFrom" readonly [min]="minDate">
+                                    <mat-datepicker-toggle matSuffix [for]="pickerFrom">
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #pickerFrom disabled="false"></mat-datepicker>
+                                </mat-form-field>
+                            </td>
+                            <td class="form-width-30">
+                                <mat-form-field class="form-full-width-90">
+                                    <input matInput type="time" placeholder="Time from" formControlName="timeFrom">
+                                    <mat-error *ngIf="searchForm.get('timeFrom').errors && searchForm.get('timeFrom').errors['required'] ||
+                            searchForm.get('dateFrom').errors && searchForm.get('dateFrom').errors['required'] ">
+                                        Please choose date and time from.
+                                    </mat-error>
+
+                                </mat-form-field>
+                            </td>
+                            <td class="form-width-40">
+                                <mat-form-field class="form-full-width-95">
+                                    <input matInput placeholder="Pick-up Point" formControlName="pickUpPoint">
+                                    <mat-error
+                                        *ngIf="searchForm.get('pickUpPoint').errors && searchForm.get('pickUpPoint').errors['required']">
+                                        Please enter Pick-up Point.
+                                    </mat-error>
+                                </mat-form-field>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="form-width-30">
+                                <mat-form-field class="form-full-width-90">
+                                    <input matInput [matDatepicker]="pickerTo" placeholder="Date to"
+                                        formControlName="dateTo" readonly [min]="minDate">
+                                    <mat-datepicker-toggle matSuffix [for]="pickerTo">
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #pickerTo disabled="false"></mat-datepicker>
+                                </mat-form-field>
+                            </td>
+                            <td class="form-width-30">
+                                <mat-form-field class="form-full-width-90">
+                                    <input matInput type="time" placeholder="Time to" formControlName="timeTo">
+
+                                    <mat-error *ngIf="searchForm.get('timeTo').errors && searchForm.get('timeTo').errors['required'] || 
+                                    searchForm.get('dateTo').errors && searchForm.get('dateTo').errors['required'] ">
+                                        Please choose date and time to.
+                                    </mat-error>
+                                </mat-form-field>
+                            </td>
+                            <td class="form-width-40">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <mat-error class="date-err"
+                                    *ngIf="searchForm.errors && searchForm.errors['validError']">
+                                    Date form must be at least the present day and must be before date to.
+                                </mat-error>
+                            </td>
+                        </tr>
+                    </table>
+                </mat-card-content>
+            </mat-card>
+
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>Advanced Search</mat-panel-title>
+                    <mat-panel-description>Specify more details to narrow search results.</mat-panel-description>
+                </mat-expansion-panel-header>
+
+                <table class="form-full-width" cellspacing="0">
+                    <tr>
+                        <td class="form-width-30">
+                            <mat-form-field class="form-full-width-90">
+                                <mat-label>Make</mat-label>
+                                <mat-select formControlName="make" (selectionChange)="fetchModels()">
+                                    <mat-option *ngFor="let make of makes" [value]="make">
+                                        {{make.name}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </td>
+                        <td class="form-width-30">
+                            <mat-form-field class="form-full-width-90">
+                                <mat-label>Model</mat-label>
+                                <mat-select formControlName="model">
+                                    <mat-option *ngFor="let model of models" [value]="model">
+                                        {{model.name}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </td>
+                        <td class="form-width-30">
+                            <div class="row">
+                                <div class="col-4 rating-div">
+                                    <mat-label>Minimal rating:</mat-label>
+                                </div>
+                                <div class="col-8">
+                                    <star-rating class="rating-style" totalstars="5" checkedcolor="#87C7F3"
+                                        uncheckedcolor="black" size="30px" [(value)]="minRating"
+                                        (rate)="onRate($event)">
+                                    </star-rating>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-width-30">
+                            <mat-form-field class="form-full-width-90">
+                                <mat-label>Fuel Type</mat-label>
+                                <mat-select formControlName="fuelType">
+                                    <mat-option *ngFor="let fuelType of fuelTypes" [value]="fuelType">
+                                        {{fuelType.name}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </td>
+                        <td class="form-width-30">
+                            <mat-form-field class="form-full-width-90">
+                                <mat-label>Gearbox Type</mat-label>
+                                <mat-select formControlName="gearBoxType">
+                                    <mat-option *ngFor="let gearBoxType of gearBoxTypes" [value]="gearBoxType">
+                                        {{gearBoxType.name}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </td>
+                        <td class="form-width-30">
+                            <mat-form-field class="form-full-width-90">
+                                <mat-label>Body Style</mat-label>
+                                <mat-select formControlName="bodyStyle">
+                                    <mat-option *ngFor="let bodyStyle of bodyStyles" [value]="bodyStyle">
+                                        {{bodyStyle.name}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-width-30">
+                            <mat-form-field class="form-full-width-90">
+                                <input matInput type="number" placeholder="Minimal Price Per Day"
+                                    formControlName="minPricePerDay" min="1">
+                                <span matSuffix class="ml-2">€</span>
+                                <mat-error
+                                    *ngIf="searchForm.get('minPricePerDay').errors && searchForm.get('minPricePerDay').errors['min']">
+                                    Price must be a positive decimal number.
+                                </mat-error>
+                            </mat-form-field>
+                        </td>
+                        <td class="form-width-30">
+                            <mat-form-field class="form-full-width-90">
+                                <input matInput type="number" placeholder="Maximal Price Per Day"
+                                    formControlName="maxPricePerDay" min="1">
+                                <span matSuffix class="ml-2">€</span>
+                                <mat-error
+                                    *ngIf="searchForm.get('maxPricePerDay').errors && searchForm.get('maxPricePerDay').errors['min']">
+                                    Price must be a positive decimal number.
+                                </mat-error>
+                            </mat-form-field>
+                        </td>
+                        <td class="form-width-30">
+                            <mat-form-field class="form-full-width-90">
+                                <input matInput placeholder="Minimal No. of Kid's Seats" type="number"
+                                    formControlName="kidsSeats" min="0" max="3">
+                                <mat-error
+                                    *ngIf="searchForm.get('kidsSeats').errors && searchForm.get('kidsSeats').errors['min']">
+                                    Number of kid's seats must be positive number.
+                                </mat-error>
+                                <mat-error
+                                    *ngIf="searchForm.get('kidsSeats').errors && searchForm.get('kidsSeats').errors['max']">
+                                    Max. number of kid's seats is 3.
+                                </mat-error>
+                            </mat-form-field>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="form-width-30">
+                            <mat-form-field class="form-full-width-90">
+                                <input matInput placeholder="Maximal Mileage in Km" type="number"
+                                    formControlName="mileageInKm" min="0">
+                                <span matSuffix class="ml-2">Km</span>
+                                <mat-error
+                                    *ngIf="searchForm.get('mileageInKm').errors && searchForm.get('mileageInKm').errors['min']">
+                                    Mileage must be positive number.
+                                </mat-error>
+                            </mat-form-field>
+                        </td>
+                        <td class="form-width-30">
+                            <mat-form-field class="form-full-width-90">
+                                <input matInput placeholder="Minimal Kilometres Limit" type="number"
+                                    formControlName="kilometresLimit" min="0">
+                                <span matSuffix class="ml-2">Km</span>
+                                <mat-error
+                                    *ngIf="searchForm.get('kilometresLimit').errors && searchForm.get('kilometresLimit').errors['min']">
+                                    Kilometres limit must be positive number.
+                                </mat-error>
+                            </mat-form-field>
+                        </td>
+                        <td class="form-width-30 mt-4 mb-0">
+                            <mat-checkbox formControlName="cdw">
+                                Available Collision Damage Waiver
+                            </mat-checkbox>
+                        </td>
+                    </tr>
+                </table>
+            </mat-expansion-panel>
+
+            <div align="center" class="mt-4">
+                <button mat-raised-button color="primary" class="search-btn" [disabled]="!searchForm.valid"
+                    (click)="search()">
+                    <mat-icon>search</mat-icon>
+                    Search
+                </button>
+            </div>
+        </form>
+        <hr />
+        <table mat-table [dataSource]="advertisementsDataSource" class="advertisement-list-table">
+            <ng-container matColumnDef="advertisement">
+                <td mat-cell *matCellDef="let element">
+                    <mat-card class="item-card" (click)="viewDetails(element)">
+                        <div class="image-div">
+                            <img [src]="element.image" *ngIf="!element.isImageLoading; else noImageFound" class="image">
+                        </div>
+                        <div>
+                            <mat-card-header class="advertisement-card-header">
+                                <mat-card-title class="advertisement-card-title">{{element.advertisement.car.make.name}}
+                                    {{element.advertisement.car.model.name}}
+                                </mat-card-title>
+                                <div class="advertisement-card-buttons">
+                                    <star-rating class="rating-style" totalstars="5" checkedcolor="#87C7F3"
+                                        uncheckedcolor="black" size="30px"
+                                        [(value)]="element.advertisement.car.avgRating" readonly="true">
+                                    </star-rating>
+                                </div>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <table class="table advertisement-table">
+                                    <tbody>
+                                        <tr>
+                                            <th><span class="theader">
+                                                    <mat-icon class="mr-2">today</mat-icon>Available Between:
+                                                </span></th>
+                                            <td>{{element.advertisement.dateFrom | date:"dd.MM.yyyy."}} —
+                                                <span
+                                                    *ngIf="element.advertisement.dateTo">{{element.advertisement.dateTo | date:"dd.MM.yyyy."}}</span>
+                                                <span *ngIf="!element.advertisement.dateTo">Unlimited</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th><span class="theader">
+                                                    <mat-icon class="mr-2">speed</mat-icon>Kilometres Limit:
+                                                </span></th>
+                                            <td>
+                                                <span *ngIf="element.advertisement.kilometresLimit">
+                                                    {{element.advertisement.kilometresLimit}} Km &nbsp;
+                                                    <span class="per-km">
+                                                        ({{element.advertisement.priceList.pricePerKm}} € per
+                                                        Km)</span>
+                                                </span>
+                                                <span *ngIf="!element.advertisement.kilometresLimit">Unlimited</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th><span class="theader">
+                                                    <mat-icon class="mr-2">commute</mat-icon>Collision Damage
+                                                    Waiver:
+                                                </span></th>
+                                            <td>
+                                                <span *ngIf="element.advertisement.cdw">
+                                                    {{element.advertisement.priceList.priceForCDW}} €</span>
+                                                <span *ngIf="!element.advertisement.cdw">Not Available</span>
+                                            </td>
+                                        </tr>
+                                        <tr
+                                            *ngIf="element.advertisement.discount && element.advertisement.discount > 0">
+                                            <th><span class="theader">
+                                                    <mat-icon class="mr-2">money_off</mat-icon>30+ days Rent Discount:
+                                                </span></th>
+                                            <td>{{element.advertisement.discount}} %</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </mat-card-content>
+                        </div>
+                        <table class="price-table">
+                            <tr>
+                                <td class="price-header">Price per day:</td>
+                            </tr>
+                            <tr>
+                                <td class="price-text">
+                                    {{element.advertisement.priceList.pricePerDay}} €</td>
+                            </tr>
+                            <tr><button *ngIf="element.advertisement.active" mat-raised-button color="primary"
+                                    class="rent-btn" (click)="rent(element);$event.stopPropagation()">Rent
+                                    me!</button></tr>
+                        </table>
+                    </mat-card>
+                </td>
+            </ng-container>
+
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+    </mat-card-content>
+</mat-card>

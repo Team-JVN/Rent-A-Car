@@ -8,7 +8,7 @@
                     <tr>
                         <td>
                             <mat-form-field class="form-full-width-left">
-                                <mat-label>Choose existing Make</mat-label>
+                                <mat-label>Choose existing make</mat-label>
                                 <mat-select formControlName="make" (selectionChange)="fetchModels()">
                                     <mat-option *ngFor="let make of makes" [value]="make">
                                         {{make.name}}
@@ -17,8 +17,8 @@
                             </mat-form-field>
                         </td>
                         <td>
-                            <mat-form-field class="form-full-width-left">
-                                <mat-label>Choose existing Model</mat-label>
+                            <mat-form-field class="form-full-width-right">
+                                <mat-label>Choose existing model</mat-label>
                                 <mat-select formControlName="model">
                                     <mat-option *ngFor="let model of models" [value]="model">
                                         {{model.name}}

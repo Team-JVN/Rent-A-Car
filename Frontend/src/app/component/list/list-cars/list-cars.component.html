@@ -18,7 +18,8 @@
                         </div>
                         <div>
                             <mat-card-header class="car-card-header">
-                                <mat-card-title class="car-card-title">{{element.carDTO.make}} {{element.carDTO.model}}
+                                <mat-card-title class="car-card-title">{{element.carDTO.make.name}}
+                                    {{element.carDTO.model.name}}
                                 </mat-card-title>
                                 <div class="car-card-buttons">
                                     <button mat-icon-button aria-label="Edit" color="primary" (click)="edit(element)">

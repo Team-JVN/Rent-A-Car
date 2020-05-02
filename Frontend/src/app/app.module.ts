@@ -56,6 +56,8 @@ import { AddMakeComponent } from './component/add/add-make/add-make.component';
 import { ListMakesComponent } from './component/list/list-makes/list-makes.component';
 import { ListModelsComponent } from './component/list/list-models/list-models.component';
 import { ConfirmDialogDeleteMakeComponent } from './component/confirm-dialog/confirm-dialog-delete-make/confirm-dialog-delete-make.component';
+import { SearchAdvertisementsComponent } from './component/list/search-advertisements/search-advertisements.component';
+import { RatingModule } from 'ng-starrating';
 
 @NgModule({
   declarations: [
@@ -104,6 +106,7 @@ import { ConfirmDialogDeleteMakeComponent } from './component/confirm-dialog/con
     ListMakesComponent,
     ListModelsComponent,
     ConfirmDialogDeleteMakeComponent,
+    SearchAdvertisementsComponent,
   ],
   imports: [
     BrowserModule,
@@ -123,6 +126,7 @@ import { ConfirmDialogDeleteMakeComponent } from './component/confirm-dialog/con
     MatDatepickerModule,
     NgxDropzoneModule,
     NgxGalleryModule,
+    RatingModule,
   ],
   entryComponents: [
     AddBodyStyleComponent,
