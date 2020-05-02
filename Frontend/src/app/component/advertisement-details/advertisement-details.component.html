@@ -1,7 +1,16 @@
 <mat-card *ngIf="selectedAdWithPictures">
     <mat-card-content>
-        <h2>{{selectedAdWithPictures.advertisement.car.make.name}}
-            {{selectedAdWithPictures.advertisement.car.model.name}}</h2>
+        <div class="row">
+            <div class="col-9">
+                <h2>{{selectedAdWithPictures.advertisement.car.make.name}}
+                    {{selectedAdWithPictures.advertisement.car.model.name}}</h2>
+            </div>
+            <div class="col-3 rating">
+                <star-rating class="rating-style" totalstars="5" checkedcolor="#87C7F3" uncheckedcolor="black"
+                    size="40px" [(value)]="selectedAdWithPictures.advertisement.car.avgRating" readonly="true">
+                </star-rating>
+            </div>
+        </div>
         <div class="row car-data-div">
             <div class="col-7">
                 <ngx-gallery [options]="galleryOptions" [images]="galleryImages"></ngx-gallery>
@@ -61,6 +70,12 @@
                 <h4>Rent information:</h4>
                 <table class="table car-table">
                     <tbody>
+                        <tr>
+                            <th><span class="theader">
+                                    <mat-icon class="mr-2">person</mat-icon>Owner:
+                                </span></th>
+                            <td>{{selectedAdWithPictures.advertisement.car.owner}}</td>
+                        </tr>
                         <tr>
                             <th><span class="theader">
                                     <mat-icon class="mr-2">today</mat-icon>Available Between:

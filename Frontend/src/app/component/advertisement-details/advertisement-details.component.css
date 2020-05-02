@@ -15,6 +15,11 @@ h2 {
     margin-bottom: 20px;
 }
 
+.rating {
+    margin-top: -12px;
+    text-align: right;
+}
+
 td.mat-cell{
     border-bottom-style: none;
 }
