@@ -38,13 +38,13 @@ export class ListAdvertisementsComponent implements OnInit {
     this.fetchAll('all');
     this.createSuccess = this.advertisementService.createSuccessEmitter.subscribe(
       () => {
-        this.fetchAll(status)
+        this.fetchAll(this.status)
       }
     );
 
     this.createSuccess = this.rentRequestService.createSuccessEmitter.subscribe(
       () => {
-        this.fetchAll(status);
+        this.fetchAll(this.status);
       }
     );
   }
@@ -100,7 +100,7 @@ export class ListAdvertisementsComponent implements OnInit {
   delete(element: AdvertisementWithPicturesDTO) {
     this.advertisementService.delete(element.advertisement.id).subscribe(
       () => {
-        this.fetchAll(status);
+        this.fetchAll(this.status);
         this.toastr.success('Successfully deleted Advertisement!', 'Delete Advertisement');
       },
       (httpErrorResponse: HttpErrorResponse) => {

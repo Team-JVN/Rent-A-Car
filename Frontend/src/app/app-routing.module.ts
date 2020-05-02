@@ -1,9 +1,8 @@
+import { SearchAdvertisementsComponent } from './component/list/search-advertisements/search-advertisements.component';
 import { NonAuthenticatedErrorPageComponent } from './error/non-authenticated-error-page/non-authenticated-error-page.component';
 import { ClientPendingApprovalComponent } from './component/authentification/client-pending-approval/client-pending-approval.component';
 import { ClientRegistrationComponent } from './component/authentification/client-registration/client-registration.component';
-import { RegistrationClient } from 'src/app/model/registrationClient';
 import { ChangePasswordComponent } from './component/authentification/change-password/change-password.component';
-import { ChangePassword } from './model/changePassword';
 import { LoginComponent } from './component/authentification/login/login.component';
 import { ListRentRequestsComponent } from './component/list/list-rent-requests/list-rent-requests.component';
 import { ListClientsComponent } from './component/list/list-clients/list-clients.component';
@@ -19,7 +18,6 @@ import { ListAdvertisementsComponent } from './component/list/list-advertisement
 import { NonAuthorizedErrorPageComponent } from './error/non-authorized-error-page/non-authorized-error-page.component';
 import { ListMakesComponent } from './component/list/list-makes/list-makes.component';
 import { ListModelsComponent } from './component/list/list-models/list-models.component';
-
 
 const routes: Routes = [
   {
@@ -61,6 +59,10 @@ const routes: Routes = [
   {
     path: 'change-password',
     component: ChangePasswordComponent
+  },
+  {
+    path: 'search-advertisements',
+    component: SearchAdvertisementsComponent
   },
   {
     path: 'client/registration',
