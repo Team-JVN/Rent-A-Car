@@ -1,3 +1,5 @@
+import { ListClientRentRequestsComponent } from './component/list/list-client-rent-requests/list-client-rent-requests.component';
+import { ClientRentRequestDetailsComponent } from './component/details/client-rent-request-details/client-rent-request-details.component';
 import { RentRequestDetailsComponent } from './component/details/rent-request-details/rent-request-details.component';
 import { NonAuthenticatedErrorPageComponent } from './error/non-authenticated-error-page/non-authenticated-error-page.component';
 import { ClientPendingApprovalComponent } from './component/authentification/client-pending-approval/client-pending-approval.component';
@@ -56,8 +58,16 @@ const routes: Routes = [
     component: ListRentRequestsComponent,
   },
   {
+    path: 'client-rent-requests',
+    component: ListClientRentRequestsComponent,
+  },
+  {
     path: 'rent-request/:id',
     component: RentRequestDetailsComponent
+  },
+  {
+    path: 'client-rent-request/:id',
+    component: ClientRentRequestDetailsComponent
   },
   {
     path: 'login',

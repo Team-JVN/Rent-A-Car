@@ -1,3 +1,4 @@
+import { Feedback } from './../model/feedback';
 import { Comment } from './../model/comment';
 import { environment } from './../../environments/environment';
 import { Injectable } from '@angular/core';
@@ -27,6 +28,10 @@ export class RentRequestService {
     return this.httpClient.get(this.url + '/' + status);
   }
 
+  public getClientRentRequests(status: string) {
+    return this.httpClient.get(this.url + '/client/' + status);
+  }
+
   public get(id: number) {
     return this.httpClient.get(this.url + "/" + id);
   }
@@ -43,4 +48,7 @@ export class RentRequestService {
     return this.httpClient.post(this.url + "/" + rentRequestId + "/rent-info/" + rentInfoId + "/comment", comment);
   }
 
+  public leaveFeedback(feedback: Feedback, rentInfoId: number, rentRequestId: number): any {
+    return this.httpClient.post(this.url + "/" + rentRequestId + "/rent-info/" + rentInfoId + "/feedback", feedback);
+  }
 }

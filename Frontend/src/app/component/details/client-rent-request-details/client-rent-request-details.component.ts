@@ -1,5 +1,6 @@
-import { UserInfo } from 'src/app/model/userInfo';
+import { LeaveFeedbackComponent } from './../../add/leave-feedback/leave-feedback.component';
 
+import { UserInfo } from 'src/app/model/userInfo';
 import { MatDialog } from '@angular/material/dialog';
 import { Feedback } from './../../../model/feedback';
 import { MessageService } from './../../../service/message.service';
@@ -25,14 +26,14 @@ import { PriceList } from 'src/app/model/priceList';
 import { MatTableDataSource } from '@angular/material/table';
 import { User } from 'src/app/model/user';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
-import { ReviewFeedbackComponent } from '../../review-feedback/review-feedback.component';
 
 @Component({
-  selector: 'app-rent-request-details',
-  templateUrl: './rent-request-details.component.html',
-  styleUrls: ['./rent-request-details.component.css']
+  selector: 'app-client-rent-request-details',
+  templateUrl: './client-rent-request-details.component.html',
+  styleUrls: ['./client-rent-request-details.component.css']
 })
-export class RentRequestDetailsComponent implements OnInit {
+export class ClientRentRequestDetailsComponent implements OnInit {
+
   messageForm: FormGroup;
 
   rentRequestId: number;
@@ -91,33 +92,6 @@ export class RentRequestDetailsComponent implements OnInit {
     this.router.navigate(['/advertisement/' + rentInfo.advertisement.id]);
   }
 
-  createRentReport() {
-
-  }
-
-  reviewFeedback(rentInfo: RentInfo) {
-    // this.rentRequestService.getRentInfoFeedback(this.rentInfo.id).subscribe(
-    //   (feedback: Feedback) => {
-    //     if (feedback.rating) {
-    //       this.dialog.open(ReviewFeedbackComponent, { data: { feedback: feedback, rentInfoId: rentInfo.id, rentRequestId: this.rentRequestId }});
-    //     }
-    //   },
-    //   (httpErrorResponse: HttpErrorResponse) => {
-    //     this.toastr.error(httpErrorResponse.error.message, 'Review feedback');
-    //   }
-    // );
-
-    this.dialog.open(ReviewFeedbackComponent, { data: { feedback: null, rentInfoId: rentInfo.id, rentRequestId: this.rentRequestId } });
-  }
-
-  checkIfCanCreateComment(rentInfo: RentInfo) {
-    const dateTimeTo = new Date(rentInfo.dateTimeTo.substring(0, 10));
-    if (this.rentRequest.rentRequestStatus == 'PAID' && dateTimeTo <= new Date()) {
-      return true;
-    }
-    return false;
-  }
-
   getMessages() {
     this.messageService.getMessages(this.rentRequest.client).subscribe(
       (data: Message[]) => {
@@ -128,5 +102,17 @@ export class RentRequestDetailsComponent implements OnInit {
         this.toastr.error(httpErrorResponse.error.message, 'Fetch messages');
       }
     );
+  }
+
+  checkIfCanLeaveFeedback(rentInfo: RentInfo, rentRequest: RentRequest) {
+    const dateTimeTo = new Date(rentInfo.dateTimeTo.substring(0, 10));
+    if (rentRequest.rentRequestStatus == 'PAID' && dateTimeTo <= new Date()) {
+      return true;
+    }
+    return false;
+  }
+
+  leaveFeedback(rentInfo: RentInfo) {
+    this.dialog.open(LeaveFeedbackComponent, { data: { rentInfo: rentInfo, rentRequest: this.rentRequest } });
   }
 }

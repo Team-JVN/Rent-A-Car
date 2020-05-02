@@ -1,5 +1,4 @@
 import { RatingModule } from 'ng-starrating';
-
 import { AddRentRequestComponent } from './component/add/add-rent-request/add-rent-request.component';
 import { HeaderComponent } from './component/header/header.component';
 import { CustomHammerConfig } from './custom-hummer-config';
@@ -60,6 +59,9 @@ import { ConfirmDialogDeleteMakeComponent } from './component/confirm-dialog/con
 import { RentRequestDetailsComponent } from './component/details/rent-request-details/rent-request-details.component';
 import { ViewMessagesComponent } from './component/view-messages/view-messages.component';
 import { ReviewFeedbackComponent } from './component/review-feedback/review-feedback.component';
+import { ListClientRentRequestsComponent } from './component/list/list-client-rent-requests/list-client-rent-requests.component';
+import { ClientRentRequestDetailsComponent } from './component/details/client-rent-request-details/client-rent-request-details.component';
+import { LeaveFeedbackComponent } from './component/add/leave-feedback/leave-feedback.component';
 
 
 @NgModule({
@@ -112,6 +114,9 @@ import { ReviewFeedbackComponent } from './component/review-feedback/review-feed
     RentRequestDetailsComponent,
     ViewMessagesComponent,
     ReviewFeedbackComponent,
+    ListClientRentRequestsComponent,
+    ClientRentRequestDetailsComponent,
+    LeaveFeedbackComponent,
   ],
   imports: [
     BrowserModule,
@@ -159,6 +164,7 @@ import { ReviewFeedbackComponent } from './component/review-feedback/review-feed
     EditModelComponent,
     EditMakeComponent,
     ReviewFeedbackComponent,
+    LeaveFeedbackComponent,
   ],
   providers: [
     {
