@@ -27,6 +27,7 @@
     "jquery": "^3.5.0",
     "luxon": "^1.23.0",
     "moment": "^2.24.0",
+    "ng-starrating": "^1.0.11",
     "ngx-dropzone": "^2.2.2",
     "ngx-gallery": "^5.10.0",
     "ngx-toastr": "^11.2.1",

@@ -1,3 +1,8 @@
+import { UserInfo } from 'src/app/model/userInfo';
+
+import { MatDialog } from '@angular/material/dialog';
+import { Feedback } from './../../../model/feedback';
+import { MessageService } from './../../../service/message.service';
 import { Message } from './../../../model/message';
 import { AuthentificationService } from './../../../service/authentification.service';
 import { LoggedInUser } from './../../../model/loggedInUser';
@@ -20,6 +25,7 @@ import { PriceList } from 'src/app/model/priceList';
 import { MatTableDataSource } from '@angular/material/table';
 import { User } from 'src/app/model/user';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
+import { ReviewFeedbackComponent } from '../../review-feedback/review-feedback.component';
 
 @Component({
   selector: 'app-rent-request-details',
@@ -37,8 +43,8 @@ export class RentRequestDetailsComponent implements OnInit {
   model = new Model("Poze", 2);
   car = new Car(this.make, this.model, new FuelType("fuel"), new GearBoxType("gear"), null, 1000, 2, true);
   advestisement = new Advertisement(this.car, new PriceList(1, 2, 2), 20, 2500, true, "2020-05-05", true);
-  rentInfo = new RentInfo("2020-05-05", "2020-05-05", "Beograd", true, this.advestisement);
-  rentInfos = [new RentInfo("2020-05-05", "2020-05-05", "Beograd", true, this.advestisement),
+  rentInfo = new RentInfo("2020-04-04", "2020-04-04", "Beograd", true, this.advestisement, 1);
+  rentInfos = [new RentInfo("2020-04-04", "2020-04-04", "Beograd", true, this.advestisement, 2),
   new RentInfo("2020-05-05", "2020-05-05", "Beograd", true, this.advestisement)];
 
   rentRequest = new RentRequest(new Client("Pera", "pera@uns.ac.rs", "Beograd", "066666666"), this.rentInfos, 200, "PAID");
@@ -50,7 +56,9 @@ export class RentRequestDetailsComponent implements OnInit {
     private rentRequestService: RentRequestService,
     private location: Location,
     private authentificationService: AuthentificationService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private messageService: MessageService,
+    public dialog: MatDialog,
   ) { }
 
   ngOnInit() {
@@ -70,11 +78,13 @@ export class RentRequestDetailsComponent implements OnInit {
     //   )
     // });
     // this.loggedInUserEmail = this.authentificationService.getLoggedInUser().email;
-    this.messages = [new Message("Cao sta radi,kako si, da li si dorbo.Kako su tvoji. sta radis", new User("pera@gamil.com", "0000"), "Miroslav Mirosavljevic", 1), new Message("Kako si", new User("pera@gamil.com", "0000"), "Predrag Simic", 2),
-    new Message("Dobro", new User("pera@gamil.com", "0000"), "miroslav", 1), new Message("To?", new User("pera@gamil.com", "0000"), "Predrag", 2)];
+    //this.getMessages();
+
+    //Delete this
+    this.messages = [new Message("Cao sta radi,kako si, da li si dorbo.Kako su tvoji. sta radis", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 1), new Message("Kako si", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 2),
+    new Message("Dobro", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 1), new Message("To?", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 2)];
+    this.rentRequestId = 2;
   }
-
-
 
   advertisementDetails(rentInfo: RentInfo) {
     this.router.navigate(['/advertisement/' + rentInfo.advertisement.id]);
@@ -84,7 +94,38 @@ export class RentRequestDetailsComponent implements OnInit {
 
   }
 
-  send() {
+  reviewFeedback(rentInfo: RentInfo) {
+    // this.rentRequestService.getRentInfoFeedback(this.rentInfo.id).subscribe(
+    //   (feedback: Feedback) => {
+    //     if (feedback.rating) {
+    //       this.dialog.open(ReviewFeedbackComponent, { data: { feedback: feedback, rentInfoId: rentInfo.id, rentRequestId: this.rentRequestId }});
+    //     }
+    //   },
+    //   (httpErrorResponse: HttpErrorResponse) => {
+    //     this.toastr.error(httpErrorResponse.error.message, 'Review feedback');
+    //   }
+    // );
 
+    this.dialog.open(ReviewFeedbackComponent, { data: { feedback: null, rentInfoId: rentInfo.id, rentRequestId: this.rentRequestId } });
+  }
+
+  checkIfCanCreateComment(rentInfo: RentInfo) {
+    const dateTimeTo = new Date(rentInfo.dateTimeTo.substring(0, 10));
+    if (this.rentRequest.rentRequestStatus == 'PAID' && dateTimeTo <= new Date()) {
+      return true;
+    }
+    return false;
+  }
+
+  getMessages() {
+    this.messageService.getMessages(this.rentRequest.client).subscribe(
+      (data: Message[]) => {
+        this.toastr.success('Success!', 'Fetch messages');
+        this.messages = data;
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Fetch messages');
+      }
+    );
   }
 }

@@ -1,3 +1,4 @@
+import { RatingModule } from 'ng-starrating';
 
 import { AddRentRequestComponent } from './component/add/add-rent-request/add-rent-request.component';
 import { HeaderComponent } from './component/header/header.component';
@@ -58,6 +59,8 @@ import { ListModelsComponent } from './component/list/list-models/list-models.co
 import { ConfirmDialogDeleteMakeComponent } from './component/confirm-dialog/confirm-dialog-delete-make/confirm-dialog-delete-make.component';
 import { RentRequestDetailsComponent } from './component/details/rent-request-details/rent-request-details.component';
 import { ViewMessagesComponent } from './component/view-messages/view-messages.component';
+import { ReviewFeedbackComponent } from './component/review-feedback/review-feedback.component';
+
 
 @NgModule({
   declarations: [
@@ -108,6 +111,7 @@ import { ViewMessagesComponent } from './component/view-messages/view-messages.c
     ConfirmDialogDeleteMakeComponent,
     RentRequestDetailsComponent,
     ViewMessagesComponent,
+    ReviewFeedbackComponent,
   ],
   imports: [
     BrowserModule,
@@ -127,6 +131,7 @@ import { ViewMessagesComponent } from './component/view-messages/view-messages.c
     MatDatepickerModule,
     NgxDropzoneModule,
     NgxGalleryModule,
+    RatingModule,
   ],
   entryComponents: [
     AddBodyStyleComponent,
@@ -153,6 +158,7 @@ import { ViewMessagesComponent } from './component/view-messages/view-messages.c
     AddMakeComponent,
     EditModelComponent,
     EditMakeComponent,
+    ReviewFeedbackComponent,
   ],
   providers: [
     {

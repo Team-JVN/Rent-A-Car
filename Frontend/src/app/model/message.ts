@@ -1,15 +1,14 @@
+import { UserInfo } from './userInfo';
 import { User } from './user';
 
 export class Message {
     id: number;
     text: string;
-    sender: User;
-    senderName: string;
-    constructor(text: string, sender: User, senderName: string, id?: number) {
+    senderInfo: UserInfo;
+    constructor(text: string, senderInfo: UserInfo, id?: number) {
         this.text = text;
-        this.sender = sender;
+        this.senderInfo = senderInfo;
         this.id = id;
-        this.senderName = senderName;
     }
 
 }

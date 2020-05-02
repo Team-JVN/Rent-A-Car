@@ -1,3 +1,4 @@
+import { Comment } from './../model/comment';
 import { environment } from './../../environments/environment';
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
@@ -33,4 +34,13 @@ export class RentRequestService {
   public delete(id: number): any {
     return this.httpClient.delete(this.url + '/' + id);
   }
+
+  public getRentInfoFeedback(rentInfoId: number) {
+    return this.httpClient.get(this.url + '/rent-info/' + rentInfoId);
+  }
+
+  public createComment(comment: Comment, rentInfoId: number, rentRequestId: number): any {
+    return this.httpClient.post(this.url + "/" + rentRequestId + "/rent-info/" + rentInfoId + "/comment", comment);
+  }
+
 }

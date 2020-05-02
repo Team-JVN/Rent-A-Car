@@ -7,7 +7,7 @@
 </ng-template>
 
 <div class="main">
-    <div class="user-info">{{senderName}}</div>
+    <div class="user-info">{{client.name}}</div>
     <div *ngIf="messages && messages[0]; else noMessages" class="messages-container" #scrollMe>
         <ul>
             <li *ngFor="let message of messages" [style.flex-direction]="

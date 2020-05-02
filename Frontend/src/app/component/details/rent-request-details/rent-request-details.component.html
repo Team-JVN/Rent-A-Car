@@ -1,12 +1,12 @@
 <div class="row div-page">
-    <div class="col-7">
+    <div class="col-8">
         <mat-card>
             <mat-card-content>
                 <h2>Rent request from {{rentRequest.client.name}}</h2>
                 <div *ngFor="let rentInfo of rentRequest.rentInfos">
                     <mat-card class="item-card">
                         <div class="row">
-                            <div class="col-9">
+                            <div class="col-6">
                                 <mat-card-header>
                                     <mat-card-title>
                                         Rent info for
@@ -19,8 +19,13 @@
                             </div>
 
                             <div class="col-3 mt-0" align="end">
-                                <button mat-raised-button *ngIf="rentRequest.rentRequestStatus == 'PAID'"
-                                    color="primary" (click)="createRentReport()">Create
+                                <button mat-raised-button *ngIf="checkIfCanCreateComment(rentInfo)" color="primary"
+                                    (click)="reviewFeedback(rentInfo)">Review feedback
+                                </button>
+                            </div>
+                            <div class="col-3 mt-0" align="end">
+                                <button mat-raised-button *ngIf="rentRequest.rentRequestStatus =='PAID'" color="primary"
+                                    (click)="createRentReport()">Create
                                     Report</button>
                             </div>
                         </div>
@@ -72,14 +77,14 @@
             </mat-card-content>
         </mat-card>
     </div>
-    <div class="col-5">
+    <div class="col-4">
         <div *ngIf="rentRequest.rentRequestStatus == 'PAID'">
 
             <!-- <mat-card class="message-card">
                 <mat-card-content> -->
             <div class="chat-page">
                 <div class="chat-box">
-                    <app-view-messages [messages]="messages"></app-view-messages>
+                    <app-view-messages [messages]="messages" [client]="rentRequest.client"></app-view-messages>
                 </div>
             </div>
             <!-- </mat-card-content>

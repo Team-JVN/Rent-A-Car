@@ -18,6 +18,8 @@ export const environment = {
   admin: '/api/admin',
   make: "/api/make",
   model: "/api/model",
+  message: "/api/message",
+  comment: '/api/comment',
 };
 
 /*
