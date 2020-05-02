@@ -53,8 +53,8 @@ export class ListRentRequestsComponent implements OnInit {
     const make = new Make("Opel", 1);
     const model = new Model("Poze");
     const car = new Car(make, model, new FuelType("fuel"), new GearBoxType("gear"), null, 1000, 2, true);
-    const advestisement = new Advertisement(car, new PriceList(1, 2, 2), 20, 2500, true, "20.05.2020.", true);
-    const rentInfo = new RentInfo("22.05.2020.", "22.06.2021.", "Beograd", true, advestisement);
+    const advestisement = new Advertisement(car, new PriceList(1, 2, 2), 20, 2500, true, "2020-05-05", true);
+    const rentInfo = new RentInfo("2020-05-05", "2020-05-05", "Beograd", true, advestisement);
     const rentInfos = [];
     rentInfos.push(rentInfo)
     data1.push(new RentRequest(new Client("pera", "pera@uns.ac.rs", "Beograd", "066666666"), rentInfos, 200, "PAID"))
