@@ -1,4 +1,5 @@
 import { RentingCartComponent } from './component/renting-cart/renting-cart.component';
+import { CarsStatisticsComponent } from './component/list/cars-statistics/cars-statistics.component';
 import { SearchAdvertisementsComponent } from './component/list/search-advertisements/search-advertisements.component';
 import { ListClientRentRequestsComponent } from './component/list/list-client-rent-requests/list-client-rent-requests.component';
 import { ClientRentRequestDetailsComponent } from './component/details/client-rent-request-details/client-rent-request-details.component';
@@ -43,6 +44,10 @@ const routes: Routes = [
   {
     path: 'cars',
     component: ListCarsComponent
+  },
+  {
+    path: 'statistics',
+    component: CarsStatisticsComponent
   },
   {
     path: 'price-lists',
