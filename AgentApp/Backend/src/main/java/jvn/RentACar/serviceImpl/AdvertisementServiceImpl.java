@@ -6,7 +6,6 @@ import jvn.RentACar.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.RentACar.mapper.AdvertisementDtoMapper;
 import jvn.RentACar.model.Advertisement;
 import jvn.RentACar.model.PriceList;
-import jvn.RentACar.model.RentInfo;
 import jvn.RentACar.repository.AdvertisementRepository;
 import jvn.RentACar.service.AdvertisementService;
 import jvn.RentACar.service.CarService;
@@ -17,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -34,7 +34,10 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     @Override
     public Advertisement create(Advertisement createAdvertisementDTO) {
-        checkIfCarIsAvailable(createAdvertisementDTO.getCar().getId(), createAdvertisementDTO.getDateFrom(), null);
+        //TODO: Ako klijent kreira oglas onda dateTo ne sme biti null!
+        checkDate(createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
+        checkIfCarIsAvailable(createAdvertisementDTO.getCar().getId(), createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo(), null);
+
         createAdvertisementDTO.setCar(carService.get(createAdvertisementDTO.getCar().getId()));
         createAdvertisementDTO.setPriceList(priceListService.get(createAdvertisementDTO.getPriceList().getId()));
         PriceList priceList = createAdvertisementDTO.getPriceList();
@@ -56,7 +59,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     public Advertisement edit(Long id, Advertisement advertisement) {
         Advertisement dbAdvertisement = get(advertisement.getId());
         isEditable(dbAdvertisement);
-        checkIfCarIsAvailable(advertisement.getCar().getId(), advertisement.getDateFrom(), advertisement.getId());
+        checkIfCarIsAvailable(advertisement.getCar().getId(), advertisement.getDateFrom(), advertisement.getDateTo(), advertisement.getId());
         dbAdvertisement.setDateFrom(advertisement.getDateFrom());
         dbAdvertisement.setCar(carService.get(advertisement.getCar().getId()));
         dbAdvertisement.setPriceList(priceListService.get(advertisement.getPriceList().getId()));
@@ -83,7 +86,10 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     @Override
     public void delete(Long id) {
         Advertisement advertisement = get(id);
-        isEditable(advertisement);
+        //TODO: Odbi sve zahteve koji su PENDING
+        if (advertisementRepository.findByIdAndLogicalStatusAndRentInfosRentRequestRentRequestStatusAndRentInfosDateTimeToGreaterThanEqual(advertisement.getId(), LogicalStatus.EXISTING, RentRequestStatus.PAID, LocalDateTime.now()) != null) {
+            throw new InvalidAdvertisementDataException("This advertisement is in use and therefore can not be deleted.", HttpStatus.FORBIDDEN);
+        }
         advertisement.setLogicalStatus(LogicalStatus.DELETED);
         advertisementRepository.save(advertisement);
     }
@@ -99,39 +105,44 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     public List<Advertisement> getAll(String status) {
         List<Advertisement> ads = null;
-        //TODO:CHANGE THIS!!!!!!
         if (status.equals("all")) {
             ads = advertisementRepository.findAllByLogicalStatusNot(LogicalStatus.DELETED);
         } else if (status.equals("active")) {
-            ads = advertisementRepository.findAllByLogicalStatusNot(LogicalStatus.DELETED);
+            ads = advertisementRepository.findAllByLogicalStatusNotAndDateToEqualsOrLogicalStatusNotAndDateToGreaterThan(LogicalStatus.DELETED, null, LogicalStatus.DELETED,
+                    LocalDate.now());
         } else {
-            ads = advertisementRepository.findAllByLogicalStatusNot(LogicalStatus.DELETED);
+            ads = advertisementRepository.findAllByLogicalStatusNotAndDateToLessThanEqual(LogicalStatus.DELETED, LocalDate.now());
         }
         return ads;
     }
 
-    private void checkIfCarIsAvailable(Long carId, LocalDate advertisementDateFrom, Long advertisementId) {
-        if (!advertisementRepository.findByCarIdAndLogicalStatus(carId, LogicalStatus.EXISTING).isEmpty()) {
-            if (advertisementId != null) {
-                List<Advertisement> advertisements = advertisementRepository.findByCarIdAndLogicalStatus(carId, LogicalStatus.EXISTING);
-                if (advertisements.size() != 1 || !advertisements.get(0).getId().equals(advertisementId)) {
-                    throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
-                }
-            } else {
-                throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
-            }
-
+    private void checkIfCarIsAvailable(Long carId, LocalDate advertisementDateFrom, LocalDate advertisementDateTo, Long advertisementId) {
+        if (!advertisementRepository.findByCarIdAndLogicalStatusNotAndDateToEquals(carId, LogicalStatus.DELETED, null).isEmpty()) {
+            throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.FORBIDDEN);
         }
-        List<RentInfo> paidRentInfos = rentInfoService.getPaidRentInfos(carId);
-        if (!paidRentInfos.isEmpty()) {
-            if (advertisementDateFrom.isBefore(paidRentInfos.get(0).getDateTimeTo().toLocalDate()) || advertisementDateFrom.isEqual(paidRentInfos.get(0).getDateTimeTo().toLocalDate())) {
-                throw new InvalidAdvertisementDataException("Car is not available until " + paidRentInfos.get(0).getDateTimeTo().toLocalDate() + " !", HttpStatus.BAD_REQUEST);
+
+        if (advertisementDateTo == null) {
+            if (!advertisementRepository.findByCarIdAndLogicalStatusNotAndDateToGreaterThanEqual(carId, LogicalStatus.DELETED, advertisementDateFrom).isEmpty()) {
+                throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.FORBIDDEN);
+            }
+        } else {
+            if (!advertisementRepository.findByCarIdAndLogicalStatusNotAndDateFromLessThanEqualAndDateToGreaterThanEqual(carId, LogicalStatus.DELETED, advertisementDateTo, advertisementDateFrom).isEmpty()) {
+                throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.FORBIDDEN);
             }
         }
     }
 
+    private void checkDate(LocalDate dateFrom, LocalDate dateTo) {
+        if (dateFrom.isBefore(LocalDate.now()) || (dateTo != null && dateTo.isBefore(LocalDate.now()))) {
+            throw new InvalidAdvertisementDataException("Invalid date from/to.", HttpStatus.BAD_REQUEST);
+        }
+        if (dateTo != null && dateTo.isBefore(dateFrom)) {
+            throw new InvalidAdvertisementDataException("Date To cannot be before Date From.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
     private void isEditable(Advertisement advertisement) {
-        if (!advertisement.getRentInfos().isEmpty() && advertisementRepository.findByIdAndRentInfosRentRequestRentRequestStatusNotAndLogicalStatus(advertisement.getId(), RentRequestStatus.CANCELED, LogicalStatus.EXISTING) != null) {
+        if (advertisementRepository.findByIdAndRentInfosRentRequestRentRequestStatusNotAndLogicalStatus(advertisement.getId(), RentRequestStatus.CANCELED, LogicalStatus.EXISTING) != null) {
             throw new InvalidAdvertisementDataException("This advertisement is in use and therefore can not be edited/deleted.", HttpStatus.BAD_REQUEST);
         }
     }

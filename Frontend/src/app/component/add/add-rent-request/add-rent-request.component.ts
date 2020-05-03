@@ -137,13 +137,22 @@ export class AddRentRequestComponent implements OnInit {
     }
     // TODO: DELETE WHEN RENTING CART IS DONE
     else {
-      let rentInfos: RentInfo[] = JSON.parse(localStorage.getItem("rentInfos") || "[]");
+      var rentInfos = [];
       rentInfos.push(newRentInfo);
-      localStorage.setItem("rentInfos", JSON.stringify(rentInfos));
-      this.clientForm.reset();
-      this.informationForm.reset();
-      this.dialogRef.close();
-      this.toastr.success('Successfully added to cart!', 'Create Rent Request');
+      const rentRequest = new RentRequest(this.clientForm.value.client, rentInfos);
+
+      this.rentRequestService.create(rentRequest).subscribe(
+        (data: RentRequest) => {
+          this.clientForm.reset();
+          this.informationForm.reset();
+          this.dialogRef.close();
+          this.toastr.success('Success.', 'Create Rent Request');
+          this.rentRequestService.createSuccessEmitter.next(data);
+        },
+        (httpErrorResponse: HttpErrorResponse) => {
+          this.toastr.error(httpErrorResponse.error.message, 'Create Rent Request');
+        }
+      );
     }
   }
 

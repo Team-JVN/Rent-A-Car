@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import { RentRequestService } from 'src/app/service/rent-request.service';
 import { AddRentRequestComponent } from './../../add/add-rent-request/add-rent-request.component';
 import { Router } from '@angular/router';
@@ -118,4 +119,13 @@ export class ListAdvertisementsComponent implements OnInit {
     this.router.navigate(['/advertisement/' + element.id]);
   }
 
+  checkIfCanRentAdvertisement(element: AdvertisementWithPicturesDTO): boolean {
+    if (!element.dateTo) {
+      return true;
+    }
+    if (new Date(element.dateTo) > new Date()) {
+      return true;
+    }
+    return false;
+  }
 }

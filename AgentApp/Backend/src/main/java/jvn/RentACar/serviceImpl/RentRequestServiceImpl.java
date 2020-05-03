@@ -18,9 +18,11 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class RentRequestServiceImpl implements RentRequestService {
@@ -69,9 +71,10 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     @Override
     public void delete(Long id) {
+        //TODO: Samo korisnik koji je kreirao zahtev moze da ga obrise!
         RentRequest rentRequest = get(id);
-        if (!rentRequest.getRentRequestStatus().equals(RentRequestStatus.CANCELED)) {
-            throw new InvalidRentRequestDataException("This rent request is not CANCELED so you can not delete it.",
+        if (rentRequest.getRentRequestStatus().equals(RentRequestStatus.PAID)) {
+            throw new InvalidRentRequestDataException("This rent request is PAID so you can not delete it.",
                     HttpStatus.FORBIDDEN);
         }
         rentRequest.setClient(null);
@@ -81,44 +84,12 @@ public class RentRequestServiceImpl implements RentRequestService {
         rentRequestRepository.deleteById(id);
     }
 
-    private double changeRentInfosData(RentRequest dbRentRequest, RentRequest rentRequest) {
-        double totalPrice = 0;
-        List<RentInfo> dbRentInfos = new ArrayList<>(dbRentRequest.getRentInfos().size());
-        dbRentInfos.addAll(dbRentRequest.getRentInfos());
-        Map<Long, RentInfo> rentInfos = rentRequest.getRentInfos().stream()
-                .collect(Collectors.toMap(RentInfo::getId, x -> x));
-
-        for (RentInfo dbRentInfo : dbRentInfos) {
-            RentInfo rentInfo = rentInfos.get(dbRentInfo.getId());
-            if (rentInfo == null) {
-                throw new InvalidRentRequestDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
-            }
-
-            Advertisement advertisement = advertisementService.get(dbRentInfo.getAdvertisement().getId());
-
-            checkDate(advertisement, rentInfo.getDateTimeFrom().toLocalDate(), rentInfo.getDateTimeTo().toLocalDate());
-            dbRentInfo.setDateTimeFrom(rentInfo.getDateTimeFrom());
-            dbRentInfo.setDateTimeTo(rentInfo.getDateTimeTo());
-
-            dbRentInfo.setOptedForCDW(rentInfo.getOptedForCDW());
-            if (!advertisement.getCDW()) {
-                dbRentInfo.setOptedForCDW(null);
-            }
-            totalPrice += countPrice(rentInfo);
-
-        }
-
-        return totalPrice;
-
-    }
-
     private double setRentInfosData(RentRequest rentRequest, Set<RentInfo> rentInfos, Boolean activeAdvertisement) {
         double totalPrice = 0;
         for (RentInfo rentInfo : rentInfos) {
             rentInfo.setRentRequest(rentRequest);
             Advertisement advertisement = advertisementService.get(rentInfo.getAdvertisement().getId());
-
-            checkDate(advertisement, rentInfo.getDateTimeFrom().toLocalDate(), rentInfo.getDateTimeTo().toLocalDate());
+            checkDate(advertisement, rentInfo.getDateTimeFrom().toLocalDate(), rentInfo.getDateTimeTo().toLocalDate(), rentInfo.getDateTimeFrom(), rentInfo.getDateTimeTo());
             rentInfo.setAdvertisement(advertisement);
             if (!advertisement.getCDW()) {
                 rentInfo.setOptedForCDW(null);
@@ -131,19 +102,41 @@ public class RentRequestServiceImpl implements RentRequestService {
         return totalPrice;
     }
 
-    private void checkDate(Advertisement advertisement, LocalDate rentInfoDateFrom, LocalDate rentInfoDateTo) {
+
+    private void checkDate(Advertisement advertisement, LocalDate rentInfoDateFrom, LocalDate rentInfoDateTo, LocalDateTime rentInfoDateTimeFrom, LocalDateTime rentInfoDateTimeTo) {
         LocalDate advertisementDateFrom = advertisement.getDateFrom();
+        if (rentInfoDateFrom.isBefore(LocalDate.now()) || rentInfoDateTo.isBefore(LocalDate.now())) {
+            throw new InvalidRentRequestDataException("Invalid date from/to.",
+                    HttpStatus.NOT_FOUND);
+        }
+        if (rentInfoDateTo.isBefore(rentInfoDateFrom)) {
+            throw new InvalidRentRequestDataException("Date To cannot be before Date From.",
+                    HttpStatus.NOT_FOUND);
+        }
         if (rentInfoDateFrom.isBefore(advertisementDateFrom) || rentInfoDateTo.isBefore(advertisementDateFrom)) {
             throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
-                    HttpStatus.NOT_FOUND);
+                    HttpStatus.FORBIDDEN);
         }
         LocalDate advertisementDateTo = advertisement.getDateTo();
         if (advertisementDateTo != null) {
             if (rentInfoDateFrom.isAfter(advertisementDateTo) || rentInfoDateTo.isAfter(advertisementDateTo)) {
                 throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
-                        HttpStatus.NOT_FOUND);
+                        HttpStatus.FORBIDDEN);
             }
         }
+        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqual(RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeFrom).isEmpty()) {
+            throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
+                    HttpStatus.FORBIDDEN);
+        }
+        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqual(RentRequestStatus.PAID, rentInfoDateTimeTo, rentInfoDateTimeTo).isEmpty()) {
+            throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
+                    HttpStatus.FORBIDDEN);
+        }
+        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanEqual(RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeTo).isEmpty()) {
+            throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
+                    HttpStatus.FORBIDDEN);
+        }
+
     }
 
     private double countPrice(RentInfo rentInfo) {

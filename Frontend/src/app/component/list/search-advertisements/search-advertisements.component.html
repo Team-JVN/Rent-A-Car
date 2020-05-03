@@ -308,7 +308,8 @@
                                 <td class="price-text">
                                     {{element.priceList.pricePerDay}} €</td>
                             </tr>
-                            <tr><button *ngIf="element.active" mat-raised-button color="primary" class="rent-btn"
+                            <tr><button mat-raised-button color="primary" class="rent-btn"
+                                    *ngIf="checkIfCanRentAdvertisement(element)"
                                     (click)="rent(element);$event.stopPropagation()">Rent
                                     me!</button></tr>
                         </table>

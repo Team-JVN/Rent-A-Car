@@ -19,6 +19,9 @@ public class AdvertisementWithPicturesDtoMapper implements MapperInterface<Adver
     public Advertisement toEntity(AdvertisementWithPicturesDTO dto) throws ParseException {
         Advertisement entity = modelMapper.map(dto, Advertisement.class);
         entity.setDateFrom(getDateConverted(dto.getDateFrom()));
+        if (dto.getDateTo() != null) {
+            entity.setDateTo(getDateConverted(dto.getDateTo()));
+        }
         return entity;
     }
 
@@ -26,6 +29,9 @@ public class AdvertisementWithPicturesDtoMapper implements MapperInterface<Adver
     public AdvertisementWithPicturesDTO toDto(Advertisement entity) {
         AdvertisementWithPicturesDTO dto = modelMapper.map(entity, AdvertisementWithPicturesDTO.class);
         dto.setDateFrom(getDateConverted(entity.getDateFrom()));
+        if (entity.getDateTo() != null) {
+            dto.setDateTo(getDateConverted(entity.getDateTo()));
+        }
         return dto;
     }
 

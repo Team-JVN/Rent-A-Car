@@ -83,7 +83,7 @@ export class SearchAdvertisementsComponent implements OnInit {
     }, {
       validator: [DateValidator]
     })
-    this.fetchAll('all');
+    this.fetchAll('active');
 
     this.fetchMakes();
     this.fetchFuelTypes();
@@ -209,5 +209,15 @@ export class SearchAdvertisementsComponent implements OnInit {
 
   search() {
 
+  }
+
+  checkIfCanRentAdvertisement(element: AdvertisementWithPicturesDTO): boolean {
+    if (!element.dateTo) {
+      return true;
+    }
+    if (new Date(element.dateTo) > new Date()) {
+      return true;
+    }
+    return false;
   }
 }

@@ -79,7 +79,11 @@
                             <th><span class="theader">
                                     <mat-icon class="mr-2">today</mat-icon>Available Between:
                                 </span></th>
-                            <td>{{selectedAdWithPictures.dateFrom  | date:"dd.MM.yyyy."}} — Unlimited</td>
+                            <td><span *ngIf="selectedAdWithPictures.dateTo">
+                                    {{selectedAdWithPictures.dateFrom  | date:"dd.MM.yyyy."}} —
+                                    {{selectedAdWithPictures.dateTo  | date:"dd.MM.yyyy."}}</span>
+                                <span *ngIf="!selectedAdWithPictures.dateTo">
+                                    {{selectedAdWithPictures.dateFrom  | date:"dd.MM.yyyy."}} — Unlimited</span></td>
                         </tr>
                         <tr>
                             <th><span class="theader">
@@ -131,10 +135,10 @@
                         <td class="price-text">
                             {{selectedAdWithPictures.priceList.pricePerDay}} €</td>
                     </tr>
-                    <tr><button *ngIf="selectedAdWithPictures.active" mat-raised-button color="primary" class="rent-btn"
-                            (click)="rent(selectedAdWithPictures)">Rent me!</button>
-                        <button *ngIf="!selectedAdWithPictures.active" mat-flat-button color="warn"
-                            class="rented-out-btn">RENTED OUT</button></tr>
+                    <tr><button *ngIf="checkIfCanRentAdvertisement(selectedAdWithPictures)" mat-raised-button
+                            color="primary" class="rent-btn" (click)="rent(selectedAdWithPictures)">Rent me!</button>
+                        <button *ngIf="!checkIfCanRentAdvertisement(selectedAdWithPictures)" mat-flat-button
+                            color="warn" class="rented-out-btn">RENTED OUT</button></tr>
                 </table>
             </div>
         </div>

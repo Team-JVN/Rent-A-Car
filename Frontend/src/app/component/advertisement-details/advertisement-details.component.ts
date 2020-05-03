@@ -72,4 +72,13 @@ export class AdvertisementDetailsComponent implements OnInit {
     });
   }
 
+  checkIfCanRentAdvertisement(element: AdvertisementWithPicturesDTO): boolean {
+    if (!element.dateTo) {
+      return true;
+    }
+    if (new Date(element.dateTo) > new Date()) {
+      return true;
+    }
+    return false;
+  }
 }

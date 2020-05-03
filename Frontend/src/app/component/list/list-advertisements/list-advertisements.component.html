@@ -49,7 +49,12 @@
                                             <th><span class="theader">
                                                     <mat-icon class="mr-2">today</mat-icon>Available Between:
                                                 </span></th>
-                                            <td>{{element.dateFrom  | date:"dd.MM.yyyy."}} — Unlimited
+                                            <td>
+                                                <span *ngIf="element.dateTo">
+                                                    {{element.dateFrom  | date:"dd.MM.yyyy."}} —
+                                                    {{element.dateTo  | date:"dd.MM.yyyy."}}</span>
+                                                <span *ngIf="!element.dateTo">
+                                                    {{element.dateFrom  | date:"dd.MM.yyyy."}} — Unlimited</span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -95,7 +100,8 @@
                                 <td class="price-text">
                                     {{element.priceList.pricePerDay}} €</td>
                             </tr>
-                            <tr><button *ngIf="element.active" mat-raised-button color="primary" class="rent-btn"
+                            <tr><button mat-raised-button color="primary" class="rent-btn"
+                                    *ngIf="checkIfCanRentAdvertisement(element)"
                                     (click)="rent(element);$event.stopPropagation()">Rent
                                     me!</button></tr>
                         </table>
