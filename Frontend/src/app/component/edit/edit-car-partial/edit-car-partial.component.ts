@@ -23,9 +23,9 @@ export class EditCarPartialComponent implements OnInit {
 
   ngOnInit() {
     this.editForm = this.formBuilder.group({
-      mileageInKm: new FormControl(this.selectedItem.carDTO.mileageInKm, [Validators.required, Validators.min(0)]),
-      kidsSeats: new FormControl(this.selectedItem.carDTO.kidsSeats, [Validators.required, Validators.min(0), Validators.max(3)]),
-      availableTracking: new FormControl(this.selectedItem.carDTO.availableTracking, Validators.required),
+      mileageInKm: new FormControl(this.selectedItem.mileageInKm, [Validators.required, Validators.min(0)]),
+      kidsSeats: new FormControl(this.selectedItem.kidsSeats, [Validators.required, Validators.min(0), Validators.max(3)]),
+      availableTracking: new FormControl(this.selectedItem.availableTracking, Validators.required),
     })
 
     this.fetchPictures();
@@ -41,14 +41,14 @@ export class EditCarPartialComponent implements OnInit {
       return;
     }
     const formData = new FormData();
-    const car = new CarEdit(this.editForm.value.mileageInKm, this.editForm.value.kidsSeats, this.editForm.value.availableTracking, this.selectedItem.carDTO.id);
+    const car = new CarEdit(this.editForm.value.mileageInKm, this.editForm.value.kidsSeats, this.editForm.value.availableTracking, this.selectedItem.id);
     formData.append("carData", JSON.stringify(car));
 
     for (var i = 0; i < this.files.length; i++) {
       formData.append("files", this.files[i]);
     }
 
-    this.carService.editPartial(formData, this.selectedItem.carDTO.id).subscribe(
+    this.carService.editPartial(formData, this.selectedItem.id).subscribe(
       (data: Car) => {
         this.editForm.reset();
         this.dialogRef.close();
@@ -72,10 +72,10 @@ export class EditCarPartialComponent implements OnInit {
 
   fetchPictures() {
     this.selectedItem.pictures.forEach(element => {
-      this.carService.getPicture(element, this.selectedItem.carDTO.id).subscribe(
+      this.carService.getPicture(element.data, this.selectedItem.id).subscribe(
         (data: Blob) => {
           data.type
-          const file = new File([data], element, { type: data.type });
+          const file = new File([data], element.data, { type: data.type });
           this.files.push(file);
         },
         (httpErrorResponse: HttpErrorResponse) => {

@@ -1,3 +1,4 @@
+import { UserInfo } from './userInfo';
 import { Model } from './model';
 import { Make } from './make';
 import { BodyStyle } from 'src/app/model/bodyStyle';
@@ -14,12 +15,12 @@ export class Car {
     mileageInKm: number;
     kidsSeats: number;
     availableTracking: boolean;
-    avgRating: number;   // TODO: ADD IN CONSTRUCTOR
-    owner: string;   // TODO: ADD IN CONSTRUCTOR
-    commentsCount: number;   // TODO: ADD IN CONSTRUCTOR
+    avgRating: number;
+    owner: UserInfo;
+    commentsCount: number;
 
     constructor(make: Make, model: Model, fuelType: FuelType, gearBoxType: GearBoxType, bodyStyle: BodyStyle,
-        mileageInKm: number, kidsSeats: number, availableTracking: boolean, id?: number) {
+        mileageInKm: number, kidsSeats: number, availableTracking: boolean, id?: number, avgRating?: number, owner?: UserInfo, commentsCount?: number) {
         this.make = make;
         this.model = model;
         this.fuelType = fuelType;
@@ -29,6 +30,9 @@ export class Car {
         this.kidsSeats = kidsSeats;
         this.availableTracking = availableTracking;
         this.id = id;
+        this.avgRating = avgRating;
+        this.owner = owner;
+        this.commentsCount = commentsCount;
     }
 
 }

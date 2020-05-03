@@ -12,6 +12,4 @@ public interface RentRequestService {
     RentRequest get(Long id);
 
     void delete(Long id);
-
-    RentRequest edit(Long id, RentRequest rentRequest);
 }

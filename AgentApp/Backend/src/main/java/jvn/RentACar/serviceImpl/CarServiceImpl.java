@@ -2,14 +2,12 @@ package jvn.RentACar.serviceImpl;
 
 import jvn.RentACar.dto.both.CarDTO;
 import jvn.RentACar.dto.request.CarEditDTO;
-import jvn.RentACar.dto.response.CarWithPicturesDTO;
 import jvn.RentACar.enumeration.EditType;
 import jvn.RentACar.enumeration.LogicalStatus;
 import jvn.RentACar.exceptionHandler.InvalidCarDataException;
 import jvn.RentACar.mapper.CarDtoMapper;
 import jvn.RentACar.model.Advertisement;
 import jvn.RentACar.model.Car;
-import jvn.RentACar.model.Picture;
 import jvn.RentACar.repository.CarRepository;
 import jvn.RentACar.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -62,6 +60,8 @@ public class CarServiceImpl implements CarService {
         car.setBodyStyle(bodyStyleService.get(car.getBodyStyle().getId()));
         car.setFuelType(fuelTypeService.get(car.getFuelType().getId()));
         car.setGearBoxType(gearboxTypeService.get(car.getGearBoxType().getId()));
+        car.setCommentsCount(0);
+        car.setAvgRating(0.0);
         Car savedCar = carRepository.saveAndFlush(car);
         pictureService.savePictures(multipartFiles, PATH, savedCar);
         return savedCar;
@@ -73,18 +73,8 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public List<CarWithPicturesDTO> get() {
-        List<Car> cars = carRepository.findAllByLogicalStatusNot(LogicalStatus.DELETED);
-        List<CarWithPicturesDTO> carDTOList = new ArrayList<>();
-        for (Car car : cars) {
-            CarDTO carDTO = carMapper.toDto(car);
-            List<String> pictures = new ArrayList<>();
-            for (Picture picture : car.getPictures()) {
-                pictures.add(picture.getData());
-            }
-            carDTOList.add(new CarWithPicturesDTO(carDTO, pictures));
-        }
-        return carDTOList;
+    public List<Car> get() {
+        return carRepository.findAllByLogicalStatusNot(LogicalStatus.DELETED);
     }
 
     @Override
@@ -134,7 +124,12 @@ public class CarServiceImpl implements CarService {
     @Override
     public void delete(Long id) {
         Car car = get(id);
-        if (carRepository.findByIdAndAdvertisementsLogicalStatus(id, LogicalStatus.EXISTING) != null) {
+
+        if (carRepository.findByIdAndAdvertisementsLogicalStatusAndAdvertisementsDateToGreaterThanEqual(id, LogicalStatus.EXISTING, LocalDate.now()) != null) {
+            throw new InvalidCarDataException("Car is in use and therefore can not be deleted.", HttpStatus.FORBIDDEN);
+        }
+
+        if (carRepository.findByIdAndAdvertisementsLogicalStatusAndAdvertisementsDateToEquals(id, LogicalStatus.EXISTING, null) != null) {
             throw new InvalidCarDataException("Car is in use and therefore can not be deleted.", HttpStatus.FORBIDDEN);
         }
         car.setLogicalStatus(LogicalStatus.DELETED);

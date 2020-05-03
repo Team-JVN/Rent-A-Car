@@ -1,6 +1,5 @@
 package jvn.RentACar.service;
 
-import jvn.RentACar.dto.response.AdvertisementWithPicturesDTO;
 import jvn.RentACar.model.Advertisement;
 
 import java.util.List;
@@ -14,5 +13,5 @@ public interface AdvertisementService {
 
     Advertisement get(Long id);
 
-    List<AdvertisementWithPicturesDTO> getAll(String status);
+    List<Advertisement> getAll(String status);
 }

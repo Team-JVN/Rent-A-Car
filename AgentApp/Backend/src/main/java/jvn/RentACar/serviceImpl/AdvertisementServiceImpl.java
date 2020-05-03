@@ -1,13 +1,10 @@
 package jvn.RentACar.serviceImpl;
 
-import jvn.RentACar.dto.both.AdvertisementDTO;
-import jvn.RentACar.dto.response.AdvertisementWithPicturesDTO;
 import jvn.RentACar.enumeration.LogicalStatus;
 import jvn.RentACar.enumeration.RentRequestStatus;
 import jvn.RentACar.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.RentACar.mapper.AdvertisementDtoMapper;
 import jvn.RentACar.model.Advertisement;
-import jvn.RentACar.model.Picture;
 import jvn.RentACar.model.PriceList;
 import jvn.RentACar.model.RentInfo;
 import jvn.RentACar.repository.AdvertisementRepository;
@@ -20,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -64,6 +60,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         dbAdvertisement.setDateFrom(advertisement.getDateFrom());
         dbAdvertisement.setCar(carService.get(advertisement.getCar().getId()));
         dbAdvertisement.setPriceList(priceListService.get(advertisement.getPriceList().getId()));
+        dbAdvertisement.setPickUpPoint(advertisement.getPickUpPoint());
         PriceList priceList = dbAdvertisement.getPriceList();
         if (priceList.getPricePerKm() != null && advertisement.getKilometresLimit() == null) {
             throw new InvalidAdvertisementDataException("You have to set kilometres limit.", HttpStatus.BAD_REQUEST);
@@ -100,31 +97,23 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         return advertisement;
     }
 
-    public List<AdvertisementWithPicturesDTO> getAll(String status) {
+    public List<Advertisement> getAll(String status) {
         List<Advertisement> ads = null;
+        //TODO:CHANGE THIS!!!!!!
         if (status.equals("all")) {
             ads = advertisementRepository.findAllByLogicalStatusNot(LogicalStatus.DELETED);
         } else if (status.equals("active")) {
-            ads = advertisementRepository.findAllByLogicalStatusNotAndActive(LogicalStatus.DELETED, true);
+            ads = advertisementRepository.findAllByLogicalStatusNot(LogicalStatus.DELETED);
         } else {
-            ads = advertisementRepository.findAllByLogicalStatusNotAndActive(LogicalStatus.DELETED, false);
+            ads = advertisementRepository.findAllByLogicalStatusNot(LogicalStatus.DELETED);
         }
-        List<AdvertisementWithPicturesDTO> adsDTOList = new ArrayList<>();
-        for (Advertisement ad : ads) {
-            AdvertisementDTO advertisementDTO = advertisementMapper.toDto(ad);
-            List<String> pictures = new ArrayList<>();
-            for (Picture picture : ad.getCar().getPictures()) {
-                pictures.add(picture.getData());
-            }
-            adsDTOList.add(new AdvertisementWithPicturesDTO(advertisementDTO, pictures));
-        }
-        return adsDTOList;
+        return ads;
     }
 
     private void checkIfCarIsAvailable(Long carId, LocalDate advertisementDateFrom, Long advertisementId) {
-        if (!advertisementRepository.findByCarIdAndActiveAndLogicalStatus(carId, true, LogicalStatus.EXISTING).isEmpty()) {
+        if (!advertisementRepository.findByCarIdAndLogicalStatus(carId, LogicalStatus.EXISTING).isEmpty()) {
             if (advertisementId != null) {
-                List<Advertisement> advertisements = advertisementRepository.findByCarIdAndActiveAndLogicalStatus(carId, true, LogicalStatus.EXISTING);
+                List<Advertisement> advertisements = advertisementRepository.findByCarIdAndLogicalStatus(carId, LogicalStatus.EXISTING);
                 if (advertisements.size() != 1 || !advertisements.get(0).getId().equals(advertisementId)) {
                     throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
                 }

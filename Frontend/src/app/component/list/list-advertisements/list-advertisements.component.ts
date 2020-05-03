@@ -66,7 +66,7 @@ export class ListAdvertisementsComponent implements OnInit {
   }
 
   getPicture(adWithPicturesDTO: AdvertisementWithPicturesDTO) {
-    this.carService.getPicture(adWithPicturesDTO.pictures[0], adWithPicturesDTO.advertisement.car.id).subscribe(
+    this.carService.getPicture(adWithPicturesDTO.car.pictures[0].data, adWithPicturesDTO.car.id).subscribe(
       (data) => {
         this.createImageFromBlob(data, adWithPicturesDTO);
         adWithPicturesDTO.isImageLoading = false;
@@ -98,7 +98,7 @@ export class ListAdvertisementsComponent implements OnInit {
   }
 
   delete(element: AdvertisementWithPicturesDTO) {
-    this.advertisementService.delete(element.advertisement.id).subscribe(
+    this.advertisementService.delete(element.id).subscribe(
       () => {
         this.fetchAll(this.status);
         this.toastr.success('Successfully deleted Advertisement!', 'Delete Advertisement');
@@ -110,12 +110,12 @@ export class ListAdvertisementsComponent implements OnInit {
   }
 
   rent(element: AdvertisementWithPicturesDTO) {
-    this.dialog.open(AddRentRequestComponent, { data: element.advertisement });
+    this.dialog.open(AddRentRequestComponent, { data: element });
 
   }
 
   viewDetails(element: AdvertisementWithPicturesDTO) {
-    this.router.navigate(['/advertisement/' + element.advertisement.id]);
+    this.router.navigate(['/advertisement/' + element.id]);
   }
 
 }

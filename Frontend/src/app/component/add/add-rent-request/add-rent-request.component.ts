@@ -1,3 +1,4 @@
+import { AdvertisementWithPicturesDTO } from './../../../model/advertisementWithPictures';
 import { AuthentificationService } from './../../../service/authentification.service';
 import { RentInfo } from './../../../model/rentInfo';
 import { RentRequest } from './../../../model/rentRequest';
@@ -44,7 +45,7 @@ export class AddRentRequestComponent implements OnInit {
     private dialogRef: MatDialogRef<AddRentRequestComponent>,
     private formBuilder: FormBuilder,
     public dialog: MatDialog,
-    @Inject(MAT_DIALOG_DATA) public selectedItem: Advertisement) { }
+    @Inject(MAT_DIALOG_DATA) public selectedItem: AdvertisementWithPicturesDTO) { }
 
   ngOnInit() {
     if (this.minDate < new Date(this.selectedItem.dateFrom)) {
@@ -106,7 +107,7 @@ export class AddRentRequestComponent implements OnInit {
     if (!this.selectedItem.cdw) {
       cdw = null;
     }
-    const newRentInfo = new RentInfo(dateTimeFrom, dateTimeTo, this.informationForm.value.pickUpPoint, cdw, this.selectedItem);
+    const newRentInfo = new RentInfo(dateTimeFrom, dateTimeTo, cdw, this.selectedItem);
 
     if (this.authService.isAgent()) {
       var rentInfos = [];

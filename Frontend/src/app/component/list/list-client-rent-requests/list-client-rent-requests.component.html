@@ -34,10 +34,6 @@
                         (click)="viewDetails(element)">
                         <mat-icon>open_in_new</mat-icon>
                     </button>
-                    <button *ngIf="element.rentRequestStatus == 'PENDING'" mat-icon-button aria-label="Edit"
-                        color="primary" (click)="edit(element)">
-                        <mat-icon>edit</mat-icon>
-                    </button>
                     <button mat-icon-button aria-label="Delete" *ngIf="element.rentRequestStatus == 'CANCELED'"
                         color="warn" (click)="delete(element)">
                         <mat-icon>delete</mat-icon>

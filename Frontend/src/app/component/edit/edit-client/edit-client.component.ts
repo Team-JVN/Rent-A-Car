@@ -21,14 +21,13 @@ export class EditClientComponent implements OnInit {
   ngOnInit() {
     this.editForm = this.formBuilder.group({
       name: new FormControl(this.selectedItem.name, Validators.required),
-      email: new FormControl(this.selectedItem.email, [Validators.required, Validators.email]),
       address: new FormControl(this.selectedItem.address, Validators.required),
       phoneNumber: new FormControl(this.selectedItem.phoneNumber, [Validators.required, Validators.minLength(9), Validators.maxLength(10), Validators.pattern("0[0-9]+")])
     })
   }
 
   edit() {
-    const client = new Client(this.editForm.value.name, this.editForm.value.email, this.editForm.value.address, this.editForm.value.phoneNumber, this.selectedItem.id);
+    const client = new Client(this.editForm.value.name, this.selectedItem.email, this.editForm.value.address, this.editForm.value.phoneNumber, this.selectedItem.id);
     this.clientService.edit(client).subscribe(
       (data: Client) => {
         this.editForm.reset();

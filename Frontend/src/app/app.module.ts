@@ -39,7 +39,6 @@ import { AddClientComponent } from './component/add/add-client/add-client.compon
 import { EditClientComponent } from './component/edit/edit-client/edit-client.component';
 import { AdvertisementDetailsComponent } from './component/advertisement-details/advertisement-details.component';
 import { ListRentRequestsComponent } from './component/list/list-rent-requests/list-rent-requests.component';
-import { EditRentRequestComponent } from './component/edit/edit-rent-request/edit-rent-request.component';
 import { LoginComponent } from './component/authentification/login/login.component';
 import { ChangePasswordComponent } from './component/authentification/change-password/change-password.component';
 import { ClientRegistrationComponent } from './component/authentification/client-registration/client-registration.component';
@@ -99,7 +98,6 @@ import { TableForStatisticsComponent } from './component/list/table-for-statisti
     AddRentRequestComponent,
     AdvertisementDetailsComponent,
     ListRentRequestsComponent,
-    EditRentRequestComponent,
     LoginComponent,
     ChangePasswordComponent,
     ClientRegistrationComponent,
@@ -164,7 +162,6 @@ import { TableForStatisticsComponent } from './component/list/table-for-statisti
     AddClientComponent,
     EditClientComponent,
     AddRentRequestComponent,
-    EditRentRequestComponent,
     AddAgentComponent,
     AddAdminComponent,
     AddModelComponent,

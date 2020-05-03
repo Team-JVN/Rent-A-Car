@@ -61,13 +61,13 @@ export class AdvertisementDetailsComponent implements OnInit {
   }
 
   rent(element: AdvertisementWithPicturesDTO) {
-    this.dialog.open(AddRentRequestComponent, { data: element.advertisement });
+    this.dialog.open(AddRentRequestComponent, { data: element });
 
   }
 
   fetchPictures() {
-    this.selectedAdWithPictures.pictures.forEach(element => {
-      let imgUrl = this.url + '/' + this.selectedAdWithPictures.advertisement.car.id + '/picture?fileName=' + element;
+    this.selectedAdWithPictures.car.pictures.forEach(element => {
+      let imgUrl = this.url + '/' + this.selectedAdWithPictures.car.id + '/picture?fileName=' + element.data;
       this.galleryImages.push({ small: imgUrl, medium: imgUrl });
     });
   }

@@ -37,34 +37,34 @@
                                             <th><span class="theader">
                                                     <mat-icon class="mr-2">local_gas_station</mat-icon>Fuel Type:
                                                 </span></th>
-                                            <td>{{element.carDTO.fuelType.name}}</td>
+                                            <td>{{element.fuelType.name}}</td>
                                             <th><span class="theader">
                                                     <mat-icon class="mr-2">speed</mat-icon>Mileage:
                                                 </span></th>
-                                            <td>{{element.carDTO.mileageInKm | number}} Km</td>
+                                            <td>{{element.mileageInKm | number}} Km</td>
                                         </tr>
                                         <tr>
                                             <th><span class="theader">
                                                     <mat-icon class="mr-2">settings</mat-icon>Gearbox:
                                                 </span></th>
-                                            <td>{{element.carDTO.gearBoxType.name}}</td>
+                                            <td>{{element.gearBoxType.name}}</td>
                                             <th><span class="theader">
                                                     <mat-icon class="mr-2">airline_seat_recline_normal</mat-icon>Kid's
                                                     seats:
                                                 </span></th>
-                                            <td>{{element.carDTO.kidsSeats}}</td>
+                                            <td>{{element.kidsSeats}}</td>
                                         </tr>
                                         <tr>
                                             <th><span class="theader">
                                                     <mat-icon class="mr-2">airport_shuttle</mat-icon>Body Style:
                                                 </span></th>
-                                            <td>{{element.carDTO.bodyStyle.name}}</td>
+                                            <td>{{element.bodyStyle.name}}</td>
                                             <th><span class="theader">
                                                     <mat-icon class="mr-2">navigation</mat-icon>Tracking:
                                                 </span></th>
                                             <td>
-                                                <span *ngIf="element.carDTO.availableTracking">Available</span>
-                                                <span *ngIf="!element.carDTO.availableTracking">Not Available</span>
+                                                <span *ngIf="element.availableTracking">Available</span>
+                                                <span *ngIf="!element.availableTracking">Not Available</span>
                                             </td>
                                         </tr>
                                     </tbody>

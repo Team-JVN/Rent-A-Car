@@ -38,6 +38,8 @@ public class RentRequestServiceImpl implements RentRequestService {
     public RentRequest create(RentRequest rentRequest) {
         // TODO: You need to refuse all other requests
         rentRequest.setClient(clientService.get(rentRequest.getClient().getId()));
+        //TODO:Set rentrequeststatus
+        //TODO:Set createdByUser
         rentRequest.setRentRequestStatus(RentRequestStatus.PAID);
         rentRequest.setTotalPrice(0.0);
         Set<RentInfo> rentInfos = rentRequest.getRentInfos();
@@ -79,19 +81,6 @@ public class RentRequestServiceImpl implements RentRequestService {
         rentRequestRepository.deleteById(id);
     }
 
-    @Override
-    public RentRequest edit(Long id, RentRequest rentRequest) {
-        RentRequest dbRentRequest = get(id);
-        if (!dbRentRequest.getRentRequestStatus().equals(RentRequestStatus.PENDING)) {
-            throw new InvalidRentRequestDataException(
-                    "This rent request is not in status PENDING so you can not edit it.", HttpStatus.FORBIDDEN);
-        }
-
-        dbRentRequest.setClient(clientService.get(rentRequest.getClient().getId()));
-        dbRentRequest.setTotalPrice(changeRentInfosData(dbRentRequest, rentRequest));
-        return rentRequestRepository.save(dbRentRequest);
-    }
-
     private double changeRentInfosData(RentRequest dbRentRequest, RentRequest rentRequest) {
         double totalPrice = 0;
         List<RentInfo> dbRentInfos = new ArrayList<>(dbRentRequest.getRentInfos().size());
@@ -107,14 +96,10 @@ public class RentRequestServiceImpl implements RentRequestService {
 
             Advertisement advertisement = advertisementService.get(dbRentInfo.getAdvertisement().getId());
 
-            if (!advertisement.getActive()) {
-                throw new InvalidRentRequestDataException("Car " + advertisement.getCar().getMake() + " "
-                        + advertisement.getCar().getModel() + " is already booked.", HttpStatus.FORBIDDEN);
-            }
             checkDate(advertisement, rentInfo.getDateTimeFrom().toLocalDate(), rentInfo.getDateTimeTo().toLocalDate());
             dbRentInfo.setDateTimeFrom(rentInfo.getDateTimeFrom());
             dbRentInfo.setDateTimeTo(rentInfo.getDateTimeTo());
-            dbRentInfo.setPickUpPoint(rentInfo.getPickUpPoint());
+
             dbRentInfo.setOptedForCDW(rentInfo.getOptedForCDW());
             if (!advertisement.getCDW()) {
                 dbRentInfo.setOptedForCDW(null);
@@ -133,18 +118,14 @@ public class RentRequestServiceImpl implements RentRequestService {
             rentInfo.setRentRequest(rentRequest);
             Advertisement advertisement = advertisementService.get(rentInfo.getAdvertisement().getId());
 
-            if (!advertisement.getActive()) {
-                throw new InvalidRentRequestDataException("This car is already booked.", HttpStatus.FORBIDDEN);
-            }
-
-            if (!activeAdvertisement) {
-                advertisement.setActive(false);
-            }
             checkDate(advertisement, rentInfo.getDateTimeFrom().toLocalDate(), rentInfo.getDateTimeTo().toLocalDate());
             rentInfo.setAdvertisement(advertisement);
             if (!advertisement.getCDW()) {
                 rentInfo.setOptedForCDW(null);
             }
+            rentInfo.setRating(0);
+            rentInfo.setKilometresLimit(advertisement.getKilometresLimit());
+            rentInfo.setPricePerKm(advertisement.getPriceList().getPricePerKm());
             totalPrice += countPrice(rentInfo);
         }
         return totalPrice;
@@ -194,7 +175,7 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     @Autowired
     public RentRequestServiceImpl(ClientService clientService, AdvertisementService advertisementService,
-            RentRequestRepository rentRequestRepository, RentInfoService rentInfoService) {
+                                  RentRequestRepository rentRequestRepository, RentInfoService rentInfoService) {
         this.clientService = clientService;
         this.advertisementService = advertisementService;
         this.rentRequestRepository = rentRequestRepository;

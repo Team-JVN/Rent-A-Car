@@ -37,7 +37,7 @@ export class ListCarsComponent implements OnInit {
   }
 
   getPicture(carWithPicturesDTO: CarWithPictures) {
-    this.carService.getPicture(carWithPicturesDTO.pictures[0], carWithPicturesDTO.carDTO.id).subscribe(
+    this.carService.getPicture(carWithPicturesDTO.pictures[0].data, carWithPicturesDTO.id).subscribe(
       (data) => {
         this.createImageFromBlob(data, carWithPicturesDTO);
         carWithPicturesDTO.isImageLoading = false;
@@ -77,7 +77,7 @@ export class ListCarsComponent implements OnInit {
   }
 
   edit(element: CarWithPictures) {
-    this.carService.getEditType(element.carDTO.id).subscribe(
+    this.carService.getEditType(element.id).subscribe(
       (data: string) => {
         if (data === "ALL") {
           this.dialog.open(EditCarComponent, { data: element });
@@ -99,7 +99,7 @@ export class ListCarsComponent implements OnInit {
   }
 
   delete(element: CarWithPictures) {
-    this.carService.delete(element.carDTO.id).subscribe(
+    this.carService.delete(element.id).subscribe(
       () => {
         this.fetchCars();
         this.toastr.success('Successfully deleted Car!', 'Delete Car');

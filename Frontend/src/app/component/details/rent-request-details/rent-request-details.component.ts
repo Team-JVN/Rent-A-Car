@@ -1,3 +1,5 @@
+import { AdvertisementWithPicturesDTO } from 'src/app/model/advertisementWithPictures';
+import { CarWithPictures } from './../../../model/carWithPictures';
 import { UserInfo } from 'src/app/model/userInfo';
 
 import { MatDialog } from '@angular/material/dialog';
@@ -22,8 +24,6 @@ import { FuelType } from 'src/app/model/fuelType';
 import { GearBoxType } from 'src/app/model/gearboxType';
 import { Client } from 'src/app/model/client';
 import { PriceList } from 'src/app/model/priceList';
-import { MatTableDataSource } from '@angular/material/table';
-import { User } from 'src/app/model/user';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { ReviewFeedbackComponent } from '../../review-feedback/review-feedback.component';
 
@@ -42,11 +42,11 @@ export class RentRequestDetailsComponent implements OnInit {
   messages: Message[];
   make = new Make("Opel", 1);
   model = new Model("Poze", 2);
-  car = new Car(this.make, this.model, new FuelType("fuel"), new GearBoxType("gear"), null, 1000, 2, true);
-  advestisement = new Advertisement(this.car, new PriceList(1, 2, 2), 20, 2500, true, "2020-05-05", true);
-  rentInfo = new RentInfo("2020-04-04", "2020-04-04", "Beograd", true, this.advestisement, 1);
-  rentInfos = [new RentInfo("2020-04-04", "2020-04-04", "Beograd", true, this.advestisement, 2),
-  new RentInfo("2020-05-05", "2020-05-05", "Beograd", true, this.advestisement)];
+  car = new CarWithPictures(this.make, this.model, new FuelType("fuel"), new GearBoxType("gear"), null, 1000, 2, true, null);
+  advestisement = new AdvertisementWithPicturesDTO(this.car, new PriceList(1, 2, 2), 20, 2500, true, "Bg", "2020-05-05");
+  rentInfo = new RentInfo("2020-04-04", "2020-04-04", true, this.advestisement, 1);
+  rentInfos = [new RentInfo("2020-04-04", "2020-04-04", true, this.advestisement, 2),
+  new RentInfo("2020-05-05", "2020-05-05", true, this.advestisement)];
 
   rentRequest = new RentRequest(new Client("Pera", "pera@uns.ac.rs", "Beograd", "066666666"), this.rentInfos, 200, "PAID");
 

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.text.ParseException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/api/advertisement", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -27,6 +28,7 @@ public class AdvertisementController {
     private CreateAdvertisementDtoMapper createAdvertisementDtoMapper;
 
     private AdvertisementDtoMapper advertisementDtoMapper;
+
     private AdvertisementWithPicturesDtoMapper adWithPicturesDtoMapper;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -40,9 +42,9 @@ public class AdvertisementController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AdvertisementDTO> edit(@PathVariable Long id, @Valid @RequestBody AdvertisementDTO advertisementDTO) {
+    public ResponseEntity<AdvertisementDTO> edit(@PathVariable Long id, @Valid @RequestBody AdvertisementWithPicturesDTO advertisementDTO) {
         try {
-            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.edit(id, advertisementDtoMapper.toEntity(advertisementDTO))), HttpStatus.OK);
+            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.edit(id, adWithPicturesDtoMapper.toEntity(advertisementDTO))), HttpStatus.OK);
         } catch (ParseException e) {
             throw new InvalidAdvertisementDataException("Please choose valid date.", HttpStatus.BAD_REQUEST);
         }
@@ -56,7 +58,9 @@ public class AdvertisementController {
 
     @GetMapping("/all/{status}")
     public ResponseEntity<List<AdvertisementWithPicturesDTO>> getAll(@PathVariable(value = "status", required = false) String status) {
-        return new ResponseEntity<>(advertisementService.getAll(status), HttpStatus.OK);
+        List<AdvertisementWithPicturesDTO> list = advertisementService.getAll(status).stream().map(adWithPicturesDtoMapper::toDto).
+                collect(Collectors.toList());
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

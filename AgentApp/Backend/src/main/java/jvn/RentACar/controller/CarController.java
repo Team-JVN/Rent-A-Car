@@ -8,6 +8,7 @@ import jvn.RentACar.dto.response.CarWithPicturesDTO;
 import jvn.RentACar.enumeration.EditType;
 import jvn.RentACar.exceptionHandler.InvalidCarDataException;
 import jvn.RentACar.mapper.CarDtoMapper;
+import jvn.RentACar.mapper.CarWithPicturesDtoMapper;
 import jvn.RentACar.mapper.CreateCarDtoMapper;
 import jvn.RentACar.service.CarService;
 import jvn.RentACar.service.MakeService;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/api/car")
@@ -38,6 +40,8 @@ public class CarController {
     private CarDtoMapper carMapper;
 
     private CreateCarDtoMapper createCarDtoMapper;
+
+    private CarWithPicturesDtoMapper carWithPicturesDtoMapper;
 
     private ModelService modelService;
 
@@ -60,7 +64,9 @@ public class CarController {
 
     @GetMapping
     public ResponseEntity<List<CarWithPicturesDTO>> get() {
-        return new ResponseEntity<>(carService.get(), HttpStatus.OK);
+        List<CarWithPicturesDTO> list = carService.get().stream().map(carWithPicturesDtoMapper::toDto).
+                collect(Collectors.toList());
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}/picture", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
@@ -139,9 +145,11 @@ public class CarController {
     }
 
     @Autowired
-    public CarController(CarService carService, CarDtoMapper carMapper, CreateCarDtoMapper createCarDtoMapper) {
+    public CarController(CarService carService, CarDtoMapper carMapper, CreateCarDtoMapper createCarDtoMapper,
+                         CarWithPicturesDtoMapper carWithPicturesDtoMapper) {
         this.carService = carService;
         this.carMapper = carMapper;
         this.createCarDtoMapper = createCarDtoMapper;
+        this.carWithPicturesDtoMapper = carWithPicturesDtoMapper;
     }
 }

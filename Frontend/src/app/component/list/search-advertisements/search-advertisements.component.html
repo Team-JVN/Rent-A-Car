@@ -242,13 +242,13 @@
                         </div>
                         <div>
                             <mat-card-header class="advertisement-card-header">
-                                <mat-card-title class="advertisement-card-title">{{element.advertisement.car.make.name}}
-                                    {{element.advertisement.car.model.name}}
+                                <mat-card-title class="advertisement-card-title">{{element.car.make.name}}
+                                    {{element.car.model.name}}
                                 </mat-card-title>
                                 <div class="advertisement-card-buttons">
                                     <star-rating class="rating-style" totalstars="5" checkedcolor="#87C7F3"
-                                        uncheckedcolor="black" size="30px"
-                                        [(value)]="element.advertisement.car.avgRating" readonly="true">
+                                        uncheckedcolor="black" size="30px" [(value)]="element.car.avgRating"
+                                        readonly="true">
                                     </star-rating>
                                 </div>
                             </mat-card-header>
@@ -259,10 +259,10 @@
                                             <th><span class="theader">
                                                     <mat-icon class="mr-2">today</mat-icon>Available Between:
                                                 </span></th>
-                                            <td>{{element.advertisement.dateFrom | date:"dd.MM.yyyy."}} —
+                                            <td>{{element.dateFrom | date:"dd.MM.yyyy."}} —
                                                 <span
-                                                    *ngIf="element.advertisement.dateTo">{{element.advertisement.dateTo | date:"dd.MM.yyyy."}}</span>
-                                                <span *ngIf="!element.advertisement.dateTo">Unlimited</span>
+                                                    *ngIf="element.dateTo">{{element.dateTo | date:"dd.MM.yyyy."}}</span>
+                                                <span *ngIf="!element.dateTo">Unlimited</span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -270,13 +270,13 @@
                                                     <mat-icon class="mr-2">speed</mat-icon>Kilometres Limit:
                                                 </span></th>
                                             <td>
-                                                <span *ngIf="element.advertisement.kilometresLimit">
-                                                    {{element.advertisement.kilometresLimit}} Km &nbsp;
+                                                <span *ngIf="element.kilometresLimit">
+                                                    {{element.kilometresLimit}} Km &nbsp;
                                                     <span class="per-km">
-                                                        ({{element.advertisement.priceList.pricePerKm}} € per
+                                                        ({{element.priceList.pricePerKm}} € per
                                                         Km)</span>
                                                 </span>
-                                                <span *ngIf="!element.advertisement.kilometresLimit">Unlimited</span>
+                                                <span *ngIf="!element.kilometresLimit">Unlimited</span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -285,17 +285,16 @@
                                                     Waiver:
                                                 </span></th>
                                             <td>
-                                                <span *ngIf="element.advertisement.cdw">
-                                                    {{element.advertisement.priceList.priceForCDW}} €</span>
-                                                <span *ngIf="!element.advertisement.cdw">Not Available</span>
+                                                <span *ngIf="element.cdw">
+                                                    {{element.priceList.priceForCDW}} €</span>
+                                                <span *ngIf="!element.cdw">Not Available</span>
                                             </td>
                                         </tr>
-                                        <tr
-                                            *ngIf="element.advertisement.discount && element.advertisement.discount > 0">
+                                        <tr *ngIf="element.discount && element.discount > 0">
                                             <th><span class="theader">
                                                     <mat-icon class="mr-2">money_off</mat-icon>30+ days Rent Discount:
                                                 </span></th>
-                                            <td>{{element.advertisement.discount}} %</td>
+                                            <td>{{element.discount}} %</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -307,10 +306,10 @@
                             </tr>
                             <tr>
                                 <td class="price-text">
-                                    {{element.advertisement.priceList.pricePerDay}} €</td>
+                                    {{element.priceList.pricePerDay}} €</td>
                             </tr>
-                            <tr><button *ngIf="element.advertisement.active" mat-raised-button color="primary"
-                                    class="rent-btn" (click)="rent(element);$event.stopPropagation()">Rent
+                            <tr><button *ngIf="element.active" mat-raised-button color="primary" class="rent-btn"
+                                    (click)="rent(element);$event.stopPropagation()">Rent
                                     me!</button></tr>
                         </table>
                     </mat-card>

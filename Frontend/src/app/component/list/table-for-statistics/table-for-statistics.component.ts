@@ -26,7 +26,7 @@ export class TableForStatisticsComponent implements OnInit {
   }
 
   getPicture(carWithPicturesDTO: CarWithPictures) {
-    this.carService.getPicture(carWithPicturesDTO.pictures[0], carWithPicturesDTO.carDTO.id).subscribe(
+    this.carService.getPicture(carWithPicturesDTO.pictures[0].data, carWithPicturesDTO.id).subscribe(
       (data) => {
         this.createImageFromBlob(data, carWithPicturesDTO);
         carWithPicturesDTO.isImageLoading = false;

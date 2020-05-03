@@ -42,4 +42,7 @@ public class CarDTO {
     @NotNull(message = "Available tracking is null.")
     private Boolean availableTracking;
 
+    private Double avgRating;
+
+    private Integer commentsCount;
 }

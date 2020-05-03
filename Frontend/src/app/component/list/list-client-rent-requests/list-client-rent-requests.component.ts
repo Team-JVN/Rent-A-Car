@@ -1,3 +1,5 @@
+import { AdvertisementWithPicturesDTO } from 'src/app/model/advertisementWithPictures';
+import { CarWithPictures } from 'src/app/model/carWithPictures';
 import { LeaveFeedbackComponent } from './../../add/leave-feedback/leave-feedback.component';
 import { Car } from 'src/app/model/car';
 import { BodyStyle } from './../../../model/bodystyle';
@@ -7,7 +9,6 @@ import { Model } from './../../../model/model';
 import { Make } from 'src/app/model/make';
 import { Advertisement } from './../../../model/advertisement';
 import { element } from 'protractor';
-import { EditRentRequestComponent } from './../../edit/edit-rent-request/edit-rent-request.component';
 import { RentInfo } from './../../../model/rentInfo';
 import { RentRequestService } from 'src/app/service/rent-request.service';
 import { RentRequest } from './../../../model/rentRequest';
@@ -52,9 +53,9 @@ export class ListClientRentRequestsComponent implements OnInit {
     const data1: RentRequest[] = []
     const make = new Make("Opel", 1);
     const model = new Model("Poze");
-    const car = new Car(make, model, new FuelType("fuel"), new GearBoxType("gear"), null, 1000, 2, true);
-    const advestisement = new Advertisement(car, new PriceList(1, 2, 2), 20, 2500, true, "2020-05-05", true);
-    const rentInfo = new RentInfo("2020-05-05", "2020-05-05", "Beograd", true, advestisement);
+    const car = new CarWithPictures(make, model, new FuelType("fuel"), new GearBoxType("gear"), null, 1000, 2, true, null);
+    const advestisement = new AdvertisementWithPicturesDTO(car, new PriceList(1, 2, 2), 20, 2500, true, "Bg", "2020-05-05");
+    const rentInfo = new RentInfo("2020-05-05", "2020-05-05", true, advestisement);
     const rentInfos = [];
     rentInfos.push(rentInfo)
     data1.push(new RentRequest(new Client("pera", "pera@uns.ac.rs", "Beograd", "066666666"), rentInfos, 200, "PAID"))
@@ -79,11 +80,6 @@ export class ListClientRentRequestsComponent implements OnInit {
 
       }
     );
-  }
-
-  edit(element: RentRequest) {
-    this.dialog.open(EditRentRequestComponent, { data: element });
-
   }
 
   delete(element: RentRequest) {

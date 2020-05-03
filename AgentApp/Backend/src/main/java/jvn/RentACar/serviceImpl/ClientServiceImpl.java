@@ -20,6 +20,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Client create(Client client) {
+        //TODO: Kada agent kreira klijenta tom klijentu izgenerises sifru i posaljes mu mejl.
         if (clientRepository.findByPhoneNumber(client.getPhoneNumber()) != null) {
             throw new InvalidClientDataException("Client with same phone number already exists.", HttpStatus.BAD_REQUEST);
         }
@@ -49,11 +50,7 @@ public class ClientServiceImpl implements ClientService {
         if (clientRepository.findByPhoneNumberAndIdNot(client.getPhoneNumber(), id) != null) {
             throw new InvalidClientDataException("Client with same phone number already exists.", HttpStatus.BAD_REQUEST);
         }
-        if (userRepository.findByEmailAndIdNot(client.getEmail(), id) != null) {
-            throw new InvalidClientDataException("Client with same email address already exists.", HttpStatus.BAD_REQUEST);
-        }
         dbClient.setPhoneNumber(client.getPhoneNumber());
-        dbClient.setEmail(client.getEmail());
         dbClient.setName(client.getName());
         dbClient.setAddress(client.getAddress());
         return clientRepository.save(dbClient);

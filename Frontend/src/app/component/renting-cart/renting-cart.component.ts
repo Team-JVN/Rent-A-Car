@@ -26,32 +26,35 @@ export class RentingCartComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.fetchRentInfos();
+    // this.fetchRentInfos();
   }
-
-  fetchCars() {
-    this.carService.getCars().subscribe(
-      (data: CarWithPictures[]) => {
-        data.forEach(carWithPicturesDTO => {
-          this.getPicture(carWithPicturesDTO);
-        });
-        this.carsDataSource = new MatTableDataSource(data);
-      },
-      (httpErrorResponse: HttpErrorResponse) => {
-        const data: CarWithPictures[] = []
-        this.carsDataSource = new MatTableDataSource(data)
-        this.toastr.error(httpErrorResponse.error.message, 'Show Cars');
-      }
-    );
-  }
-
-  fetchRentInfos() {
-    let rentInfos: RentInfo[] = JSON.parse(localStorage.getItem("rentInfos") || "[]");
-    this.rentInfosDataSource = new MatTableDataSource(rentInfos);
-  }
+  /*
+    fetchCars() {
+      this.carService.getCars().subscribe(
+        (data: CarWithPictures[]) => {
+          data.forEach(carWithPicturesDTO => {
+            this.getPicture(carWithPicturesDTO);
+          });
+          this.carsDataSource = new MatTableDataSource(data);
+        },
+        (httpErrorResponse: HttpErrorResponse) => {
+          const data: CarWithPictures[] = []
+          this.carsDataSource = new MatTableDataSource(data)
+          this.toastr.error(httpErrorResponse.error.message, 'Show Cars');
+        }
+      );
+    }
+  
+    fetchRentInfos() {
+      let rentInfos: RentInfo[] = JSON.parse(localStorage.getItem("rentInfos") || "[]");
+      rentInfos.forEach(rentInfo => {
+        this.getPicture(rentInfo.advertisement.car)
+      })
+      this.rentInfosDataSource = new MatTableDataSource(rentInfos);
+    }*/
 
   getPicture(carWithPicturesDTO: CarWithPictures) {
-    this.carService.getPicture(carWithPicturesDTO.pictures[0], carWithPicturesDTO.carDTO.id).subscribe(
+    this.carService.getPicture(carWithPicturesDTO.pictures[0].data, carWithPicturesDTO.id).subscribe(
       (data) => {
         this.createImageFromBlob(data, carWithPicturesDTO);
         carWithPicturesDTO.isImageLoading = false;
