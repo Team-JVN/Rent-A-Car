@@ -63,6 +63,8 @@ import { ReviewFeedbackComponent } from './component/review-feedback/review-feed
 import { ListClientRentRequestsComponent } from './component/list/list-client-rent-requests/list-client-rent-requests.component';
 import { ClientRentRequestDetailsComponent } from './component/details/client-rent-request-details/client-rent-request-details.component';
 import { LeaveFeedbackComponent } from './component/add/leave-feedback/leave-feedback.component';
+import { CarsStatisticsComponent } from './component/list/cars-statistics/cars-statistics.component';
+import { TableForStatisticsComponent } from './component/list/table-for-statistics/table-for-statistics.component';
 
 
 @NgModule({
@@ -119,6 +121,8 @@ import { LeaveFeedbackComponent } from './component/add/leave-feedback/leave-fee
     ListClientRentRequestsComponent,
     ClientRentRequestDetailsComponent,
     LeaveFeedbackComponent,
+    CarsStatisticsComponent,
+    TableForStatisticsComponent,
   ],
   imports: [
     BrowserModule,
