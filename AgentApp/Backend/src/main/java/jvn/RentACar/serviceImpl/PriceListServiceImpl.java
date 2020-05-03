@@ -27,7 +27,6 @@ public class PriceListServiceImpl implements PriceListService {
         if (priceList == null) {
             throw new InvalidPriceListDataException("Requested price list does not exist.", HttpStatus.NOT_FOUND);
         }
-
         return priceList;
     }
 
@@ -59,7 +58,6 @@ public class PriceListServiceImpl implements PriceListService {
 
     private PriceList isEditable(Long id) {
         PriceList priceList = get(id);
-
         if (!priceList.getAdvertisements().isEmpty()) {
             throw new InvalidPriceListDataException("Price list is used in advertisements, so it can't be edited/deleted.", HttpStatus.FORBIDDEN);
         }

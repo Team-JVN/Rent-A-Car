@@ -16,6 +16,7 @@ export class Car {
     availableTracking: boolean;
     avgRating: number;   // TODO: ADD IN CONSTRUCTOR
     owner: string;   // TODO: ADD IN CONSTRUCTOR
+    commentsCount: number;   // TODO: ADD IN CONSTRUCTOR
 
     constructor(make: Make, model: Model, fuelType: FuelType, gearBoxType: GearBoxType, bodyStyle: BodyStyle,
         mileageInKm: number, kidsSeats: number, availableTracking: boolean, id?: number) {

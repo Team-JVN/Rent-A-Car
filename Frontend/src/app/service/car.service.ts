@@ -51,5 +51,7 @@ export class CarService {
         return this.httpClient.delete(this.url + '/' + id);
     }
 
-
+    public getCarsForStatistics(filter: string) {
+        return this.httpClient.get(this.url + "/statistics/" + filter);
+    }
 }

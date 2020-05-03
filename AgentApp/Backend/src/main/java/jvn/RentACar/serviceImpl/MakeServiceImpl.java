@@ -66,7 +66,6 @@ public class MakeServiceImpl implements MakeService {
 
     private Make isEditable(Long id) {
         Make make = get(id);
-
         if (make.getCars().isEmpty()) {
             return make;
         }
