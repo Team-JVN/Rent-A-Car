@@ -22,7 +22,6 @@ export class TableForStatisticsComponent implements OnInit {
     private toastr: ToastrService) { }
 
   ngOnInit() {
-    this.fetchCars();
     this.fetchCarsForStatistics();
   }
 
@@ -48,20 +47,6 @@ export class TableForStatisticsComponent implements OnInit {
     if (image) {
       reader.readAsDataURL(image);
     }
-  }
-
-  fetchCars() {
-    this.carService.getCars().subscribe(
-      (data: CarWithPictures[]) => {
-        data.forEach(carWithPicturesDTO => {
-          this.getPicture(carWithPicturesDTO);
-        });
-        this.carsDataSource = new MatTableDataSource(data);
-      },
-      (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Show Cars');
-      }
-    );
   }
 
   fetchCarsForStatistics() {
