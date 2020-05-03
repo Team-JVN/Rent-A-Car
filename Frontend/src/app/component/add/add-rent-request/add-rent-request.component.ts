@@ -1,3 +1,4 @@
+import { AuthentificationService } from './../../../service/authentification.service';
 import { RentInfo } from './../../../model/rentInfo';
 import { RentRequest } from './../../../model/rentRequest';
 import { AddClientComponent } from './../add-client/add-client.component';
@@ -35,8 +36,14 @@ export class AddRentRequestComponent implements OnInit {
   successCreatedClient: Subscription;
   clients: Client[] = [];
 
-  constructor(private toastr: ToastrService, private clientService: ClientService, private rentRequestService: RentRequestService,
-    private dialogRef: MatDialogRef<AddRentRequestComponent>, private formBuilder: FormBuilder, public dialog: MatDialog,
+  constructor(
+    private toastr: ToastrService,
+    private clientService: ClientService,
+    private rentRequestService: RentRequestService,
+    private authService: AuthentificationService,
+    private dialogRef: MatDialogRef<AddRentRequestComponent>,
+    private formBuilder: FormBuilder,
+    public dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public selectedItem: Advertisement) { }
 
   ngOnInit() {
@@ -99,23 +106,44 @@ export class AddRentRequestComponent implements OnInit {
     if (!this.selectedItem.cdw) {
       cdw = null;
     }
-    const rentInfo = new RentInfo(dateTimeFrom, dateTimeTo, this.informationForm.value.pickUpPoint, cdw, this.selectedItem);
-    var rentInfos = [];
-    rentInfos.push(rentInfo);
-    const rentRequest = new RentRequest(this.clientForm.value.client, rentInfos);
+    const newRentInfo = new RentInfo(dateTimeFrom, dateTimeTo, this.informationForm.value.pickUpPoint, cdw, this.selectedItem);
 
-    this.rentRequestService.create(rentRequest).subscribe(
-      (data: RentRequest) => {
-        this.clientForm.reset();
-        this.informationForm.reset();
-        this.dialogRef.close();
-        this.toastr.success('Success.', 'Create Rent Request');
-        this.rentRequestService.createSuccessEmitter.next(data);
-      },
-      (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Create Rent Request');
-      }
-    );
+    if (this.authService.isAgent()) {
+      var rentInfos = [];
+      rentInfos.push(newRentInfo);
+      const rentRequest = new RentRequest(this.clientForm.value.client, rentInfos);
+
+      this.rentRequestService.create(rentRequest).subscribe(
+        (data: RentRequest) => {
+          this.clientForm.reset();
+          this.informationForm.reset();
+          this.dialogRef.close();
+          this.toastr.success('Success.', 'Create Rent Request');
+          this.rentRequestService.createSuccessEmitter.next(data);
+        },
+        (httpErrorResponse: HttpErrorResponse) => {
+          this.toastr.error(httpErrorResponse.error.message, 'Create Rent Request');
+        }
+      );
+    } else if (this.authService.isClient()) {
+      let rentInfos: RentInfo[] = JSON.parse(localStorage.getItem("rentInfos") || "[]");
+      rentInfos.push(newRentInfo);
+      localStorage.setItem("rentInfos", JSON.stringify(rentInfos));
+      this.clientForm.reset();
+      this.informationForm.reset();
+      this.dialogRef.close();
+      this.toastr.success('Successfully added to cart!', 'Create Rent Request');
+    }
+    // TODO: DELETE WHEN RENTING CART IS DONE
+    else {
+      let rentInfos: RentInfo[] = JSON.parse(localStorage.getItem("rentInfos") || "[]");
+      rentInfos.push(newRentInfo);
+      localStorage.setItem("rentInfos", JSON.stringify(rentInfos));
+      this.clientForm.reset();
+      this.informationForm.reset();
+      this.dialogRef.close();
+      this.toastr.success('Successfully added to cart!', 'Create Rent Request');
+    }
   }
 
   openAddClient() {

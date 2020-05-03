@@ -1,0 +1,83 @@
+<mat-card>
+    <mat-card-content>
+        <div class="row">
+            <div class="col-9">
+                <h2>Renting Cart</h2>
+            </div>
+            <div class="col-3" align="end">
+                <button mat-button color="warn" (click)="emptyCart()">
+                    <mat-icon>remove_shopping_cart</mat-icon>
+                    Empty Cart
+                </button>
+            </div>
+        </div>
+        <br />
+        <table mat-table [dataSource]="rentInfosDataSource" class="car-list-table">
+            <ng-container matColumnDef="rentInfo">
+                <td mat-cell *matCellDef="let element">
+                    <mat-card class="item-card" (click)="viewDetails(element)">
+                        <div class="image-div">
+                            <img [src]="element.image" *ngIf="!element.isImageLoading; else noImageFound" class="image">
+                        </div>
+                        <div>
+                            <mat-card-header class="car-card-header">
+                                <mat-card-title class="car-card-title">{{element.advertisement.car.make.name}}
+                                    {{element.advertisement.car.model.name}}
+                                </mat-card-title>
+                                <div class="car-card-buttons">
+                                    <button mat-icon-button aria-label="Delete" color="warn" (click)="delete(element)">
+                                        <mat-icon>delete</mat-icon>
+                                    </button>
+                                </div>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <table class="table car-table">
+                                    <tbody>
+                                        <tr>
+                                            <th><span class="theader">
+                                                    <mat-icon class="mr-2">local_gas_station</mat-icon>Fuel Type:
+                                                </span></th>
+                                            <td>{{element.carDTO.fuelType.name}}</td>
+                                            <th><span class="theader">
+                                                    <mat-icon class="mr-2">speed</mat-icon>Mileage:
+                                                </span></th>
+                                            <td>{{element.carDTO.mileageInKm | number}} Km</td>
+                                        </tr>
+                                        <tr>
+                                            <th><span class="theader">
+                                                    <mat-icon class="mr-2">settings</mat-icon>Gearbox:
+                                                </span></th>
+                                            <td>{{element.carDTO.gearBoxType.name}}</td>
+                                            <th><span class="theader">
+                                                    <mat-icon class="mr-2">airline_seat_recline_normal</mat-icon>Kid's
+                                                    seats:
+                                                </span></th>
+                                            <td>{{element.carDTO.kidsSeats}}</td>
+                                        </tr>
+                                        <tr>
+                                            <th><span class="theader">
+                                                    <mat-icon class="mr-2">airport_shuttle</mat-icon>Body Style:
+                                                </span></th>
+                                            <td>{{element.carDTO.bodyStyle.name}}</td>
+                                            <th><span class="theader">
+                                                    <mat-icon class="mr-2">navigation</mat-icon>Tracking:
+                                                </span></th>
+                                            <td>
+                                                <span *ngIf="element.carDTO.availableTracking">Available</span>
+                                                <span *ngIf="!element.carDTO.availableTracking">Not Available</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </mat-card-content>
+                        </div>
+                    </mat-card>
+                </td>
+            </ng-container>
+
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+    </mat-card-content>
+
+</mat-card>

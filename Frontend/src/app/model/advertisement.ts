@@ -7,8 +7,11 @@ export class Advertisement {
     kilometresLimit: number;
     discount: number;
     cdw: boolean;
+    pickUpPoint: string;   // TODO: ADD IN CONSTRUCTOR
     dateFrom: string;
+    dateTo: string;   // TODO: ADD IN CONSTRUCTOR
     active: boolean;
+
     constructor(car: Car, priceList: PriceList, discount: number, kilometresLimit: number, cdw: boolean, dateFrom: string, active?: boolean, id?: number) {
         this.id = id;
         this.car = car;

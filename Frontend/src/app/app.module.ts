@@ -63,6 +63,7 @@ import { ReviewFeedbackComponent } from './component/review-feedback/review-feed
 import { ListClientRentRequestsComponent } from './component/list/list-client-rent-requests/list-client-rent-requests.component';
 import { ClientRentRequestDetailsComponent } from './component/details/client-rent-request-details/client-rent-request-details.component';
 import { LeaveFeedbackComponent } from './component/add/leave-feedback/leave-feedback.component';
+import { RentingCartComponent } from './component/renting-cart/renting-cart.component';
 
 
 @NgModule({
@@ -119,6 +120,7 @@ import { LeaveFeedbackComponent } from './component/add/leave-feedback/leave-fee
     ListClientRentRequestsComponent,
     ClientRentRequestDetailsComponent,
     LeaveFeedbackComponent,
+    RentingCartComponent,
   ],
   imports: [
     BrowserModule,
