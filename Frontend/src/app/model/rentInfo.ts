@@ -1,5 +1,4 @@
 import { AdvertisementWithPictures } from 'src/app/model/advertisementWithPictures';
-import { Advertisement } from './advertisement';
 
 export class RentInfo {
     id: number;

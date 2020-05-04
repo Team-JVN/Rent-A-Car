@@ -41,6 +41,12 @@
 }
 
 .date-err {
-margin-top: .66667em;
-font-size: 80%;
+    margin-top: .66667em;
+    font-size: 80%;
+}
+
+.item-card {
+    width: 100%;
+    background-color: #F5F5F5;    
+    margin: 0.7em auto;
 }

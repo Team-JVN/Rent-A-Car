@@ -44,7 +44,7 @@ export class ViewPicturesComponent implements OnInit {
 
   fetchPictures() {
     this.selectedCar.pictures.forEach(element => {
-      let imgUrl = this.url + '/' + this.selectedCar.id + '/picture?fileName=' + element;
+      let imgUrl = this.url + '/' + this.selectedCar.id + '/picture?fileName=' + element.data;
       this.galleryImages.push({ small: imgUrl, medium: imgUrl });
     });
   }

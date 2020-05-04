@@ -1,10 +1,25 @@
 mat-card {
-    max-width: 1000px;
+    max-width: 950px;
     margin: 2em auto;
 }
 
-.buttons-width {
-    width: 105px;
+mat-card-content {
+    margin-left: 16px;
+    margin-right: 16px;
+    margin-bottom: 0;
+}
+
+mat-card-header mat-card-title {
+    font-size: 24px;
+    font-weight: 550;
+}
+
+.at {
+    font-weight: 550;
+}
+
+.car-data {
+    width: 100%;
 }
 
 td.mat-cell{
@@ -15,13 +30,26 @@ th.mat-header-cell{
     border-bottom-style: none;
 }
 
-.car-table tr {
+.rent-info-list-table td.mat-cell:first-of-type{
+    padding-left: 8px;
+}
+
+.rent-info-list-table td.mat-cell:last-of-type{
+    padding-right: 8px;
+}
+
+.rent-info-div {
+    width: 100%;
+}
+
+.rent-info-table tr {
     border-bottom: 1px solid #ddd;
 }
 
-.car-table th, .table td {
-    font-size: 16px;
+.rent-info-table th, .table td {
+    font-size: 15px;
     vertical-align: bottom;
+    padding: 0.6rem;
 }
 
 .theader {
@@ -35,7 +63,13 @@ th.mat-header-cell{
     display: inline-flex;
     background-color: #F5F5F5;    
     margin: 0.7em auto;
-    align-items: center;
+    align-items: center;    
+    transition: all 0.1s ease-in-out;
+}
+
+.item-card:hover {
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
 }
 
 .image {
@@ -52,32 +86,29 @@ th.mat-header-cell{
     align-items: center;
 }
 
-.image-div:hover {
-    cursor: pointer;
-    opacity: 0.8;
-}
-
-.car-card-header{
+.rent-info-card-header{
     display:inline-block;
     width:100%;
     vertical-align: middle;
 }
 
-.car-card-title{
+.rent-info-card-title{
     float: left;
 }
 
-.car-card-buttons{
-    float:right;
-    margin-top: -6px;
+.rent-info-card-buttons{
+    float: right;
+    margin-top: -3px;
 }
 
-mat-card-content {
-    margin-left: 16px;
-    margin-bottom: 0;
+.status-filter {    
+    font-size: 110%;
 }
 
-mat-card-header mat-card-title {
-    font-size: 24px;
-    font-weight: 550;
+.filter-span {
+    margin-right: 20px;
+}
+
+.select-owner {
+    width: 300px;
 }

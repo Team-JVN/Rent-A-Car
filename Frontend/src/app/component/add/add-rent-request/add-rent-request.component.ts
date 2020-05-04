@@ -1,3 +1,4 @@
+import { UserInfo } from './../../../model/userInfo';
 import { AdvertisementWithPictures } from './../../../model/advertisementWithPictures';
 import { AuthentificationService } from './../../../service/authentification.service';
 import { RentInfo } from './../../../model/rentInfo';
@@ -60,7 +61,6 @@ export class AddRentRequestComponent implements OnInit {
       timeFrom: new FormControl(null, [Validators.required]),
       dateTo: new FormControl(null, [Validators.required]),
       timeTo: new FormControl(null, [Validators.required]),
-      pickUpPoint: new FormControl(null, Validators.required),
       optedForCDW: new FormControl(null)
     }, {
       validator: [DateValidator]
@@ -137,22 +137,14 @@ export class AddRentRequestComponent implements OnInit {
     }
     // TODO: DELETE WHEN RENTING CART IS DONE
     else {
-      var rentInfos = [];
+      let rentInfos: RentInfo[] = JSON.parse(localStorage.getItem("rentInfos") || "[]");
+      newRentInfo.advertisement.car.owner = new UserInfo('vlasnik@maildorop.cc', 'Vlasnik (OBRISI POSLE)');
       rentInfos.push(newRentInfo);
-      const rentRequest = new RentRequest(this.clientForm.value.client, rentInfos);
-
-      this.rentRequestService.create(rentRequest).subscribe(
-        (data: RentRequest) => {
-          this.clientForm.reset();
-          this.informationForm.reset();
-          this.dialogRef.close();
-          this.toastr.success('Success.', 'Create Rent Request');
-          this.rentRequestService.createSuccessEmitter.next(data);
-        },
-        (httpErrorResponse: HttpErrorResponse) => {
-          this.toastr.error(httpErrorResponse.error.message, 'Create Rent Request');
-        }
-      );
+      localStorage.setItem("rentInfos", JSON.stringify(rentInfos));
+      this.clientForm.reset();
+      this.informationForm.reset();
+      this.dialogRef.close();
+      this.toastr.success('Successfully added to cart!', 'Create Rent Request');
     }
   }
 

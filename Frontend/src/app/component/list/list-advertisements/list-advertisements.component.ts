@@ -70,7 +70,7 @@ export class ListAdvertisementsComponent implements OnInit {
     this.carService.getPicture(adWithPicturesDTO.car.pictures[0].data, adWithPicturesDTO.car.id).subscribe(
       (data) => {
         this.createImageFromBlob(data, adWithPicturesDTO);
-        adWithPicturesDTO.isImageLoading = false;
+        adWithPicturesDTO.car.isImageLoading = false;
       },
       (httpErrorResponse: HttpErrorResponse) => {
         this.toastr.error(httpErrorResponse.error.message, 'Get picture');
@@ -81,7 +81,7 @@ export class ListAdvertisementsComponent implements OnInit {
   createImageFromBlob(image: Blob, adWithPicturesDTO: AdvertisementWithPictures) {
     let reader = new FileReader();
     reader.addEventListener("load", () => {
-      adWithPicturesDTO.image = reader.result;
+      adWithPicturesDTO.car.image = reader.result;
     }, false);
 
     if (image) {
