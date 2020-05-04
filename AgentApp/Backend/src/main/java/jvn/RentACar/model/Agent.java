@@ -20,7 +20,7 @@ public class Agent extends User {
     private String taxIdNumber;
 
     public Agent(String name, String email, String password, String address, String taxIdNumber) {
-        super(null, name, email, password, address, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
+        super(null, name, email, password, address, true, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
         this.taxIdNumber = taxIdNumber;
     }
 }

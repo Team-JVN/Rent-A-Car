@@ -43,10 +43,11 @@ public class CarServiceImpl implements CarService {
 
     private MakeService makeService;
 
+    private UserService userService;
+
     @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public Car create(Car car, List<MultipartFile> multipartFiles) {
-        //TODO: Set owner.
         if (multipartFiles.size() > 5) {
             throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
         }
@@ -55,6 +56,7 @@ public class CarServiceImpl implements CarService {
                 throw new InvalidCarDataException("Picture exceeds maximum size of 2MB.", HttpStatus.PAYLOAD_TOO_LARGE);
             }
         }
+        car.setOwner(userService.getLoginAgent());
         car.setMake(makeService.get(car.getMake().getId()));
         car.setModel(modelService.get(car.getModel().getId(), car.getMake().getId()));
         car.setBodyStyle(bodyStyleService.get(car.getBodyStyle().getId()));
@@ -80,10 +82,12 @@ public class CarServiceImpl implements CarService {
     @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public Car editAll(Long id, CarDTO carDTO, List<MultipartFile> multipartFiles) {
+
         if (multipartFiles.size() > 5) {
             throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
         }
         Car car = get(id);
+        checkOwner(car);
         Set<Advertisement> advertisements = get(id).getAdvertisements();
         if (advertisements != null && !advertisements.isEmpty()) {
             throw new InvalidCarDataException("Car is in use and therefore can not be edited.", HttpStatus.FORBIDDEN);
@@ -108,6 +112,7 @@ public class CarServiceImpl implements CarService {
             throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
         }
         Car car = get(id);
+        checkOwner(car);
         for (Advertisement advertisement : get(id).getAdvertisements()) {
             if (advertisement.getLogicalStatus().equals(LogicalStatus.EXISTING) && !advertisement.getRentInfos().isEmpty()) {
                 throw new InvalidCarDataException("Car is in use and therefore can not be edited.", HttpStatus.FORBIDDEN);
@@ -124,7 +129,7 @@ public class CarServiceImpl implements CarService {
     @Override
     public void delete(Long id) {
         Car car = get(id);
-
+        checkOwner(car);
         if (carRepository.findByIdAndAdvertisementsLogicalStatusAndAdvertisementsDateToGreaterThanEqual(id, LogicalStatus.EXISTING, LocalDate.now()) != null) {
             throw new InvalidCarDataException("Car is in use and therefore can not be deleted.", HttpStatus.FORBIDDEN);
         }
@@ -154,10 +159,17 @@ public class CarServiceImpl implements CarService {
         return car;
     }
 
+    private void checkOwner(Car car) {
+        if (!userService.getLoginAgent().getEmail().equals(car.getOwner().getEmail())) {
+            throw new InvalidCarDataException("You are not owner of this car.", HttpStatus.FORBIDDEN);
+        }
+    }
+
     @Autowired
     public CarServiceImpl(CarRepository carRepository, BodyStyleService bodyStyleService,
                           FuelTypeService fuelTypeService, GearboxTypeService gearboxTypeService,
-                          PictureService pictureService, CarDtoMapper carMapper, ModelService modelService, MakeService makeService) {
+                          PictureService pictureService, CarDtoMapper carMapper, ModelService modelService, MakeService makeService,
+                          UserService userService) {
         this.carRepository = carRepository;
         this.bodyStyleService = bodyStyleService;
         this.fuelTypeService = fuelTypeService;
@@ -166,5 +178,6 @@ public class CarServiceImpl implements CarService {
         this.carMapper = carMapper;
         this.modelService = modelService;
         this.makeService = makeService;
+        this.userService = userService;
     }
 }

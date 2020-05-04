@@ -1,8 +1,10 @@
 package jvn.RentACar.controller;
 
 import jvn.RentACar.dto.both.AdvertisementDTO;
+import jvn.RentACar.dto.request.AdvertisementEditDTO;
 import jvn.RentACar.dto.request.CreateAdvertisementDTO;
 import jvn.RentACar.dto.response.AdvertisementWithPicturesDTO;
+import jvn.RentACar.enumeration.EditType;
 import jvn.RentACar.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.RentACar.mapper.AdvertisementDtoMapper;
 import jvn.RentACar.mapper.AdvertisementWithPicturesDtoMapper;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -32,6 +35,7 @@ public class AdvertisementController {
     private AdvertisementWithPicturesDtoMapper adWithPicturesDtoMapper;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<AdvertisementDTO> create(@Valid @RequestBody CreateAdvertisementDTO createAdvertisementDTO) {
         try {
             return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.create(createAdvertisementDtoMapper.toEntity(createAdvertisementDTO))),
@@ -42,6 +46,7 @@ public class AdvertisementController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<AdvertisementDTO> edit(@PathVariable Long id, @Valid @RequestBody AdvertisementWithPicturesDTO advertisementDTO) {
         try {
             return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.edit(id, adWithPicturesDtoMapper.toEntity(advertisementDTO))), HttpStatus.OK);
@@ -50,7 +55,20 @@ public class AdvertisementController {
         }
     }
 
+    @PutMapping(value = "/{id}/partial", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('AGENT')")
+    public ResponseEntity<AdvertisementDTO> editPartial(@PathVariable Long id, @Valid @RequestBody AdvertisementEditDTO advertisementDTO) {
+        return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.editPartial(id, advertisementDTO)), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{id}/edit", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('AGENT')")
+    public ResponseEntity<EditType> getEditType(@PathVariable Long id) {
+        return new ResponseEntity<>(advertisementService.getEditType(id), HttpStatus.OK);
+    }
+
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         advertisementService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

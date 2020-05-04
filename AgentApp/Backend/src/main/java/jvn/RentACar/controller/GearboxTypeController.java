@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -23,6 +24,7 @@ public class GearboxTypeController {
     private GearboxTypeDtoMapper gearboxTypeDtoMapper;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<GearboxTypeDTO> create(@Valid @RequestBody CreateGearboxTypeDTO createGearBoxTypeDTO) {
         return new ResponseEntity<>(gearboxTypeDtoMapper.toDto(gearBoxTypeService.create(createGearBoxTypeDTO)), HttpStatus.CREATED);
     }
@@ -35,11 +37,13 @@ public class GearboxTypeController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<GearboxTypeDTO> edit(@PathVariable Long id, @Valid @RequestBody GearboxTypeDTO gearBoxTypeDTO) {
         return new ResponseEntity<>(gearboxTypeDtoMapper.toDto(gearBoxTypeService.edit(id, gearBoxTypeDTO)), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         gearBoxTypeService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

@@ -5,7 +5,7 @@ import { User } from './../model/user';
 import { environment } from './../../environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { LoggedInUser } from '../model/loggedInUser';
 import { Router } from '@angular/router';
 import { RegistrationClient } from '../model/registrationClient';
@@ -18,17 +18,23 @@ export class AuthentificationService {
   url = environment.baseUrl + environment.auth;
   access_token = null;
   loggedInUserSubject: BehaviorSubject<LoggedInUser>;
+  loggedInUser: Observable<LoggedInUser>;
 
-  constructor(private httpClient: HttpClient, private router: Router) { }
+  constructor(private httpClient: HttpClient, private router: Router) {
+    this.loggedInUserSubject = new BehaviorSubject<LoggedInUser>(JSON.parse(localStorage.getItem('LoggedInUser')));
+    this.loggedInUser = this.loggedInUserSubject.asObservable();
+  }
 
 
   login(user: User) {
     return this.httpClient.post(this.url + "/login", user).pipe(map((res: LoggedInUser) => {
       this.access_token = res.userTokenState.accessToken;
+      console.log(res)
       localStorage.setItem('LoggedInUser', JSON.stringify(res));
       this.loggedInUserSubject.next(res);
     }));
   }
+
 
   register(client: RegistrationClient) {
     return this.httpClient.post(this.url, client);
@@ -53,20 +59,21 @@ export class AuthentificationService {
   }
 
   isAdmin() {
+    console.log(this.loggedInUserSubject.value)
     if (this.isLoggedIn()) {
-      return this.loggedInUserSubject.value.role === "ADMIN";
+      return this.loggedInUserSubject.value.role === "ROLE_ADMIN";
     }
   }
 
   isAgent() {
     if (this.isLoggedIn()) {
-      return this.loggedInUserSubject.value.role === "AGENT";
+      return this.loggedInUserSubject.value.role === "ROLE_AGENT";
     }
   }
 
   isClient() {
     if (this.isLoggedIn()) {
-      return this.loggedInUserSubject.value.role === "CLIENT";
+      return this.loggedInUserSubject.value.role === "ROLE_CLIENT";
     }
   }
 }

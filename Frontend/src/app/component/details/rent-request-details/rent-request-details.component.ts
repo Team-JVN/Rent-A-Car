@@ -1,4 +1,4 @@
-import { AdvertisementWithPicturesDTO } from 'src/app/model/advertisementWithPictures';
+import { AdvertisementWithPictures } from 'src/app/model/advertisementWithPictures';
 import { CarWithPictures } from './../../../model/carWithPictures';
 import { UserInfo } from 'src/app/model/userInfo';
 
@@ -43,7 +43,7 @@ export class RentRequestDetailsComponent implements OnInit {
   make = new Make("Opel", 1);
   model = new Model("Poze", 2);
   car = new CarWithPictures(this.make, this.model, new FuelType("fuel"), new GearBoxType("gear"), null, 1000, 2, true, null);
-  advestisement = new AdvertisementWithPicturesDTO(this.car, new PriceList(1, 2, 2), 20, 2500, true, "Bg", "2020-05-05");
+  advestisement = new AdvertisementWithPictures(this.car, new PriceList(1, 2, 2), 20, 2500, true, "Bg", "2020-05-05");
   rentInfo = new RentInfo("2020-04-04", "2020-04-04", true, this.advestisement, 1);
   rentInfos = [new RentInfo("2020-04-04", "2020-04-04", true, this.advestisement, 2),
   new RentInfo("2020-05-05", "2020-05-05", true, this.advestisement)];

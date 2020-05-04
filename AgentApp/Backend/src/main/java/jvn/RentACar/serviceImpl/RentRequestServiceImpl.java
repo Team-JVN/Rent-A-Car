@@ -7,10 +7,7 @@ import jvn.RentACar.model.PriceList;
 import jvn.RentACar.model.RentInfo;
 import jvn.RentACar.model.RentRequest;
 import jvn.RentACar.repository.RentRequestRepository;
-import jvn.RentACar.service.AdvertisementService;
-import jvn.RentACar.service.ClientService;
-import jvn.RentACar.service.RentInfoService;
-import jvn.RentACar.service.RentRequestService;
+import jvn.RentACar.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
@@ -35,13 +33,14 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     private RentInfoService rentInfoService;
 
+    private UserService userService;
+
     @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public RentRequest create(RentRequest rentRequest) {
         // TODO: You need to refuse all other requests
         rentRequest.setClient(clientService.get(rentRequest.getClient().getId()));
-        //TODO:Set rentrequeststatus
-        //TODO:Set createdByUser
+        rentRequest.setCreatedBy(userService.getLoginAgent());
         rentRequest.setRentRequestStatus(RentRequestStatus.PAID);
         rentRequest.setTotalPrice(0.0);
         Set<RentInfo> rentInfos = rentRequest.getRentInfos();
@@ -71,8 +70,8 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     @Override
     public void delete(Long id) {
-        //TODO: Samo korisnik koji je kreirao zahtev moze da ga obrise!
         RentRequest rentRequest = get(id);
+        checkCreator(rentRequest);
         if (rentRequest.getRentRequestStatus().equals(RentRequestStatus.PAID)) {
             throw new InvalidRentRequestDataException("This rent request is PAID so you can not delete it.",
                     HttpStatus.FORBIDDEN);
@@ -80,8 +79,15 @@ public class RentRequestServiceImpl implements RentRequestService {
         rentRequest.setClient(null);
         Set<RentInfo> rentInfos = rentRequest.getRentInfos();
         rentRequest.setRentInfos(new HashSet<>());
+        rentRequest.setCreatedBy(null);
         rentInfoService.delete(rentInfos);
         rentRequestRepository.deleteById(id);
+    }
+
+    private void checkCreator(RentRequest rentRequest) {
+        if (!userService.getLoginAgent().getEmail().equals(rentRequest.getCreatedBy().getEmail())) {
+            throw new InvalidRentRequestDataException("This rent request is not yours so you cann't delete it.", HttpStatus.FORBIDDEN);
+        }
     }
 
     private double setRentInfosData(RentRequest rentRequest, Set<RentInfo> rentInfos, Boolean activeAdvertisement) {
@@ -124,6 +130,8 @@ public class RentRequestServiceImpl implements RentRequestService {
                         HttpStatus.FORBIDDEN);
             }
         }
+        rentInfoDateTimeFrom = LocalDateTime.of(rentInfoDateFrom.minusDays(1), LocalTime.of(23, 59));
+        rentInfoDateTimeTo = LocalDateTime.of(rentInfoDateTo.plusDays(1), LocalTime.of(00, 00));
         if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqual(RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeFrom).isEmpty()) {
             throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
                     HttpStatus.FORBIDDEN);
@@ -167,11 +175,12 @@ public class RentRequestServiceImpl implements RentRequestService {
     }
 
     @Autowired
-    public RentRequestServiceImpl(ClientService clientService, AdvertisementService advertisementService,
+    public RentRequestServiceImpl(ClientService clientService, AdvertisementService advertisementService, UserService userService,
                                   RentRequestRepository rentRequestRepository, RentInfoService rentInfoService) {
         this.clientService = clientService;
         this.advertisementService = advertisementService;
         this.rentRequestRepository = rentRequestRepository;
         this.rentInfoService = rentInfoService;
+        this.userService = userService;
     }
 }

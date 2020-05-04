@@ -18,6 +18,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,6 +49,7 @@ public class CarController {
     private MakeService makeService;
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<CarDTO> create(@RequestParam("carData") String jsonString, @RequestParam("files") List<MultipartFile> multipartFiles) throws ParseException {
 
         ObjectMapper mapper = new ObjectMapper();
@@ -75,17 +77,20 @@ public class CarController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         carService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping(value = "/{id}/edit", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<EditType> getEditType(@PathVariable Long id) {
         return new ResponseEntity<>(carService.getEditType(id), HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<CarDTO> editAll(@PathVariable Long id, @RequestParam("carData") String jsonString, @RequestParam("files")
             List<MultipartFile> multipartFiles) throws ParseException {
 
@@ -102,6 +107,7 @@ public class CarController {
     }
 
     @PutMapping(value = "/{id}/partial", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<CarDTO> editPartial(@PathVariable Long id, @RequestParam("carData") String jsonString, @RequestParam("files")
             List<MultipartFile> multipartFiles) throws ParseException {
         ObjectMapper mapper = new ObjectMapper();

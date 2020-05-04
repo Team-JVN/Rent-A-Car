@@ -117,15 +117,6 @@
                         </tr>
                         <tr>
                             <td class="form-full-width-left">
-                                <mat-form-field class="form-full-width-95">
-                                    <input matInput placeholder="Pick-up Point" formControlName="pickUpPoint">
-                                    <mat-error
-                                        *ngIf="informationForm.get('pickUpPoint').errors && informationForm.get('pickUpPoint').errors['required']">
-                                        Please enter Pick-up Point.
-                                    </mat-error>
-                                </mat-form-field>
-                            </td>
-                            <td class="form-full-width-right">
                                 <div *ngIf="this.selectedItem.cdw">
                                     <mat-checkbox formControlName="optedForCDW" class="form-full-width">
                                         Include Collision Damage Waiver

@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { User } from './../../../model/user';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
@@ -14,7 +15,7 @@ export class LoginComponent implements OnInit {
   loginForm: FormGroup;
 
   constructor(private toastr: ToastrService, private authentificationService: AuthentificationService,
-    private formBuilder: FormBuilder) { }
+    private formBuilder: FormBuilder, private router: Router) { }
 
   ngOnInit() {
     this.loginForm = this.formBuilder.group({
@@ -31,13 +32,22 @@ export class LoginComponent implements OnInit {
         this.redirectToHomePage();
       },
       (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Create Body Style');
+        this.toastr.error(httpErrorResponse.error.message, 'Login');
       }
     );
   }
 
   redirectToHomePage() {
-
+    if (this.authentificationService.isAgent()) {
+      console.log("AGENT HAJ")
+      this.router.navigate(['']);
+    } else if (this.authentificationService.isClient()) {
+      this.router.navigate(['/search-advertisements']);
+    } else if (this.authentificationService.isAdmin()) {
+      this.router.navigate(['']);
+    } else {
+      this.authentificationService.logout();
+    }
   }
 
 

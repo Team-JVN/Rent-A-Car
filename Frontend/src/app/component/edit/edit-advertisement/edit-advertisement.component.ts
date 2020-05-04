@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import { AdvertisementWithPicturesDTO } from './../../../model/advertisementWithPictures';
+import { AdvertisementWithPictures } from './../../../model/advertisementWithPictures';
 import { AddPriceListComponent } from './../../add/add-price-list/add-price-list.component';
 import { AddCarComponent } from './../../add/add-car/add-car.component';
 import { PriceList } from './../../../model/priceList';
@@ -33,7 +33,7 @@ export class EditAdvertisementComponent implements OnInit {
   successCreatedList: Subscription;
 
   constructor(private toastr: ToastrService, private carService: CarService, private priceListService: PriceListService, private advertisementService: AdvertisementService,
-    private dialogRef: MatDialogRef<EditAdvertisementComponent>, @Inject(MAT_DIALOG_DATA) public selectedItem: AdvertisementWithPicturesDTO,
+    private dialogRef: MatDialogRef<EditAdvertisementComponent>, @Inject(MAT_DIALOG_DATA) public selectedItem: AdvertisementWithPictures,
     private formBuilder: FormBuilder, public dialog: MatDialog) { }
 
   ngOnInit() {
