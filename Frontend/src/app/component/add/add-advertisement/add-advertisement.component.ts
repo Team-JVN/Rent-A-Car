@@ -1,4 +1,4 @@
-import { AdvertisementWithPicturesDTO } from 'src/app/model/advertisementWithPictures';
+import { AdvertisementWithPictures } from 'src/app/model/advertisementWithPictures';
 import { Advertisement } from './../../../model/advertisement';
 import { AddPriceListComponent } from './../add-price-list/add-price-list.component';
 import { PriceList } from './../../../model/priceList';
@@ -120,7 +120,7 @@ export class AddAdvertisementComponent implements OnInit {
       cdw = false;
     }
 
-    const advertisement = new AdvertisementWithPicturesDTO(this.carForm.value.car, this.priceListForm.value.priceList,
+    const advertisement = new AdvertisementWithPictures(this.carForm.value.car, this.priceListForm.value.priceList,
       this.dateForm.value.discount, this.dateForm.value.kilometresLimit, cdw, this.dateForm.value.pickUpPoint, validFrom);
 
     this.advertisementService.create(advertisement).subscribe(

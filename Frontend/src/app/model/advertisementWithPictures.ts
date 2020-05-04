@@ -1,7 +1,7 @@
 import { PriceList } from './priceList';
 import { CarWithPictures } from 'src/app/model/carWithPictures';
 
-export class AdvertisementWithPicturesDTO {
+export class AdvertisementWithPictures {
     id: number;
     car: CarWithPictures;
     priceList: PriceList;

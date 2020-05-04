@@ -1,4 +1,4 @@
-import { AdvertisementWithPicturesDTO } from './../../../model/advertisementWithPictures';
+import { AdvertisementWithPictures } from './../../../model/advertisementWithPictures';
 import { AuthentificationService } from './../../../service/authentification.service';
 import { RentInfo } from './../../../model/rentInfo';
 import { RentRequest } from './../../../model/rentRequest';
@@ -45,7 +45,7 @@ export class AddRentRequestComponent implements OnInit {
     private dialogRef: MatDialogRef<AddRentRequestComponent>,
     private formBuilder: FormBuilder,
     public dialog: MatDialog,
-    @Inject(MAT_DIALOG_DATA) public selectedItem: AdvertisementWithPicturesDTO) { }
+    @Inject(MAT_DIALOG_DATA) public selectedItem: AdvertisementWithPictures) { }
 
   ngOnInit() {
     if (this.minDate < new Date(this.selectedItem.dateFrom)) {

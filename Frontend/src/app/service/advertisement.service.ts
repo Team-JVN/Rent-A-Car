@@ -1,4 +1,4 @@
-import { AdvertisementWithPicturesDTO } from 'src/app/model/advertisementWithPictures';
+import { AdvertisementWithPictures } from 'src/app/model/advertisementWithPictures';
 import { Advertisement } from './../model/advertisement';
 import { environment } from './../../environments/environment';
 import { Injectable } from '@angular/core';
@@ -14,7 +14,7 @@ export class AdvertisementService {
 
   constructor(private httpClient: HttpClient) { }
 
-  public create(advertisement: AdvertisementWithPicturesDTO): any {
+  public create(advertisement: AdvertisementWithPictures): any {
     return this.httpClient.post(this.url, advertisement);
   }
 
