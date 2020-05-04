@@ -36,19 +36,10 @@ export class RentRequestDetailsComponent implements OnInit {
   messageForm: FormGroup;
 
   rentRequestId: number;
-  // rentRequest: RentRequest;
+  rentRequest: RentRequest;
   loggedInUserEmail: string;
 
   messages: Message[];
-  make = new Make("Opel", 1);
-  model = new Model("Poze", 2);
-  car = new CarWithPictures(this.make, this.model, new FuelType("fuel"), new GearBoxType("gear"), null, 1000, 2, true, null);
-  advestisement = new AdvertisementWithPictures(this.car, new PriceList(1, 2, 2), 20, 2500, true, "Bg", "2020-05-05");
-  rentInfo = new RentInfo("2020-04-04", "2020-04-04", true, this.advestisement, 1);
-  rentInfos = [new RentInfo("2020-04-04", "2020-04-04", true, this.advestisement, 2),
-  new RentInfo("2020-05-05", "2020-05-05", true, this.advestisement)];
-
-  rentRequest = new RentRequest(new Client("Pera", "pera@uns.ac.rs", "Beograd", "066666666"), this.rentInfos, 200, "PAID");
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -66,20 +57,20 @@ export class RentRequestDetailsComponent implements OnInit {
     this.messageForm = this.formBuilder.group({
       text: new FormControl(null, Validators.required)
     })
-    // this.activatedRoute.params.subscribe((params: Params) => {
-    //   this.rentRequestId = params['id'];
-    //   this.rentRequestService.get(this.rentRequestId).subscribe(
-    //     (data: RentRequest) => {
-    //       this.rentRequest = data;
-    //     },
-    //     (httpErrorResponse: HttpErrorResponse) => {
-    //       this.toastr.error(httpErrorResponse.error.message, 'Rent Request Details');
-    //       this.location.back();
-    //     }
-    //   )
-    // });
-    // this.loggedInUserEmail = this.authentificationService.getLoggedInUser().email;
-    //this.getMessages();
+    this.activatedRoute.params.subscribe((params: Params) => {
+      this.rentRequestId = params['id'];
+      this.rentRequestService.get(this.rentRequestId).subscribe(
+        (data: RentRequest) => {
+          this.rentRequest = data;
+        },
+        (httpErrorResponse: HttpErrorResponse) => {
+          this.toastr.error(httpErrorResponse.error.message, 'Rent Request Details');
+          this.location.back();
+        }
+      )
+    });
+    this.loggedInUserEmail = this.authentificationService.getLoggedInUser().email;
+    this.getMessages();
 
     //Delete this
     this.messages = [new Message("Cao sta radi,kako si, da li si dorbo.Kako su tvoji. sta radis", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 1), new Message("Kako si", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 2),
@@ -112,12 +103,19 @@ export class RentRequestDetailsComponent implements OnInit {
 
   checkIfCanCreateComment(rentInfo: RentInfo) {
     const dateTimeTo = new Date(rentInfo.dateTimeTo.substring(0, 10));
-    if (this.rentRequest.rentRequestStatus == 'PAID' && dateTimeTo <= new Date()) {
+    if (this.rentRequest.rentRequestStatus == 'PAID' && dateTimeTo < new Date()) {
       return true;
     }
     return false;
   }
 
+  checkIfCanCreateReport(rentInfo: RentInfo) {
+    const dateTimeTo = new Date(rentInfo.dateTimeTo.substring(0, 10));
+    if (this.rentRequest.rentRequestStatus == 'PAID' && dateTimeTo < new Date()) {
+      return true;
+    }
+    return false;
+  }
   getMessages() {
     this.messageService.getMessages(this.rentRequest.client).subscribe(
       (data: Message[]) => {

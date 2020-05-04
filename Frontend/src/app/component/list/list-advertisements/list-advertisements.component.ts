@@ -1,3 +1,4 @@
+import { element } from 'protractor';
 import { EditAdvertisementPartialComponent } from './../../edit/edit-advertisement-partial/edit-advertisement-partial.component';
 import { DateTime } from 'luxon';
 import { RentRequestService } from 'src/app/service/rent-request.service';
@@ -141,5 +142,9 @@ export class ListAdvertisementsComponent implements OnInit {
       return true;
     }
     return false;
+  }
+
+  viewRentRequests(element: AdvertisementWithPictures) {
+    this.router.navigate(['/rent-requests/' + element.id]);
   }
 }

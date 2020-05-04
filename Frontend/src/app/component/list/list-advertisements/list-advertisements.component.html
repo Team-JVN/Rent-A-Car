@@ -32,6 +32,10 @@
                                     {{element.car.model.name}}
                                 </mat-card-title>
                                 <div class="advertisement-card-buttons">
+                                    <button mat-icon-button aria-label="View rent requests"
+                                        matTooltip="View Rent Requests" (click)="viewRentRequests(element)">
+                                        <mat-icon>assignment</mat-icon>
+                                    </button>
                                     <button mat-icon-button aria-label="Edit" color="primary"
                                         (click)="edit(element);$event.stopPropagation()">
                                         <mat-icon>edit</mat-icon>

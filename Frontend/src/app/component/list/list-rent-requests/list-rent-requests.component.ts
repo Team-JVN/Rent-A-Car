@@ -1,3 +1,5 @@
+import { element } from 'protractor';
+import { AdvertisementService } from 'src/app/service/advertisement.service';
 import { AdvertisementWithPictures } from 'src/app/model/advertisementWithPictures';
 import { CarWithPictures } from 'src/app/model/carWithPictures';
 import { GearBoxType } from './../../../model/gearboxType';
@@ -10,7 +12,7 @@ import { RentRequest } from './../../../model/rentRequest';
 import { Component, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { Subscription } from 'rxjs';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -37,15 +39,22 @@ export class ListRentRequestsComponent implements OnInit {
   rentRequestsDataSource: MatTableDataSource<RentRequest>;
   createSuccess: Subscription;
   status: string = "all";
+  advertisementId: number;
 
   constructor(
+    private activatedRoute: ActivatedRoute,
     public router: Router,
     public dialog: MatDialog,
+    private advertisementService: AdvertisementService,
     private rentRequestService: RentRequestService,
     private toastr: ToastrService
   ) { }
 
   ngOnInit() {
+    this.activatedRoute.params.subscribe((params: Params) => {
+      this.advertisementId = params['id'];
+      this.fetchRentRequests('all');
+    });
     this.fetchRentRequests('all');
     this.createSuccess = this.rentRequestService.createSuccessEmitter.subscribe(
       () => {
@@ -55,7 +64,7 @@ export class ListRentRequestsComponent implements OnInit {
   }
 
   fetchRentRequests(status: string) {
-    this.rentRequestService.getRentRequests(status).subscribe(
+    this.advertisementService.getRentRequests(this.advertisementId, status).subscribe(
       (data: RentRequest[]) => {
         this.rentRequestsDataSource = new MatTableDataSource(data);
       },
@@ -91,5 +100,29 @@ export class ListRentRequestsComponent implements OnInit {
 
   viewDetails(element: RentRequest) {
     this.router.navigate(['/rent-request/' + element.id]);
+  }
+
+  accept(element: RentRequest) {
+    this.rentRequestService.accept(element).subscribe(
+      () => {
+        this.fetchRentRequests(this.status);
+        this.toastr.success('Successfully accepted Rent Request!', 'Accept Rent Request');
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Accept Rent Request');
+      }
+    );
+  }
+
+  reject(element: RentRequest) {
+    this.rentRequestService.reject(element).subscribe(
+      () => {
+        this.fetchRentRequests(this.status);
+        this.toastr.success('Successfully canceled Rent Request!', 'Cancel Rent Request');
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Cancel Rent Request');
+      }
+    );
   }
 }

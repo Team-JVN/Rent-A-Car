@@ -2,10 +2,7 @@ package jvn.RentACar.serviceImpl;
 
 import jvn.RentACar.enumeration.RentRequestStatus;
 import jvn.RentACar.exceptionHandler.InvalidRentRequestDataException;
-import jvn.RentACar.model.Advertisement;
-import jvn.RentACar.model.PriceList;
-import jvn.RentACar.model.RentInfo;
-import jvn.RentACar.model.RentRequest;
+import jvn.RentACar.model.*;
 import jvn.RentACar.repository.RentRequestRepository;
 import jvn.RentACar.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,11 +49,24 @@ public class RentRequestServiceImpl implements RentRequestService {
     }
 
     @Override
-    public List<RentRequest> get(String status) {
+    public List<RentRequest> getMine(String status) {
+        User loggedInUser = userService.getLoginAgent();
         if (status.equals("all")) {
-            return rentRequestRepository.findAll();
+            return rentRequestRepository.findByClientEmail(loggedInUser.getEmail());
         }
-        return rentRequestRepository.findByRentRequestStatus(getRentRequestStatus(status));
+        return rentRequestRepository.findByClientEmailAndRentRequestStatus(loggedInUser.getEmail(), getRentRequestStatus(status));
+    }
+
+    @Override
+    public List<RentRequest> get(Long advertisementId, String status) {
+        Advertisement advertisement = advertisementService.get(advertisementId);
+        if (!userService.getLoginAgent().getEmail().equals(advertisement.getCar().getOwner().getEmail())) {
+            throw new InvalidRentRequestDataException("This rent request is not yours.", HttpStatus.FORBIDDEN);
+        }
+        if (status.equals("all")) {
+            return rentRequestRepository.findByRentInfosAdvertisementId(advertisementId);
+        }
+        return rentRequestRepository.findByRentInfosAdvertisementIdAndRentRequestStatus(advertisementId, getRentRequestStatus(status));
     }
 
     @Override

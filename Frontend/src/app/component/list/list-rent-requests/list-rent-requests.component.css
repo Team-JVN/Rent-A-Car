@@ -9,11 +9,10 @@ mat-card {
 
 .element-detail {
     overflow: hidden;
-    display: flex;
 }
 
 .item-card {
-    width: 100%;
+    width: 99%;
     background-color: #F5F5F5;    
     margin: 0.7em auto;
 }
@@ -80,7 +79,7 @@ tr.element-row:not(.expanded-row):active {
 }
 
 .buttons-width {
-    width: 105px;
+    width: 200px;
 }
 
 .status-filter {    

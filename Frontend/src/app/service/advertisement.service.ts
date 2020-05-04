@@ -39,6 +39,9 @@ export class AdvertisementService {
     return this.httpClient.get(this.url + "/" + id);
   }
 
+  public getRentRequests(advertisementId: number, status: string) {
+    return this.httpClient.get(this.url + "/" + advertisementId + "/rent-requests/" + status);
+  }
   public delete(id: number): any {
     return this.httpClient.delete(this.url + '/' + id);
   }

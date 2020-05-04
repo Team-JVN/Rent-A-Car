@@ -7,7 +7,9 @@ import java.util.List;
 public interface RentRequestService {
     RentRequest create(RentRequest rentRequestDTO);
 
-    List<RentRequest> get(String status);
+    List<RentRequest> getMine(String status);
+
+    List<RentRequest> get(Long advertisementId, String status);
 
     RentRequest get(Long id);
 

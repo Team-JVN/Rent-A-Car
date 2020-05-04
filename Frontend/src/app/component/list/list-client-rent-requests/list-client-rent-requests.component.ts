@@ -50,17 +50,7 @@ export class ListClientRentRequestsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    const data1: RentRequest[] = []
-    const make = new Make("Opel", 1);
-    const model = new Model("Poze");
-    const car = new CarWithPictures(make, model, new FuelType("fuel"), new GearBoxType("gear"), null, 1000, 2, true, null);
-    const advestisement = new AdvertisementWithPictures(car, new PriceList(1, 2, 2), 20, 2500, true, "Bg", "2020-05-05");
-    const rentInfo = new RentInfo("2020-05-05", "2020-05-05", true, advestisement);
-    const rentInfos = [];
-    rentInfos.push(rentInfo)
-    data1.push(new RentRequest(new Client("pera", "pera@uns.ac.rs", "Beograd", "066666666"), rentInfos, 200, "PAID"))
-    this.rentRequestsDataSource = new MatTableDataSource(data1);
-    //   this.fetchRentRequests('all');
+    this.fetchRentRequests('all');
     this.createSuccess = this.rentRequestService.createSuccessEmitter.subscribe(
       () => {
         this.fetchRentRequests(this.status)
@@ -94,6 +84,17 @@ export class ListClientRentRequestsComponent implements OnInit {
     );
   }
 
+  cancel(element: RentRequest) {
+    this.rentRequestService.cancel(element.id).subscribe(
+      () => {
+        this.fetchRentRequests(this.status);
+        this.toastr.success('Successfully canceled Rent Request!', 'Cancel Rent Request');
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Cancel Rent Request');
+      }
+    );
+  }
   advertisementDetails(rentInfo: RentInfo) {
     this.router.navigate(['/advertisement/' + rentInfo.advertisement.id]);
   }

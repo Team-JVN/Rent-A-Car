@@ -35,11 +35,16 @@ public class RentRequestController {
         }
     }
 
-    @GetMapping("/{status}")
-    public ResponseEntity<List<RentRequestDTO>> get(@PathVariable(value = "status", required = false) String status) {
-        List<RentRequestDTO> list = rentRequestService.get(status).stream().map(rentRequestDtoMapper::toDto).
+    @GetMapping("/{status}/mine")
+    public ResponseEntity<List<RentRequestDTO>> getMine(@PathVariable(value = "status") String status) {
+        List<RentRequestDTO> list = rentRequestService.getMine(status).stream().map(rentRequestDtoMapper::toDto).
                 collect(Collectors.toList());
         return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<RentRequestDTO> get(@PathVariable Long id) {
+        return new ResponseEntity<>(rentRequestDtoMapper.toDto(rentRequestService.get(id)), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

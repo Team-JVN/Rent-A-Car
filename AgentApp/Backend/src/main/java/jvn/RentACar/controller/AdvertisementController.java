@@ -1,6 +1,7 @@
 package jvn.RentACar.controller;
 
 import jvn.RentACar.dto.both.AdvertisementDTO;
+import jvn.RentACar.dto.both.RentRequestDTO;
 import jvn.RentACar.dto.request.AdvertisementEditDTO;
 import jvn.RentACar.dto.request.CreateAdvertisementDTO;
 import jvn.RentACar.dto.response.AdvertisementWithPicturesDTO;
@@ -9,7 +10,9 @@ import jvn.RentACar.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.RentACar.mapper.AdvertisementDtoMapper;
 import jvn.RentACar.mapper.AdvertisementWithPicturesDtoMapper;
 import jvn.RentACar.mapper.CreateAdvertisementDtoMapper;
+import jvn.RentACar.mapper.RentRequestDtoMapper;
 import jvn.RentACar.service.AdvertisementService;
+import jvn.RentACar.service.RentRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,6 +36,10 @@ public class AdvertisementController {
     private AdvertisementDtoMapper advertisementDtoMapper;
 
     private AdvertisementWithPicturesDtoMapper adWithPicturesDtoMapper;
+
+    private RentRequestService rentRequestService;
+
+    private RentRequestDtoMapper rentRequestDtoMapper;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('AGENT')")
@@ -81,6 +88,14 @@ public class AdvertisementController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
+    @GetMapping("/{advertisementId}/rent-requests/{status}")
+    public ResponseEntity<List<RentRequestDTO>> getRentRequests(@PathVariable(value = "advertisementId", required = false) Long advertisementId,
+                                                                @PathVariable(value = "status", required = false) String status) {
+        List<RentRequestDTO> list = rentRequestService.get(advertisementId, status).stream().map(rentRequestDtoMapper::toDto).
+                collect(Collectors.toList());
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<AdvertisementWithPicturesDTO> get(@PathVariable Long id) {
         return new ResponseEntity<>(adWithPicturesDtoMapper.toDto(advertisementService.get(id)), HttpStatus.OK);
@@ -88,10 +103,13 @@ public class AdvertisementController {
 
     @Autowired
     public AdvertisementController(AdvertisementService advertisementService, CreateAdvertisementDtoMapper createAdvertisementDtoMapper,
-                                   AdvertisementDtoMapper advertisementDtoMapper, AdvertisementWithPicturesDtoMapper adWithPicturesDtoMapper) {
+                                   AdvertisementDtoMapper advertisementDtoMapper, AdvertisementWithPicturesDtoMapper adWithPicturesDtoMapper,
+                                   RentRequestDtoMapper rentRequestDtoMapper, RentRequestService rentRequestService) {
         this.advertisementService = advertisementService;
         this.createAdvertisementDtoMapper = createAdvertisementDtoMapper;
         this.advertisementDtoMapper = advertisementDtoMapper;
         this.adWithPicturesDtoMapper = adWithPicturesDtoMapper;
+        this.rentRequestDtoMapper = rentRequestDtoMapper;
+        this.rentRequestService = rentRequestService;
     }
 }

@@ -24,12 +24,20 @@ export class RentRequestService {
     return this.httpClient.put(this.url + '/' + rentRequest.id, rentRequest);
   }
 
+  public accept(rentRequest: RentRequest): any {
+    return this.httpClient.put(this.url + '/' + rentRequest.id, { status: "PAID" });
+  }
+
+  public reject(rentRequest: RentRequest): any {
+    return this.httpClient.put(this.url + '/' + rentRequest.id, { status: "CANCELED" });
+  }
+
   public getRentRequests(status: string) {
-    return this.httpClient.get(this.url + '/' + status);
+    return this.httpClient.get(this.url + '/all/' + status);
   }
 
   public getClientRentRequests(status: string) {
-    return this.httpClient.get(this.url + '/client/' + status);
+    return this.httpClient.get(this.url + '/' + status + '/mine');
   }
 
   public get(id: number) {
@@ -38,6 +46,10 @@ export class RentRequestService {
 
   public delete(id: number): any {
     return this.httpClient.delete(this.url + '/' + id);
+  }
+
+  public cancel(id: number): any {
+    return this.httpClient.put(this.url + '/' + id, { status: "CANCELED" });
   }
 
   public getRentInfoFeedback(rentInfoId: number) {

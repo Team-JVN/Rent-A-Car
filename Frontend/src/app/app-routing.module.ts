@@ -58,7 +58,7 @@ const routes: Routes = [
     component: ListClientsComponent,
   },
   {
-    path: 'rent-requests',
+    path: 'rent-requests/:id',
     component: ListRentRequestsComponent,
   },
   {
