@@ -6,7 +6,6 @@ import { AddClientComponent } from './../add-client/add-client.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Client } from './../../../model/client';
 import { Subscription } from 'rxjs';
-import { Advertisement } from './../../../model/advertisement';
 import { MatDialogRef, MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ClientService } from './../../../service/client.service';
 import { ToastrService } from 'ngx-toastr';
@@ -133,25 +132,6 @@ export class AddRentRequestComponent implements OnInit {
       this.informationForm.reset();
       this.dialogRef.close();
       this.toastr.success('Successfully added to cart!', 'Create Rent Request');
-    }
-    // TODO: DELETE WHEN RENTING CART IS DONE
-    else {
-      var rentInfos = [];
-      rentInfos.push(newRentInfo);
-      const rentRequest = new RentRequest(this.clientForm.value.client, rentInfos);
-
-      this.rentRequestService.create(rentRequest).subscribe(
-        (data: RentRequest) => {
-          this.clientForm.reset();
-          this.informationForm.reset();
-          this.dialogRef.close();
-          this.toastr.success('Success.', 'Create Rent Request');
-          this.rentRequestService.createSuccessEmitter.next(data);
-        },
-        (httpErrorResponse: HttpErrorResponse) => {
-          this.toastr.error(httpErrorResponse.error.message, 'Create Rent Request');
-        }
-      );
     }
   }
 

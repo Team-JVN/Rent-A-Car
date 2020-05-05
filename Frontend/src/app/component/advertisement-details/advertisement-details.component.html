@@ -99,7 +99,7 @@
                                 <span *ngIf="selectedAdWithPictures.kilometresLimit">
                                     {{selectedAdWithPictures.kilometresLimit}} Km &nbsp;
                                     <span class="per-km">
-                                        ({{selectedAdWithPictures.priceList.pricePerKm}} € per
+                                        ({{selectedAdWithPictures.priceList.pricePerKm | number: '1.2-2'}} € per
                                         Km)</span>
                                 </span>
                                 <span *ngIf="!selectedAdWithPictures.kilometresLimit">Unlimited</span>
@@ -112,13 +112,13 @@
                                 </span></th>
                             <td>
                                 <span *ngIf="selectedAdWithPictures.cdw">
-                                    {{selectedAdWithPictures.priceList.priceForCDW}} €</span>
+                                    {{selectedAdWithPictures.priceList.priceForCDW | number: '1.2-2'}} €</span>
                                 <span *ngIf="!selectedAdWithPictures.cdw">Not Available</span>
                             </td>
                         </tr>
                         <tr *ngIf="selectedAdWithPictures.discount && selectedAdWithPictures.discount > 0">
                             <th><span class="theader">
-                                    <mat-icon class="mr-2">money_off</mat-icon>30+ days Rent
+                                    <mat-icon class="mr-2">money_off</mat-icon>30+ Days Rent
                                     Discount:
                                 </span></th>
                             <td>{{selectedAdWithPictures.discount}} %</td>
@@ -133,7 +133,7 @@
                     </tr>
                     <tr>
                         <td class="price-text">
-                            {{selectedAdWithPictures.priceList.pricePerDay}} €</td>
+                            {{selectedAdWithPictures.priceList.pricePerDay | number: '1.2-2'}} €</td>
                     </tr>
                     <tr><button *ngIf="checkIfCanRentAdvertisement(selectedAdWithPictures)" mat-raised-button
                             color="primary" class="rent-btn" (click)="rent(selectedAdWithPictures)">Rent me!</button>

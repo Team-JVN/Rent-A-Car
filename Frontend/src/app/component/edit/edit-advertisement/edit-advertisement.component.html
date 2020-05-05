@@ -86,9 +86,11 @@
                             <mat-label>Choose existing price list</mat-label>
                             <mat-select formControlName="priceList">
                                 <mat-option *ngFor="let priceList of priceLists" [value]="priceList">
-                                    <span>Per day: {{priceList.pricePerDay}} €</span>
-                                    <span *ngIf="priceList.pricePerKm"> — Per Km: {{priceList.pricePerKm}} €</span>
-                                    <span *ngIf="priceList.priceForCDW"> — For CDW: {{priceList.priceForCDW}} €</span>
+                                    <span>Per day: {{priceList.pricePerDay | number: '1.2-2'}} €</span>
+                                    <span *ngIf="priceList.pricePerKm"> — Per Km:
+                                        {{priceList.pricePerKm | number: '1.2-2'}} €</span>
+                                    <span *ngIf="priceList.priceForCDW"> — For CDW:
+                                        {{priceList.priceForCDW | number: '1.2-2'}} €</span>
                                 </mat-option>
                             </mat-select>
                         </mat-form-field>

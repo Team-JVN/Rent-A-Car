@@ -1,18 +1,9 @@
-import { AdvertisementWithPictures } from 'src/app/model/advertisementWithPictures';
-import { CarWithPictures } from './../../../model/carWithPictures';
 import { UserInfo } from 'src/app/model/userInfo';
-
 import { MatDialog } from '@angular/material/dialog';
-import { Feedback } from './../../../model/feedback';
 import { MessageService } from './../../../service/message.service';
 import { Message } from './../../../model/message';
 import { AuthentificationService } from './../../../service/authentification.service';
-import { LoggedInUser } from './../../../model/loggedInUser';
 import { RentInfo } from './../../../model/rentInfo';
-import { Advertisement } from './../../../model/advertisement';
-import { Car } from 'src/app/model/car';
-import { Model } from './../../../model/model';
-import { Make } from './../../../model/make';
 import { RentRequestService } from './../../../service/rent-request.service';
 import { RentRequest } from './../../../model/rentRequest';
 import { Component, OnInit } from '@angular/core';
@@ -20,10 +11,6 @@ import { ActivatedRoute, Router, Params } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Location } from '@angular/common';
-import { FuelType } from 'src/app/model/fuelType';
-import { GearBoxType } from 'src/app/model/gearboxType';
-import { Client } from 'src/app/model/client';
-import { PriceList } from 'src/app/model/priceList';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { ReviewFeedbackComponent } from '../../review-feedback/review-feedback.component';
 

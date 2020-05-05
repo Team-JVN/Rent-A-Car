@@ -47,13 +47,18 @@ th.mat-header-cell{
     padding-right: 8px;
 }
 
+.advertisement-div {
+    width: 100%;
+}
+
 .advertisement-table tr {
     border-bottom: 1px solid #ddd;
 }
 
 .advertisement-table th, .table td {
-    font-size: 16px;
+    font-size: 15px;
     vertical-align: bottom;
+    padding: 0.6rem;
 }
 
 .theader {
@@ -100,9 +105,10 @@ th.mat-header-cell{
     float: left;
 }
 
-.advertisement-card-buttons{
+.rating{
     float:right;
     margin-top: -9px;
+    margin-right: 10px;
 }
 
 .per-km {
@@ -122,8 +128,7 @@ th.mat-header-cell{
 
 .price-table {
     text-align: center;
-    margin-left: 25px;
-    margin-top: 10px;
+    width: 290px;
 }
 
 .rent-btn {

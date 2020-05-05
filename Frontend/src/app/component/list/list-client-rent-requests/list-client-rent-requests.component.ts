@@ -1,15 +1,6 @@
-import { AdvertisementWithPictures } from 'src/app/model/advertisementWithPictures';
-import { CarWithPictures } from 'src/app/model/carWithPictures';
-import { LeaveFeedbackComponent } from './../../add/leave-feedback/leave-feedback.component';
-import { Car } from 'src/app/model/car';
-import { BodyStyle } from './../../../model/bodystyle';
-import { GearBoxType } from './../../../model/gearboxType';
-import { FuelType } from './../../../model/fuelType';
-import { Model } from './../../../model/model';
-import { Make } from 'src/app/model/make';
-import { Advertisement } from './../../../model/advertisement';
-import { element } from 'protractor';
 import { RentInfo } from './../../../model/rentInfo';
+
+import { LeaveFeedbackComponent } from './../../add/leave-feedback/leave-feedback.component';
 import { RentRequestService } from 'src/app/service/rent-request.service';
 import { RentRequest } from './../../../model/rentRequest';
 import { Component, OnInit } from '@angular/core';
@@ -20,8 +11,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
 import { trigger, state, transition, style, animate } from '@angular/animations';
-import { PriceList } from 'src/app/model/priceList';
-import { Client } from 'src/app/model/client';
 @Component({
   selector: 'app-list-client-rent-requests',
   templateUrl: './list-client-rent-requests.component.html',

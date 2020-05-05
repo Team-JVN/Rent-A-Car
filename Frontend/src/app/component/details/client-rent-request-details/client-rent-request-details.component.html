@@ -75,16 +75,11 @@
     </div>
     <div class="col-4">
         <div *ngIf="rentRequest.rentRequestStatus == 'PAID'">
-
-            <!-- <mat-card class="message-card">
-                <mat-card-content> -->
             <div class="chat-page">
                 <div class="chat-box">
                     <app-view-messages [messages]="messages" [client]="rentRequest.client"></app-view-messages>
                 </div>
             </div>
-            <!-- </mat-card-content>
-            </mat-card> -->
         </div>
     </div>
 

@@ -1,11 +1,4 @@
-import { element } from 'protractor';
 import { AdvertisementService } from 'src/app/service/advertisement.service';
-import { AdvertisementWithPictures } from 'src/app/model/advertisementWithPictures';
-import { CarWithPictures } from 'src/app/model/carWithPictures';
-import { GearBoxType } from './../../../model/gearboxType';
-import { FuelType } from './../../../model/fuelType';
-import { Model } from './../../../model/model';
-import { Make } from 'src/app/model/make';
 import { RentInfo } from './../../../model/rentInfo';
 import { RentRequestService } from 'src/app/service/rent-request.service';
 import { RentRequest } from './../../../model/rentRequest';
@@ -17,8 +10,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
 import { trigger, state, transition, style, animate } from '@angular/animations';
-import { PriceList } from 'src/app/model/priceList';
-import { Client } from 'src/app/model/client';
 
 @Component({
   selector: 'app-list-rent-requests',

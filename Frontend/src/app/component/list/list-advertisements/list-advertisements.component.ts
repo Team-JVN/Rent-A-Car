@@ -72,7 +72,7 @@ export class ListAdvertisementsComponent implements OnInit {
     this.carService.getPicture(adWithPicturesDTO.car.pictures[0].data, adWithPicturesDTO.car.id).subscribe(
       (data) => {
         this.createImageFromBlob(data, adWithPicturesDTO);
-        adWithPicturesDTO.isImageLoading = false;
+        adWithPicturesDTO.car.isImageLoading = false;
       },
       (httpErrorResponse: HttpErrorResponse) => {
         this.toastr.error(httpErrorResponse.error.message, 'Get picture');
@@ -83,7 +83,7 @@ export class ListAdvertisementsComponent implements OnInit {
   createImageFromBlob(image: Blob, adWithPicturesDTO: AdvertisementWithPictures) {
     let reader = new FileReader();
     reader.addEventListener("load", () => {
-      adWithPicturesDTO.image = reader.result;
+      adWithPicturesDTO.car.image = reader.result;
     }, false);
 
     if (image) {
@@ -94,7 +94,6 @@ export class ListAdvertisementsComponent implements OnInit {
   openDialog() {
     this.dialog.open(AddAdvertisementComponent);
   }
-
 
   edit(element: AdvertisementWithPictures) {
     this.advertisementService.getEditType(element.id).subscribe(
@@ -109,9 +108,7 @@ export class ListAdvertisementsComponent implements OnInit {
         this.toastr.error(httpErrorResponse.error.message, 'Get edit type');
       }
     );
-
   }
-
 
   delete(element: AdvertisementWithPictures) {
     this.advertisementService.delete(element.id).subscribe(
