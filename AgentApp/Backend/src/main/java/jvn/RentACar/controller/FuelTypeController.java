@@ -30,6 +30,7 @@ public class FuelTypeController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<List<FuelTypeDTO>> get() {
         List<FuelTypeDTO> list = fuelTypeService.get().stream().map(fuelTypeDtoMapper::toDto).
                 collect(Collectors.toList());

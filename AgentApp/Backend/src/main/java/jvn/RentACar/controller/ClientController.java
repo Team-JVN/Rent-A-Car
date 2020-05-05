@@ -29,6 +29,7 @@ public class ClientController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<List<ClientDTO>> get() {
         List<ClientDTO> list = clientService.get().stream().map(clientDtoMapper::toDto).
                 collect(Collectors.toList());

@@ -27,6 +27,11 @@
                 <td mat-cell *matCellDef="let element"> {{element.totalPrice}}</td>
             </ng-container>
 
+            <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+                <td mat-cell *matCellDef="let element"> {{element.rentRequestStatus | titlecase}}</td>
+            </ng-container>
+
             <ng-container matColumnDef="buttons">
                 <th mat-header-cell *matHeaderCellDef class="buttons-width">&nbsp;</th>
                 <td mat-cell *matCellDef="let element">
@@ -34,12 +39,12 @@
                         (click)="viewDetails(element)">
                         <mat-icon>open_in_new</mat-icon>
                     </button>
-                    <button mat-icon-button aria-label="Cancel" *ngIf="element.rentRequestStatus == 'PENDING'"
-                        color="warn" (click)="cancel(element)">
+                    <button mat-icon-button aria-label="Cancel" matTooltip="Cancel"
+                        *ngIf="element.rentRequestStatus == 'PENDING'" color="warn" (click)="cancel(element)">
                         <mat-icon>cancel</mat-icon>
                     </button>
-                    <button mat-icon-button aria-label="Delete" *ngIf="element.rentRequestStatus != 'PAID'" color="warn"
-                        (click)="delete(element)">
+                    <button mat-icon-button aria-label="Delete" matTooltip="Delete"
+                        *ngIf="element.rentRequestStatus != 'PAID'" color="warn" (click)="delete(element)">
                         <mat-icon>delete</mat-icon>
                     </button>
                 </td>

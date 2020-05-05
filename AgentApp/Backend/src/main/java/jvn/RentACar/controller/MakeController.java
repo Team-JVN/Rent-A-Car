@@ -35,6 +35,7 @@ public class MakeController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<List<MakeDTO>> get() {
         List<MakeDTO> list = makeService.get().stream().map(makeDtoMapper::toDto).
                 collect(Collectors.toList());
@@ -61,6 +62,7 @@ public class MakeController {
     }
 
     @GetMapping("/{makeId}/models")
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<List<ModelDTO>> getModels(@PathVariable Long makeId) {
         List<ModelDTO> list = modelService.getAll(makeId).stream().map(modelDtoMapper::toDto).
                 collect(Collectors.toList());

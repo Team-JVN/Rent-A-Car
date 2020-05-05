@@ -82,6 +82,7 @@ public class AdvertisementController {
     }
 
     @GetMapping("/all/{status}")
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<List<AdvertisementWithPicturesDTO>> getAll(@PathVariable(value = "status", required = false) String status) {
         List<AdvertisementWithPicturesDTO> list = advertisementService.getAll(status).stream().map(adWithPicturesDtoMapper::toDto).
                 collect(Collectors.toList());
@@ -89,6 +90,7 @@ public class AdvertisementController {
     }
 
     @GetMapping("/{advertisementId}/rent-requests/{status}")
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<List<RentRequestDTO>> getRentRequests(@PathVariable(value = "advertisementId", required = false) Long advertisementId,
                                                                 @PathVariable(value = "status", required = false) String status) {
         List<RentRequestDTO> list = rentRequestService.get(advertisementId, status).stream().map(rentRequestDtoMapper::toDto).

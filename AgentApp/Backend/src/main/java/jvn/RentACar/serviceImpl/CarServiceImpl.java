@@ -56,7 +56,7 @@ public class CarServiceImpl implements CarService {
                 throw new InvalidCarDataException("Picture exceeds maximum size of 2MB.", HttpStatus.PAYLOAD_TOO_LARGE);
             }
         }
-        car.setOwner(userService.getLoginAgent());
+        car.setOwner(userService.getLoginUser());
         car.setMake(makeService.get(car.getMake().getId()));
         car.setModel(modelService.get(car.getModel().getId(), car.getMake().getId()));
         car.setBodyStyle(bodyStyleService.get(car.getBodyStyle().getId()));

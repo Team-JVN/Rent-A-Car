@@ -28,6 +28,7 @@ public class PriceListController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<List<PriceListDTO>> getAll() {
         List<PriceListDTO> list = priceListService.getAll().stream().map(priceListDtoMapper::toDto).
                 collect(Collectors.toList());

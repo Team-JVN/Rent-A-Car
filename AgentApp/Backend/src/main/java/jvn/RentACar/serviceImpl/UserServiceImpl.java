@@ -131,6 +131,12 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         return (Agent) userRepository.findByEmail(currentUser.getName());
     }
 
+    @Override
+    public User getLoginUser() {
+        Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
+        return userRepository.findByEmail(currentUser.getName());
+    }
+
     @Autowired
     public UserServiceImpl(UserRepository userRepository, TokenUtils tokenUtils, AuthenticationManager authenticationManager,
                            AuthorityRepository authorityRepository, PasswordEncoder passwordEncoder) {

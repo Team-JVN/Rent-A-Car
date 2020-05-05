@@ -30,6 +30,7 @@ public class BodyStyleController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<List<BodyStyleDTO>> get() {
         List<BodyStyleDTO> list = bodyStyleService.get().stream().map(bodyStyleDtoMapper::toDto).
                 collect(Collectors.toList());

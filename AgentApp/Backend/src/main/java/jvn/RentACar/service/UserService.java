@@ -20,4 +20,6 @@ public interface UserService {
     void changePassword(ChangePasswordDTO changePasswordDTO) throws NullPointerException;
 
     Agent getLoginAgent();
+
+    User getLoginUser();
 }

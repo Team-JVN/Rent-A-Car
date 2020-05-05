@@ -30,6 +30,7 @@ public class GearboxTypeController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<List<GearboxTypeDTO>> get() {
         List<GearboxTypeDTO> list = gearBoxTypeService.get().stream().map(gearboxTypeDtoMapper::toDto).
                 collect(Collectors.toList());

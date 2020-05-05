@@ -1,6 +1,7 @@
 package jvn.RentACar.controller;
 
 import jvn.RentACar.dto.both.RentRequestDTO;
+import jvn.RentACar.dto.request.RentRequestStatusDTO;
 import jvn.RentACar.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.RentACar.mapper.RentRequestDtoMapper;
 import jvn.RentACar.service.RentRequestService;
@@ -25,7 +26,7 @@ public class RentRequestController {
     private RentRequestDtoMapper rentRequestDtoMapper;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('AGENT')")
+    @PreAuthorize("hasAnyRole('AGENT','CLIENT')")
     public ResponseEntity<RentRequestDTO> create(@Valid @RequestBody RentRequestDTO rentRequestDTO) {
         try {
             return new ResponseEntity<>(rentRequestDtoMapper.toDto(rentRequestService.create(rentRequestDtoMapper.toEntity(rentRequestDTO))),
@@ -36,6 +37,7 @@ public class RentRequestController {
     }
 
     @GetMapping("/{status}/mine")
+    @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<List<RentRequestDTO>> getMine(@PathVariable(value = "status") String status) {
         List<RentRequestDTO> list = rentRequestService.getMine(status).stream().map(rentRequestDtoMapper::toDto).
                 collect(Collectors.toList());
@@ -48,11 +50,17 @@ public class RentRequestController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         rentRequestService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAnyRole('AGENT','CLIENT')")
+    public ResponseEntity<RentRequestDTO> changeRentRequestStatus(@PathVariable Long id, @Valid @RequestBody RentRequestStatusDTO status) {
+        return new ResponseEntity<>(rentRequestDtoMapper.toDto(rentRequestService.changeRentRequestStatus(id, status)), HttpStatus.OK);
+    }
 
     @Autowired
     public RentRequestController(RentRequestService rentRequestService, RentRequestDtoMapper rentRequestDtoMapper) {
