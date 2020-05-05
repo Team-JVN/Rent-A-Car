@@ -14,7 +14,6 @@ public class RentRequestDTO {
 
     private Long id;
 
-    @NotNull(message = "Client is null.")
     private ClientDTO client;
 
     @NotNull(message = "Set of rent info is null.")

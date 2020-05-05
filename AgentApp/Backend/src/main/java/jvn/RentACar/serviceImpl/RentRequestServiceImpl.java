@@ -36,21 +36,31 @@ public class RentRequestServiceImpl implements RentRequestService {
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public RentRequest create(RentRequest rentRequest) {
         // TODO: You need to refuse all other requests
-        rentRequest.setClient(clientService.get(rentRequest.getClient().getId()));
-        rentRequest.setCreatedBy(userService.getLoginAgent());
-        rentRequest.setRentRequestStatus(RentRequestStatus.PAID);
+        User user = userService.getLoginUser();
+        if (user instanceof Agent) {
+            rentRequest.setRentRequestStatus(RentRequestStatus.PAID);
+            if (rentRequest.getClient() == null) {
+                throw new InvalidRentRequestDataException("Please choose a client.", HttpStatus.FORBIDDEN);
+            }
+            rentRequest.setClient(clientService.get(rentRequest.getClient().getId()));
+        } else if (user instanceof Client) {
+            rentRequest.setRentRequestStatus(RentRequestStatus.PENDING);
+            rentRequest.setClient((Client) user);
+        }
+
+        rentRequest.setCreatedBy(user);
         rentRequest.setTotalPrice(0.0);
         Set<RentInfo> rentInfos = rentRequest.getRentInfos();
         rentRequest.setRentInfos(new HashSet<>());
         RentRequest savedRequest = rentRequestRepository.save(rentRequest);
-        rentRequest.setTotalPrice(setRentInfosData(savedRequest, rentInfos, false));
+        rentRequest.setTotalPrice(setRentInfosData(savedRequest, rentInfos));
         savedRequest.setRentInfos(rentInfos);
         return rentRequestRepository.save(savedRequest);
     }
 
     @Override
     public List<RentRequest> getMine(String status) {
-        User loggedInUser = userService.getLoginAgent();
+        User loggedInUser = userService.getLoginUser();
         if (status.equals("all")) {
             return rentRequestRepository.findByClientEmail(loggedInUser.getEmail());
         }
@@ -95,12 +105,12 @@ public class RentRequestServiceImpl implements RentRequestService {
     }
 
     private void checkCreator(RentRequest rentRequest) {
-        if (!userService.getLoginAgent().getEmail().equals(rentRequest.getCreatedBy().getEmail())) {
-            throw new InvalidRentRequestDataException("This rent request is not yours so you cann't delete it.", HttpStatus.FORBIDDEN);
+        if (!userService.getLoginUser().getEmail().equals(rentRequest.getCreatedBy().getEmail())) {
+            throw new InvalidRentRequestDataException("This rent request is not yours so you can't delete it.", HttpStatus.FORBIDDEN);
         }
     }
 
-    private double setRentInfosData(RentRequest rentRequest, Set<RentInfo> rentInfos, Boolean activeAdvertisement) {
+    private double setRentInfosData(RentRequest rentRequest, Set<RentInfo> rentInfos) {
         double totalPrice = 0;
         for (RentInfo rentInfo : rentInfos) {
             rentInfo.setRentRequest(rentRequest);
@@ -141,7 +151,7 @@ public class RentRequestServiceImpl implements RentRequestService {
             }
         }
         rentInfoDateTimeFrom = LocalDateTime.of(rentInfoDateFrom.minusDays(1), LocalTime.of(23, 59));
-        rentInfoDateTimeTo = LocalDateTime.of(rentInfoDateTo.plusDays(1), LocalTime.of(00, 00));
+        rentInfoDateTimeTo = LocalDateTime.of(rentInfoDateTo.plusDays(1), LocalTime.of(0, 0));
         if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqual(RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeFrom).isEmpty()) {
             throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
                     HttpStatus.FORBIDDEN);
