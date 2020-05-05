@@ -7,12 +7,12 @@
                 </div>
                 <div>
                     <mat-card-header class="advertisement-card-header">
-                        <mat-card-title class="advertisement-card-title">{{element.carDTO.make.name}}
-                            {{element.carDTO.model.name}}
+                        <mat-card-title class="advertisement-card-title">{{element.make.name}}
+                            {{element.model.name}}
                         </mat-card-title>
                         <div class="advertisement-card-buttons">
                             <star-rating class="rating-style" totalstars="5" checkedcolor="#87C7F3"
-                                uncheckedcolor="black" size="30px" [(value)]="element.carDTO.avgRating" readonly="true">
+                                uncheckedcolor="black" size="30px" [(value)]="element.avgRating" readonly="true">
                             </star-rating>
                         </div>
                     </mat-card-header>
@@ -23,33 +23,33 @@
                                     <th><span class="theader">
                                             <mat-icon class="mr-2">local_gas_station</mat-icon>Fuel Type:
                                         </span></th>
-                                    <td>{{element.carDTO.fuelType.name}}</td>
+                                    <td>{{element.fuelType.name}}</td>
                                     <th><span class="theader">
                                             <mat-icon class="mr-2">speed</mat-icon>Mileage:
                                         </span></th>
-                                    <td>{{element.carDTO.mileageInKm | number}} Km</td>
+                                    <td>{{element.mileageInKm | number}} Km</td>
                                 </tr>
                                 <tr>
                                     <th><span class="theader">
                                             <mat-icon class="mr-2">settings</mat-icon>Gearbox:
                                         </span></th>
-                                    <td>{{element.carDTO.gearBoxType.name}}</td>
+                                    <td>{{element.gearBoxType.name}}</td>
                                     <th><span class="theader">
                                             <mat-icon class="mr-2">airline_seat_recline_normal</mat-icon>Kid's
                                             seats:
                                         </span></th>
-                                    <td>{{element.carDTO.kidsSeats}}</td>
+                                    <td>{{element.kidsSeats}}</td>
                                 </tr>
                                 <tr>
                                     <th><span class="theader">
                                             <mat-icon class="mr-2">airport_shuttle</mat-icon>Body Style:
                                         </span></th>
-                                    <td>{{element.carDTO.bodyStyle.name}}</td>
+                                    <td>{{element.bodyStyle.name}}</td>
                                     <th><span class="theader">
                                             <mat-icon class="mr-2">comment</mat-icon>Comments:
                                         </span></th>
                                     <td>
-                                        {{element.carDTO.commentsCount}}
+                                        {{element.commentsCount}}
                                     </td>
                                 </tr>
                             </tbody>

@@ -6,6 +6,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -22,9 +24,6 @@ public class RentInfo {
     @Column(nullable = false)
     private LocalDateTime dateTimeTo;
 
-    @Column(nullable = false)
-    private String pickUpPoint;
-
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Advertisement advertisement;
 
@@ -36,4 +35,16 @@ public class RentInfo {
 
     @OneToOne(mappedBy = "rentInfo", cascade = CascadeType.ALL)
     private RentReport rentReport;
+
+    @Column
+    private Integer rating;
+
+    @OneToMany(mappedBy = "rentInfo", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Comment> comments = new HashSet<>();
+
+    @Column
+    private Integer kilometresLimit;
+
+    @Column
+    private Double pricePerKm;
 }

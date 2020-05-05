@@ -2,7 +2,7 @@ import { NgxGalleryOptions, NgxGalleryImage, NgxGalleryAnimation } from 'ngx-gal
 import { environment } from './../../../environments/environment';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
-import { AdvertisementWithPicturesDTO } from './../../model/advertisementWithPictures';
+import { AdvertisementWithPictures } from './../../model/advertisementWithPictures';
 import { AdvertisementService } from './../../service/advertisement.service';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -17,7 +17,7 @@ import { AddRentRequestComponent } from '../add/add-rent-request/add-rent-reques
 export class AdvertisementDetailsComponent implements OnInit {
 
   advertisementId: number;
-  selectedAdWithPictures: AdvertisementWithPicturesDTO;
+  selectedAdWithPictures: AdvertisementWithPictures;
 
   url = environment.baseUrl + environment.car;
   galleryOptions: NgxGalleryOptions[] = [];
@@ -48,7 +48,7 @@ export class AdvertisementDetailsComponent implements OnInit {
     this.activatedRoute.params.subscribe((params: Params) => {
       this.advertisementId = params['id'];
       this.advertisementService.get(this.advertisementId).subscribe(
-        (data: AdvertisementWithPicturesDTO) => {
+        (data: AdvertisementWithPictures) => {
           this.selectedAdWithPictures = data;
           this.fetchPictures();
         },
@@ -60,16 +60,25 @@ export class AdvertisementDetailsComponent implements OnInit {
     });
   }
 
-  rent(element: AdvertisementWithPicturesDTO) {
-    this.dialog.open(AddRentRequestComponent, { data: element.advertisement });
+  rent(element: AdvertisementWithPictures) {
+    this.dialog.open(AddRentRequestComponent, { data: element });
 
   }
 
   fetchPictures() {
-    this.selectedAdWithPictures.pictures.forEach(element => {
-      let imgUrl = this.url + '/' + this.selectedAdWithPictures.advertisement.car.id + '/picture?fileName=' + element;
+    this.selectedAdWithPictures.car.pictures.forEach(element => {
+      let imgUrl = this.url + '/' + this.selectedAdWithPictures.car.id + '/picture?fileName=' + element.data;
       this.galleryImages.push({ small: imgUrl, medium: imgUrl });
     });
   }
 
+  checkIfCanRentAdvertisement(element: AdvertisementWithPictures): boolean {
+    if (!element.dateTo) {
+      return true;
+    }
+    if (new Date(element.dateTo) > new Date()) {
+      return true;
+    }
+    return false;
+  }
 }

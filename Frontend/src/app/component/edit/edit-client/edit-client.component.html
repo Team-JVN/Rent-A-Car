@@ -8,15 +8,6 @@
             </mat-error>
         </mat-form-field>
         <mat-form-field class="form-full-width">
-            <input matInput placeholder="Email" type="email" formControlName="email">
-            <mat-error *ngIf="editForm.get('email').errors && editForm.get('email').errors['required']">
-                Please enter email address.
-            </mat-error>
-            <mat-error *ngIf="editForm.get('email').errors && editForm.get('email').errors['email']">
-                Please enter valid email address.
-            </mat-error>
-        </mat-form-field>
-        <mat-form-field class="form-full-width">
             <input matInput placeholder="Address" formControlName="address">
             <mat-error *ngIf="editForm.get('address').errors && editForm.get('address').errors['required']">
                 Please enter address.

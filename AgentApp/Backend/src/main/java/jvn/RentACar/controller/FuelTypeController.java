@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -23,6 +24,7 @@ public class FuelTypeController {
     private FuelTypeDtoMapper fuelTypeDtoMapper;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<FuelTypeDTO> create(@Valid @RequestBody CreateFuelTypeDTO fuelTypeDTO) {
         return new ResponseEntity<>(fuelTypeDtoMapper.toDto(fuelTypeService.create(fuelTypeDTO)), HttpStatus.CREATED);
     }
@@ -35,11 +37,13 @@ public class FuelTypeController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<FuelTypeDTO> edit(@PathVariable Long id, @Valid @RequestBody FuelTypeDTO fuelTypeDTO) {
         return new ResponseEntity<>(fuelTypeDtoMapper.toDto(fuelTypeService.edit(id, fuelTypeDTO)), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         fuelTypeService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

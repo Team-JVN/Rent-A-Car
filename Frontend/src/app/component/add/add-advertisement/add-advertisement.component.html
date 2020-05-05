@@ -10,7 +10,7 @@
                             <mat-label>Choose existing car</mat-label>
                             <mat-select formControlName="car">
                                 <mat-option *ngFor="let car of cars" [value]="car">
-                                    {{car.carDTO.make.name}} {{car.carDTO.model.name}}
+                                    {{car.make.name}} {{car.model.name}}
                                 </mat-option>
                             </mat-select>
                         </mat-form-field>
@@ -24,8 +24,8 @@
                     <mat-card class="item-card">
                         <div>
                             <mat-card-header class="car-card-header">
-                                <mat-card-title class="car-card-title">{{getSelectedCar().carDTO.make.name}}
-                                    {{getSelectedCar().carDTO.model.name}}
+                                <mat-card-title class="car-card-title">{{getSelectedCar().make.name}}
+                                    {{getSelectedCar().model.name}}
                                 </mat-card-title>
                             </mat-card-header>
                             <mat-card-content>
@@ -35,34 +35,34 @@
                                             <th><span class="theader">
                                                     <mat-icon class="mr-2">local_gas_station</mat-icon>Fuel Type:
                                                 </span></th>
-                                            <td>{{getSelectedCar().carDTO.fuelType.name}}</td>
+                                            <td>{{getSelectedCar().fuelType.name}}</td>
                                             <th><span class="theader">
                                                     <mat-icon class="mr-2">speed</mat-icon>Mileage:
                                                 </span></th>
-                                            <td>{{getSelectedCar().carDTO.mileageInKm | number}} Km</td>
+                                            <td>{{getSelectedCar().mileageInKm | number}} Km</td>
                                         </tr>
                                         <tr>
                                             <th><span class="theader">
                                                     <mat-icon class="mr-2">settings</mat-icon>Gearbox:
                                                 </span></th>
-                                            <td>{{getSelectedCar().carDTO.gearBoxType.name}}</td>
+                                            <td>{{getSelectedCar().gearBoxType.name}}</td>
                                             <th><span class="theader">
                                                     <mat-icon class="mr-2">airline_seat_recline_normal</mat-icon>Kid's
                                                     seats:
                                                 </span></th>
-                                            <td>{{getSelectedCar().carDTO.kidsSeats}}</td>
+                                            <td>{{getSelectedCar().kidsSeats}}</td>
                                         </tr>
                                         <tr>
                                             <th><span class="theader">
                                                     <mat-icon class="mr-2">airport_shuttle</mat-icon>Body Style:
                                                 </span></th>
-                                            <td>{{getSelectedCar().carDTO.bodyStyle.name}}</td>
+                                            <td>{{getSelectedCar().bodyStyle.name}}</td>
                                             <th><span class="theader">
                                                     <mat-icon class="mr-2">navigation</mat-icon>Tracking:
                                                 </span></th>
                                             <td>
-                                                <span *ngIf="getSelectedCar().carDTO.availableTracking">Available</span>
-                                                <span *ngIf="!getSelectedCar().carDTO.availableTracking">Not
+                                                <span *ngIf="getSelectedCar().availableTracking">Available</span>
+                                                <span *ngIf="!getSelectedCar().availableTracking">Not
                                                     Available</span>
                                             </td>
                                         </tr>
@@ -148,6 +148,15 @@
                         <tr>
                             <td class="form-full-width-left">
                                 <mat-form-field class="form-full-width-95">
+                                    <input matInput placeholder="Pick-up Point" formControlName="pickUpPoint">
+                                    <mat-error
+                                        *ngIf="dateForm.get('pickUpPoint').errors && dateForm.get('pickUpPoint').errors['required']">
+                                        Pick-up Point is required.
+                                    </mat-error>
+                                </mat-form-field>
+                            </td>
+                            <td class="form-full-width-right">
+                                <mat-form-field class="form-full-width">
                                     <input matInput [matDatepicker]="pickerFrom" placeholder="Valid from"
                                         formControlName="validFrom" readonly [min]="minDate">
                                     <mat-datepicker-toggle matSuffix [for]="pickerFrom">
@@ -155,8 +164,10 @@
                                     <mat-datepicker #pickerFrom disabled="false"></mat-datepicker>
                                 </mat-form-field>
                             </td>
-                            <td class="form-full-width-right">
-                                <mat-form-field class="form-full-width">
+                        </tr>
+                        <tr>
+                            <td class="form-full-width-left">
+                                <mat-form-field class="form-full-width-95">
                                     <input matInput placeholder="Discount for 30+ days rent" type="number"
                                         formControlName="discount" min="0" max="99">
                                     <span matSuffix class="ml-2">%</span>
@@ -170,11 +181,9 @@
                                     </mat-error>
                                 </mat-form-field>
                             </td>
-                        </tr>
-                        <tr>
-                            <td class="form-full-width-left">
+                            <td class="form-full-width-right">
                                 <div *ngIf="getSelectedPriceList() && getSelectedPriceList().pricePerKm">
-                                    <mat-form-field class="form-full-width-95">
+                                    <mat-form-field class="form-full-width">
                                         <input matInput placeholder="Kilometres Limit" type="number"
                                             formControlName="kilometresLimit" min="0">
                                         <span matSuffix class="ml-2">Km</span>

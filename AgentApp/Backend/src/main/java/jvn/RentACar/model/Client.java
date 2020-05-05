@@ -19,5 +19,6 @@ public class Client extends User {
     private String phoneNumber;
 
     @OneToMany(mappedBy = "client", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<RentRequest> rentRequests = new HashSet<>();
+    private Set<RentRequest> clientRentRequests = new HashSet<>();
+
 }

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -24,6 +25,7 @@ public class RentRequestController {
     private RentRequestDtoMapper rentRequestDtoMapper;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<RentRequestDTO> create(@Valid @RequestBody RentRequestDTO rentRequestDTO) {
         try {
             return new ResponseEntity<>(rentRequestDtoMapper.toDto(rentRequestService.create(rentRequestDtoMapper.toEntity(rentRequestDTO))),
@@ -33,16 +35,16 @@ public class RentRequestController {
         }
     }
 
-    @GetMapping("/{status}")
-    public ResponseEntity<List<RentRequestDTO>> get(@PathVariable(value = "status", required = false) String status) {
-        List<RentRequestDTO> list = rentRequestService.get(status).stream().map(rentRequestDtoMapper::toDto).
+    @GetMapping("/{status}/mine")
+    public ResponseEntity<List<RentRequestDTO>> getMine(@PathVariable(value = "status") String status) {
+        List<RentRequestDTO> list = rentRequestService.getMine(status).stream().map(rentRequestDtoMapper::toDto).
                 collect(Collectors.toList());
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<RentRequestDTO> edit(@PathVariable Long id, @Valid @RequestBody RentRequestDTO rentRequestDTO) {
-        return new ResponseEntity<>(rentRequestDtoMapper.toDto(rentRequestService.edit(id, rentRequestDtoMapper.toEntity(rentRequestDTO))), HttpStatus.OK);
+    @GetMapping("/{id}")
+    public ResponseEntity<RentRequestDTO> get(@PathVariable Long id) {
+        return new ResponseEntity<>(rentRequestDtoMapper.toDto(rentRequestService.get(id)), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -50,6 +52,7 @@ public class RentRequestController {
         rentRequestService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
 
     @Autowired
     public RentRequestController(RentRequestService rentRequestService, RentRequestDtoMapper rentRequestDtoMapper) {

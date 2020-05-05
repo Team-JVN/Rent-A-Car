@@ -1,3 +1,5 @@
+import { AdvertisementWithPictures } from 'src/app/model/advertisementWithPictures';
+import { CarWithPictures } from 'src/app/model/carWithPictures';
 import { LeaveFeedbackComponent } from './../../add/leave-feedback/leave-feedback.component';
 import { Car } from 'src/app/model/car';
 import { BodyStyle } from './../../../model/bodystyle';
@@ -7,7 +9,6 @@ import { Model } from './../../../model/model';
 import { Make } from 'src/app/model/make';
 import { Advertisement } from './../../../model/advertisement';
 import { element } from 'protractor';
-import { EditRentRequestComponent } from './../../edit/edit-rent-request/edit-rent-request.component';
 import { RentInfo } from './../../../model/rentInfo';
 import { RentRequestService } from 'src/app/service/rent-request.service';
 import { RentRequest } from './../../../model/rentRequest';
@@ -49,17 +50,7 @@ export class ListClientRentRequestsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    const data1: RentRequest[] = []
-    const make = new Make("Opel", 1);
-    const model = new Model("Poze");
-    const car = new Car(make, model, new FuelType("fuel"), new GearBoxType("gear"), null, 1000, 2, true);
-    const advestisement = new Advertisement(car, new PriceList(1, 2, 2), 20, 2500, true, "2020-05-05", true);
-    const rentInfo = new RentInfo("2020-05-05", "2020-05-05", "Beograd", true, advestisement);
-    const rentInfos = [];
-    rentInfos.push(rentInfo)
-    data1.push(new RentRequest(new Client("pera", "pera@uns.ac.rs", "Beograd", "066666666"), rentInfos, 200, "PAID"))
-    this.rentRequestsDataSource = new MatTableDataSource(data1);
-    //   this.fetchRentRequests('all');
+    this.fetchRentRequests('all');
     this.createSuccess = this.rentRequestService.createSuccessEmitter.subscribe(
       () => {
         this.fetchRentRequests(this.status)
@@ -81,11 +72,6 @@ export class ListClientRentRequestsComponent implements OnInit {
     );
   }
 
-  edit(element: RentRequest) {
-    this.dialog.open(EditRentRequestComponent, { data: element });
-
-  }
-
   delete(element: RentRequest) {
     this.rentRequestService.delete(element.id).subscribe(
       () => {
@@ -98,6 +84,17 @@ export class ListClientRentRequestsComponent implements OnInit {
     );
   }
 
+  cancel(element: RentRequest) {
+    this.rentRequestService.cancel(element.id).subscribe(
+      () => {
+        this.fetchRentRequests(this.status);
+        this.toastr.success('Successfully canceled Rent Request!', 'Cancel Rent Request');
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Cancel Rent Request');
+      }
+    );
+  }
   advertisementDetails(rentInfo: RentInfo) {
     this.router.navigate(['/advertisement/' + rentInfo.advertisement.id]);
   }

@@ -8,7 +8,7 @@ import { BodyStyle } from './../../../model/bodystyle';
 import { GearBoxType } from './../../../model/gearboxType';
 import { FuelType } from './../../../model/fuelType';
 import { FormGroup, ValidatorFn, FormControl, FormBuilder, Validators } from '@angular/forms';
-import { AdvertisementWithPicturesDTO } from './../../../model/advertisementWithPictures';
+import { AdvertisementWithPictures } from './../../../model/advertisementWithPictures';
 import { RentRequestService } from './../../../service/rent-request.service';
 import { AddRentRequestComponent } from './../../add/add-rent-request/add-rent-request.component';
 import { Router } from '@angular/router';
@@ -38,7 +38,7 @@ const DateValidator: ValidatorFn = (fg: FormGroup) => {
 export class SearchAdvertisementsComponent implements OnInit {
 
   displayedColumns: string[] = ['advertisement'];
-  advertisementsDataSource: MatTableDataSource<AdvertisementWithPicturesDTO>;
+  advertisementsDataSource: MatTableDataSource<AdvertisementWithPictures>;
   searchForm: FormGroup;
   fuelTypes: FuelType[] = [];
   gearBoxTypes: GearBoxType[] = [];
@@ -83,7 +83,7 @@ export class SearchAdvertisementsComponent implements OnInit {
     }, {
       validator: [DateValidator]
     })
-    this.fetchAll('all');
+    this.fetchAll('active');
 
     this.fetchMakes();
     this.fetchFuelTypes();
@@ -93,14 +93,14 @@ export class SearchAdvertisementsComponent implements OnInit {
 
   fetchAll(status: string) {
     this.advertisementService.getAll(status).subscribe(
-      (data: AdvertisementWithPicturesDTO[]) => {
+      (data: AdvertisementWithPictures[]) => {
         data.forEach(adWithPicturesDTO => {
           this.getPicture(adWithPicturesDTO);
         });
         this.advertisementsDataSource = new MatTableDataSource(data);
       },
       (httpErrorResponse: HttpErrorResponse) => {
-        const data: AdvertisementWithPicturesDTO[] = []
+        const data: AdvertisementWithPictures[] = []
         this.advertisementsDataSource = new MatTableDataSource(data)
         this.toastr.error(httpErrorResponse.error.message, 'Show Advertisements');
       }
@@ -167,8 +167,8 @@ export class SearchAdvertisementsComponent implements OnInit {
     );
   }
 
-  getPicture(adWithPicturesDTO: AdvertisementWithPicturesDTO) {
-    this.carService.getPicture(adWithPicturesDTO.pictures[0], adWithPicturesDTO.advertisement.car.id).subscribe(
+  getPicture(adWithPicturesDTO: AdvertisementWithPictures) {
+    this.carService.getPicture(adWithPicturesDTO.car.pictures[0].data, adWithPicturesDTO.car.id).subscribe(
       (data) => {
         this.createImageFromBlob(data, adWithPicturesDTO);
         adWithPicturesDTO.isImageLoading = false;
@@ -179,7 +179,7 @@ export class SearchAdvertisementsComponent implements OnInit {
     );
   }
 
-  createImageFromBlob(image: Blob, adWithPicturesDTO: AdvertisementWithPicturesDTO) {
+  createImageFromBlob(image: Blob, adWithPicturesDTO: AdvertisementWithPictures) {
     let reader = new FileReader();
     reader.addEventListener("load", () => {
       adWithPicturesDTO.image = reader.result;
@@ -190,12 +190,12 @@ export class SearchAdvertisementsComponent implements OnInit {
     }
   }
 
-  rent(element: AdvertisementWithPicturesDTO) {
-    this.dialog.open(AddRentRequestComponent, { data: element.advertisement });
+  rent(element: AdvertisementWithPictures) {
+    this.dialog.open(AddRentRequestComponent, { data: element });
   }
 
-  viewDetails(element: AdvertisementWithPicturesDTO) {
-    this.router.navigate(['/advertisement/' + element.advertisement.id]);
+  viewDetails(element: AdvertisementWithPictures) {
+    this.router.navigate(['/advertisement/' + element.id]);
   }
 
   onRate($event: { oldValue: number, newValue: number, starRating: StarRatingComponent }) {
@@ -209,5 +209,15 @@ export class SearchAdvertisementsComponent implements OnInit {
 
   search() {
 
+  }
+
+  checkIfCanRentAdvertisement(element: AdvertisementWithPictures): boolean {
+    if (!element.dateTo) {
+      return true;
+    }
+    if (new Date(element.dateTo) > new Date()) {
+      return true;
+    }
+    return false;
   }
 }

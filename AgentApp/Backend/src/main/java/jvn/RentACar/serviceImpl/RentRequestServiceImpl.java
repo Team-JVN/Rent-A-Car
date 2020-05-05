@@ -2,15 +2,9 @@ package jvn.RentACar.serviceImpl;
 
 import jvn.RentACar.enumeration.RentRequestStatus;
 import jvn.RentACar.exceptionHandler.InvalidRentRequestDataException;
-import jvn.RentACar.model.Advertisement;
-import jvn.RentACar.model.PriceList;
-import jvn.RentACar.model.RentInfo;
-import jvn.RentACar.model.RentRequest;
+import jvn.RentACar.model.*;
 import jvn.RentACar.repository.RentRequestRepository;
-import jvn.RentACar.service.AdvertisementService;
-import jvn.RentACar.service.ClientService;
-import jvn.RentACar.service.RentInfoService;
-import jvn.RentACar.service.RentRequestService;
+import jvn.RentACar.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,9 +12,12 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class RentRequestServiceImpl implements RentRequestService {
@@ -33,11 +30,14 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     private RentInfoService rentInfoService;
 
+    private UserService userService;
+
     @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public RentRequest create(RentRequest rentRequest) {
         // TODO: You need to refuse all other requests
         rentRequest.setClient(clientService.get(rentRequest.getClient().getId()));
+        rentRequest.setCreatedBy(userService.getLoginAgent());
         rentRequest.setRentRequestStatus(RentRequestStatus.PAID);
         rentRequest.setTotalPrice(0.0);
         Set<RentInfo> rentInfos = rentRequest.getRentInfos();
@@ -49,11 +49,24 @@ public class RentRequestServiceImpl implements RentRequestService {
     }
 
     @Override
-    public List<RentRequest> get(String status) {
+    public List<RentRequest> getMine(String status) {
+        User loggedInUser = userService.getLoginAgent();
         if (status.equals("all")) {
-            return rentRequestRepository.findAll();
+            return rentRequestRepository.findByClientEmail(loggedInUser.getEmail());
         }
-        return rentRequestRepository.findByRentRequestStatus(getRentRequestStatus(status));
+        return rentRequestRepository.findByClientEmailAndRentRequestStatus(loggedInUser.getEmail(), getRentRequestStatus(status));
+    }
+
+    @Override
+    public List<RentRequest> get(Long advertisementId, String status) {
+        Advertisement advertisement = advertisementService.get(advertisementId);
+        if (!userService.getLoginAgent().getEmail().equals(advertisement.getCar().getOwner().getEmail())) {
+            throw new InvalidRentRequestDataException("This rent request is not yours.", HttpStatus.FORBIDDEN);
+        }
+        if (status.equals("all")) {
+            return rentRequestRepository.findByRentInfosAdvertisementId(advertisementId);
+        }
+        return rentRequestRepository.findByRentInfosAdvertisementIdAndRentRequestStatus(advertisementId, getRentRequestStatus(status));
     }
 
     @Override
@@ -68,63 +81,23 @@ public class RentRequestServiceImpl implements RentRequestService {
     @Override
     public void delete(Long id) {
         RentRequest rentRequest = get(id);
-        if (!rentRequest.getRentRequestStatus().equals(RentRequestStatus.CANCELED)) {
-            throw new InvalidRentRequestDataException("This rent request is not CANCELED so you can not delete it.",
+        checkCreator(rentRequest);
+        if (rentRequest.getRentRequestStatus().equals(RentRequestStatus.PAID)) {
+            throw new InvalidRentRequestDataException("This rent request is PAID so you can not delete it.",
                     HttpStatus.FORBIDDEN);
         }
         rentRequest.setClient(null);
         Set<RentInfo> rentInfos = rentRequest.getRentInfos();
         rentRequest.setRentInfos(new HashSet<>());
+        rentRequest.setCreatedBy(null);
         rentInfoService.delete(rentInfos);
         rentRequestRepository.deleteById(id);
     }
 
-    @Override
-    public RentRequest edit(Long id, RentRequest rentRequest) {
-        RentRequest dbRentRequest = get(id);
-        if (!dbRentRequest.getRentRequestStatus().equals(RentRequestStatus.PENDING)) {
-            throw new InvalidRentRequestDataException(
-                    "This rent request is not in status PENDING so you can not edit it.", HttpStatus.FORBIDDEN);
+    private void checkCreator(RentRequest rentRequest) {
+        if (!userService.getLoginAgent().getEmail().equals(rentRequest.getCreatedBy().getEmail())) {
+            throw new InvalidRentRequestDataException("This rent request is not yours so you cann't delete it.", HttpStatus.FORBIDDEN);
         }
-
-        dbRentRequest.setClient(clientService.get(rentRequest.getClient().getId()));
-        dbRentRequest.setTotalPrice(changeRentInfosData(dbRentRequest, rentRequest));
-        return rentRequestRepository.save(dbRentRequest);
-    }
-
-    private double changeRentInfosData(RentRequest dbRentRequest, RentRequest rentRequest) {
-        double totalPrice = 0;
-        List<RentInfo> dbRentInfos = new ArrayList<>(dbRentRequest.getRentInfos().size());
-        dbRentInfos.addAll(dbRentRequest.getRentInfos());
-        Map<Long, RentInfo> rentInfos = rentRequest.getRentInfos().stream()
-                .collect(Collectors.toMap(RentInfo::getId, x -> x));
-
-        for (RentInfo dbRentInfo : dbRentInfos) {
-            RentInfo rentInfo = rentInfos.get(dbRentInfo.getId());
-            if (rentInfo == null) {
-                throw new InvalidRentRequestDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
-            }
-
-            Advertisement advertisement = advertisementService.get(dbRentInfo.getAdvertisement().getId());
-
-            if (!advertisement.getActive()) {
-                throw new InvalidRentRequestDataException("Car " + advertisement.getCar().getMake() + " "
-                        + advertisement.getCar().getModel() + " is already booked.", HttpStatus.FORBIDDEN);
-            }
-            checkDate(advertisement, rentInfo.getDateTimeFrom().toLocalDate(), rentInfo.getDateTimeTo().toLocalDate());
-            dbRentInfo.setDateTimeFrom(rentInfo.getDateTimeFrom());
-            dbRentInfo.setDateTimeTo(rentInfo.getDateTimeTo());
-            dbRentInfo.setPickUpPoint(rentInfo.getPickUpPoint());
-            dbRentInfo.setOptedForCDW(rentInfo.getOptedForCDW());
-            if (!advertisement.getCDW()) {
-                dbRentInfo.setOptedForCDW(null);
-            }
-            totalPrice += countPrice(rentInfo);
-
-        }
-
-        return totalPrice;
-
     }
 
     private double setRentInfosData(RentRequest rentRequest, Set<RentInfo> rentInfos, Boolean activeAdvertisement) {
@@ -132,37 +105,56 @@ public class RentRequestServiceImpl implements RentRequestService {
         for (RentInfo rentInfo : rentInfos) {
             rentInfo.setRentRequest(rentRequest);
             Advertisement advertisement = advertisementService.get(rentInfo.getAdvertisement().getId());
-
-            if (!advertisement.getActive()) {
-                throw new InvalidRentRequestDataException("This car is already booked.", HttpStatus.FORBIDDEN);
-            }
-
-            if (!activeAdvertisement) {
-                advertisement.setActive(false);
-            }
-            checkDate(advertisement, rentInfo.getDateTimeFrom().toLocalDate(), rentInfo.getDateTimeTo().toLocalDate());
+            checkDate(advertisement, rentInfo.getDateTimeFrom().toLocalDate(), rentInfo.getDateTimeTo().toLocalDate(), rentInfo.getDateTimeFrom(), rentInfo.getDateTimeTo());
             rentInfo.setAdvertisement(advertisement);
             if (!advertisement.getCDW()) {
                 rentInfo.setOptedForCDW(null);
             }
+            rentInfo.setRating(0);
+            rentInfo.setKilometresLimit(advertisement.getKilometresLimit());
+            rentInfo.setPricePerKm(advertisement.getPriceList().getPricePerKm());
             totalPrice += countPrice(rentInfo);
         }
         return totalPrice;
     }
 
-    private void checkDate(Advertisement advertisement, LocalDate rentInfoDateFrom, LocalDate rentInfoDateTo) {
+
+    private void checkDate(Advertisement advertisement, LocalDate rentInfoDateFrom, LocalDate rentInfoDateTo, LocalDateTime rentInfoDateTimeFrom, LocalDateTime rentInfoDateTimeTo) {
         LocalDate advertisementDateFrom = advertisement.getDateFrom();
+        if (rentInfoDateFrom.isBefore(LocalDate.now()) || rentInfoDateTo.isBefore(LocalDate.now())) {
+            throw new InvalidRentRequestDataException("Invalid date from/to.",
+                    HttpStatus.NOT_FOUND);
+        }
+        if (rentInfoDateTo.isBefore(rentInfoDateFrom)) {
+            throw new InvalidRentRequestDataException("Date To cannot be before Date From.",
+                    HttpStatus.NOT_FOUND);
+        }
         if (rentInfoDateFrom.isBefore(advertisementDateFrom) || rentInfoDateTo.isBefore(advertisementDateFrom)) {
             throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
-                    HttpStatus.NOT_FOUND);
+                    HttpStatus.FORBIDDEN);
         }
         LocalDate advertisementDateTo = advertisement.getDateTo();
         if (advertisementDateTo != null) {
             if (rentInfoDateFrom.isAfter(advertisementDateTo) || rentInfoDateTo.isAfter(advertisementDateTo)) {
                 throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
-                        HttpStatus.NOT_FOUND);
+                        HttpStatus.FORBIDDEN);
             }
         }
+        rentInfoDateTimeFrom = LocalDateTime.of(rentInfoDateFrom.minusDays(1), LocalTime.of(23, 59));
+        rentInfoDateTimeTo = LocalDateTime.of(rentInfoDateTo.plusDays(1), LocalTime.of(00, 00));
+        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqual(RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeFrom).isEmpty()) {
+            throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
+                    HttpStatus.FORBIDDEN);
+        }
+        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqual(RentRequestStatus.PAID, rentInfoDateTimeTo, rentInfoDateTimeTo).isEmpty()) {
+            throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
+                    HttpStatus.FORBIDDEN);
+        }
+        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanEqual(RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeTo).isEmpty()) {
+            throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
+                    HttpStatus.FORBIDDEN);
+        }
+
     }
 
     private double countPrice(RentInfo rentInfo) {
@@ -193,11 +185,12 @@ public class RentRequestServiceImpl implements RentRequestService {
     }
 
     @Autowired
-    public RentRequestServiceImpl(ClientService clientService, AdvertisementService advertisementService,
-            RentRequestRepository rentRequestRepository, RentInfoService rentInfoService) {
+    public RentRequestServiceImpl(ClientService clientService, AdvertisementService advertisementService, UserService userService,
+                                  RentRequestRepository rentRequestRepository, RentInfoService rentInfoService) {
         this.clientService = clientService;
         this.advertisementService = advertisementService;
         this.rentRequestRepository = rentRequestRepository;
         this.rentInfoService = rentInfoService;
+        this.userService = userService;
     }
 }

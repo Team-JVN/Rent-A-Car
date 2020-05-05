@@ -56,4 +56,9 @@ public class Car {
     @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Advertisement> advertisements = new HashSet<>();
 
+    @Column
+    private Double avgRating;
+
+    @Column
+    private Integer commentsCount;
 }

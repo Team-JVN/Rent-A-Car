@@ -2,7 +2,6 @@ package jvn.RentACar.service;
 
 import jvn.RentACar.dto.both.CarDTO;
 import jvn.RentACar.dto.request.CarEditDTO;
-import jvn.RentACar.dto.response.CarWithPicturesDTO;
 import jvn.RentACar.enumeration.EditType;
 import jvn.RentACar.model.Car;
 import org.springframework.core.io.Resource;
@@ -17,7 +16,7 @@ public interface CarService {
 
     Resource get(String fileName);
 
-    List<CarWithPicturesDTO> get();
+    List<Car> get();
 
     Car editAll(Long id, CarDTO carDTO, List<MultipartFile> multipartFiles);
 

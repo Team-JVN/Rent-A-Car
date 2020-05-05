@@ -1,3 +1,4 @@
+import { RentingCartComponent } from './component/renting-cart/renting-cart.component';
 import { CarsStatisticsComponent } from './component/list/cars-statistics/cars-statistics.component';
 import { SearchAdvertisementsComponent } from './component/list/search-advertisements/search-advertisements.component';
 import { ListClientRentRequestsComponent } from './component/list/list-client-rent-requests/list-client-rent-requests.component';
@@ -57,7 +58,7 @@ const routes: Routes = [
     component: ListClientsComponent,
   },
   {
-    path: 'rent-requests',
+    path: 'rent-requests/:id',
     component: ListRentRequestsComponent,
   },
   {
@@ -91,6 +92,10 @@ const routes: Routes = [
   {
     path: 'client/pending-approval',
     component: ClientPendingApprovalComponent
+  },
+  {
+    path: 'client/renting-cart',
+    component: RentingCartComponent
   },
   {
     path: "makes",

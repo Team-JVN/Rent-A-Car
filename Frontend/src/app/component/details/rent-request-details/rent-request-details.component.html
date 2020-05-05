@@ -24,7 +24,7 @@
                                 </button>
                             </div>
                             <div class="col-3 mt-0" align="end">
-                                <button mat-raised-button *ngIf="rentRequest.rentRequestStatus =='PAID'" color="primary"
+                                <button mat-raised-button *ngIf="checkIfCanCreateReport(rentInfo)" color="primary"
                                     (click)="createRentReport()">Create
                                     Report</button>
                             </div>
@@ -49,7 +49,7 @@
                                     <tr>
                                         <th class="first first-column">Pick up point:</th>
                                         <td>
-                                            {{rentInfo.pickUpPoint }}
+                                            {{rentInfo.advertisement.pickUpPoint }}
                                         </td>
                                         <th class="first second-column"> Opted for Collision <br> Damage Waiver:
                                         </th>

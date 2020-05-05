@@ -1,5 +1,6 @@
 package jvn.RentACar.dto.both;
 
+import jvn.RentACar.dto.response.AdvertisementWithPicturesDTO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,13 +20,10 @@ public class RentInfoDTO {
     @NotEmpty(message = "Date and time to is empty.")
     private String dateTimeTo;
 
-    @NotEmpty(message = "Pick up point is empty.")
-    private String pickUpPoint;
-
     private Boolean optedForCDW;
 
     @NotNull(message = "Advertisement is null.")
-    private AdvertisementDTO advertisement;
+    private AdvertisementWithPicturesDTO advertisement;
 
 //    private RentReportDTO rentReport;
 }

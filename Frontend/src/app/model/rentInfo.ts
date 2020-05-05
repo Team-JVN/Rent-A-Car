@@ -1,17 +1,16 @@
+import { AdvertisementWithPictures } from 'src/app/model/advertisementWithPictures';
 import { Advertisement } from './advertisement';
 
 export class RentInfo {
     id: number;
     dateTimeFrom: string;
     dateTimeTo: string;
-    pickUpPoint: string;
     optedForCDW: boolean;
-    advertisement: Advertisement;
+    advertisement: AdvertisementWithPictures;
 
-    constructor(dateTimeFrom: string, dateTimeTo: string, pickUpPoint: string, optedForCDW: boolean, advertisement: Advertisement, id?: number) {
+    constructor(dateTimeFrom: string, dateTimeTo: string, optedForCDW: boolean, advertisement: AdvertisementWithPictures, id?: number) {
         this.dateTimeFrom = dateTimeFrom;
         this.dateTimeTo = dateTimeTo;
-        this.pickUpPoint = pickUpPoint;
         this.optedForCDW = optedForCDW;
         this.advertisement = advertisement;
         this.id = id;

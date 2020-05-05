@@ -45,7 +45,7 @@ public class Advertisement {
     private Boolean CDW;
 
     @Column
-    private Boolean active = true; //active=false when one rentRequest has status PAID
+    private String pickUpPoint;
 
     @OneToMany(mappedBy = "advertisement", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<RentInfo> rentInfos = new HashSet<>();

@@ -42,7 +42,7 @@ public class PriceListServiceImpl implements PriceListService {
 
     @Override
     public PriceList edit(Long id, PriceList priceList) {
-        PriceList dbPriceList = isEditable(id);
+        PriceList dbPriceList = get(id);
         dbPriceList.setPriceForCDW(priceList.getPriceForCDW());
         dbPriceList.setPricePerDay(priceList.getPricePerDay());
         dbPriceList.setPricePerKm(priceList.getPricePerKm());
@@ -51,17 +51,12 @@ public class PriceListServiceImpl implements PriceListService {
 
     @Override
     public void delete(Long id) {
-        PriceList priceList = isEditable(id);
+        PriceList priceList = get(id);
+
+        if (priceListRepository.findByIdAndStatusNotAndAdvertisementsLogicalStatusNot(id, LogicalStatus.DELETED, LogicalStatus.DELETED) != null) {
+            throw new InvalidPriceListDataException("Price list is used in advertisements, so it can't be deleted.", HttpStatus.FORBIDDEN);
+        }
         priceList.setStatus(LogicalStatus.DELETED);
         priceListRepository.save(priceList);
     }
-
-    private PriceList isEditable(Long id) {
-        PriceList priceList = get(id);
-        if (!priceList.getAdvertisements().isEmpty()) {
-            throw new InvalidPriceListDataException("Price list is used in advertisements, so it can't be edited/deleted.", HttpStatus.FORBIDDEN);
-        }
-        return priceList;
-    }
-
 }

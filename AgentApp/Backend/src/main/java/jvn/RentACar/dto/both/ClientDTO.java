@@ -23,6 +23,7 @@ public class ClientDTO {
     @Email(message = "Email is not valid.")
     private String email;
 
+    @Pattern(regexp = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$")
     private String password;
 
     @NotEmpty(message = "Address is empty.")

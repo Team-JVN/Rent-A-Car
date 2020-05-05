@@ -1,3 +1,6 @@
+import { AgentGuard } from './guard/agent.guard';
+import { AdminGuard } from './guard/admin.guard';
+import { TokenInterceptor } from './interseptor/toke.interceptor';
 import { AddRentRequestComponent } from './component/add/add-rent-request/add-rent-request.component';
 import { HeaderComponent } from './component/header/header.component';
 import { CustomHammerConfig } from './custom-hummer-config';
@@ -12,7 +15,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { LayoutModule } from '@angular/cdk/layout';
 import { ToastrModule } from 'ngx-toastr';
 import { NgxGalleryModule } from 'ngx-gallery';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ListBodyStylesComponent } from './component/list/list-body-styles/list-body-styles.component';
 import { AddBodyStyleComponent } from './component/add/add-body-style/add-body-style.component';
 import { EditBodyStyleComponent } from './component/edit/edit-body-style-component/edit-body-style-component.component';
@@ -39,7 +42,6 @@ import { AddClientComponent } from './component/add/add-client/add-client.compon
 import { EditClientComponent } from './component/edit/edit-client/edit-client.component';
 import { AdvertisementDetailsComponent } from './component/advertisement-details/advertisement-details.component';
 import { ListRentRequestsComponent } from './component/list/list-rent-requests/list-rent-requests.component';
-import { EditRentRequestComponent } from './component/edit/edit-rent-request/edit-rent-request.component';
 import { LoginComponent } from './component/authentification/login/login.component';
 import { ChangePasswordComponent } from './component/authentification/change-password/change-password.component';
 import { ClientRegistrationComponent } from './component/authentification/client-registration/client-registration.component';
@@ -63,8 +65,12 @@ import { ReviewFeedbackComponent } from './component/review-feedback/review-feed
 import { ListClientRentRequestsComponent } from './component/list/list-client-rent-requests/list-client-rent-requests.component';
 import { ClientRentRequestDetailsComponent } from './component/details/client-rent-request-details/client-rent-request-details.component';
 import { LeaveFeedbackComponent } from './component/add/leave-feedback/leave-feedback.component';
+import { RentingCartComponent } from './component/renting-cart/renting-cart.component';
 import { CarsStatisticsComponent } from './component/list/cars-statistics/cars-statistics.component';
 import { TableForStatisticsComponent } from './component/list/table-for-statistics/table-for-statistics.component';
+import { ErrorInterceptor } from './interseptor/error.interceptor';
+import { ClientGuard } from './guard/client.guard';
+import { EditAdvertisementPartialComponent } from './component/edit/edit-advertisement-partial/edit-advertisement-partial.component';
 
 
 @NgModule({
@@ -98,7 +104,6 @@ import { TableForStatisticsComponent } from './component/list/table-for-statisti
     AddRentRequestComponent,
     AdvertisementDetailsComponent,
     ListRentRequestsComponent,
-    EditRentRequestComponent,
     LoginComponent,
     ChangePasswordComponent,
     ClientRegistrationComponent,
@@ -121,8 +126,10 @@ import { TableForStatisticsComponent } from './component/list/table-for-statisti
     ListClientRentRequestsComponent,
     ClientRentRequestDetailsComponent,
     LeaveFeedbackComponent,
+    RentingCartComponent,
     CarsStatisticsComponent,
     TableForStatisticsComponent,
+    EditAdvertisementPartialComponent,
   ],
   imports: [
     BrowserModule,
@@ -159,10 +166,10 @@ import { TableForStatisticsComponent } from './component/list/table-for-statisti
     EditPriceListComponent,
     ViewPicturesComponent,
     EditAdvertisementComponent,
+    EditAdvertisementPartialComponent,
     AddClientComponent,
     EditClientComponent,
     AddRentRequestComponent,
-    EditRentRequestComponent,
     AddAgentComponent,
     AddAdminComponent,
     AddModelComponent,
@@ -175,7 +182,12 @@ import { TableForStatisticsComponent } from './component/list/table-for-statisti
   providers: [
     {
       provide: HAMMER_GESTURE_CONFIG, useClass: CustomHammerConfig
-    }
+    },
+    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
+    // { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    AdminGuard,
+    AgentGuard,
+    ClientGuard
   ],
   bootstrap: [AppComponent]
 })
