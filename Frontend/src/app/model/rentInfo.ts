@@ -6,6 +6,8 @@ export class RentInfo {
     dateTimeTo: string;
     optedForCDW: boolean;
     advertisement: AdvertisementWithPictures;
+    index: number;
+    inBundle: boolean;
 
     constructor(dateTimeFrom: string, dateTimeTo: string, optedForCDW: boolean, advertisement: AdvertisementWithPictures, id?: number) {
         this.dateTimeFrom = dateTimeFrom;
@@ -13,6 +15,7 @@ export class RentInfo {
         this.optedForCDW = optedForCDW;
         this.advertisement = advertisement;
         this.id = id;
+        this.inBundle = false;
     }
 
 }
