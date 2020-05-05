@@ -34,7 +34,7 @@ import { Client } from 'src/app/model/client';
 })
 export class ListRentRequestsComponent implements OnInit {
   //CLIENT AND AGENT HAVE ACCESS TO THIS PAGE
-  displayedColumns: string[] = ['client', 'totalPrice', 'buttons'];
+  displayedColumns: string[] = ['client', 'totalPrice', 'status', 'buttons'];
   expandedElement: RentRequest | null;
   rentRequestsDataSource: MatTableDataSource<RentRequest>;
   createSuccess: Subscription;
