@@ -1,0 +1,235 @@
+<mat-card>
+  <mat-card-content>
+    <div class="row">
+      <div class="col-9">
+        <h2>Manage Users</h2>
+      </div>
+    </div>
+    <div>
+      <mat-tab-group animationDuration="500ms">
+        <mat-tab label="Clients">
+          <div>
+            <br /><br />
+            <div class="status-filter">
+              <span class="filter-span">Filter by status:</span>
+              <mat-form-field>
+                <mat-select
+                  [(ngModel)]="status"
+                  (selectionChange)="fetchAllClients(status)"
+                >
+                  <mat-option value="all" selected>- All -</mat-option>
+                  <mat-option value="inactive">Inactive</mat-option>
+                  <mat-option value="active">Active</mat-option>
+                  <mat-option value="blocked">Blocked</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <br /><br />
+            </div>
+            <div>
+              <!-- TODO: add [dataSource]="dataSource" -->
+              <table mat-table class="mat-elevation-z8">
+                <ng-container matColumnDef="name">
+                  <th mat-header-cell *matHeaderCellDef>Name</th>
+                  <td mat-cell *matCellDef="let element">DATA</td>
+                </ng-container>
+
+                <ng-container matColumnDef="email">
+                  <th mat-header-cell *matHeaderCellDef>Email</th>
+                  <td mat-cell *matCellDef="let element">DATA</td>
+                </ng-container>
+
+                <ng-container matColumnDef="address">
+                  <th mat-header-cell *matHeaderCellDef>Address</th>
+                  <td mat-cell *matCellDef="let element">DATA</td>
+                </ng-container>
+
+                <ng-container matColumnDef="number">
+                  <th mat-header-cell *matHeaderCellDef>Phone number</th>
+                  <td mat-cell *matCellDef="let element">DATA</td>
+                </ng-container>
+
+                <ng-container matColumnDef="canceledReservationCounter">
+                  <th mat-header-cell *matHeaderCellDef>
+                    Canceled Reservation Counter
+                  </th>
+                  <td mat-cell *matCellDef="let element">DATA</td>
+                </ng-container>
+
+                <ng-container matColumnDef="rejectedCommentsCounter">
+                  <th mat-header-cell *matHeaderCellDef>
+                    Rejected Comments Counter
+                  </th>
+                  <td mat-cell *matCellDef="let element">DATA</td>
+                </ng-container>
+
+                <ng-container matColumnDef="delete">
+                  <th mat-header-cell *matHeaderCellDef>Delete client</th>
+                  <td mat-cell *matCellDef="let element">DATA</td>
+                </ng-container>
+
+                <ng-container matColumnDef="block">
+                  <th mat-header-cell *matHeaderCellDef>Block client</th>
+                  <td mat-cell *matCellDef="let element">DATA</td>
+                </ng-container>
+                <!-- 
+                <ng-container matColumnDef="symbol">
+                  <th mat-header-cell *matHeaderCellDef>Address</th>
+                  <td mat-cell *matCellDef="let element">DATA</td>
+                </ng-container> -->
+
+                <tr
+                  mat-header-row
+                  *matHeaderRowDef="displayedColumnsClient"
+                ></tr>
+                <tr
+                  mat-row
+                  *matRowDef="let row; columns: displayedColumnsClient"
+                ></tr>
+              </table>
+            </div>
+          </div>
+        </mat-tab>
+        <mat-tab label="Agents">
+          <div>
+            <br /><br />
+            <div class="status-filter">
+              <span class="filter-span">Filter by status:</span>
+              <mat-form-field>
+                <mat-select
+                  [(ngModel)]="status"
+                  (selectionChange)="fetchAllClients(status)"
+                >
+                  <mat-option value="all" selected>- All -</mat-option>
+                  <mat-option value="inactive">Inactive</mat-option>
+                  <mat-option value="active">Active</mat-option>
+                  <mat-option value="blocked">Blocked</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div align="end">
+              <button
+                mat-raised-button
+                color="primary"
+                (click)="newAgentDialog()"
+              >
+                Create New
+              </button>
+            </div>
+            <br /><br />
+            <div>
+              <!-- TODO: add [dataSource]="dataSource" -->
+              <table mat-table class="mat-elevation-z8">
+                <ng-container matColumnDef="name">
+                  <th mat-header-cell *matHeaderCellDef>Name</th>
+                  <td mat-cell *matCellDef="let element">DATA</td>
+                </ng-container>
+
+                <ng-container matColumnDef="email">
+                  <th mat-header-cell *matHeaderCellDef>Email</th>
+                  <td mat-cell *matCellDef="let element">DATA</td>
+                </ng-container>
+
+                <ng-container matColumnDef="address">
+                  <th mat-header-cell *matHeaderCellDef>Address</th>
+                  <td mat-cell *matCellDef="let element">DATA</td>
+                </ng-container>
+
+                <ng-container matColumnDef="number">
+                  <th mat-header-cell *matHeaderCellDef>Phone number</th>
+                  <td mat-cell *matCellDef="let element">DATA</td>
+                </ng-container>
+
+                <ng-container matColumnDef="taxIdNumber">
+                  <th mat-header-cell *matHeaderCellDef>TAX ID number</th>
+                  <td mat-cell *matCellDef="let element">DATA</td>
+                </ng-container>
+
+                <ng-container matColumnDef="delete">
+                  <th mat-header-cell *matHeaderCellDef>Delete agent</th>
+                  <td mat-cell *matCellDef="let element">DATA</td>
+                </ng-container>
+                <!-- 
+                <ng-container matColumnDef="symbol">
+                  <th mat-header-cell *matHeaderCellDef>Address</th>
+                  <td mat-cell *matCellDef="let element">DATA</td>
+                </ng-container> -->
+
+                <tr
+                  mat-header-row
+                  *matHeaderRowDef="displayedColumnsAgent"
+                ></tr>
+                <tr
+                  mat-row
+                  *matRowDef="let row; columns: displayedColumnsAgent"
+                ></tr>
+              </table>
+            </div>
+          </div>
+        </mat-tab>
+        <mat-tab label="Admins">
+          <div>
+            <br /><br />
+            <div class="status-filter">
+              <span class="filter-span">Filter by status:</span>
+              <mat-form-field>
+                <mat-select
+                  [(ngModel)]="status"
+                  (selectionChange)="fetchAllClients(status)"
+                >
+                  <mat-option value="all" selected>- All -</mat-option>
+                  <mat-option value="inactive">Inactive</mat-option>
+                  <mat-option value="active">Active</mat-option>
+                  <mat-option value="blocked">Blocked</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div align="end">
+              <button
+                mat-raised-button
+                color="primary"
+                (click)="newAdminDialog()"
+              >
+                Create New
+              </button>
+            </div>
+            <br /><br />
+            <div>
+              <!-- TODO: add [dataSource]="dataSource" -->
+              <table mat-table class="mat-elevation-z8">
+                <ng-container matColumnDef="name">
+                  <th mat-header-cell *matHeaderCellDef>Name</th>
+                  <td mat-cell *matCellDef="let element">DATA</td>
+                </ng-container>
+
+                <ng-container matColumnDef="email">
+                  <th mat-header-cell *matHeaderCellDef>Email</th>
+                  <td mat-cell *matCellDef="let element">DATA</td>
+                </ng-container>
+
+                <ng-container matColumnDef="delete">
+                  <th mat-header-cell *matHeaderCellDef>Delete admin</th>
+                  <td mat-cell *matCellDef="let element">DATA</td>
+                </ng-container>
+
+                <!-- 
+                <ng-container matColumnDef="symbol">
+                  <th mat-header-cell *matHeaderCellDef>Address</th>
+                  <td mat-cell *matCellDef="let element">DATA</td>
+                </ng-container> -->
+
+                <tr
+                  mat-header-row
+                  *matHeaderRowDef="displayedColumnsAdmin"
+                ></tr>
+                <tr
+                  mat-row
+                  *matRowDef="let row; columns: displayedColumnsAdmin"
+                ></tr>
+              </table>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </mat-card-content>
+</mat-card>

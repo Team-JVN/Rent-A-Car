@@ -23,27 +23,31 @@ import { ListAdvertisementsComponent } from './component/list/list-advertisement
 import { NonAuthorizedErrorPageComponent } from './error/non-authorized-error-page/non-authorized-error-page.component';
 import { ListMakesComponent } from './component/list/list-makes/list-makes.component';
 import { ListModelsComponent } from './component/list/list-models/list-models.component';
+import { ManageUsersComponent } from "./component/manage-users/manage-users.component";
+import { EditClientInfoComponent } from "./component/edit/edit-personal-info/edit-client/edit-client-info.component";
+import { EditAgentComponent } from "./component/edit/edit-personal-info/edit-agent/edit-agent.component";
+import { EditAdminComponent } from "./component/edit/edit-personal-info/edit-admin/edit-admin.component";
 
 const routes: Routes = [
   {
-    path: 'advertisement/:id',
-    component: AdvertisementDetailsComponent
+    path: "advertisement/:id",
+    component: AdvertisementDetailsComponent,
   },
   {
-    path: 'body-styles',
-    component: ListBodyStylesComponent
+    path: "body-styles",
+    component: ListBodyStylesComponent,
   },
   {
-    path: 'fuel-types',
-    component: ListFuelTypeComponent
+    path: "fuel-types",
+    component: ListFuelTypeComponent,
   },
   {
-    path: 'gearbox-types',
-    component: ListGearBoxTypesComponent
+    path: "gearbox-types",
+    component: ListGearBoxTypesComponent,
   },
   {
-    path: 'cars',
-    component: ListCarsComponent
+    path: "cars",
+    component: ListCarsComponent,
   },
   {
     path: 'statistics',
@@ -54,7 +58,7 @@ const routes: Routes = [
     component: ListPriceListsComponent
   },
   {
-    path: 'clients',
+    path: "clients",
     component: ListClientsComponent,
   },
   {
@@ -74,12 +78,28 @@ const routes: Routes = [
     component: ClientRentRequestDetailsComponent
   },
   {
-    path: 'login',
-    component: LoginComponent
+    path: "login",
+    component: LoginComponent,
   },
   {
-    path: 'change-password',
-    component: ChangePasswordComponent
+    path: "change-password",
+    component: ChangePasswordComponent,
+  },
+  {
+    path: "client/registration",
+    component: ClientRegistrationComponent,
+  },
+  {
+    path: "client/pending-approval",
+    component: ClientPendingApprovalComponent,
+  },
+  {
+    path: "manage-users",
+    component: ManageUsersComponent,
+  },
+  {
+    path: "edit-client-info",
+    component: EditClientInfoComponent,
   },
   {
     path: 'search-advertisements',
@@ -90,8 +110,12 @@ const routes: Routes = [
     component: ClientRegistrationComponent
   },
   {
-    path: 'client/pending-approval',
-    component: ClientPendingApprovalComponent
+    path: "edit-agent-info",
+    component: EditAgentComponent,
+  },
+  {
+    path: "edit-admin-info",
+    component: EditAdminComponent,
   },
   {
     path: 'client/renting-cart',
@@ -107,21 +131,21 @@ const routes: Routes = [
   },
   //******************* ERROR PAGES ************************
   {
-    path: 'error/non-authenticated',
+    path: "error/non-authenticated",
     component: NonAuthenticatedErrorPageComponent,
   },
   {
-    path: 'error/non-authorized',
-    component: NonAuthorizedErrorPageComponent
+    path: "error/non-authorized",
+    component: NonAuthorizedErrorPageComponent,
   },
   {
-    path: '',
-    component: ListAdvertisementsComponent
+    path: "",
+    component: ListAdvertisementsComponent,
   },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class AppRoutingModule { }

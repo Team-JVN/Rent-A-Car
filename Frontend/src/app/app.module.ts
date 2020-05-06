@@ -68,10 +68,12 @@ import { LeaveFeedbackComponent } from './component/add/leave-feedback/leave-fee
 import { RentingCartComponent } from './component/renting-cart/renting-cart.component';
 import { CarsStatisticsComponent } from './component/list/cars-statistics/cars-statistics.component';
 import { TableForStatisticsComponent } from './component/list/table-for-statistics/table-for-statistics.component';
-import { ErrorInterceptor } from './interseptor/error.interceptor';
 import { ClientGuard } from './guard/client.guard';
 import { EditAdvertisementPartialComponent } from './component/edit/edit-advertisement-partial/edit-advertisement-partial.component';
-
+import { ManageUsersComponent } from "./component/manage-users/manage-users.component";
+import { EditClientInfoComponent } from "./component/edit/edit-personal-info/edit-client/edit-client-info.component";
+import { EditAgentComponent } from "./component/edit/edit-personal-info/edit-agent/edit-agent.component";
+import { EditAdminComponent } from "./component/edit/edit-personal-info/edit-admin/edit-admin.component";
 
 @NgModule({
   declarations: [
@@ -130,6 +132,10 @@ import { EditAdvertisementPartialComponent } from './component/edit/edit-adverti
     CarsStatisticsComponent,
     TableForStatisticsComponent,
     EditAdvertisementPartialComponent,
+    ManageUsersComponent,
+    EditClientInfoComponent,
+    EditAgentComponent,
+    EditAdminComponent,
   ],
   imports: [
     BrowserModule,
@@ -140,7 +146,7 @@ import { EditAdvertisementPartialComponent } from './component/edit/edit-adverti
     LayoutModule,
     ToastrModule.forRoot({
       timeOut: 3000,
-      positionClass: 'toast-top-right',
+      positionClass: "toast-top-right",
       preventDuplicates: true,
     }),
     AppRoutingModule,
@@ -172,12 +178,13 @@ import { EditAdvertisementPartialComponent } from './component/edit/edit-adverti
     AddRentRequestComponent,
     AddAgentComponent,
     AddAdminComponent,
-    AddModelComponent,
     AddMakeComponent,
     EditModelComponent,
     EditMakeComponent,
     ReviewFeedbackComponent,
     LeaveFeedbackComponent,
+    EditClientInfoComponent,
+    EditAdminComponent
   ],
   providers: [
     {
