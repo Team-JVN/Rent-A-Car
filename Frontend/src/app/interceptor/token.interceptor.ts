@@ -1,4 +1,4 @@
-import { LoggedInUser } from './../model/loggedInUser';
+import { LoggedInUser } from '../model/loggedInUser';
 import { UserTokenState } from '../model/userTokenState';
 import { Injectable } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/common/http';

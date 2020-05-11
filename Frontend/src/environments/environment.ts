@@ -20,6 +20,7 @@ export const environment = {
   model: "/api/model",
   message: "/api/message",
   comment: '/api/comment',
+  rentReport: "/api/rent-report",
 };
 
 /*

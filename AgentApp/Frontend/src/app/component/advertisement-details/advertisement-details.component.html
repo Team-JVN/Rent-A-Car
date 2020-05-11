@@ -1,7 +1,16 @@
 <mat-card *ngIf="selectedAdWithPictures">
     <mat-card-content>
-        <h2>{{selectedAdWithPictures.advertisement.car.make.name}}
-            {{selectedAdWithPictures.advertisement.car.model.name}}</h2>
+        <div class="row">
+            <div class="col-9">
+                <h2>{{selectedAdWithPictures.car.make.name}}
+                    {{selectedAdWithPictures.car.model.name}}</h2>
+            </div>
+            <div class="col-3 rating">
+                <star-rating class="rating-style" totalstars="5" checkedcolor="#87C7F3" uncheckedcolor="black"
+                    size="40px" [(value)]="selectedAdWithPictures.car.avgRating" readonly="true">
+                </star-rating>
+            </div>
+        </div>
         <div class="row car-data-div">
             <div class="col-7">
                 <ngx-gallery [options]="galleryOptions" [images]="galleryImages"></ngx-gallery>
@@ -14,23 +23,22 @@
                             <th><span class="theader">
                                     <mat-icon class="mr-2">speed</mat-icon>Mileage:
                                 </span></th>
-                            <td>{{selectedAdWithPictures.advertisement.car.mileageInKm | number}} Km</td>
+                            <td>{{selectedAdWithPictures.car.mileageInKm | number}} Km</td>
                         </tr>
                         <tr>
                             <th><span class="theader">
                                     <mat-icon class="mr-2">airline_seat_recline_normal</mat-icon>Kid's
                                     seats:
                                 </span></th>
-                            <td>{{selectedAdWithPictures.advertisement.car.kidsSeats}}</td>
+                            <td>{{selectedAdWithPictures.car.kidsSeats}}</td>
                         </tr>
                         <tr>
                             <th><span class="theader">
                                     <mat-icon class="mr-2">navigation</mat-icon>Tracking:
                                 </span></th>
                             <td>
-                                <span
-                                    *ngIf="selectedAdWithPictures.advertisement.car.availableTracking">Available</span>
-                                <span *ngIf="!selectedAdWithPictures.advertisement.car.availableTracking">Not
+                                <span *ngIf="selectedAdWithPictures.car.availableTracking">Available</span>
+                                <span *ngIf="!selectedAdWithPictures.car.availableTracking">Not
                                     Available</span>
                             </td>
                         </tr>
@@ -38,19 +46,19 @@
                             <th><span class="theader">
                                     <mat-icon class="mr-2">local_gas_station</mat-icon>Fuel Type:
                                 </span></th>
-                            <td>{{selectedAdWithPictures.advertisement.car.fuelType.name}}</td>
+                            <td>{{selectedAdWithPictures.car.fuelType.name}}</td>
                         </tr>
                         <tr>
                             <th><span class="theader">
                                     <mat-icon class="mr-2">settings</mat-icon>Gearbox:
                                 </span></th>
-                            <td>{{selectedAdWithPictures.advertisement.car.gearBoxType.name}}</td>
+                            <td>{{selectedAdWithPictures.car.gearBoxType.name}}</td>
                         </tr>
                         <tr>
                             <th><span class="theader">
                                     <mat-icon class="mr-2">airport_shuttle</mat-icon>Body Style:
                                 </span></th>
-                            <td>{{selectedAdWithPictures.advertisement.car.bodyStyle.name}}</td>
+                            <td>{{selectedAdWithPictures.car.bodyStyle.name}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -63,22 +71,38 @@
                     <tbody>
                         <tr>
                             <th><span class="theader">
+                                    <mat-icon class="mr-2">person</mat-icon>Owner:
+                                </span></th>
+                            <td>{{selectedAdWithPictures.car.owner}}</td>
+                        </tr>
+                        <tr>
+                            <th><span class="theader">
                                     <mat-icon class="mr-2">today</mat-icon>Available Between:
                                 </span></th>
-                            <td>{{selectedAdWithPictures.advertisement.dateFrom  | date:"dd.MM.yyyy."}} — Unlimited</td>
+                            <td><span *ngIf="selectedAdWithPictures.dateTo">
+                                    {{selectedAdWithPictures.dateFrom  | date:"dd.MM.yyyy."}} —
+                                    {{selectedAdWithPictures.dateTo  | date:"dd.MM.yyyy."}}</span>
+                                <span *ngIf="!selectedAdWithPictures.dateTo">
+                                    {{selectedAdWithPictures.dateFrom  | date:"dd.MM.yyyy."}} — Unlimited</span></td>
+                        </tr>
+                        <tr>
+                            <th><span class="theader">
+                                    <mat-icon class="mr-2">place</mat-icon>Pick-up Point:
+                                </span></th>
+                            <td>{{selectedAdWithPictures.pickUpPoint}}</td>
                         </tr>
                         <tr>
                             <th><span class="theader">
                                     <mat-icon class="mr-2">speed</mat-icon>Kilometres Limit:
                                 </span></th>
                             <td>
-                                <span *ngIf="selectedAdWithPictures.advertisement.kilometresLimit">
-                                    {{selectedAdWithPictures.advertisement.kilometresLimit}} Km &nbsp;
+                                <span *ngIf="selectedAdWithPictures.kilometresLimit">
+                                    {{selectedAdWithPictures.kilometresLimit}} Km &nbsp;
                                     <span class="per-km">
-                                        ({{selectedAdWithPictures.advertisement.priceList.pricePerKm}} € per
+                                        ({{selectedAdWithPictures.priceList.pricePerKm | number: '1.2-2'}} € per
                                         Km)</span>
                                 </span>
-                                <span *ngIf="!selectedAdWithPictures.advertisement.kilometresLimit">Unlimited</span>
+                                <span *ngIf="!selectedAdWithPictures.kilometresLimit">Unlimited</span>
                             </td>
                         </tr>
                         <tr>
@@ -87,18 +111,17 @@
                                     Waiver:
                                 </span></th>
                             <td>
-                                <span *ngIf="selectedAdWithPictures.advertisement.cdw">
-                                    {{selectedAdWithPictures.advertisement.priceList.priceForCDW}} €</span>
-                                <span *ngIf="!selectedAdWithPictures.advertisement.cdw">Not Available</span>
+                                <span *ngIf="selectedAdWithPictures.cdw">
+                                    {{selectedAdWithPictures.priceList.priceForCDW | number: '1.2-2'}} €</span>
+                                <span *ngIf="!selectedAdWithPictures.cdw">Not Available</span>
                             </td>
                         </tr>
-                        <tr
-                            *ngIf="selectedAdWithPictures.advertisement.discount && selectedAdWithPictures.advertisement.discount > 0">
+                        <tr *ngIf="selectedAdWithPictures.discount && selectedAdWithPictures.discount > 0">
                             <th><span class="theader">
-                                    <mat-icon class="mr-2">money_off</mat-icon>30+ days Rent
+                                    <mat-icon class="mr-2">money_off</mat-icon>30+ Days Rent
                                     Discount:
                                 </span></th>
-                            <td>{{selectedAdWithPictures.advertisement.discount}} %</td>
+                            <td>{{selectedAdWithPictures.discount}} %</td>
                         </tr>
                     </tbody>
                 </table>
@@ -110,12 +133,12 @@
                     </tr>
                     <tr>
                         <td class="price-text">
-                            {{selectedAdWithPictures.advertisement.priceList.pricePerDay}} €</td>
+                            {{selectedAdWithPictures.priceList.pricePerDay | number: '1.2-2'}} €</td>
                     </tr>
-                    <tr><button *ngIf="selectedAdWithPictures.advertisement.active" mat-raised-button color="primary"
-                            class="rent-btn" (click)="rent(selectedAdWithPictures)">Rent me!</button>
-                        <button *ngIf="!selectedAdWithPictures.advertisement.active" mat-flat-button color="warn"
-                            class="rented-out-btn">RENTED OUT</button></tr>
+                    <tr><button *ngIf="checkIfCanRentAdvertisement(selectedAdWithPictures)" mat-raised-button
+                            color="primary" class="rent-btn" (click)="rent(selectedAdWithPictures)">Rent me!</button>
+                        <button *ngIf="!checkIfCanRentAdvertisement(selectedAdWithPictures)" mat-flat-button
+                            color="warn" class="rented-out-btn">RENTED OUT</button></tr>
                 </table>
             </div>
         </div>

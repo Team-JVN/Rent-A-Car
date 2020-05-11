@@ -81,7 +81,6 @@
                                 informationForm.get('dateFrom').errors && informationForm.get('dateFrom').errors['required'] ">
                                         Please choose date and time from.
                                     </mat-error>
-
                                 </mat-form-field>
                             </td>
                         </tr>
@@ -98,7 +97,6 @@
                             <td class="form-full-width-right">
                                 <mat-form-field class="form-full-width">
                                     <input matInput type="time" placeholder="Time to" formControlName="timeTo">
-
                                     <mat-error
                                         *ngIf="informationForm.get('timeTo').errors && informationForm.get('timeTo').errors['required'] || 
                                         informationForm.get('dateTo').errors && informationForm.get('dateTo').errors['required'] ">
@@ -116,16 +114,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="form-full-width-left">
-                                <mat-form-field class="form-full-width-95">
-                                    <input matInput placeholder="Pick-up Point" formControlName="pickUpPoint">
-                                    <mat-error
-                                        *ngIf="informationForm.get('pickUpPoint').errors && informationForm.get('pickUpPoint').errors['required']">
-                                        Please enter Pick-up Point.
-                                    </mat-error>
-                                </mat-form-field>
-                            </td>
-                            <td class="form-full-width-right">
+                            <td class="form-full-width-left pt-2" colspan="2">
                                 <div *ngIf="this.selectedItem.cdw">
                                     <mat-checkbox formControlName="optedForCDW" class="form-full-width">
                                         Include Collision Damage Waiver

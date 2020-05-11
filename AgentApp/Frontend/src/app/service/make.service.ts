@@ -1,9 +1,9 @@
+import { Injectable } from '@angular/core';
 import { Model } from './../model/model';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from './../../environments/environment';
 import { Subject } from 'rxjs';
-import { Injectable } from '@angular/core';
 import { Make } from '../model/make';
 
 @Injectable({
@@ -48,5 +48,4 @@ export class MakeService {
   public deleteModel(makeId: number, modelId: number): any {
     return this.httpClient.delete(this.url + '/' + makeId + '/model/' + modelId);
   }
-
 }

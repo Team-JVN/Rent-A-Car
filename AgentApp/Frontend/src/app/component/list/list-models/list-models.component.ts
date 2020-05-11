@@ -17,7 +17,6 @@ import { Location } from '@angular/common';
   styleUrls: ['./list-models.component.css']
 })
 export class ListModelsComponent implements OnInit {
-
   displayedColumns: string[] = ['name', 'buttons'];
   modelsDataSource: MatTableDataSource<Model>;
   successCreated: Subscription;
@@ -79,6 +78,4 @@ export class ListModelsComponent implements OnInit {
       }
     );
   }
-
-
 }

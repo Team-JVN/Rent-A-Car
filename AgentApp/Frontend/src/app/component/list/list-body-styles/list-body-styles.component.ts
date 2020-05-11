@@ -1,4 +1,3 @@
-import { element } from 'protractor';
 import { BodyStyleService } from './../../../service/bodyStyle.service';
 import { BodyStyle } from '../../../model/bodyStyle';
 import { Component, OnInit } from '@angular/core';
