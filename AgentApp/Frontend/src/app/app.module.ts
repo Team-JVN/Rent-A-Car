@@ -1,3 +1,4 @@
+import { ListRentReportsComponent } from './component/list/list-rent-reports/list-rent-reports.component';
 import { AgentGuard } from './guard/agent.guard';
 import { TokenInterceptor } from './interceptor/token.interceptor';
 import { AddRentRequestComponent } from './component/add/add-rent-request/add-rent-request.component';
@@ -105,6 +106,7 @@ import { EditAdvertisementPartialComponent } from './component/edit/edit-adverti
     RentRequestDetailsComponent,
     ClientRentRequestDetailsComponent,
     EditAdvertisementPartialComponent,
+    ListRentReportsComponent,
   ],
   imports: [
     BrowserModule,

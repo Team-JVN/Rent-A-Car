@@ -18,6 +18,7 @@ import { ListAdvertisementsComponent } from './component/list/list-advertisement
 import { NonAuthorizedErrorPageComponent } from './error/non-authorized-error-page/non-authorized-error-page.component';
 import { ListMakesComponent } from './component/list/list-makes/list-makes.component';
 import { ListModelsComponent } from './component/list/list-models/list-models.component';
+import { ListRentReportsComponent } from './component/list/list-rent-reports/list-rent-reports.component';
 
 const routes: Routes = [
   {
@@ -83,6 +84,10 @@ const routes: Routes = [
   {
     path: "models/:id",
     component: ListModelsComponent,
+  },
+  {
+    path: "rent-reports",
+    component: ListRentReportsComponent,
   },
   //******************* ERROR PAGES ************************
   {
