@@ -37,4 +37,5 @@ export class AddModelComponent implements OnInit {
       }
     );
   }
+
 }

@@ -1,3 +1,4 @@
+import { AdvertisementWithPictures } from 'src/app/model/advertisementWithPictures';
 import { Advertisement } from './../../../model/advertisement';
 import { AddPriceListComponent } from './../add-price-list/add-price-list.component';
 import { PriceList } from './../../../model/priceList';
@@ -43,6 +44,7 @@ export class AddAdvertisementComponent implements OnInit {
     })
 
     this.dateForm = this.formBuilder.group({
+      pickUpPoint: new FormControl(null, Validators.required),
       validFrom: new FormControl(null, Validators.required),
       discount: new FormControl(null, [Validators.min(0), Validators.max(99)]),
       kilometresLimit: new FormControl(null, Validators.min(1))
@@ -117,9 +119,9 @@ export class AddAdvertisementComponent implements OnInit {
     if (!this.priceListForm.value.priceList.priceForCDW) {
       cdw = false;
     }
-    console.log(this.dateForm.value.validFrom)
-    const advertisement = new Advertisement(this.carForm.value.car.carDTO, this.priceListForm.value.priceList,
-      this.dateForm.value.discount, this.dateForm.value.kilometresLimit, cdw, validFrom);
+
+    const advertisement = new AdvertisementWithPictures(this.carForm.value.car, this.priceListForm.value.priceList,
+      this.dateForm.value.discount, this.dateForm.value.kilometresLimit, cdw, this.dateForm.value.pickUpPoint, validFrom);
 
     this.advertisementService.create(advertisement).subscribe(
       (data: Advertisement) => {
