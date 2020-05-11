@@ -15,6 +15,11 @@ h2 {
     margin-bottom: 20px;
 }
 
+.rating {
+    margin-top: -12px;
+    text-align: right;
+}
+
 td.mat-cell{
     border-bottom-style: none;
 }
@@ -60,7 +65,7 @@ th.mat-header-cell{
 .price-table {
     text-align: center;
     margin-left: 50px;
-    margin-top: 45px;
+    margin-top: 100px;
 }
 
 .rent-btn {

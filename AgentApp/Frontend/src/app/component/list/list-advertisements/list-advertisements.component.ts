@@ -1,3 +1,6 @@
+import { element } from 'protractor';
+import { EditAdvertisementPartialComponent } from './../../edit/edit-advertisement-partial/edit-advertisement-partial.component';
+import { DateTime } from 'luxon';
 import { RentRequestService } from 'src/app/service/rent-request.service';
 import { AddRentRequestComponent } from './../../add/add-rent-request/add-rent-request.component';
 import { Router } from '@angular/router';
@@ -10,7 +13,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AddAdvertisementComponent } from '../../add/add-advertisement/add-advertisement.component';
 import { MatTableDataSource } from '@angular/material/table';
-import { AdvertisementWithPicturesDTO } from 'src/app/model/advertisementWithPictures';
+import { AdvertisementWithPictures } from 'src/app/model/advertisementWithPictures';
 import { EditAdvertisementComponent } from '../../edit/edit-advertisement/edit-advertisement.component';
 
 @Component({
@@ -21,7 +24,7 @@ import { EditAdvertisementComponent } from '../../edit/edit-advertisement/edit-a
 export class ListAdvertisementsComponent implements OnInit {
 
   displayedColumns: string[] = ['advertisement'];
-  advertisementsDataSource: MatTableDataSource<AdvertisementWithPicturesDTO>;
+  advertisementsDataSource: MatTableDataSource<AdvertisementWithPictures>;
   createSuccess: Subscription;
   status: string = 'all';
 
@@ -38,19 +41,12 @@ export class ListAdvertisementsComponent implements OnInit {
     this.fetchAll('all');
     this.createSuccess = this.advertisementService.createSuccessEmitter.subscribe(
       () => {
-        if (status) {
-          this.fetchAll(status);
-        } else {
-          this.status = "all";
-          this.fetchAll(status);
-        }
-
+        this.fetchAll(this.status)
       }
     );
 
     this.createSuccess = this.rentRequestService.createSuccessEmitter.subscribe(
       () => {
-        console.log(this.status)
         this.fetchAll(this.status);
       }
     );
@@ -58,25 +54,25 @@ export class ListAdvertisementsComponent implements OnInit {
 
   fetchAll(status: string) {
     this.advertisementService.getAll(status).subscribe(
-      (data: AdvertisementWithPicturesDTO[]) => {
+      (data: AdvertisementWithPictures[]) => {
         data.forEach(adWithPicturesDTO => {
           this.getPicture(adWithPicturesDTO);
         });
         this.advertisementsDataSource = new MatTableDataSource(data);
       },
       (httpErrorResponse: HttpErrorResponse) => {
-        const data: AdvertisementWithPicturesDTO[] = []
+        const data: AdvertisementWithPictures[] = []
         this.advertisementsDataSource = new MatTableDataSource(data)
         this.toastr.error(httpErrorResponse.error.message, 'Show Advertisements');
       }
     );
   }
 
-  getPicture(adWithPicturesDTO: AdvertisementWithPicturesDTO) {
-    this.carService.getPicture(adWithPicturesDTO.pictures[0], adWithPicturesDTO.advertisement.car.id).subscribe(
+  getPicture(adWithPicturesDTO: AdvertisementWithPictures) {
+    this.carService.getPicture(adWithPicturesDTO.car.pictures[0].data, adWithPicturesDTO.car.id).subscribe(
       (data) => {
         this.createImageFromBlob(data, adWithPicturesDTO);
-        adWithPicturesDTO.isImageLoading = false;
+        adWithPicturesDTO.car.isImageLoading = false;
       },
       (httpErrorResponse: HttpErrorResponse) => {
         this.toastr.error(httpErrorResponse.error.message, 'Get picture');
@@ -84,10 +80,10 @@ export class ListAdvertisementsComponent implements OnInit {
     );
   }
 
-  createImageFromBlob(image: Blob, adWithPicturesDTO: AdvertisementWithPicturesDTO) {
+  createImageFromBlob(image: Blob, adWithPicturesDTO: AdvertisementWithPictures) {
     let reader = new FileReader();
     reader.addEventListener("load", () => {
-      adWithPicturesDTO.image = reader.result;
+      adWithPicturesDTO.car.image = reader.result;
     }, false);
 
     if (image) {
@@ -99,15 +95,24 @@ export class ListAdvertisementsComponent implements OnInit {
     this.dialog.open(AddAdvertisementComponent);
   }
 
-  edit(element: AdvertisementWithPicturesDTO) {
-    this.dialog.open(EditAdvertisementComponent, { data: element });
-
+  edit(element: AdvertisementWithPictures) {
+    this.advertisementService.getEditType(element.id).subscribe(
+      (data: string) => {
+        if (data === "ALL") {
+          this.dialog.open(EditAdvertisementComponent, { data: element });
+        } else {
+          this.dialog.open(EditAdvertisementPartialComponent, { data: element });
+        }
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Get edit type');
+      }
+    );
   }
 
-  delete(element: AdvertisementWithPicturesDTO) {
-    this.advertisementService.delete(element.advertisement.id).subscribe(
+  delete(element: AdvertisementWithPictures) {
+    this.advertisementService.delete(element.id).subscribe(
       () => {
-        console.log(this.status)
         this.fetchAll(this.status);
         this.toastr.success('Successfully deleted Advertisement!', 'Delete Advertisement');
       },
@@ -117,13 +122,26 @@ export class ListAdvertisementsComponent implements OnInit {
     );
   }
 
-  rent(element: AdvertisementWithPicturesDTO) {
-    this.dialog.open(AddRentRequestComponent, { data: element.advertisement });
+  rent(element: AdvertisementWithPictures) {
+    this.dialog.open(AddRentRequestComponent, { data: element });
 
   }
 
-  viewDetails(element: AdvertisementWithPicturesDTO) {
-    this.router.navigate(['/advertisement/' + element.advertisement.id]);
+  viewDetails(element: AdvertisementWithPictures) {
+    this.router.navigate(['/advertisement/' + element.id]);
   }
 
+  checkIfCanRentAdvertisement(element: AdvertisementWithPictures): boolean {
+    if (!element.dateTo) {
+      return true;
+    }
+    if (new Date(element.dateTo) > new Date()) {
+      return true;
+    }
+    return false;
+  }
+
+  viewRentRequests(element: AdvertisementWithPictures) {
+    this.router.navigate(['/rent-requests/' + element.id]);
+  }
 }

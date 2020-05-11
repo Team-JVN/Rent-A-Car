@@ -2,6 +2,7 @@
 export class Client {
     id: number;
     name: string;
+    password: string;
     email: string;
     address: string;
     phoneNumber: string;

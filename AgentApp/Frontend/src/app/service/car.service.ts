@@ -1,6 +1,7 @@
 import { CarEdit } from './../model/carEdit';
 import { Car } from './../model/car';
 import { Router } from '@angular/router';
+import { BodyStyle } from '../model/bodyStyle';
 import { environment } from './../../environments/environment';
 import { Injectable } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
@@ -50,5 +51,7 @@ export class CarService {
         return this.httpClient.delete(this.url + '/' + id);
     }
 
-
+    public getCarsForStatistics(filter: string) {
+        return this.httpClient.get(this.url + "/statistics/" + filter);
+    }
 }

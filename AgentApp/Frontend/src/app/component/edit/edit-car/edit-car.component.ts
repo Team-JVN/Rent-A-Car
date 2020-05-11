@@ -39,14 +39,14 @@ export class EditCarComponent implements OnInit {
   ngOnInit() {
 
     this.editForm = this.formBuilder.group({
-      make: new FormControl(this.selectedItem.carDTO.make, Validators.required),
-      model: new FormControl(this.selectedItem.carDTO.model, Validators.required),
+      make: new FormControl(this.selectedItem.make, Validators.required),
+      model: new FormControl(this.selectedItem.model, Validators.required),
       fuelType: new FormControl(null, Validators.required),
       gearBoxType: new FormControl(null, Validators.required),
       bodyStyle: new FormControl(null, Validators.required),
-      mileageInKm: new FormControl(this.selectedItem.carDTO.mileageInKm, [Validators.required, Validators.min(0)]),
-      kidsSeats: new FormControl(this.selectedItem.carDTO.kidsSeats, [Validators.required, Validators.min(0), Validators.max(3)]),
-      availableTracking: new FormControl(this.selectedItem.carDTO.availableTracking, Validators.required),
+      mileageInKm: new FormControl(this.selectedItem.mileageInKm, [Validators.required, Validators.min(0)]),
+      kidsSeats: new FormControl(this.selectedItem.kidsSeats, [Validators.required, Validators.min(0), Validators.max(3)]),
+      availableTracking: new FormControl(this.selectedItem.availableTracking, Validators.required),
     })
 
     this.fetchFuelTypes();
@@ -59,7 +59,7 @@ export class EditCarComponent implements OnInit {
 
   selectBodyStyle() {
     this.bodyStyles.forEach((element: BodyStyle) => {
-      if (element.id === this.selectedItem.carDTO.bodyStyle.id) {
+      if (element.id === this.selectedItem.bodyStyle.id) {
         this.editForm.controls['bodyStyle'].setValue(element);
       }
     });
@@ -67,7 +67,7 @@ export class EditCarComponent implements OnInit {
 
   selectfetchFuelType() {
     this.fuelTypes.forEach((element: FuelType) => {
-      if (element.id === this.selectedItem.carDTO.fuelType.id) {
+      if (element.id === this.selectedItem.fuelType.id) {
         this.editForm.controls['fuelType'].setValue(element);
       }
     });
@@ -75,7 +75,7 @@ export class EditCarComponent implements OnInit {
 
   selectfetchGearboxType() {
     this.gearBoxTypes.forEach((element: GearBoxType) => {
-      if (element.id === this.selectedItem.carDTO.gearBoxType.id) {
+      if (element.id === this.selectedItem.gearBoxType.id) {
         this.editForm.controls['gearBoxType'].setValue(element);
       }
     });
@@ -83,7 +83,7 @@ export class EditCarComponent implements OnInit {
 
   selectMake() {
     this.makes.forEach((element: Make) => {
-      if (element.id === this.selectedItem.carDTO.make.id) {
+      if (element.id === this.selectedItem.make.id) {
         this.editForm.controls['make'].setValue(element);
       }
     });
@@ -91,7 +91,7 @@ export class EditCarComponent implements OnInit {
 
   selectModel() {
     this.models.forEach((element: Model) => {
-      if (element.id === this.selectedItem.carDTO.model.id) {
+      if (element.id === this.selectedItem.model.id) {
         this.editForm.controls['model'].setValue(element);
       }
     });
@@ -173,14 +173,14 @@ export class EditCarComponent implements OnInit {
     }
     const formData = new FormData();
     const car = new Car(this.editForm.value.make, this.editForm.value.model, this.editForm.value.fuelType, this.editForm.value.gearBoxType, this.editForm.value.bodyStyle,
-      this.editForm.value.mileageInKm, this.editForm.value.kidsSeats, this.editForm.value.availableTracking, this.selectedItem.carDTO.id);
+      this.editForm.value.mileageInKm, this.editForm.value.kidsSeats, this.editForm.value.availableTracking, this.selectedItem.id);
     formData.append("carData", JSON.stringify(car));
 
     for (var i = 0; i < this.files.length; i++) {
       formData.append("files", this.files[i]);
     }
 
-    this.carService.edit(formData, this.selectedItem.carDTO.id).subscribe(
+    this.carService.edit(formData, this.selectedItem.id).subscribe(
       (data: Car) => {
         this.editForm.reset();
         this.dialogRef.close();
@@ -205,10 +205,10 @@ export class EditCarComponent implements OnInit {
 
   fetchPictures() {
     this.selectedItem.pictures.forEach(element => {
-      this.carService.getPicture(element, this.selectedItem.carDTO.id).subscribe(
+      this.carService.getPicture(element.data, this.selectedItem.id).subscribe(
         (data: Blob) => {
           data.type
-          const file = new File([data], element, { type: data.type });
+          const file = new File([data], element.data, { type: data.type });
           this.files.push(file);
         },
         (httpErrorResponse: HttpErrorResponse) => {

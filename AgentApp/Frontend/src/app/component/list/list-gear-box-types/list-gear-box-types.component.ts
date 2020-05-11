@@ -3,7 +3,6 @@ import { EditGearBoxTypeComponent } from './../../edit/edit-gear-box-type/edit-g
 import { HttpErrorResponse } from '@angular/common/http';
 import { GearboxTypeService } from './../../../service/gearboxType.service';
 import { ToastrService } from 'ngx-toastr';
-import { FuelTypeService } from './../../../service/fuelType.service';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { MatTableDataSource } from '@angular/material/table';

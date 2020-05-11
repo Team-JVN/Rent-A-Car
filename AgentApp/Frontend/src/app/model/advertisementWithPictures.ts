@@ -1,16 +1,27 @@
-import { Advertisement } from './advertisement';
+import { PriceList } from './priceList';
+import { CarWithPictures } from 'src/app/model/carWithPictures';
 
-export class AdvertisementWithPicturesDTO {
-    advertisement: Advertisement;
-    pictures: string[];
-    image: any;
-    isImageLoading: boolean;
+export class AdvertisementWithPictures {
+    id: number;
+    car: CarWithPictures;
+    priceList: PriceList;
+    kilometresLimit: number;
+    discount: number;
+    cdw: boolean;
+    pickUpPoint: string;
+    dateFrom: string;
+    dateTo: string;
 
-    constructor(advertisementDTO: Advertisement, pictures: any, image?: any, isImageLoading?: boolean) {
-        this.advertisement = advertisementDTO;
-        this.pictures = pictures;
-        this.image = image;
-        this.isImageLoading = isImageLoading;
+    constructor(car: CarWithPictures, priceList: PriceList, discount: number, kilometresLimit: number, cdw: boolean, pickUpPoint: string, dateFrom: string, dateTo?: string, id?: number,
+    ) {
+        this.id = id;
+        this.car = car;
+        this.priceList = priceList;
+        this.discount = discount;
+        this.kilometresLimit = kilometresLimit;
+        this.cdw = cdw;
+        this.dateFrom = dateFrom;
+        this.pickUpPoint = pickUpPoint;
+        this.dateTo = dateTo;
     }
-
 }

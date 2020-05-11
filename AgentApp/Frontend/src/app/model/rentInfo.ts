@@ -1,33 +1,21 @@
-import { Advertisement } from "./advertisement";
-import { RentReport } from "./rentReport";
+import { AdvertisementWithPictures } from 'src/app/model/advertisementWithPictures';
 
 export class RentInfo {
   id: number;
   dateTimeFrom: string;
   dateTimeTo: string;
-  pickUpPoint: string;
   optedForCDW: boolean;
-  advertisement: Advertisement;
-  availableCreatingRentReport: boolean;
-  rentReport: RentReport;
+  advertisement: AdvertisementWithPictures;
+  index: number;
+  inBundle: boolean;
 
-  constructor(
-    dateTimeFrom: string,
-    dateTimeTo: string,
-    pickUpPoint: string,
-    optedForCDW: boolean,
-    advertisement: Advertisement,
-    availableCreatingRentReport?: boolean,
-    id?: number,
-    rentReport?: RentReport
-  ) {
+  constructor(dateTimeFrom: string, dateTimeTo: string, optedForCDW: boolean, advertisement: AdvertisementWithPictures, id?: number) {
     this.dateTimeFrom = dateTimeFrom;
     this.dateTimeTo = dateTimeTo;
-    this.pickUpPoint = pickUpPoint;
     this.optedForCDW = optedForCDW;
     this.advertisement = advertisement;
     this.id = id;
-    this.availableCreatingRentReport = availableCreatingRentReport;
-    this.rentReport = rentReport;
+    this.inBundle = false;
   }
+
 }

@@ -3,6 +3,17 @@ mat-card {
     margin: 2em auto;
 }
 
+mat-card-content {
+    margin-left: 16px;
+    margin-right: 16px;
+    margin-bottom: 0;
+}
+
+mat-card-header mat-card-title {
+    font-size: 24px;
+    font-weight: 550;
+}
+
 .buttons-width {
     width: 105px;
 }
@@ -15,13 +26,26 @@ th.mat-header-cell{
     border-bottom-style: none;
 }
 
+.advertisement-list-table td.mat-cell:first-of-type{
+    padding-left: 8px;
+}
+
+.advertisement-list-table td.mat-cell:last-of-type{
+    padding-right: 8px;
+}
+
+.advertisement-div {
+    width: 100%;
+}
+
 .advertisement-table tr {
     border-bottom: 1px solid #ddd;
 }
 
 .advertisement-table th, .table td {
-    font-size: 16px;
+    font-size: 15px;
     vertical-align: bottom;
+    padding: 0.6rem;
 }
 
 .theader {
@@ -73,16 +97,6 @@ th.mat-header-cell{
     margin-top: -6px;
 }
 
-mat-card-content {
-    margin-left: 16px;
-    margin-bottom: 0;
-}
-
-mat-card-header mat-card-title {
-    font-size: 24px;
-    font-weight: 550;
-}
-
 .per-km {
     font-weight: 550;
 }
@@ -100,8 +114,7 @@ mat-card-header mat-card-title {
 
 .price-table {
     text-align: center;
-    margin-left: 25px;
-    margin-top: 10px;
+    width: 290px;
 }
 
 .rent-btn {

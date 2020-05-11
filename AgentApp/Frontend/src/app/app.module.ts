@@ -45,10 +45,12 @@ import { AdvertisementDetailsComponent } from "./component/advertisement-details
 import { ListRentRequestsComponent } from "./component/list/list-rent-requests/list-rent-requests.component";
 import { AddRentReportComponent } from "./component/add/add-rent-report/add-rent-report.component";
 import { ListRentReportsComponent } from "./component/list/list-rent-reports/list-rent-reports.component";
-import { EditRentRequestComponent } from './component/edit/edit-rent-request/edit-rent-request.component';
 import { ListMakesComponent } from './component/list/list-makes/list-makes.component';
 import { ListModelsComponent } from './component/list/list-models/list-models.component';
 import { ConfirmDialogDeleteMakeComponent } from './component/confirm-dialog/confirm-dialog-delete-make/confirm-dialog-delete-make.component';
+import { EditAdvertisementPartialComponent } from './component/edit/edit-advertisement-partial/edit-advertisement-partial.component';
+import { ClientRentRequestDetailsComponent } from './component/details/client-rent-request-details/client-rent-request-details.component';
+import { RentRequestDetailsComponent } from './component/details/rent-request-details/rent-request-details.component';
 
 @NgModule({
   declarations: [
@@ -81,7 +83,6 @@ import { ConfirmDialogDeleteMakeComponent } from './component/confirm-dialog/con
     AddRentRequestComponent,
     AdvertisementDetailsComponent,
     ListRentRequestsComponent,
-    EditRentRequestComponent,
     AddRentReportComponent,
     ListRentReportsComponent,
     ListMakesComponent,
@@ -91,6 +92,9 @@ import { ConfirmDialogDeleteMakeComponent } from './component/confirm-dialog/con
     EditMakeComponent,
     EditModelComponent,
     ConfirmDialogDeleteMakeComponent,
+    EditAdvertisementPartialComponent,
+    ClientRentRequestDetailsComponent,
+    RentRequestDetailsComponent,
   ],
   imports: [
     BrowserModule,
@@ -129,7 +133,6 @@ import { ConfirmDialogDeleteMakeComponent } from './component/confirm-dialog/con
     AddClientComponent,
     EditClientComponent,
     AddRentRequestComponent,
-    EditRentRequestComponent,
     AddRentReportComponent,
     AddMakeComponent,
     AddModelComponent,

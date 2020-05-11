@@ -13,7 +13,7 @@ export class BodyStyleService {
     updateSuccessEmitter = new Subject<BodyStyle>();
     createSuccessEmitter = new Subject<BodyStyle>();
 
-    constructor(private httpClient: HttpClient, private router: Router) { }
+    constructor(private httpClient: HttpClient) { }
 
     public create(bodyStyle: BodyStyle): any {
         return this.httpClient.post(this.url, bodyStyle);
