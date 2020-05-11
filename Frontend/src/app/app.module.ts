@@ -1,6 +1,6 @@
 import { AgentGuard } from './guard/agent.guard';
 import { AdminGuard } from './guard/admin.guard';
-import { TokenInterceptor } from './interseptor/toke.interceptor';
+import { TokenInterceptor } from './interceptor/token.interceptor';
 import { AddRentRequestComponent } from './component/add/add-rent-request/add-rent-request.component';
 import { HeaderComponent } from './component/header/header.component';
 import { CustomHammerConfig } from './custom-hummer-config';

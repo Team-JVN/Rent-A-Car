@@ -1,0 +1,45 @@
+<mat-card>
+    <mat-card-content>
+
+        <div class="row">
+            <div class="col-9">
+                <h2>Login</h2>
+            </div>
+        </div>
+
+        <form [formGroup]="loginForm" class="form-full-width">
+            <mat-form-field class="form-full-width mt-2">
+                <input matInput placeholder="Email" formControlName="email">
+                <mat-error *ngIf="loginForm.get('email').errors && loginForm.get('email').errors['required']">
+                    Please enter email address.
+                </mat-error>
+                <mat-error *ngIf="loginForm.get('email').errors && loginForm.get('email').errors['email']">
+                    Please enter a valid email address.
+                </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="form-full-width mt-2">
+                <input matInput placeholder="Password" type="password" formControlName="password">
+                <mat-error *ngIf="loginForm.get('password').errors && loginForm.get('password').errors['required']">
+                    Please enter password.
+                </mat-error>
+                <mat-error *ngIf="loginForm.get('password').errors && loginForm.get('password').errors['minlength']">
+                    Password must be at least 8 characters long
+                </mat-error>
+                <mat-error *ngIf="loginForm.get('password').errors && loginForm.get('password').errors['pattern']">
+                    Password must contain at least 1 lowercase, 1 uppercase letter and 1 number
+                </mat-error>
+            </mat-form-field>
+            <div class="row mt-4 vertical-align: middle">
+                <div class="col-9 mt-2">
+                    <a routerLink="/client/register">Don't have an account? Register here.</a>
+                </div>
+                <div class="col-3" align="end">
+                    <button mat-raised-button color="primary" (click)="login()"
+                        [disabled]="!loginForm.valid">Login</button>
+                </div>
+            </div>
+
+        </form>
+    </mat-card-content>
+</mat-card>
