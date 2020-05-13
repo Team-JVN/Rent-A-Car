@@ -102,6 +102,10 @@ const routes: Routes = [
     path: "",
     component: ListAdvertisementsComponent,
   },
+  {
+    path: "**",
+    component: ListAdvertisementsComponent,
+  },
 ];
 
 @NgModule({

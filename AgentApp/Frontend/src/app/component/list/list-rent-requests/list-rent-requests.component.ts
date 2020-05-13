@@ -1,3 +1,4 @@
+import { AddRentReportComponent } from './../../add/add-rent-report/add-rent-report.component';
 import { AdvertisementService } from 'src/app/service/advertisement.service';
 import { RentInfo } from './../../../model/rentInfo';
 import { RentRequestService } from 'src/app/service/rent-request.service';
@@ -82,7 +83,7 @@ export class ListRentRequestsComponent implements OnInit {
   }
 
   createRentReport(rentRequest: RentRequest, rentInfo: RentInfo) {
-    // this.dialog.open(AddRentRequestComponent, { data: element.advertisement });
+    this.dialog.open(AddRentReportComponent, { data: rentInfo });
   }
 
   advertisementDetails(rentInfo: RentInfo) {

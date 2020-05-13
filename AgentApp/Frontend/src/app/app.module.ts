@@ -1,3 +1,4 @@
+import { AddRentReportComponent } from './component/add/add-rent-report/add-rent-report.component';
 import { ListRentReportsComponent } from './component/list/list-rent-reports/list-rent-reports.component';
 import { AgentGuard } from './guard/agent.guard';
 import { TokenInterceptor } from './interceptor/token.interceptor';
@@ -107,6 +108,7 @@ import { EditAdvertisementPartialComponent } from './component/edit/edit-adverti
     ClientRentRequestDetailsComponent,
     EditAdvertisementPartialComponent,
     ListRentReportsComponent,
+    AddRentReportComponent,
   ],
   imports: [
     BrowserModule,
@@ -151,6 +153,7 @@ import { EditAdvertisementPartialComponent } from './component/edit/edit-adverti
     EditModelComponent,
     EditMakeComponent,
     AddModelComponent,
+    AddRentReportComponent,
   ],
   providers: [
     {
