@@ -11,12 +11,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.List;
 import java.util.stream.Collectors;
-
+@Validated
 @RestController
 @RequestMapping(value = "/api/make", produces = MediaType.APPLICATION_JSON_VALUE)
 public class MakeController {
@@ -44,26 +46,26 @@ public class MakeController {
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<MakeDTO> edit(@PathVariable Long id, @Valid @RequestBody MakeDTO makeDTO) {
+    public ResponseEntity<MakeDTO> edit(@PathVariable  @Positive(message = "Id must be positive.") Long id, @Valid @RequestBody MakeDTO makeDTO) {
         return new ResponseEntity<>(makeDtoMapper.toDto(makeService.edit(id, makeDTO)), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id")  @Positive(message = "Id must be positive.") Long id) {
         makeService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping(value = "/{makeId}/model", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<ModelDTO> createModel(@Valid @RequestBody ModelDTO modelDTO, @PathVariable Long makeId) {
+    public ResponseEntity<ModelDTO> createModel(@Valid @RequestBody ModelDTO modelDTO, @PathVariable  @Positive(message = "Id must be positive.") Long makeId) {
         return new ResponseEntity<>(modelDtoMapper.toDto(modelService.create(modelDtoMapper.toEntity(modelDTO), makeService.get(makeId))), HttpStatus.CREATED);
     }
 
     @GetMapping("/{makeId}/models")
     @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<List<ModelDTO>> getModels(@PathVariable Long makeId) {
+    public ResponseEntity<List<ModelDTO>> getModels(@PathVariable  @Positive(message = "Id must be positive.") Long makeId) {
         List<ModelDTO> list = modelService.getAll(makeId).stream().map(modelDtoMapper::toDto).
                 collect(Collectors.toList());
         return new ResponseEntity<>(list, HttpStatus.OK);
@@ -71,13 +73,16 @@ public class MakeController {
 
     @PutMapping(value = "/{makeId}/model/{modelId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<ModelDTO> editModel(@PathVariable Long makeId, @PathVariable Long modelId, @Valid @RequestBody ModelDTO modelDTO) {
+    public ResponseEntity<ModelDTO> editModel(@PathVariable  @Positive(message = "Id must be positive.")  Long makeId,
+                                              @PathVariable  @Positive(message = "Id must be positive.") Long modelId,
+                                              @Valid @RequestBody ModelDTO modelDTO) {
         return new ResponseEntity<>(modelDtoMapper.toDto(modelService.edit(modelId, modelDTO, makeId)), HttpStatus.OK);
     }
 
     @DeleteMapping("/{makeId}/model/{modelId}")
     @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<Void> delete(@PathVariable Long makeId, @PathVariable Long modelId) {
+    public ResponseEntity<Void> delete(@PathVariable  @Positive(message = "Id must be positive.") Long makeId,
+                                       @PathVariable  @Positive(message = "Id must be positive.") Long modelId) {
         modelService.delete(modelId, makeId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

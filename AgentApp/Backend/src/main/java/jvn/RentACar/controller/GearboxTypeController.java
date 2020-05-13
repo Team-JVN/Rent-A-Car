@@ -9,12 +9,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.List;
 import java.util.stream.Collectors;
-
+@Validated
 @RestController
 @RequestMapping(value = "/api/gearbox-type", produces = MediaType.APPLICATION_JSON_VALUE)
 public class GearboxTypeController {
@@ -39,13 +41,13 @@ public class GearboxTypeController {
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<GearboxTypeDTO> edit(@PathVariable Long id, @Valid @RequestBody GearboxTypeDTO gearBoxTypeDTO) {
+    public ResponseEntity<GearboxTypeDTO> edit(@PathVariable  @Positive(message = "Id must be positive.") Long id, @Valid @RequestBody GearboxTypeDTO gearBoxTypeDTO) {
         return new ResponseEntity<>(gearboxTypeDtoMapper.toDto(gearBoxTypeService.edit(id, gearBoxTypeDTO)), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id")  @Positive(message = "Id must be positive.") Long id) {
         gearBoxTypeService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

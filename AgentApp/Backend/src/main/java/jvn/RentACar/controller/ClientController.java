@@ -8,12 +8,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.List;
 import java.util.stream.Collectors;
-
+@Validated
 @RestController
 @RequestMapping(value = "/api/client", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ClientController {
@@ -38,13 +40,13 @@ public class ClientController {
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<ClientDTO> edit(@PathVariable Long id, @Valid @RequestBody ClientDTO clientDTO) {
+    public ResponseEntity<ClientDTO> edit(@PathVariable  @Positive(message = "Id must be positive.") Long id, @Valid @RequestBody ClientDTO clientDTO) {
         return new ResponseEntity<>(clientDtoMapper.toDto(clientService.edit(id, clientDtoMapper.toEntity(clientDTO))), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id")  @Positive(message = "Id must be positive.") Long id) {
         clientService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

@@ -24,7 +24,7 @@ public class CarDTO {
     @NotNull(message = "Fuel type is null.")
     private FuelTypeDTO fuelType;
 
-    @NotNull(message = "Gerbox type is null.")
+    @NotNull(message = "Gearbox type is null.")
     private GearboxTypeDTO gearBoxType;
 
     @NotNull(message = "Body style is null.")

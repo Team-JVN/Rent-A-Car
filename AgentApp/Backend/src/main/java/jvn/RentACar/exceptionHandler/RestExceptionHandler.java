@@ -1,5 +1,6 @@
 package jvn.RentACar.exceptionHandler;
 
+import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -110,9 +113,22 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(error);
     }
 
-    @ExceptionHandler({ Exception.class })
-    public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
-        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST, "Something is wrong.Please try again.");
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleOtherExceptions() {
+        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST, "Unknown error occurred. Please try again.");
+        return  buildResponseEntity(error);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+        ex.getConstraintViolations().forEach(constraintViolation -> {
+            stringBuilder.append(constraintViolation.getMessage());
+            stringBuilder.append(" ");
+        });
+
+        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST,stringBuilder.toString());
         return  buildResponseEntity(error);
     }
 

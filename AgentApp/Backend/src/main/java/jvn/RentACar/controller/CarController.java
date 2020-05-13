@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,12 +25,13 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.constraints.Positive;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
+@Validated
 @RestController
 @CrossOrigin
 @RequestMapping(value = "/api/car")
@@ -45,10 +47,10 @@ public class CarController {
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<CarDTO> create(@RequestParam("carData") String jsonString, @RequestParam("files") List<MultipartFile> multipartFiles) throws ParseException {
+    public ResponseEntity<CarDTO> create(@RequestParam("carData") String jsonString, @RequestParam("files") List<MultipartFile> multipartFiles) {
 
         ObjectMapper mapper = new ObjectMapper();
-        CreateCarDTO createCarDTO = null;
+        CreateCarDTO createCarDTO;
         try {
             createCarDTO = mapper.readValue(jsonString, CreateCarDTO.class);
             validateCreateCarDTO(createCarDTO);
@@ -68,30 +70,31 @@ public class CarController {
     }
 
     @GetMapping(value = "/{id}/picture", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
-    public ResponseEntity<Resource> get(@PathVariable Long id, @RequestParam(value = "fileName", required = true) String fileName) {
+    public ResponseEntity<Resource> get(@PathVariable @Positive(message = "Id must be positive.")  Long id,
+                                        @RequestParam(value = "fileName") String fileName) {
         return new ResponseEntity<>(carService.get(fileName), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") @Positive(message = "Id must be positive.")  Long id) {
         carService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping(value = "/{id}/edit", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<EditType> getEditType(@PathVariable Long id) {
+    public ResponseEntity<EditType> getEditType(@PathVariable @Positive(message = "Id must be positive.")  Long id) {
         return new ResponseEntity<>(carService.getEditType(id), HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<CarDTO> editAll(@PathVariable Long id, @RequestParam("carData") String jsonString, @RequestParam("files")
-            List<MultipartFile> multipartFiles) throws ParseException {
+    public ResponseEntity<CarDTO> editAll(@PathVariable @Positive(message = "Id must be positive.")  Long id, @RequestParam("carData") String jsonString,
+                                          @RequestParam("files") List<MultipartFile> multipartFiles)  {
 
         ObjectMapper mapper = new ObjectMapper();
-        CarDTO carDTO = null;
+        CarDTO carDTO;
         try {
             carDTO = mapper.readValue(jsonString, CarDTO.class);
             validateCarDTO(carDTO);
@@ -104,10 +107,10 @@ public class CarController {
 
     @PutMapping(value = "/{id}/partial", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<CarDTO> editPartial(@PathVariable Long id, @RequestParam("carData") String jsonString, @RequestParam("files")
-            List<MultipartFile> multipartFiles) throws ParseException {
+    public ResponseEntity<CarDTO> editPartial(@PathVariable @Positive(message = "Id must be positive.")  Long id,
+                                              @RequestParam("carData") String jsonString, @RequestParam("files") List<MultipartFile> multipartFiles)  {
         ObjectMapper mapper = new ObjectMapper();
-        CarEditDTO carEditDTO = null;
+        CarEditDTO carEditDTO;
         try {
             carEditDTO = mapper.readValue(jsonString, CarEditDTO.class);
             validateCarEditDTO(carEditDTO);
