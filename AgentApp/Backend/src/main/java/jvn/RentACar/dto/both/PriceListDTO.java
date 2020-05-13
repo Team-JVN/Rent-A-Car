@@ -14,6 +14,7 @@ import javax.validation.constraints.Positive;
 @AllArgsConstructor
 public class PriceListDTO {
 
+    @Positive(message = "Id must be positive.")
     private Long id;
 
     @NotNull

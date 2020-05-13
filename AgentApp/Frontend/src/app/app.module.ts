@@ -150,6 +150,7 @@ import { EditAdvertisementPartialComponent } from './component/edit/edit-adverti
     AddMakeComponent,
     EditModelComponent,
     EditMakeComponent,
+    AddModelComponent,
   ],
   providers: [
     {

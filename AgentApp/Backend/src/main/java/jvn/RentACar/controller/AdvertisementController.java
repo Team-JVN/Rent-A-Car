@@ -1,6 +1,6 @@
 package jvn.RentACar.controller;
 
-import jvn.RentACar.dto.both.AdvertisementDTO;
+import jvn.RentACar.dto.response.AdvertisementDTO;
 import jvn.RentACar.dto.both.RentRequestDTO;
 import jvn.RentACar.dto.request.AdvertisementEditDTO;
 import jvn.RentACar.dto.request.CreateAdvertisementDTO;

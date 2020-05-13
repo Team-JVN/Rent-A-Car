@@ -1,7 +1,7 @@
-package jvn.RentACar.dto.request;
+package jvn.RentACar.dto.response;
 
+import jvn.RentACar.dto.both.CarDTO;
 import jvn.RentACar.dto.both.PriceListDTO;
-import jvn.RentACar.dto.response.CarWithPicturesDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,9 +11,13 @@ import javax.validation.constraints.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CreateAdvertisementDTO {
+public class AdvertisementDTO {
+    @NotNull(message = "Id is null.")
+    @Positive(message = "Id must be positive.")
+    private Long id;
+
     @NotNull(message = "Car is null.")
-    private CarWithPicturesDTO car;
+    private CarDTO car;
 
     @NotNull(message = "Price list is null.")
     private PriceListDTO priceList;
@@ -25,10 +29,14 @@ public class CreateAdvertisementDTO {
     @Max(value = 99,message = "Maximal discount is 99%.")
     private Integer discount;
 
+    @NotNull(message = "CDW is null.")
+    private Boolean CDW;
+
     @NotBlank(message = "Date from is empty.")
     @Pattern(regexp = "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$",message = "Date from is not validly formatted")
     private String dateFrom;
 
+    @NotBlank(message = "Date to is empty.")
     @Pattern(regexp = "^(\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]))?$",message = "Date to is not validly formatted")
     private String dateTo;
 
