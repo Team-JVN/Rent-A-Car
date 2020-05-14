@@ -1,3 +1,4 @@
+import { ErrorInterceptor } from './interceptor/error.interceptor';
 import { AddRentReportComponent } from './component/add/add-rent-report/add-rent-report.component';
 import { ListRentReportsComponent } from './component/list/list-rent-reports/list-rent-reports.component';
 import { AgentGuard } from './guard/agent.guard';
@@ -160,7 +161,7 @@ import { EditAdvertisementPartialComponent } from './component/edit/edit-adverti
       provide: HAMMER_GESTURE_CONFIG, useClass: CustomHammerConfig
     },
     { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
-    // { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     AgentGuard,
     ClientGuard
   ],

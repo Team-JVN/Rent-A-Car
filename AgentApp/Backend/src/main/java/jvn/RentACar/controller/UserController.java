@@ -52,7 +52,7 @@ public class UserController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ClientDTO> registerPatient(@Valid @RequestBody ClientDTO clientDTO) {
+    public ResponseEntity<ClientDTO> register(@Valid @RequestBody ClientDTO clientDTO) {
         return new ResponseEntity<>(clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO))), HttpStatus.CREATED);
     }
 

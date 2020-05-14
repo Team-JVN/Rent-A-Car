@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +14,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Validated
 @RestController
 @RequestMapping(value = "/api/price-list", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -25,12 +25,11 @@ public class PriceListController {
     private PriceListDtoMapper priceListDtoMapper;
 
     @GetMapping("/{id}")
-    public ResponseEntity<PriceListDTO> get(@PathVariable  @Positive(message = "Id must be positive.") Long id) {
+    public ResponseEntity<PriceListDTO> get(@PathVariable @Positive(message = "Id must be positive.") Long id) {
         return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.get(id)), HttpStatus.OK);
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<List<PriceListDTO>> getAll() {
         List<PriceListDTO> list = priceListService.getAll().stream().map(priceListDtoMapper::toDto).
                 collect(Collectors.toList());
@@ -38,20 +37,17 @@ public class PriceListController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<PriceListDTO> create(@Valid @RequestBody PriceListDTO priceListDTO) {
         return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.create(priceListDtoMapper.toEntity(priceListDTO))), HttpStatus.CREATED);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<PriceListDTO> edit(@PathVariable  @Positive(message = "Id must be positive.") Long id, @Valid @RequestBody PriceListDTO priceListDTO) {
+    public ResponseEntity<PriceListDTO> edit(@PathVariable @Positive(message = "Id must be positive.") Long id, @Valid @RequestBody PriceListDTO priceListDTO) {
         return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.edit(id, priceListDtoMapper.toEntity(priceListDTO))), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<Void> delete(@PathVariable  @Positive(message = "Id must be positive.") Long id) {
+    public ResponseEntity<Void> delete(@PathVariable @Positive(message = "Id must be positive.") Long id) {
         priceListService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
