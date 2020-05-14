@@ -13,11 +13,11 @@ import java.util.List;
 @Service
 public class PermissionServiceImpl implements PermissionService {
 
-    PermissionRepository permissionRepository;
+    private PermissionRepository permissionRepository;
 
     @Override
     public List<Permission> getAll() {
-        return permissionRepository.findAll();
+        return permissionRepository.findByNameNot("MANAGE_ROLES");
     }
 
     @Override

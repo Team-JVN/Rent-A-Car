@@ -11,7 +11,7 @@ export class PermissionService {
   constructor(private httpClient: HttpClient) { }
 
   public getPermissions() {
-    return this.httpClient.get(this.url + '/all');
+    return this.httpClient.get(this.url);
   }
 
 }

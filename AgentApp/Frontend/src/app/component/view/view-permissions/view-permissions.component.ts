@@ -22,19 +22,15 @@ export class ViewPermissionsComponent implements OnInit {
     private roleService: RoleService) { }
 
   ngOnInit() {
-    //this.fetchPermissions();
-    const permissions = [new Permission("MANAGE_CODE_BOOKS", 1), new Permission("MANAGE_CLIENTS", 2), new Permission("MANAGE_AGENTS", 3), new Permission("MANAGE_CLIENT5", 4)]
-    this.permissionsDataSource = new MatTableDataSource(permissions);
-    this.allPermissions = permissions;
-    this.selectPermissions();
+    this.fetchPermissions();
   }
-
 
   fetchPermissions() {
     this.permissionService.getPermissions().subscribe(
       (data: Permission[]) => {
         this.permissionsDataSource = new MatTableDataSource(data);
         this.allPermissions = data;
+        this.selectPermissions();
       },
       (httpErrorResponse: HttpErrorResponse) => {
         const permissions = [];

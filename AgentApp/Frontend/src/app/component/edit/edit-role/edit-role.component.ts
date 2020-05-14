@@ -20,10 +20,7 @@ export class EditRoleComponent implements OnInit {
     private toastr: ToastrService) { }
 
   ngOnInit() {
-    // this.fetchRoles();
-    const permissions = [new Permission("MANAGE_CODE_BOOKS", 1), new Permission("MANAGE_CLIENTS", 2)]
-    const role = new Role("ROLE_CLIENT", 1, permissions);
-    this.roles = [role, new Role("ROLE_AGENT", 1, permissions)]
+    this.fetchRoles();
   }
 
   fetchRoles() {

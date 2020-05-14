@@ -12,7 +12,7 @@ export class RoleService {
   constructor(private httpClient: HttpClient) { }
 
   public getRoles() {
-    return this.httpClient.get(this.url + '/all');
+    return this.httpClient.get(this.url);
   }
 
   public getPermissions(roleId: number) {

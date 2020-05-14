@@ -19,9 +19,11 @@ import java.util.Set;
 @Service
 public class RoleServiceImpl implements RoleService {
 
-    RoleRepository roleRepository;
+    private RoleRepository roleRepository;
 
-    PermissionService permissionService;
+    private PermissionService permissionService;
+
+    private UserServiceImpl userService;
 
     @Override
     public Role editPermissions(Long id, RoleDTO roleDTO) {
@@ -36,7 +38,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<Role> getAll() {
-        return roleRepository.findAll();
+        return roleRepository.findByNameNot(userService.getLoginUser().getRole().getName());
     }
 
     @Override
@@ -49,8 +51,10 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Autowired
-    public RoleServiceImpl(RoleRepository roleRepository, PermissionService permissionService) {
+    public RoleServiceImpl(RoleRepository roleRepository, PermissionService permissionService,
+                           UserServiceImpl userService) {
         this.roleRepository = roleRepository;
         this.permissionService = permissionService;
+        this.userService = userService;
     }
 }
