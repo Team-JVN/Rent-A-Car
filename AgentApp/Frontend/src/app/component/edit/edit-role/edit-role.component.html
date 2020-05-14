@@ -1,0 +1,12 @@
+<mat-card>
+    <mat-card-content>
+        <br />
+        <mat-tab-group>
+            <div *ngFor="let role of roles">
+                <mat-tab label="{{role.name | slice: 5 : end | titlecase}}">
+                    <app-view-permissions [role]="role"></app-view-permissions>
+                </mat-tab>
+            </div>
+        </mat-tab-group>
+    </mat-card-content>
+</mat-card>
