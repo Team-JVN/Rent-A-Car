@@ -7,4 +7,6 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
 
     Permission findByName(String name);
 
+    Permission findOneById(Long id);
+
 }

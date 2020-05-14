@@ -1,6 +1,5 @@
 package jvn.RentACar.exceptionHandler;
 
-import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -11,31 +10,32 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(InvalidBodyStyleDataException.class)
-    protected ResponseEntity<Object> handleInvalidBodyStyleDataException(InvalidBodyStyleDataException ex) {
+    @ExceptionHandler(InvalidRoleDataException.class)
+    protected ResponseEntity<Object> handleInvalidRoleDataException(InvalidRoleDataException ex) {
         ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
         return buildResponseEntity(error);
     }
 
-    @ExceptionHandler(NullPointerException.class)
-    protected ResponseEntity<Object> handleNullPointerException(NullPointerException ex) {
-        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST, "Please try again.");
+    @ExceptionHandler(InvalidPermissionDataException.class)
+    protected ResponseEntity<Object> handleInvalidPermissionDataException(InvalidPermissionDataException ex) {
+        ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
+        return buildResponseEntity(error);
+    }
+
+    @ExceptionHandler(InvalidBodyStyleDataException.class)
+    protected ResponseEntity<Object> handleInvalidBodyStyleDataException(InvalidBodyStyleDataException ex) {
+        ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
         return buildResponseEntity(error);
     }
 
@@ -116,7 +116,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleOtherExceptions() {
         ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST, "Unknown error occurred. Please try again.");
-        return  buildResponseEntity(error);
+        return buildResponseEntity(error);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -128,8 +128,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             stringBuilder.append(" ");
         });
 
-        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST,stringBuilder.toString());
-        return  buildResponseEntity(error);
+        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST, stringBuilder.toString());
+        return buildResponseEntity(error);
     }
 
     @Override
@@ -137,13 +137,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         final List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
         StringBuilder stringBuilder = new StringBuilder();
-        for (FieldError fieldError:fieldErrors) {
+        for (FieldError fieldError : fieldErrors) {
             stringBuilder.append(fieldError.getDefaultMessage());
             stringBuilder.append(" ");
         }
 
-        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST,stringBuilder.toString());
-        return  buildResponseEntity(error);
+        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST, stringBuilder.toString());
+        return buildResponseEntity(error);
     }
 
     private ResponseEntity<Object> buildResponseEntity(ErrorResponse error) {

@@ -35,7 +35,7 @@ public class FuelTypeServiceImpl implements FuelTypeService {
     }
 
     @Override
-    public List<FuelType> get() throws InvalidFuelTypeDataException {
+    public List<FuelType> get() {
         return fuelTypeRepository.findAll();
     }
 
