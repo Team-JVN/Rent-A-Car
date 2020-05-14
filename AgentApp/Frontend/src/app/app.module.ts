@@ -1,3 +1,4 @@
+import { ReplacePipe } from './util/replace.pipe';
 import { ErrorInterceptor } from './interceptor/error.interceptor';
 import { AddRentReportComponent } from './component/add/add-rent-report/add-rent-report.component';
 import { ListRentReportsComponent } from './component/list/list-rent-reports/list-rent-reports.component';
@@ -61,9 +62,12 @@ import { RentRequestDetailsComponent } from './component/details/rent-request-de
 import { ClientRentRequestDetailsComponent } from './component/details/client-rent-request-details/client-rent-request-details.component';
 import { ClientGuard } from './guard/client.guard';
 import { EditAdvertisementPartialComponent } from './component/edit/edit-advertisement-partial/edit-advertisement-partial.component';
+import { EditRoleComponent } from './component/edit/edit-role/edit-role.component';
+import { ViewPermissionsComponent } from './component/view/view-permissions/view-permissions.component';
 
 @NgModule({
   declarations: [
+    ReplacePipe,
     AppComponent,
     ListBodyStylesComponent,
     HeaderComponent,
@@ -110,6 +114,8 @@ import { EditAdvertisementPartialComponent } from './component/edit/edit-adverti
     EditAdvertisementPartialComponent,
     ListRentReportsComponent,
     AddRentReportComponent,
+    EditRoleComponent,
+    ViewPermissionsComponent,
   ],
   imports: [
     BrowserModule,

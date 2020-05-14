@@ -1,3 +1,4 @@
+import { EditRoleComponent } from './component/edit/edit-role/edit-role.component';
 import { ClientRentRequestDetailsComponent } from './component/details/client-rent-request-details/client-rent-request-details.component';
 import { RentRequestDetailsComponent } from './component/details/rent-request-details/rent-request-details.component';
 import { NonAuthenticatedErrorPageComponent } from './error/non-authenticated-error-page/non-authenticated-error-page.component';
@@ -88,6 +89,10 @@ const routes: Routes = [
   {
     path: "rent-reports",
     component: ListRentReportsComponent,
+  },
+  {
+    path: "role",
+    component: EditRoleComponent,
   },
   //******************* ERROR PAGES ************************
   {
