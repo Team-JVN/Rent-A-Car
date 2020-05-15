@@ -56,7 +56,6 @@ export class AddRentReportComponent implements OnInit {
     public dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public selectedItem: RentInfo
   ) {
-    console.log(this.selectedItem);
   }
 
   ngOnInit() {
@@ -80,7 +79,6 @@ export class AddRentReportComponent implements OnInit {
       this.createForm.value.mileage,
       this.createForm.value.comment
     );
-    console.log(rentReport);
     this.rentReportService.create(rentReport).subscribe(
       (data: RentReport) => {
         this.createForm.reset();

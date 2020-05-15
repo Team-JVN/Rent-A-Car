@@ -52,7 +52,7 @@ export class RentRequestDetailsComponent implements OnInit {
         }
       )
     });
-    this.loggedInUserEmail = this.authentificationService.getLoggedInUser().email;
+    this.loggedInUserEmail = this.authentificationService.getLoggedInUserEmail();
     // this.getMessages();
 
     // //Delete this

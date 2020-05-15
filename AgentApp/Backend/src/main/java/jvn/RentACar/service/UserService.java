@@ -1,10 +1,10 @@
 package jvn.RentACar.service;
 
 import jvn.RentACar.dto.request.ChangePasswordDTO;
-import jvn.RentACar.dto.response.LoggedInUserDTO;
 import jvn.RentACar.model.Agent;
 import jvn.RentACar.model.Role;
 import jvn.RentACar.model.User;
+import jvn.RentACar.model.UserTokenState;
 import jvn.RentACar.security.JwtAuthenticationRequest;
 
 public interface UserService {
@@ -13,7 +13,7 @@ public interface UserService {
 
     Role findRoleByName(String name);
 
-    LoggedInUserDTO login(JwtAuthenticationRequest authenticationRequest);
+    UserTokenState login(JwtAuthenticationRequest authenticationRequest);
 
     void changePassword(ChangePasswordDTO changePasswordDTO) throws NullPointerException;
 

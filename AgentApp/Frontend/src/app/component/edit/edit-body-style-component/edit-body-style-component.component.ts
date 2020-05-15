@@ -38,7 +38,6 @@ export class EditBodyStyleComponent implements OnInit {
         this.bodyStyleService.createSuccessEmitter.next(data);
       },
       (httpErrorResponse: HttpErrorResponse) => {
-        console.log(httpErrorResponse)
         this.toastr.error(httpErrorResponse.error.message, 'Edit Body Style');
       }
     );

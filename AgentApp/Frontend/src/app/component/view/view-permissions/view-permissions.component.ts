@@ -67,7 +67,6 @@ export class ViewPermissionsComponent implements OnInit {
 
   saveChanges() {
     this.role.permissions = this.getSelectedPermissions();
-    console.log(this.role)
     this.roleService.edit(this.role).subscribe(
       () => {
         this.toastr.success('Successfully changed permissions.', 'Edit Permissions');

@@ -3,6 +3,7 @@ package jvn.RentACar.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jvn.RentACar.model.Permission;
 import jvn.RentACar.model.User;
 import jvn.RentACar.utils.TimeProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.Set;
 
 @Component
 public class TokenUtils {
@@ -38,14 +40,15 @@ public class TokenUtils {
     private SignatureAlgorithm SIGNATURE_ALGORITHM = SignatureAlgorithm.HS512;
 
     // Funkcija za generisanje JWT token
-    public String generateToken(String username) {
+    public String generateToken(String username, String role, Set<Permission> permissions) {
         return Jwts.builder()
                 .setIssuer(APP_NAME)
                 .setSubject(username)
                 .setAudience(generateAudience())
                 .setIssuedAt(timeProvider.now())
                 .setExpiration(generateExpirationDate())
-                // .claim("role", role) //postavljanje proizvoljnih podataka u telo JWT tokena
+                .claim("role", role)
+                .claim("permissions", permissions) //postavljanje proizvoljnih podataka u telo JWT tokena
                 .signWith(SIGNATURE_ALGORITHM, SECRET).compact();
     }
 
@@ -132,7 +135,6 @@ public class TokenUtils {
         return EXPIRES_IN;
     }
 
-    // Funkcija za preuzimanje JWT tokena iz zahteva
     public String getToken(HttpServletRequest request) {
         String authHeader = getAuthHeaderFromHeader(request);
 
@@ -161,7 +163,6 @@ public class TokenUtils {
         return (audience.equals(AUDIENCE_TABLET) || audience.equals(AUDIENCE_MOBILE));
     }
 
-    // Funkcija za citanje svih podataka iz JWT tokena
     private Claims getAllClaimsFromToken(String token) {
         Claims claims;
         try {

@@ -2,9 +2,9 @@ package jvn.RentACar.controller;
 
 import jvn.RentACar.dto.both.ClientDTO;
 import jvn.RentACar.dto.request.ChangePasswordDTO;
-import jvn.RentACar.dto.response.LoggedInUserDTO;
 import jvn.RentACar.exceptionHandler.InvalidUserDataException;
 import jvn.RentACar.mapper.ClientDtoMapper;
+import jvn.RentACar.model.UserTokenState;
 import jvn.RentACar.security.JwtAuthenticationRequest;
 import jvn.RentACar.service.ClientService;
 import jvn.RentACar.service.UserService;
@@ -29,13 +29,13 @@ public class UserController {
     private ClientDtoMapper clientDtoMapper;
 
     @PostMapping(value = "/login")
-    public ResponseEntity<LoggedInUserDTO> login(@RequestBody JwtAuthenticationRequest authenticationRequest) {
+    public ResponseEntity<UserTokenState> login(@RequestBody JwtAuthenticationRequest authenticationRequest) {
         try {
-            LoggedInUserDTO loggedInUserDTO = userService.login(authenticationRequest);
-            if (loggedInUserDTO == null) {
+            UserTokenState userTokenState = userService.login(authenticationRequest);
+            if (userTokenState == null) {
                 throw new UsernameNotFoundException(String.format("Invalid email or password. Please try again."));
             }
-            return new ResponseEntity<>(loggedInUserDTO, HttpStatus.OK);
+            return new ResponseEntity<>(userTokenState, HttpStatus.OK);
         } catch (AuthenticationException | NullPointerException e) {
             throw new UsernameNotFoundException(String.format("Invalid email or password. Please try again."));
         }

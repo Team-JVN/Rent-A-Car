@@ -39,8 +39,7 @@ export class LoginComponent implements OnInit {
 
   redirectToHomePage() {
     if (this.authentificationService.isAgent()) {
-      console.log("AGENT HAJ")
-      this.router.navigate(['']);
+      this.router.navigate(['/advertisements']);
     } else if (this.authentificationService.isClient()) {
       this.router.navigate(['/search-advertisements']);
     } else {

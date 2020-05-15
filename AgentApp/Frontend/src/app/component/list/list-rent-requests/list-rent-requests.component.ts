@@ -25,7 +25,7 @@ import { trigger, state, transition, style, animate } from '@angular/animations'
   ],
 })
 export class ListRentRequestsComponent implements OnInit {
-  //CLIENT AND AGENT HAVE ACCESS TO THIS PAGE
+
   displayedColumns: string[] = ['client', 'totalPrice', 'status', 'buttons'];
   expandedElement: RentRequest | null;
   rentRequestsDataSource: MatTableDataSource<RentRequest>;
@@ -65,19 +65,6 @@ export class ListRentRequestsComponent implements OnInit {
         this.rentRequestsDataSource = new MatTableDataSource(data)
         this.toastr.error(httpErrorResponse.error.message, 'Show Rent Requests');
 
-      }
-    );
-  }
-
-
-  delete(element: RentRequest) {
-    this.rentRequestService.delete(element.id).subscribe(
-      () => {
-        this.fetchRentRequests(this.status);
-        this.toastr.success('Successfully deleted Rent Request!', 'Delete Rent Request');
-      },
-      (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Delete Rent Request');
       }
     );
   }

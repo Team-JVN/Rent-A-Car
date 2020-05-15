@@ -1,7 +1,6 @@
 package jvn.RentACar.serviceImpl;
 
 import jvn.RentACar.dto.request.ChangePasswordDTO;
-import jvn.RentACar.dto.response.LoggedInUserDTO;
 import jvn.RentACar.exceptionHandler.InvalidUserDataException;
 import jvn.RentACar.model.Agent;
 import jvn.RentACar.model.Role;
@@ -58,7 +57,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     }
 
     @Override
-    public LoggedInUserDTO login(JwtAuthenticationRequest authenticationRequest) {
+    public UserTokenState login(JwtAuthenticationRequest authenticationRequest) {
         final Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(),
                         authenticationRequest.getPassword()));
@@ -66,10 +65,10 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         User user = (User) authentication.getPrincipal();
-        String jwt = tokenUtils.generateToken(user.getUsername());
+        String jwt = tokenUtils.generateToken(user.getUsername(), user.getRole().getName(), user.getRole().getPermissions());
         int expiresIn = tokenUtils.getExpiredIn();
-        String role = user.getRole().getName();
-        return new LoggedInUserDTO(user.getId(), user.getEmail(), role, new UserTokenState(jwt, expiresIn));
+
+        return new UserTokenState(jwt, expiresIn);
     }
 
     @Override

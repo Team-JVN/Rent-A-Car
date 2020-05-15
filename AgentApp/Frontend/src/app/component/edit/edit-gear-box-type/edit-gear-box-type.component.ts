@@ -40,7 +40,6 @@ export class EditGearBoxTypeComponent implements OnInit {
         this.gearboxTypeService.createSuccessEmitter.next(data);
       },
       (httpErrorResponse: HttpErrorResponse) => {
-        console.log(httpErrorResponse)
         this.toastr.error(httpErrorResponse.error.message, 'Edit Gearbox Type');
       }
     );

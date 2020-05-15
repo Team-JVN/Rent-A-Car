@@ -43,7 +43,7 @@ export class ListRentReportsComponent implements OnInit {
     public dialog: MatDialog,
     private rentReportService: RentReportService,
     private toastr: ToastrService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.fetchRentReports();
@@ -58,7 +58,6 @@ export class ListRentReportsComponent implements OnInit {
     this.rentReportService.getAll().subscribe(
       (data: RentReport[]) => {
         this.rentReportsDataSource = new MatTableDataSource(data);
-        console.log(data);
       },
       (httpErrorResponse: HttpErrorResponse) => {
         const data: RentReport[] = [];

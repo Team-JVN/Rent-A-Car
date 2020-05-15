@@ -39,7 +39,6 @@ export class EditFuelTypeComponent implements OnInit {
         this.fuelTypeService.createSuccessEmitter.next(data);
       },
       (httpErrorResponse: HttpErrorResponse) => {
-        console.log(httpErrorResponse)
         this.toastr.error(httpErrorResponse.error.message, 'Edit Fuel Type');
       }
     );
