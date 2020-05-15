@@ -54,7 +54,7 @@ public class PriceListServiceImpl implements PriceListService {
         PriceList priceList = get(id);
 
         if (priceListRepository.findByIdAndStatusNotAndAdvertisementsLogicalStatusNot(id, LogicalStatus.DELETED, LogicalStatus.DELETED) != null) {
-            throw new InvalidPriceListDataException("Price list is used in advertisements, so it can't be deleted.", HttpStatus.FORBIDDEN);
+            throw new InvalidPriceListDataException("Price list is used in advertisements, so it can't be deleted.", HttpStatus.BAD_REQUEST);
         }
         priceList.setStatus(LogicalStatus.DELETED);
         priceListRepository.save(priceList);

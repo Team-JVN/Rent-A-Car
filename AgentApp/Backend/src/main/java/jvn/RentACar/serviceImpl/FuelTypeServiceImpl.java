@@ -20,7 +20,7 @@ public class FuelTypeServiceImpl implements FuelTypeService {
     @Override
     public FuelType create(CreateFuelTypeDTO createFuelTypeDTO) throws InvalidFuelTypeDataException {
         if (fuelTypeRepository.findByName(createFuelTypeDTO.getName()) != null) {
-            throw new InvalidFuelTypeDataException("This Fuel Type already exist.", HttpStatus.FORBIDDEN);
+            throw new InvalidFuelTypeDataException("This Fuel Type already exist.", HttpStatus.BAD_REQUEST);
         }
         return fuelTypeRepository.save(new FuelType(createFuelTypeDTO.getName()));
     }
@@ -42,7 +42,7 @@ public class FuelTypeServiceImpl implements FuelTypeService {
     @Override
     public FuelType edit(Long id, FuelTypeDTO fuelTypeDTO) {
         if (fuelTypeRepository.findByNameAndIdNot(fuelTypeDTO.getName(), id) != null) {
-            throw new InvalidFuelTypeDataException("This Fuel Type already exist.", HttpStatus.FORBIDDEN);
+            throw new InvalidFuelTypeDataException("This Fuel Type already exist.", HttpStatus.BAD_REQUEST);
         }
         FuelType fuelType = isEditable(fuelTypeDTO.getId());
         fuelType.setName(fuelTypeDTO.getName());
@@ -61,7 +61,7 @@ public class FuelTypeServiceImpl implements FuelTypeService {
         if (fuelType.getCars().isEmpty()) {
             return fuelType;
         }
-        throw new InvalidFuelTypeDataException("There's at least one car with this fuel type so you can not edit/delete it.", HttpStatus.FORBIDDEN);
+        throw new InvalidFuelTypeDataException("There's at least one car with this fuel type so you can not edit/delete it.", HttpStatus.BAD_REQUEST);
     }
 
     @Autowired

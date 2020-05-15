@@ -7,6 +7,8 @@ import jvn.RentACar.model.User;
 import jvn.RentACar.model.UserTokenState;
 import jvn.RentACar.security.JwtAuthenticationRequest;
 
+import javax.servlet.http.HttpServletRequest;
+
 public interface UserService {
 
     User findByEmail(String email);
@@ -20,4 +22,6 @@ public interface UserService {
     Agent getLoginAgent();
 
     User getLoginUser();
+
+    UserTokenState refreshAuthenticationToken(HttpServletRequest request);
 }

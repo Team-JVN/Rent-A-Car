@@ -13,9 +13,12 @@ public class UserTokenState {
 
     private Long expiresIn;
 
-    public UserTokenState(String accessToken, long expiresIn) {
+    private String refreshToken;
+
+    public UserTokenState(String accessToken, long expiresIn, String refreshToken) {
         this.accessToken = accessToken;
         this.expiresIn = expiresIn;
+        this.refreshToken = refreshToken;
     }
 
 }

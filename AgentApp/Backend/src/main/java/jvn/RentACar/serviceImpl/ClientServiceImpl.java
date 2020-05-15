@@ -75,7 +75,7 @@ public class ClientServiceImpl implements ClientService {
     public void delete(Long id) {
         Client dbClient = get(id);
         if (!dbClient.getClientRentRequests().isEmpty()) {
-            throw new InvalidClientDataException("This client has at least one request so you can not delete this client.", HttpStatus.FORBIDDEN);
+            throw new InvalidClientDataException("This client has at least one request so you can not delete this client.", HttpStatus.BAD_REQUEST);
         }
         dbClient.setRole(null);
         clientRepository.deleteById(id);

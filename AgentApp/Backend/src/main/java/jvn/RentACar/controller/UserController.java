@@ -16,6 +16,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
@@ -54,6 +55,11 @@ public class UserController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ClientDTO> register(@Valid @RequestBody ClientDTO clientDTO) {
         return new ResponseEntity<>(clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO))), HttpStatus.CREATED);
+    }
+
+    @RequestMapping(value = "/refresh", method = RequestMethod.POST)
+    public ResponseEntity<UserTokenState> refreshAuthenticationToken(HttpServletRequest request) {
+        return new ResponseEntity<>(userService.refreshAuthenticationToken(request), HttpStatus.OK);
     }
 
     @Autowired

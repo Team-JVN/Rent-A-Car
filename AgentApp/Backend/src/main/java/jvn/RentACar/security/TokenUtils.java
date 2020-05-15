@@ -23,8 +23,13 @@ public class TokenUtils {
     @Value("somesecret")
     public String SECRET;
 
-    @Value("86400000")
+    //15min
+    @Value("900000")
     private int EXPIRES_IN;
+
+    //14 days
+    @Value("1209600000")
+    private int REFRESH_TOKEN_EXPIRES_IN;
 
     @Value("Authorization")
     private String AUTH_HEADER;
@@ -52,6 +57,17 @@ public class TokenUtils {
                 .signWith(SIGNATURE_ALGORITHM, SECRET).compact();
     }
 
+    // Funkcija za generisanje JWT token
+    public String generateRefreshToken(String username) {
+        return Jwts.builder()
+                .setIssuer(APP_NAME)
+                .setSubject(username)
+                .setAudience(generateAudience())
+                .setIssuedAt(timeProvider.now())
+                .setExpiration(new Date(timeProvider.now().getTime() + REFRESH_TOKEN_EXPIRES_IN))
+                .signWith(SIGNATURE_ALGORITHM, SECRET).compact();
+    }
+
     private String generateAudience() {
         return AUDIENCE_WEB;
     }
@@ -60,7 +76,7 @@ public class TokenUtils {
         return new Date(timeProvider.now().getTime() + EXPIRES_IN);
     }
 
-    public String refreshToken(String token) {
+    public String refreshToken(String token, User user) {
         String refreshedToken;
         try {
             final Claims claims = this.getAllClaimsFromToken(token);
@@ -68,6 +84,8 @@ public class TokenUtils {
             refreshedToken = Jwts.builder()
                     .setClaims(claims)
                     .setExpiration(generateExpirationDate())
+                    .claim("role", user.getRole().getName())
+                    .claim("permissions", user.getRole().getPermissions())
                     .signWith(SIGNATURE_ALGORITHM, SECRET).compact();
         } catch (Exception e) {
             refreshedToken = null;
@@ -84,7 +102,10 @@ public class TokenUtils {
     public Boolean validateToken(String token, UserDetails userDetails) {
         User user = (User) userDetails;
         final String username = getUsernameFromToken(token);
-        return (username != null && username.equals(userDetails.getUsername()));
+        final Date created = getIssuedAtDateFromToken(token);
+
+        return (username != null && username.equals(userDetails.getUsername())
+                && !isCreatedBeforeLastPasswordReset(created, user.getLastPasswordResetDate()));
     }
 
     public String getUsernameFromToken(String token) {

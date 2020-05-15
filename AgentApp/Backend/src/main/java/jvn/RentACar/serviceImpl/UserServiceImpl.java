@@ -23,6 +23,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Service
 public class UserServiceImpl implements UserDetailsService, UserService {
 
@@ -66,9 +68,10 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
         User user = (User) authentication.getPrincipal();
         String jwt = tokenUtils.generateToken(user.getUsername(), user.getRole().getName(), user.getRole().getPermissions());
+        String refreshJwt = tokenUtils.generateRefreshToken(user.getUsername());
         int expiresIn = tokenUtils.getExpiredIn();
 
-        return new UserTokenState(jwt, expiresIn);
+        return new UserTokenState(jwt, expiresIn, refreshJwt);
     }
 
     @Override
@@ -93,6 +96,21 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     public User getLoginUser() {
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findByEmail(currentUser.getName());
+    }
+
+    @Override
+    public UserTokenState refreshAuthenticationToken(HttpServletRequest request) {
+        String token = tokenUtils.getToken(request);
+        String username = this.tokenUtils.getUsernameFromToken(token);
+        User user = (User) loadUserByUsername(username);
+
+        if (this.tokenUtils.canTokenBeRefreshed(token, user.getLastPasswordResetDate())) {
+            String refreshedToken = tokenUtils.refreshToken(token, user);
+            int expiresIn = tokenUtils.getExpiredIn();
+            return new UserTokenState(refreshedToken, expiresIn, token);
+        } else {
+            throw new InvalidUserDataException("Token can not be refreshed", HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Autowired

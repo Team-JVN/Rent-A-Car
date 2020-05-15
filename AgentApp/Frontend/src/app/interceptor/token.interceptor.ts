@@ -12,15 +12,25 @@ export class TokenInterceptor implements HttpInterceptor {
         this.userTokenState = JSON.parse(localStorage.getItem("UserTokenState"));
 
         if (this.userTokenState) {
-            if (this.userTokenState.accessToken) {
-                request = request.clone({
-                    setHeaders: {
-                        Authorization: `Bearer ${this.userTokenState.accessToken}`
-                    }
-                });
+            if (request.url.includes("refresh")) {
+                if (this.userTokenState.refreshToken) {
+                    request = request.clone({
+                        setHeaders: {
+                            Authorization: `Bearer ${this.userTokenState.refreshToken}`
+                        }
+                    });
+                }
+            } else {
+                if (this.userTokenState.accessToken) {
+                    request = request.clone({
+                        setHeaders: {
+                            Authorization: `Bearer ${this.userTokenState.accessToken}`
+                        }
+                    });
+                }
             }
-        }
 
+        }
         return next.handle(request);
     }
 }
