@@ -19,7 +19,7 @@
             </mat-form-field>
 
             <mat-form-field class="form-full-width mt-2">
-                <input matInput placeholder="Password" type="password" formControlName="password">
+                <input matInput placeholder="Password" type="password" formControlName="password" maxlength="64">
                 <mat-error *ngIf="loginForm.get('password').errors && loginForm.get('password').errors['required']">
                     Please enter password.
                 </mat-error>

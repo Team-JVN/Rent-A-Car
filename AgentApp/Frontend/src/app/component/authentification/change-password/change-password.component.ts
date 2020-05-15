@@ -21,9 +21,9 @@ export class ChangePasswordComponent implements OnInit {
   ngOnInit() {
     this.changePasswordForm = this.formBuilder.group({
       email: new FormControl(null, [Validators.required, Validators.email]),
-      oldPassword: new FormControl(null, [Validators.required, Validators.minLength(8), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$')]),
-      newPassword: new FormControl(null, [Validators.required, Validators.minLength(8), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$')]),
-      repeatedPassword: new FormControl(null, [Validators.required, Validators.minLength(8), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$')])
+      oldPassword: new FormControl(null, [Validators.required, Validators.minLength(8), Validators.maxLength(64), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,64}$')]),
+      newPassword: new FormControl(null, [Validators.required, Validators.minLength(8), Validators.maxLength(64), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,64}$')]),
+      repeatedPassword: new FormControl(null, [Validators.required, Validators.minLength(8), Validators.maxLength(64), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,64}$')])
     }, {
       validator: PasswordMatch('newPassword', 'repeatedPassword')
     })
