@@ -2,16 +2,16 @@ package jvn.RentACar.serviceImpl;
 
 import jvn.RentACar.dto.request.ChangePasswordDTO;
 import jvn.RentACar.dto.response.LoggedInUserDTO;
+import jvn.RentACar.enumeration.AgentStatus;
+import jvn.RentACar.enumeration.ClientStatus;
 import jvn.RentACar.exceptionHandler.InvalidUserDataException;
-import jvn.RentACar.model.Agent;
-import jvn.RentACar.model.Role;
-import jvn.RentACar.model.User;
-import jvn.RentACar.model.UserTokenState;
+import jvn.RentACar.model.*;
 import jvn.RentACar.repository.RoleRepository;
 import jvn.RentACar.repository.UserRepository;
 import jvn.RentACar.security.JwtAuthenticationRequest;
 import jvn.RentACar.security.TokenUtils;
 import jvn.RentACar.service.UserService;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +23,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
 
 @Service
 public class UserServiceImpl implements UserDetailsService, UserService {
@@ -76,10 +78,17 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     public void changePassword(ChangePasswordDTO changePasswordDTO) throws NullPointerException {
         User user = userRepository.findByEmail(changePasswordDTO.getEmail());
 
+        if (user instanceof Client) {
+            ((Client) user).setStatus(ClientStatus.ACTIVE);
+        } else if (user instanceof Agent) {
+            ((Agent) user).setStatus(AgentStatus.ACTIVE);
+        }
+
         if (!passwordEncoder.matches(changePasswordDTO.getOldPassword(), user.getPassword())) {
             throw new InvalidUserDataException("Invalid password.", HttpStatus.BAD_REQUEST);
         }
         user.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
+        user.setLastPasswordResetDate(new Timestamp(DateTime.now().getMillis()));
         userRepository.save(user);
     }
 

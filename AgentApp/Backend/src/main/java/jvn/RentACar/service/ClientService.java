@@ -15,4 +15,6 @@ public interface ClientService {
     Client edit(Long id, Client client);
 
     void delete(Long id);
+
+    Client activateAccount(Long id);
 }

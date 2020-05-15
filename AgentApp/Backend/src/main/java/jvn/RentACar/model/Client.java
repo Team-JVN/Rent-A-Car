@@ -1,5 +1,6 @@
 package jvn.RentACar.model;
 
+import jvn.RentACar.enumeration.ClientStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,4 +22,6 @@ public class Client extends User {
     @OneToMany(mappedBy = "client", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<RentRequest> clientRentRequests = new HashSet<>();
 
+    @Enumerated(EnumType.STRING)
+    private ClientStatus status;
 }

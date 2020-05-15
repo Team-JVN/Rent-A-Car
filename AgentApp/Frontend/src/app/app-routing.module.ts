@@ -1,3 +1,4 @@
+import { AccountActivatedComponent } from './component/authentification/account-activated/account-activated.component';
 import { EditRoleComponent } from './component/edit/edit-role/edit-role.component';
 import { ClientRentRequestDetailsComponent } from './component/details/client-rent-request-details/client-rent-request-details.component';
 import { RentRequestDetailsComponent } from './component/details/rent-request-details/rent-request-details.component';
@@ -93,6 +94,10 @@ const routes: Routes = [
   {
     path: "role",
     component: EditRoleComponent,
+  },
+  {
+    path: "account-activated/:id",
+    component: AccountActivatedComponent,
   },
   //******************* ERROR PAGES ************************
   {

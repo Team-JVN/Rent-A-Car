@@ -1,15 +1,19 @@
 package jvn.RentACar.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jvn.RentACar.enumeration.AgentStatus;
+import jvn.RentACar.enumeration.ClientStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.joda.time.DateTime;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.*;
 
 @Entity
@@ -40,7 +44,7 @@ public abstract class User implements UserDetails {
     @Column(nullable = false)
     private String address;
 
-    @Column(name = "enabled")
+    @Column
     private boolean enabled;
 
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -58,6 +62,8 @@ public abstract class User implements UserDetails {
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Role role;
 
+    @Column
+    private Timestamp lastPasswordResetDate = new Timestamp(DateTime.now().getMillis());
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -96,7 +102,13 @@ public abstract class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        if (this instanceof Client) {
+            return ((Client) this).getStatus() == ClientStatus.ACTIVE;
+        } else if (this instanceof Agent) {
+            return ((Agent) this).getStatus() == AgentStatus.ACTIVE;
+        }
+
+        return false;
     }
 
     @Override

@@ -30,4 +30,8 @@ export class ClientService {
     return this.httpClient.delete(this.url + '/' + id);
   }
 
+  activateAccount(id: number) {
+    return this.httpClient.put(this.url + '/' + id + '/activate', {});
+  }
+
 }

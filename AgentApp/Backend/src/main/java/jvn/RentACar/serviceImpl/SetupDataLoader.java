@@ -1,14 +1,17 @@
 package jvn.RentACar.serviceImpl;
 
+import jvn.RentACar.common.RandomPasswordGenerator;
 import jvn.RentACar.model.Agent;
 import jvn.RentACar.model.Permission;
 import jvn.RentACar.model.Role;
 import jvn.RentACar.repository.PermissionRepository;
 import jvn.RentACar.repository.RoleRepository;
 import jvn.RentACar.repository.UserRepository;
+import jvn.RentACar.service.EmailNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +29,10 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private PermissionRepository permissionRepository;
 
     private UserRepository userRepository;
+
+    private PasswordEncoder passwordEncoder;
+
+    private EmailNotificationService emailNotificationService;
 
     @Override
     @Transactional
@@ -50,15 +57,18 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         Permission changeRentRequestStatus = createPermissionIfNotFound("CHANGE_RENT_REQUEST_STATUS");
 
         Set<Permission> agentPermissions = new HashSet<>(Arrays.asList(manageAdvertisements, manageCodeBooks, manageCars, manageClients,
-                managePriceLists, manageRentReports, createRentRequest, getReceivedRentRequest, changeRentRequestStatus,manageRoles));
+                managePriceLists, manageRentReports, createRentRequest, getReceivedRentRequest, changeRentRequestStatus, manageRoles));
         createRoleIfNotFound("ROLE_AGENT", agentPermissions);
 
         Set<Permission> clientPermissions = new HashSet<>(Arrays.asList(createRentRequest, getMyRentRequests, deleteRentRequest,
                 changeRentRequestStatus));
         createRoleIfNotFound("ROLE_CLIENT", clientPermissions);
 
-        //Rentacar1
-        Agent agent = new Agent("Rent-A-Car agency", "rentacar@maildrop.cc", "$2a$10$34ippcUyKNhjxY8o5yDVBO47eOXdtXzC1LqPPO4UlxJgdbdo/lcZe", "Beograd", "11111111");
+        RandomPasswordGenerator randomPasswordGenerator = new RandomPasswordGenerator();
+        String generatedPassword = randomPasswordGenerator.generatePassword();
+
+        Agent agent = new Agent("Rent-a-Car Agency", "rentacar@maildrop.cc",
+                passwordEncoder.encode(generatedPassword), "Beograd", "00000001");
         if (userRepository.findByEmail(agent.getEmail()) != null) {
             return;
         }
@@ -66,6 +76,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         Role agentRole = this.roleRepository.findByName("ROLE_AGENT");
         agent.setRole(agentRole);
         userRepository.save(agent);
+        composeAndSendEmailToChangePassword(agent.getEmail(), generatedPassword);
 
         alreadySetup = true;
     }
@@ -92,10 +103,33 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         }
     }
 
+    private void composeAndSendEmailToChangePassword(String recipientEmail, String generatedPassword) {
+        String subject = "Activate your account";
+        StringBuilder sb = new StringBuilder();
+        sb.append("An account for you on Rent-a-Car website has been created.");
+        sb.append(System.lineSeparator());
+        sb.append(System.lineSeparator());
+        sb.append("You can log in using your email address and the following password: ");
+        sb.append(generatedPassword);
+        sb.append(System.lineSeparator());
+        sb.append(System.lineSeparator());
+        sb.append("Because of the security protocol, you will have to change this given password the first time you log in.");
+        sb.append(System.lineSeparator());
+        sb.append("To do that click the following link:");
+        sb.append(System.lineSeparator());
+        sb.append("http://localhost:4200/change-password");
+        String text = sb.toString();
+
+        emailNotificationService.sendEmail(recipientEmail, subject, text);
+    }
+
     @Autowired
-    public SetupDataLoader(RoleRepository roleRepository, PermissionRepository permissionRepository, UserRepository userRepository) {
+    public SetupDataLoader(RoleRepository roleRepository, PermissionRepository permissionRepository, UserRepository userRepository,
+                           PasswordEncoder passwordEncoder, EmailNotificationService emailNotificationService) {
         this.roleRepository = roleRepository;
         this.permissionRepository = permissionRepository;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.emailNotificationService = emailNotificationService;
     }
 }

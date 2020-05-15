@@ -64,6 +64,7 @@ import { ClientGuard } from './guard/client.guard';
 import { EditAdvertisementPartialComponent } from './component/edit/edit-advertisement-partial/edit-advertisement-partial.component';
 import { EditRoleComponent } from './component/edit/edit-role/edit-role.component';
 import { ViewPermissionsComponent } from './component/view/view-permissions/view-permissions.component';
+import { AccountActivatedComponent } from './component/authentification/account-activated/account-activated.component';
 
 @NgModule({
   declarations: [
@@ -116,6 +117,7 @@ import { ViewPermissionsComponent } from './component/view/view-permissions/view
     AddRentReportComponent,
     EditRoleComponent,
     ViewPermissionsComponent,
+    AccountActivatedComponent,
   ],
   imports: [
     BrowserModule,
