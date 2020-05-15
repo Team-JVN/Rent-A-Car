@@ -17,22 +17,17 @@ export class ErrorInterceptor implements HttpInterceptor {
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<any> {
         return next.handle(request).pipe(catchError((err) => {
             if (err.status === 401) {
-                // We don't want to refresh token for some requests like login or refresh token itself
                 if (request.url.includes("refresh") || request.url.includes("login")) {
-                    if (request.url.includes("refresh")) {
-                        this.authentificationService.logout();
-                    }
                     this.dialogRef.closeAll();
-                    localStorage.removeItem('UserTokenState');
+                    this.authentificationService.clearLocalStorage();
                     this.router.navigate(['/error/non-authenticated']);
-                    return of(true);
+                    return throwError(err);
                 }
 
                 if (!this.isRefreshingToken) {
                     this.isRefreshingToken = true;
-                    // Reset here so that the following requests wait until the token
-                    // comes back from the refreshToken call.
                     this.tokenSubject.next(null);
+
                     this.authentificationService.refreshAccessToken().toPromise().then(
                         (res: UserTokenState) => {
                             this.authentificationService.access_token = null;
@@ -43,15 +38,15 @@ export class ErrorInterceptor implements HttpInterceptor {
                             return of(true);
                         },
                         () => {
-                            this.authentificationService.logout();
-                            localStorage.removeItem('UserTokenState');
+                            this.authentificationService.clearLocalStorage();
                             this.isRefreshingToken = false;
+                            this.router.navigate(['/error/non-authenticated']);
                         }
                     );
                     return of(true);
                 } else {
                     this.dialogRef.closeAll();
-                    localStorage.removeItem('UserTokenState');
+                    this.authentificationService.clearLocalStorage();
                     this.router.navigate(['/error/non-authenticated']);
                 }
             } else if (err.status === 403) {

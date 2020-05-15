@@ -100,14 +100,14 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
     @Override
     public UserTokenState refreshAuthenticationToken(HttpServletRequest request) {
-        String token = tokenUtils.getToken(request);
-        String username = this.tokenUtils.getUsernameFromToken(token);
+        String refreshToken = tokenUtils.getToken(request);
+        String username = this.tokenUtils.getUsernameFromToken(refreshToken);
         User user = (User) loadUserByUsername(username);
 
-        if (this.tokenUtils.canTokenBeRefreshed(token, user.getLastPasswordResetDate())) {
-            String refreshedToken = tokenUtils.refreshToken(token, user);
+        if (this.tokenUtils.canTokenBeRefreshed(refreshToken, user.getLastPasswordResetDate())) {
+            String newToken = tokenUtils.refreshToken(refreshToken, user);
             int expiresIn = tokenUtils.getExpiredIn();
-            return new UserTokenState(refreshedToken, expiresIn, token);
+            return new UserTokenState(newToken, expiresIn, refreshToken);
         } else {
             throw new InvalidUserDataException("Token can not be refreshed", HttpStatus.BAD_REQUEST);
         }

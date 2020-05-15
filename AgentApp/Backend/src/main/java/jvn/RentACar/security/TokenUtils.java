@@ -34,10 +34,7 @@ public class TokenUtils {
     @Value("Authorization")
     private String AUTH_HEADER;
 
-    static final String AUDIENCE_UNKNOWN = "unknown";
     static final String AUDIENCE_WEB = "web";
-    static final String AUDIENCE_MOBILE = "mobile";
-    static final String AUDIENCE_TABLET = "tablet";
 
     @Autowired
     private TimeProvider timeProvider;
@@ -96,7 +93,7 @@ public class TokenUtils {
     public Boolean canTokenBeRefreshed(String token, Date lastPasswordReset) {
         final Date created = this.getIssuedAtDateFromToken(token);
         return (!(this.isCreatedBeforeLastPasswordReset(created, lastPasswordReset))
-                && (!(this.isTokenExpired(token)) || this.ignoreTokenExpiration(token)));
+                && (!(this.isTokenExpired(token))));
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
@@ -128,17 +125,6 @@ public class TokenUtils {
             issueAt = null;
         }
         return issueAt;
-    }
-
-    public String getAudienceFromToken(String token) {
-        String audience;
-        try {
-            final Claims claims = this.getAllClaimsFromToken(token);
-            audience = claims.getAudience();
-        } catch (Exception e) {
-            audience = null;
-        }
-        return audience;
     }
 
     public Date getExpirationDateFromToken(String token) {
@@ -177,11 +163,6 @@ public class TokenUtils {
     private Boolean isTokenExpired(String token) {
         final Date expiration = this.getExpirationDateFromToken(token);
         return expiration.before(timeProvider.now());
-    }
-
-    private Boolean ignoreTokenExpiration(String token) {
-        String audience = this.getAudienceFromToken(token);
-        return (audience.equals(AUDIENCE_TABLET) || audience.equals(AUDIENCE_MOBILE));
     }
 
     private Claims getAllClaimsFromToken(String token) {

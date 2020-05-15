@@ -53,10 +53,14 @@ export class AuthentificationService {
 
   logout() {
     //TODO: Delete everything from localstorage
+    this.clearLocalStorage();
+    this.router.navigate(['/login']);
+  }
+
+  clearLocalStorage() {
     this.access_token = null;
     this.refreshToken = null;
     localStorage.removeItem('UserTokenState');
-    this.router.navigate(['/login']);
   }
 
   getUserTokenState(): UserTokenState {
