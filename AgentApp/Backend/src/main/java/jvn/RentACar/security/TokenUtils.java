@@ -23,11 +23,11 @@ public class TokenUtils {
     @Value("somesecret")
     public String SECRET;
 
-    //15min
+    // 15min
     @Value("900000")
     private int EXPIRES_IN;
 
-    //14 days
+    // 14 days
     @Value("1209600000")
     private int REFRESH_TOKEN_EXPIRES_IN;
 
@@ -43,23 +43,15 @@ public class TokenUtils {
 
     // Funkcija za generisanje JWT token
     public String generateToken(String username, String role, Set<Permission> permissions) {
-        return Jwts.builder()
-                .setIssuer(APP_NAME)
-                .setSubject(username)
-                .setAudience(generateAudience())
-                .setIssuedAt(timeProvider.now())
-                .setExpiration(generateExpirationDate())
-                .claim("role", role)
-                .claim("permissions", permissions) //postavljanje proizvoljnih podataka u telo JWT tokena
+        return Jwts.builder().setIssuer(APP_NAME).setSubject(username).setAudience(generateAudience())
+                .setIssuedAt(timeProvider.now()).setExpiration(generateExpirationDate()).claim("role", role)
+                .claim("permissions", permissions) // postavljanje proizvoljnih podataka u telo JWT tokena
                 .signWith(SIGNATURE_ALGORITHM, SECRET).compact();
     }
 
     // Funkcija za generisanje JWT token
     public String generateRefreshToken(String username) {
-        return Jwts.builder()
-                .setIssuer(APP_NAME)
-                .setSubject(username)
-                .setAudience(generateAudience())
+        return Jwts.builder().setIssuer(APP_NAME).setSubject(username).setAudience(generateAudience())
                 .setIssuedAt(timeProvider.now())
                 .setExpiration(new Date(timeProvider.now().getTime() + REFRESH_TOKEN_EXPIRES_IN))
                 .signWith(SIGNATURE_ALGORITHM, SECRET).compact();
@@ -78,11 +70,8 @@ public class TokenUtils {
         try {
             final Claims claims = this.getAllClaimsFromToken(token);
             claims.setIssuedAt(timeProvider.now());
-            refreshedToken = Jwts.builder()
-                    .setClaims(claims)
-                    .setExpiration(generateExpirationDate())
-                    .claim("role", user.getRole().getName())
-                    .claim("permissions", user.getRole().getPermissions())
+            refreshedToken = Jwts.builder().setClaims(claims).setExpiration(generateExpirationDate())
+                    .claim("role", user.getRole().getName()).claim("permissions", user.getRole().getPermissions())
                     .signWith(SIGNATURE_ALGORITHM, SECRET).compact();
         } catch (Exception e) {
             refreshedToken = null;
@@ -168,10 +157,7 @@ public class TokenUtils {
     private Claims getAllClaimsFromToken(String token) {
         Claims claims;
         try {
-            claims = Jwts.parser()
-                    .setSigningKey(SECRET)
-                    .parseClaimsJws(token)
-                    .getBody();
+            claims = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody();
         } catch (Exception e) {
             claims = null;
         }

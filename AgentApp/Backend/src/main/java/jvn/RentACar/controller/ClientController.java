@@ -47,6 +47,11 @@ public class ClientController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PutMapping(value = "/{id}/activate")
+    public ResponseEntity<ClientDTO> activateAccount(@PathVariable @Positive(message = "Id must be positive.") Long id) {
+        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.activateAccount(id)), HttpStatus.OK);
+    }
+
     @Autowired
     public ClientController(ClientService clientService, ClientDtoMapper clientDtoMapper) {
         this.clientService = clientService;

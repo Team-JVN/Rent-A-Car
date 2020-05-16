@@ -22,8 +22,8 @@ export class ClientRegistrationComponent implements OnInit {
   ngOnInit() {
     this.registrationForm = this.formBuilder.group({
       email: new FormControl(null, [Validators.required, Validators.email]),
-      password: new FormControl(null, [Validators.required, Validators.minLength(8), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$')]),
-      repeatedPassword: new FormControl(null, [Validators.required, Validators.minLength(8), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$')]),
+      password: new FormControl(null, [Validators.required, Validators.minLength(8), Validators.maxLength(64), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,64}$')]),
+      repeatedPassword: new FormControl(null, [Validators.required, Validators.minLength(8), Validators.maxLength(64), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,64}$')]),
       firstName: new FormControl(null, Validators.required),
       lastName: new FormControl(null, Validators.required),
       address: new FormControl(null, Validators.required),
@@ -45,7 +45,7 @@ export class ClientRegistrationComponent implements OnInit {
     this.authentificationService.register(client).subscribe(
       () => {
         this.registrationForm.reset();
-        this.toastr.success('Success!', 'Registration');
+        this.toastr.success('A link to activate your account has been emailed to the address provided.', 'Registration');
         this.router.navigate(['/login']);
       },
       (httpErrorResponse: HttpErrorResponse) => {

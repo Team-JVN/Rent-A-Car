@@ -1,6 +1,8 @@
 package jvn.RentACar.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jvn.RentACar.enumeration.AgentStatus;
+import jvn.RentACar.enumeration.ClientStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -100,7 +102,13 @@ public abstract class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        if (this instanceof Client) {
+            return ((Client) this).getStatus() == ClientStatus.ACTIVE;
+        } else if (this instanceof Agent) {
+            return ((Agent) this).getStatus() == AgentStatus.ACTIVE;
+        }
+
+        return false;
     }
 
     @Override
