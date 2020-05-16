@@ -4,7 +4,7 @@ import { Make } from './../../../model/make';
 import { GearboxTypeService } from './../../../service/gearboxType.service';
 import { BodyStyleService } from './../../../service/bodyStyle.service';
 import { FuelTypeService } from './../../../service/fuelType.service';
-import { BodyStyle } from './../../../model/bodystyle';
+import { BodyStyle } from '../../../model/bodyStyle';
 import { GearBoxType } from './../../../model/gearboxType';
 import { FuelType } from './../../../model/fuelType';
 import { CarEdit } from './../../../model/carEdit';

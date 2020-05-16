@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>jvn</groupId>
-	<artifactId>Users</artifactId>
+	<artifactId>Cars</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Users</name>
-	<description>Service for user management and authentification</description>
+	<name>Cars</name>
+	<description>Service for car and codebooks management</description>
 
 	<properties>
 		<java.version>1.8</java.version>
@@ -52,7 +52,7 @@
 					<artifactId>junit-vintage-engine</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
+		</dependency>		
 		<dependency>
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>

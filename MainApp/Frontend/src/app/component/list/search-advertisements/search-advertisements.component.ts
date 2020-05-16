@@ -4,7 +4,7 @@ import { GearboxTypeService } from './../../../service/gearboxType.service';
 import { FuelTypeService } from './../../../service/fuelType.service';
 import { Make } from './../../../model/make';
 import { Model } from './../../../model/model';
-import { BodyStyle } from './../../../model/bodystyle';
+import { BodyStyle } from '../../../model/bodyStyle';
 import { GearBoxType } from './../../../model/gearboxType';
 import { FuelType } from './../../../model/fuelType';
 import { FormGroup, ValidatorFn, FormControl, FormBuilder, Validators } from '@angular/forms';

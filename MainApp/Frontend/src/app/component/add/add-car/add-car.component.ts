@@ -2,7 +2,7 @@ import { Make } from './../../../model/make';
 import { Model } from './../../../model/model';
 import { MakeService } from './../../../service/make.service';
 import { Car } from './../../../model/car';
-import { BodyStyle } from 'src/app/model/bodystyle';
+import { BodyStyle } from 'src/app/model/bodyStyle';
 import { BodyStyleService } from './../../../service/bodyStyle.service';
 import { GearboxTypeService } from './../../../service/gearboxType.service';
 import { HttpErrorResponse } from '@angular/common/http';

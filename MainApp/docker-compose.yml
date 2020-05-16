@@ -1,0 +1,106 @@
+version: "3.7"
+services:
+
+    frontend:
+        build: ./Frontend
+        container_name: frontend
+        ports:
+            - 4200:80
+        links:
+            - users
+            - cars
+
+    users:
+        build: ./Users
+        image: nikolabrodic/users
+        container_name: users
+        restart: on-failure
+        networks:
+            - main-app-tls
+        ports:
+            - 8080:8080
+        environment:
+            DATABASE_USERNAME: rentacar
+            DATABASE_PASSWORD: RentACarTeam29
+            DATABASE_DOMAIN: mysql
+            DATABASE_SCHEMA: rentacardb
+        #   KEYSTORE: /etc/keystore/users.keystore.p12
+        #   KEYSTORE_PASSWORD: password
+        #   KEYSTORE_ALIAS: users
+        #   TRUSTSTORE: /etc/keystore/users.truststore.p12
+        #   TRUSTSTORE_PASSWORD: password
+        #   RMQ_HOST: rabbitmq-broker
+        #   RMQ_PORT: 5671
+        # volumes:
+        #   - ./tls/certs/users/keystore:/etc/keystore
+        depends_on: 
+            - mysql
+        #   - rabbitmq-broker
+
+    cars:
+        build: ./Cars
+        image: nikolabrodic/cars
+        container_name: cars
+        restart: on-failure
+        networks:
+            - main-app-tls
+        ports:
+            - 8081:8080
+        environment:
+            DATABASE_USERNAME: rentacar
+            DATABASE_PASSWORD: RentACarTeam29
+            DATABASE_DOMAIN: mysql
+            DATABASE_SCHEMA: rentacardb
+        #   KEYSTORE: /etc/keystore/users.keystore.p12
+        #   KEYSTORE_PASSWORD: password
+        #   KEYSTORE_ALIAS: users
+        #   TRUSTSTORE: /etc/keystore/users.truststore.p12
+        #   TRUSTSTORE_PASSWORD: password
+        #   RMQ_HOST: rabbitmq-broker
+        #   RMQ_PORT: 5671
+        # volumes:
+        #   - ./tls/certs/users/keystore:/etc/keystore
+        depends_on: 
+            - mysql
+        #   - rabbitmq-broker
+
+    mysql:
+        image: mysql:8.0.19
+        container_name: mysql
+        restart: always
+        networks:
+            - main-app-tls
+        environment:
+            MYSQL_ROOT_PASSWORD: team29VJN
+            MYSQL_USER: rentacar
+            MYSQL_PASSWORD: RentACarTeam29
+            MYSQL_DATABASE: rentacardb
+        volumes:
+            - mysql-data:/var/lib/mysql
+    
+    #   rabbitmq-broker:
+    #     image: rabbitmq:management-alpine
+    #     container_name: rabbitmq-broker
+    #     ports:
+    #       - 5672:5672
+    #       - 5671:5671
+    #       - 15671:15671
+    #     networks:
+    #       - main-app-tls
+    #     environment:
+    #       RABBITMQ_SSL_CACERTFILE: /etc/rabbitmq/cert/tls-ca-chain.pem
+    #       RABBITMQ_SSL_CERTFILE: /etc/rabbitmq/cert/rabbitmq.crt
+    #       RABBITMQ_SSL_FAIL_IF_NO_PEER_CERT: "true"
+    #       RABBITMQ_SSL_KEYFILE: /etc/rabbitmq/cert/rabbitmq.key
+    #       RABBITMQ_SSL_VERIFY: verify_peer
+    #     volumes:
+    #       - ./tls/certs/rabbitmq:/etc/rabbitmq/cert
+
+volumes:
+  mysql-data:
+  logs:
+
+networks:
+  main-app-tls:
+    name: main-app-tls
+    driver: bridge
