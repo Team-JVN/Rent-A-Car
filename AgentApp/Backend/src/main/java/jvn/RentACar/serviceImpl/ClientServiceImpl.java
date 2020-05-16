@@ -2,8 +2,8 @@ package jvn.RentACar.serviceImpl;
 
 import jvn.RentACar.common.RandomPasswordGenerator;
 import jvn.RentACar.exceptionHandler.InvalidClientDataException;
-import jvn.RentACar.model.Authority;
 import jvn.RentACar.model.Client;
+import jvn.RentACar.model.Role;
 import jvn.RentACar.repository.ClientRepository;
 import jvn.RentACar.service.ClientService;
 import jvn.RentACar.service.UserService;
@@ -12,9 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class ClientServiceImpl implements ClientService {
@@ -41,8 +39,8 @@ public class ClientServiceImpl implements ClientService {
         }
         client.setEnabled(true);
         client.setPassword(passwordEncoder.encode(client.getPassword()));
-        Set<Authority> authorities = userService.findByName("ROLE_CLIENT");
-        client.setAuthorities(authorities);
+        Role role = userService.findRoleByName("ROLE_CLIENT");
+        client.setRole(role);
 
         return clientRepository.save(client);
     }
@@ -77,9 +75,9 @@ public class ClientServiceImpl implements ClientService {
     public void delete(Long id) {
         Client dbClient = get(id);
         if (!dbClient.getClientRentRequests().isEmpty()) {
-            throw new InvalidClientDataException("This client has at least one request so you can not delete this client.", HttpStatus.FORBIDDEN);
+            throw new InvalidClientDataException("This client has at least one request so you can not delete this client.", HttpStatus.BAD_REQUEST);
         }
-        dbClient.setAuthorities(new HashSet<>());
+        dbClient.setRole(null);
         clientRepository.deleteById(id);
     }
 

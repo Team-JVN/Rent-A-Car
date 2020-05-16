@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 @Getter
 @Setter
 public class InvalidRentRequestDataException extends RuntimeException {
-
     private HttpStatus httpStatus;
 
     public InvalidRentRequestDataException(String message, HttpStatus httpStatus) {

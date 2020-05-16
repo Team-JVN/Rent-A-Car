@@ -2,9 +2,9 @@ package jvn.RentACar.controller;
 
 import jvn.RentACar.dto.both.ClientDTO;
 import jvn.RentACar.dto.request.ChangePasswordDTO;
-import jvn.RentACar.dto.response.LoggedInUserDTO;
 import jvn.RentACar.exceptionHandler.InvalidUserDataException;
 import jvn.RentACar.mapper.ClientDtoMapper;
+import jvn.RentACar.model.UserTokenState;
 import jvn.RentACar.security.JwtAuthenticationRequest;
 import jvn.RentACar.service.ClientService;
 import jvn.RentACar.service.UserService;
@@ -16,6 +16,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
@@ -29,13 +30,13 @@ public class UserController {
     private ClientDtoMapper clientDtoMapper;
 
     @PostMapping(value = "/login")
-    public ResponseEntity<LoggedInUserDTO> login(@RequestBody JwtAuthenticationRequest authenticationRequest) {
+    public ResponseEntity<UserTokenState> login(@RequestBody JwtAuthenticationRequest authenticationRequest) {
         try {
-            LoggedInUserDTO loggedInUserDTO = userService.login(authenticationRequest);
-            if (loggedInUserDTO == null) {
+            UserTokenState userTokenState = userService.login(authenticationRequest);
+            if (userTokenState == null) {
                 throw new UsernameNotFoundException(String.format("Invalid email or password. Please try again."));
             }
-            return new ResponseEntity<>(loggedInUserDTO, HttpStatus.OK);
+            return new ResponseEntity<>(userTokenState, HttpStatus.OK);
         } catch (AuthenticationException | NullPointerException e) {
             throw new UsernameNotFoundException(String.format("Invalid email or password. Please try again."));
         }
@@ -52,8 +53,13 @@ public class UserController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ClientDTO> registerPatient(@Valid @RequestBody ClientDTO clientDTO) {
+    public ResponseEntity<ClientDTO> register(@Valid @RequestBody ClientDTO clientDTO) {
         return new ResponseEntity<>(clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO))), HttpStatus.CREATED);
+    }
+
+    @RequestMapping(value = "/refresh", method = RequestMethod.POST)
+    public ResponseEntity<UserTokenState> refreshAuthenticationToken(HttpServletRequest request) {
+        return new ResponseEntity<>(userService.refreshAuthenticationToken(request), HttpStatus.OK);
     }
 
     @Autowired

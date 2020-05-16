@@ -127,7 +127,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         //TODO: Odbi sve zahteve koji su PENDING
         checkOwner(advertisement.getCar());
         if (advertisementRepository.findByIdAndLogicalStatusAndRentInfosRentRequestRentRequestStatusAndRentInfosDateTimeToGreaterThanEqual(advertisement.getId(), LogicalStatus.EXISTING, RentRequestStatus.PAID, LocalDateTime.now()) != null) {
-            throw new InvalidAdvertisementDataException("This advertisement is in use and therefore can not be deleted.", HttpStatus.FORBIDDEN);
+            throw new InvalidAdvertisementDataException("This advertisement is in use and therefore can not be deleted.", HttpStatus.BAD_REQUEST);
         }
         advertisement.setLogicalStatus(LogicalStatus.DELETED);
         advertisementRepository.save(advertisement);
@@ -157,16 +157,16 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     private void checkIfCarIsAvailable(Long carId, LocalDate advertisementDateFrom, LocalDate advertisementDateTo) {
         if (!advertisementRepository.findByCarIdAndLogicalStatusNotAndDateToEquals(carId, LogicalStatus.DELETED, null).isEmpty()) {
-            throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.FORBIDDEN);
+            throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
         }
 
         if (advertisementDateTo == null) {
             if (!advertisementRepository.findByCarIdAndLogicalStatusNotAndDateToGreaterThanEqual(carId, LogicalStatus.DELETED, advertisementDateFrom).isEmpty()) {
-                throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.FORBIDDEN);
+                throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
             }
         } else {
             if (!advertisementRepository.findByCarIdAndLogicalStatusNotAndDateFromLessThanEqualAndDateToGreaterThanEqual(carId, LogicalStatus.DELETED, advertisementDateTo, advertisementDateFrom).isEmpty()) {
-                throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.FORBIDDEN);
+                throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
             }
         }
     }
@@ -174,23 +174,23 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     private void checkIfCarIsAvailableForEdit(Long carId, LocalDate advertisementDateFrom, LocalDate advertisementDateTo, Long advertisementId) {
         List<Advertisement> advertisements = advertisementRepository.findByCarIdAndLogicalStatusNotAndDateToEquals(carId, LogicalStatus.DELETED, null);
         if (!advertisements.isEmpty() && advertisements.size() != 1) {
-            throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.FORBIDDEN);
+            throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
         }
         if (advertisements.size() == 1 && !advertisements.get(0).getId().equals(advertisementId)) {
-            throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.FORBIDDEN);
+            throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
         }
         if (advertisementDateTo == null) {
             advertisements = advertisementRepository.findByCarIdAndLogicalStatusNotAndDateToGreaterThanEqual(carId, LogicalStatus.DELETED, advertisementDateFrom);
             if (!advertisements.isEmpty()) {
                 if (advertisements.size() == 1 && !advertisements.get(0).getId().equals(advertisementId)) {
-                    throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.FORBIDDEN);
+                    throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
                 }
             }
         } else {
             advertisements = advertisementRepository.findByCarIdAndLogicalStatusNotAndDateFromLessThanEqualAndDateToGreaterThanEqual(carId, LogicalStatus.DELETED, advertisementDateTo, advertisementDateFrom);
             if (!advertisements.isEmpty()) {
                 if (advertisements.size() == 1 && !advertisements.get(0).getId().equals(advertisementId)) {
-                    throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.FORBIDDEN);
+                    throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
                 }
             }
         }
@@ -213,7 +213,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     private void checkOwner(Car car) {
         if (!userService.getLoginAgent().getEmail().equals(car.getOwner().getEmail())) {
-            throw new InvalidCarDataException("You are not owner of this car.", HttpStatus.FORBIDDEN);
+            throw new InvalidCarDataException("You are not owner of this car.", HttpStatus.BAD_REQUEST);
         }
     }
 

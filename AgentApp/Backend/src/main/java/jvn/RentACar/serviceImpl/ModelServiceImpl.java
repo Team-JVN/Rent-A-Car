@@ -63,7 +63,7 @@ public class ModelServiceImpl implements ModelService {
         if (model.getCars().isEmpty()) {
             return model;
         }
-        throw new InvalidModelDataException("There's at least one car with this model so you can not edit it.", HttpStatus.FORBIDDEN);
+        throw new InvalidModelDataException("There's at least one car with this model so you can not edit it.", HttpStatus.BAD_REQUEST);
     }
 
     @Autowired

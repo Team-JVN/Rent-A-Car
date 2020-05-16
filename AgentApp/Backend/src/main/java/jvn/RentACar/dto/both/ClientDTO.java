@@ -4,33 +4,33 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class ClientDTO {
 
+    @Positive(message = "Id must be positive.")
     private Long id;
 
-    @NotEmpty(message = "Name is empty.")
+    @NotBlank(message = "Name is empty.")
+    @Pattern(regexp = "^(([A-Za-zÀ-ƒ]+[.]?[ ]?|[a-zÀ-ƒ]+['-]?){0,4})$", message = "Name is not valid.")
     private String name;
 
-    @NotEmpty(message = "Email is empty.")
+    @NotBlank(message = "Email is empty.")
     @Email(message = "Email is not valid.")
     private String email;
 
-    @Pattern(regexp = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$")
+    @Pattern(regexp = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$", message = " Password must be at least 8 characters long and must contain at least 1 lowercase, 1 uppercase letter and 1 number.")
     private String password;
 
-    @NotEmpty(message = "Address is empty.")
+    @NotBlank(message = "Address is empty.")
+    @Pattern(regexp = "^([#.0-9a-zA-ZÀ-ƒ,-\\/]+[ ]?){1,10}$", message = "Address is not valid.")
     private String address;
 
-    @NotEmpty(message = "PhoneNumber is empty.")
-    @Size(min = 9, max = 10)
-    @Pattern(regexp = "0[0-9]+")
+    @NotBlank(message = "PhoneNumber is empty.")
+    @Size(min = 9, max = 10, message = "Phone number can contain between 9 and 10 digits.")
+    @Pattern(regexp = "0[0-9]+", message = " Phone number must begin with 0 and can contain digits only.")
     private String phoneNumber;
 }

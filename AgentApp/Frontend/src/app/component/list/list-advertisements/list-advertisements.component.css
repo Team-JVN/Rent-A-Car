@@ -1,6 +1,7 @@
 mat-card {
     max-width: 1050px;
     margin: 2em auto;
+    z-index: 0;
 }
 
 mat-card-content {

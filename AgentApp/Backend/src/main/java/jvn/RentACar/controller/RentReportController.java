@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -15,6 +15,7 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Validated
 @RestController
 @RequestMapping(value = "/api/rent-report", produces = MediaType.APPLICATION_JSON_VALUE)
 public class RentReportController {
@@ -24,7 +25,6 @@ public class RentReportController {
     private RentReportDtoMapper rentReportDtoMapper;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<RentReportDTO> create(@Valid @RequestBody RentReportDTO rentReportDTO) throws ParseException {
 
         return new ResponseEntity<>(rentReportDtoMapper.toDto(rentReportService.create(rentReportDtoMapper.toEntity(rentReportDTO))),

@@ -8,13 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Validated
 @RestController
 @RequestMapping(value = "/api/fuel-type", produces = MediaType.APPLICATION_JSON_VALUE)
 public class FuelTypeController {
@@ -24,13 +26,11 @@ public class FuelTypeController {
     private FuelTypeDtoMapper fuelTypeDtoMapper;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<FuelTypeDTO> create(@Valid @RequestBody CreateFuelTypeDTO fuelTypeDTO) {
         return new ResponseEntity<>(fuelTypeDtoMapper.toDto(fuelTypeService.create(fuelTypeDTO)), HttpStatus.CREATED);
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('AGENT')")
     public ResponseEntity<List<FuelTypeDTO>> get() {
         List<FuelTypeDTO> list = fuelTypeService.get().stream().map(fuelTypeDtoMapper::toDto).
                 collect(Collectors.toList());
@@ -38,14 +38,12 @@ public class FuelTypeController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<FuelTypeDTO> edit(@PathVariable Long id, @Valid @RequestBody FuelTypeDTO fuelTypeDTO) {
+    public ResponseEntity<FuelTypeDTO> edit(@PathVariable @Positive(message = "Id must be positive.") Long id, @Valid @RequestBody FuelTypeDTO fuelTypeDTO) {
         return new ResponseEntity<>(fuelTypeDtoMapper.toDto(fuelTypeService.edit(id, fuelTypeDTO)), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('AGENT')")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") @Positive(message = "Id must be positive.") Long id) {
         fuelTypeService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

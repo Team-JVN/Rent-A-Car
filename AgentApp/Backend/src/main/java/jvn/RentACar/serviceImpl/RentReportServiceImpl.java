@@ -16,10 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -34,40 +31,40 @@ public class RentReportServiceImpl implements RentReportService {
     @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     public RentReport create(RentReport rentReport) {
-        checkIfCreatingRentReportIsPossible(rentInfoService.get(rentReport.getRentInfo().getId()));
         rentReport.setRentInfo(rentInfoService.get(rentReport.getRentInfo().getId()));
+        checkIfCreatingRentReportIsPossible(rentInfoService.get(rentReport.getRentInfo().getId()));
         rentReport.setAdditionalCost(calculateAdditionalCost(rentReport));
         calculateMileageInKm(rentReport);
         return rentReportRepository.save(rentReport);
     }
 
-    public void checkIfCreatingRentReportIsPossible(RentInfo rentInfo){
-        if(!rentInfo.getRentRequest().getRentRequestStatus().equals(RentRequestStatus.PAID)){
+    public void checkIfCreatingRentReportIsPossible(RentInfo rentInfo) {
+        if (!rentInfo.getRentRequest().getRentRequestStatus().equals(RentRequestStatus.PAID)) {
             throw new InvalidAdvertisementDataException("Cannot create rent report if rent request is not paid!", HttpStatus.BAD_REQUEST);
         }
         LocalDateTime date1 = rentInfo.getDateTimeTo();
         LocalDateTime date2 = LocalDateTime.now();
 
-        if((date2).isBefore(date1)){
+        if ((date2).isBefore(date1)) {
             throw new InvalidAdvertisementDataException("Cannot create rent report yet! Wait until " + date1.toLocalDate() + "!", HttpStatus.BAD_REQUEST);
         }
-        if(rentInfo.getRentReport() != null){
+        if (rentInfo.getRentReport() != null) {
             throw new InvalidAdvertisementDataException("There is already rent report linked to this rent info!", HttpStatus.BAD_REQUEST);
         }
     }
 
-    public Double calculateAdditionalCost(RentReport rentReport){
+    public Double calculateAdditionalCost(RentReport rentReport) {
         Double addCost = 0.0;
-        if(rentReport.getRentInfo().getAdvertisement().getKilometresLimit() != null){
+        if (rentReport.getRentInfo().getAdvertisement().getKilometresLimit() != null) {
             Integer extraMiles = rentReport.getMadeMileage() - rentReport.getRentInfo().getAdvertisement().getKilometresLimit();
-            if(extraMiles > 0){
+            if (extraMiles > 0) {
                 addCost = extraMiles * rentReport.getRentInfo().getAdvertisement().getPriceList().getPricePerKm();
             }
         }
         return addCost;
     }
 
-    public void calculateMileageInKm(RentReport rentReport){
+    public void calculateMileageInKm(RentReport rentReport) {
         Car car = rentReport.getRentInfo().getAdvertisement().getCar();
 
         Integer previousMileageInKm = car.getMileageInKm();

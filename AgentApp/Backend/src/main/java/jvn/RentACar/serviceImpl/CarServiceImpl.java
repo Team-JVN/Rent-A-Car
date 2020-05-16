@@ -90,7 +90,7 @@ public class CarServiceImpl implements CarService {
         checkOwner(car);
         Set<Advertisement> advertisements = get(id).getAdvertisements();
         if (advertisements != null && !advertisements.isEmpty()) {
-            throw new InvalidCarDataException("Car is in use and therefore can not be edited.", HttpStatus.FORBIDDEN);
+            throw new InvalidCarDataException("Car is in use and therefore can not be edited.", HttpStatus.BAD_REQUEST);
         }
         car.setMake(makeService.get(carDTO.getMake().getId()));
         car.setModel(modelService.get(carDTO.getModel().getId(), carDTO.getMake().getId()));
@@ -115,7 +115,7 @@ public class CarServiceImpl implements CarService {
         checkOwner(car);
         for (Advertisement advertisement : get(id).getAdvertisements()) {
             if (advertisement.getLogicalStatus().equals(LogicalStatus.EXISTING) && !advertisement.getRentInfos().isEmpty()) {
-                throw new InvalidCarDataException("Car is in use and therefore can not be edited.", HttpStatus.FORBIDDEN);
+                throw new InvalidCarDataException("Car is in use and therefore can not be edited.", HttpStatus.BAD_REQUEST);
             }
         }
         car.setMileageInKm(carDTO.getMileageInKm());
@@ -131,11 +131,11 @@ public class CarServiceImpl implements CarService {
         Car car = get(id);
         checkOwner(car);
         if (carRepository.findByIdAndAdvertisementsLogicalStatusAndAdvertisementsDateToGreaterThanEqual(id, LogicalStatus.EXISTING, LocalDate.now()) != null) {
-            throw new InvalidCarDataException("Car is in use and therefore can not be deleted.", HttpStatus.FORBIDDEN);
+            throw new InvalidCarDataException("Car is in use and therefore can not be deleted.", HttpStatus.BAD_REQUEST);
         }
 
         if (carRepository.findByIdAndAdvertisementsLogicalStatusAndAdvertisementsDateToEquals(id, LogicalStatus.EXISTING, null) != null) {
-            throw new InvalidCarDataException("Car is in use and therefore can not be deleted.", HttpStatus.FORBIDDEN);
+            throw new InvalidCarDataException("Car is in use and therefore can not be deleted.", HttpStatus.BAD_REQUEST);
         }
         car.setLogicalStatus(LogicalStatus.DELETED);
         carRepository.save(car);
@@ -161,7 +161,7 @@ public class CarServiceImpl implements CarService {
 
     private void checkOwner(Car car) {
         if (!userService.getLoginAgent().getEmail().equals(car.getOwner().getEmail())) {
-            throw new InvalidCarDataException("You are not owner of this car.", HttpStatus.FORBIDDEN);
+            throw new InvalidCarDataException("You are not owner of this car.", HttpStatus.BAD_REQUEST);
         }
     }
 

@@ -56,7 +56,6 @@ export class EditCarPartialComponent implements OnInit {
         this.carService.createSuccessEmitter.next(data);
       },
       (httpErrorResponse: HttpErrorResponse) => {
-        console.log(httpErrorResponse)
         this.toastr.error(httpErrorResponse.error.message, 'Edit Car');
       }
     );

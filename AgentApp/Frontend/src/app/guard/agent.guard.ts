@@ -2,11 +2,8 @@ import { AuthentificationService } from './../service/authentification.service';
 
 import { Injectable } from '@angular/core';
 import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { LoggedInUser } from '../model/loggedInUser';
 @Injectable({ providedIn: 'root' })
 export class AgentGuard implements CanActivate {
-    loggedInUser: LoggedInUser;
-
     constructor(
         private router: Router,
         private authentificationService: AuthentificationService
@@ -14,10 +11,8 @@ export class AgentGuard implements CanActivate {
 
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
 
-        this.loggedInUser = this.authentificationService.getLoggedInUser();
-
-        if (this.loggedInUser) {
-            if (this.loggedInUser.role === 'AGENT') {
+        if (this.authentificationService.isLoggedIn()) {
+            if (this.authentificationService.isAgent()) {
                 return true;
             }
             else {

@@ -6,9 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.util.List;
 
 @Getter
@@ -16,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CarWithPicturesDTO {
+    @Positive(message = "Id must be positive.")
     @NotNull(message = "Id is null.")
     private Long id;
 
@@ -28,30 +27,32 @@ public class CarWithPicturesDTO {
     @NotNull(message = "Fuel type is null.")
     private FuelTypeDTO fuelType;
 
-    @NotNull(message = "Gerbox type is null.")
+    @NotNull(message = "Gearbox type is null.")
     private GearboxTypeDTO gearBoxType;
 
     @NotNull(message = "Body style is null.")
     private BodyStyleDTO bodyStyle;
 
-    @NotNull(message = "Mileage in km is null.")
-    @Min(0)
+    @NotNull(message = "Mileage is null.")
+    @Min(value = 0,message = "Mileage must be positive number.")
     private Integer mileageInKm;
 
     @NotNull(message = "Number of kid's seats in km is null.")
-    @Min(0)
-    @Max(3)
+    @Min(value = 0,message = "Number of kid's seats must be positive number")
+    @Max(value = 3,message = "Max number of kid's seats is 3.")
     private Integer kidsSeats;
 
     @NotNull(message = "Available tracking is null.")
     private Boolean availableTracking;
 
     @NotNull(message = "Average rating is null.")
+    @PositiveOrZero(message = "Average rating is not a positive number.")
     private Double avgRating;
 
     @NotNull(message = "Comment count is null.")
+    @PositiveOrZero(message = "Comment count is not a positive number.")
     private Integer commentsCount;
 
-    @NotNull(message = "Pictures are null.")
+    @NotEmpty(message = "Pictures are null.")
     private List<PicturesDTO> pictures;
 }

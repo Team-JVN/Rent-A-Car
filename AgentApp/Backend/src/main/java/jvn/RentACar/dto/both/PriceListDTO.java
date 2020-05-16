@@ -14,9 +14,10 @@ import javax.validation.constraints.Positive;
 @AllArgsConstructor
 public class PriceListDTO {
 
+    @Positive(message = "Id must be positive.")
     private Long id;
 
-    @NotNull
+    @NotNull(message = "Price per day is null.")
     @Positive(message = "Price per day is not a positive number.")
     private Double pricePerDay;
 

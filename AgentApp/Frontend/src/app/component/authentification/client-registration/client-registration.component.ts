@@ -39,7 +39,7 @@ export class ClientRegistrationComponent implements OnInit {
       return;
     }
 
-    const name = this.registrationForm.value.firstName + '|' + this.registrationForm.value.lastName;
+    const name = this.registrationForm.value.firstName + ' ' + this.registrationForm.value.lastName;
     const client = new RegistrationClient(name, this.registrationForm.value.email, this.registrationForm.value.password, this.registrationForm.value.address,
       this.registrationForm.value.phoneNumber)
     this.authentificationService.register(client).subscribe(

@@ -5,14 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.joda.time.DateTime;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.sql.Timestamp;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
@@ -42,7 +42,7 @@ public abstract class User implements UserDetails {
     @Column(nullable = false)
     private String address;
 
-    @Column(name = "enabled")
+    @Column
     private boolean enabled;
 
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -57,21 +57,23 @@ public abstract class User implements UserDetails {
     @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<RentRequest> rentRequests = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(name = "user_authority",
-            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "authority_id", referencedColumnName = "id"))
-    private Set<Authority> authorities;
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Role role;
 
-    public void setAuthorities(Set<Authority> authorities) {
-        this.authorities = authorities;
-    }
+    @Column
+    private Timestamp lastPasswordResetDate = new Timestamp(DateTime.now().getMillis());
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.authorities;
-    }
+        List<GrantedAuthority> authorities = new ArrayList<>();
 
+        this.role.getPermissions().forEach(p -> {
+            GrantedAuthority authority = new SimpleGrantedAuthority(p.getName());
+            authorities.add(authority);
+        });
+
+        return authorities;
+    }
 
     @Override
     public String getUsername() {

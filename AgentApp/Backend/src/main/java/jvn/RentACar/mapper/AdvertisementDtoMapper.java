@@ -1,6 +1,6 @@
 package jvn.RentACar.mapper;
 
-import jvn.RentACar.dto.both.AdvertisementDTO;
+import jvn.RentACar.dto.response.AdvertisementDTO;
 import jvn.RentACar.model.Advertisement;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

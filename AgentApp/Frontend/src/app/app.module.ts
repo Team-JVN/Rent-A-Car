@@ -1,3 +1,10 @@
+import { GetMyRentRequestsGuard } from './guard/get.my.rent.requests.guard';
+import { ManageCarsGuard } from './guard/manage.cars.guard';
+import { ManageCodeBooksGuard } from './guard/manage.code.books.guard';
+import { ManageAdvertisemetsGuard } from './guard/manage.advertisements.guard';
+import { ReplacePipe } from './util/replace.pipe';
+import { ErrorInterceptor } from './interceptor/error.interceptor';
+import { AddRentReportComponent } from './component/add/add-rent-report/add-rent-report.component';
 import { ListRentReportsComponent } from './component/list/list-rent-reports/list-rent-reports.component';
 import { AgentGuard } from './guard/agent.guard';
 import { TokenInterceptor } from './interceptor/token.interceptor';
@@ -59,9 +66,20 @@ import { RentRequestDetailsComponent } from './component/details/rent-request-de
 import { ClientRentRequestDetailsComponent } from './component/details/client-rent-request-details/client-rent-request-details.component';
 import { ClientGuard } from './guard/client.guard';
 import { EditAdvertisementPartialComponent } from './component/edit/edit-advertisement-partial/edit-advertisement-partial.component';
+import { EditRoleComponent } from './component/edit/edit-role/edit-role.component';
+import { ViewPermissionsComponent } from './component/view/view-permissions/view-permissions.component';
+import { ManageClientsGuard } from './guard/manage.clients.guard';
+import { ManagePriceListsGuard } from './guard/manage.price.lists.guard';
+import { ManageRentReportsGuard } from './guard/manage.rent.reports.guard';
+import { CreateRentRequestGuard } from './guard/create.rent.request.guard';
+import { GetReceivedRentRequestsGuard } from './guard/get.received.rent.requests.guard';
+import { DeleteRentRequestGuard } from './guard/delete.rent.request.guard';
+import { ChangeRentRequestStatusGuard } from './guard/change.rent.request.status';
+import { ManageRoleGuard } from './guard/manage.role.guard';
 
 @NgModule({
   declarations: [
+    ReplacePipe,
     AppComponent,
     ListBodyStylesComponent,
     HeaderComponent,
@@ -107,6 +125,9 @@ import { EditAdvertisementPartialComponent } from './component/edit/edit-adverti
     ClientRentRequestDetailsComponent,
     EditAdvertisementPartialComponent,
     ListRentReportsComponent,
+    AddRentReportComponent,
+    EditRoleComponent,
+    ViewPermissionsComponent,
   ],
   imports: [
     BrowserModule,
@@ -150,15 +171,29 @@ import { EditAdvertisementPartialComponent } from './component/edit/edit-adverti
     AddMakeComponent,
     EditModelComponent,
     EditMakeComponent,
+    AddModelComponent,
+    AddRentReportComponent,
   ],
   providers: [
     {
       provide: HAMMER_GESTURE_CONFIG, useClass: CustomHammerConfig
     },
     { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
-    // { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     AgentGuard,
-    ClientGuard
+    ClientGuard,
+    ManageAdvertisemetsGuard,
+    ManageCodeBooksGuard,
+    ManageCarsGuard,
+    ManageClientsGuard,
+    ManagePriceListsGuard,
+    ManageRentReportsGuard,
+    CreateRentRequestGuard,
+    GetMyRentRequestsGuard,
+    GetReceivedRentRequestsGuard,
+    DeleteRentRequestGuard,
+    ChangeRentRequestStatusGuard,
+    ManageRoleGuard
   ],
   bootstrap: [AppComponent]
 })

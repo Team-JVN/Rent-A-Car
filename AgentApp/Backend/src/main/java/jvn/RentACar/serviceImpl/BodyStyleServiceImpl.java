@@ -61,7 +61,7 @@ public class BodyStyleServiceImpl implements BodyStyleService {
         if (bodyStyle.getCars().isEmpty()) {
             return bodyStyle;
         }
-        throw new InvalidBodyStyleDataException("There's at least one car with this body style so you can not edit it.", HttpStatus.FORBIDDEN);
+        throw new InvalidBodyStyleDataException("There's at least one car with this body style so you can not edit it.", HttpStatus.BAD_REQUEST);
     }
 
     @Autowired

@@ -19,11 +19,10 @@ public class AdvertisementEditDTO {
     @NotNull(message = "Price list is null.")
     private PriceListDTO priceList;
 
-    @Min(1)
+    @Min(value = 0,message = "Kilometres limit must be positive number.")
     private Integer kilometresLimit;
 
-    @NotNull(message = "Discount is null.")
-    @Min(0)
-    @Max(99)
+    @Min(value = 0,message = "Discount must be a positive number.")
+    @Max(value = 99,message = "Maximal discount is 99%.")
     private Integer discount;
 }

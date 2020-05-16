@@ -1,3 +1,13 @@
+import { GetMyRentRequestsGuard } from './guard/get.my.rent.requests.guard';
+import { GetReceivedRentRequestsGuard } from './guard/get.received.rent.requests.guard';
+import { ManageRentReportsGuard } from './guard/manage.rent.reports.guard';
+import { ManageRoleGuard } from './guard/manage.role.guard';
+import { ManageClientsGuard } from './guard/manage.clients.guard';
+import { ManagePriceListsGuard } from './guard/manage.price.lists.guard';
+import { ManageCarsGuard } from './guard/manage.cars.guard';
+import { ManageCodeBooksGuard } from './guard/manage.code.books.guard';
+import { ManageAdvertisemetsGuard } from './guard/manage.advertisements.guard';
+import { EditRoleComponent } from './component/edit/edit-role/edit-role.component';
 import { ClientRentRequestDetailsComponent } from './component/details/client-rent-request-details/client-rent-request-details.component';
 import { RentRequestDetailsComponent } from './component/details/rent-request-details/rent-request-details.component';
 import { NonAuthenticatedErrorPageComponent } from './error/non-authenticated-error-page/non-authenticated-error-page.component';
@@ -21,46 +31,87 @@ import { ListModelsComponent } from './component/list/list-models/list-models.co
 import { ListRentReportsComponent } from './component/list/list-rent-reports/list-rent-reports.component';
 
 const routes: Routes = [
+  /** MANAGE ADVERTISEMENTS */
   {
-    path: "advertisement/:id",
-    component: AdvertisementDetailsComponent,
+    path: "advertisements",
+    component: ListAdvertisementsComponent,
+    canActivate: [ManageAdvertisemetsGuard],
   },
+
+  /** MANAGE CODE BOOKS */
   {
     path: "body-styles",
     component: ListBodyStylesComponent,
+    canActivate: [ManageCodeBooksGuard],
   },
   {
     path: "fuel-types",
     component: ListFuelTypeComponent,
+    canActivate: [ManageCodeBooksGuard],
   },
   {
     path: "gearbox-types",
     component: ListGearBoxTypesComponent,
+    canActivate: [ManageCodeBooksGuard],
   },
+  {
+    path: "makes",
+    component: ListMakesComponent,
+    canActivate: [ManageCodeBooksGuard],
+  },
+  {
+    path: "models/:id",
+    component: ListModelsComponent,
+    canActivate: [ManageCodeBooksGuard],
+  },
+  /** MANAGE CARS */
   {
     path: "cars",
     component: ListCarsComponent,
+    canActivate: [ManageCarsGuard],
   },
+  /** MANAGE PRICE LISTS */
   {
     path: 'price-lists',
-    component: ListPriceListsComponent
+    component: ListPriceListsComponent,
+    canActivate: [ManagePriceListsGuard],
   },
+  /** MANAGE CLIENTS */
   {
     path: "clients",
     component: ListClientsComponent,
+    canActivate: [ManageClientsGuard],
   },
+  /** Get received rent requests */
   {
     path: 'rent-requests/:id',
     component: ListRentRequestsComponent,
+    canActivate: [GetReceivedRentRequestsGuard],
   },
   {
     path: 'rent-request/:id',
-    component: RentRequestDetailsComponent
+    component: RentRequestDetailsComponent,
+    canActivate: [GetReceivedRentRequestsGuard],
   },
+  /** Get my rent requests */
   {
     path: 'client-rent-request/:id',
-    component: ClientRentRequestDetailsComponent
+    component: ClientRentRequestDetailsComponent,
+    canActivate: [GetMyRentRequestsGuard],
   },
+  /** MANAGE RENT REPORTS */
+  {
+    path: "rent-reports",
+    component: ListRentReportsComponent,
+    canActivate: [ManageRentReportsGuard],
+  },
+  /** MANAGE ROLES */
+  {
+    path: "role",
+    component: EditRoleComponent,
+    canActivate: [ManageRoleGuard],
+  },
+  /** Unauthorized user */
   {
     path: "login",
     component: LoginComponent,
@@ -70,24 +121,12 @@ const routes: Routes = [
     component: ChangePasswordComponent,
   },
   {
-    path: "client/registration",
-    component: ClientRegistrationComponent,
-  },
-  {
     path: 'client/registration',
     component: ClientRegistrationComponent
   },
   {
-    path: "makes",
-    component: ListMakesComponent,
-  },
-  {
-    path: "models/:id",
-    component: ListModelsComponent,
-  },
-  {
-    path: "rent-reports",
-    component: ListRentReportsComponent,
+    path: "advertisement/:id",
+    component: AdvertisementDetailsComponent,
   },
   //******************* ERROR PAGES ************************
   {
@@ -100,7 +139,11 @@ const routes: Routes = [
   },
   {
     path: "",
-    component: ListAdvertisementsComponent,
+    component: LoginComponent, //set search page
+  },
+  {
+    path: "**",
+    component: LoginComponent, //set search page
   },
 ];
 
