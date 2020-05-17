@@ -113,7 +113,7 @@
             </form>
         </mat-step>
 
-        <mat-step [stepControl]="uploadPictures">
+        <mat-step>
             <ng-template matStepLabel>Add pictures</ng-template>
             <ngx-dropzone (change)="onSelect($event)" [accept]="'image/*'" [maxFileSize]="2097152" class="mt-2">
                 <ngx-dropzone-label>Drop images here or click to choose them.</ngx-dropzone-label>

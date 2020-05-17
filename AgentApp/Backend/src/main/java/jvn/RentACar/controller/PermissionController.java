@@ -26,8 +26,8 @@ public class PermissionController {
 
     @GetMapping
     public ResponseEntity<List<PermissionDTO>> getAll() {
-        List<PermissionDTO> list = permissionService.getAll().stream().map(permissionDtoMapper::toDto).
-                collect(Collectors.toList());
+        List<PermissionDTO> list = permissionService.getAll().stream().map(permissionDtoMapper::toDto)
+                .collect(Collectors.toList());
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 

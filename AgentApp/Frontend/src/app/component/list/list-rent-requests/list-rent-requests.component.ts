@@ -69,7 +69,7 @@ export class ListRentRequestsComponent implements OnInit {
     );
   }
 
-  createRentReport(rentRequest: RentRequest, rentInfo: RentInfo) {
+  createRentReport(rentInfo: RentInfo) {
     this.dialog.open(AddRentReportComponent, { data: rentInfo });
   }
 

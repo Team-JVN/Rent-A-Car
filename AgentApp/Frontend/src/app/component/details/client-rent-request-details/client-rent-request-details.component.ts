@@ -84,7 +84,7 @@ export class ClientRentRequestDetailsComponent implements OnInit {
     return false;
   }
 
-  // leaveFeedback(rentInfo: RentInfo) {
-  //   this.dialog.open(LeaveFeedbackComponent, { data: { rentInfo: rentInfo, rentRequest: this.rentRequest } });
-  // }
+  leaveFeedback(rentInfo: RentInfo) {
+    // this.dialog.open(LeaveFeedbackComponent, { data: { rentInfo: rentInfo, rentRequest: this.rentRequest } });
+  }
 }

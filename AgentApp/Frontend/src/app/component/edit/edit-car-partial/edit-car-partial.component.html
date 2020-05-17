@@ -58,7 +58,7 @@
                 </div>
             </form>
         </mat-step>
-        <mat-step [stepControl]="uploadPictures">
+        <mat-step>
             <ng-template matStepLabel>Change pictures</ng-template>
             <ngx-dropzone (change)="onSelect($event)" [accept]="'image/*'" class="mt-2">
                 <ngx-dropzone-label>Drop images here or click to choose them.</ngx-dropzone-label>

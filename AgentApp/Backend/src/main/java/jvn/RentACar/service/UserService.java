@@ -15,10 +15,6 @@ public interface UserService {
 
     Role findRoleByName(String name);
 
-    UserTokenState login(JwtAuthenticationRequest authenticationRequest);
-
-    void changePassword(ChangePasswordDTO changePasswordDTO) throws NullPointerException;
-
     Agent getLoginAgent();
 
     User getLoginUser();

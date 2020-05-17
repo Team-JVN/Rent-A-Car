@@ -24,8 +24,7 @@
                 <td mat-cell *matCellDef="let element">
                     <mat-card class="item-card" (click)="viewDetails(element)">
                         <div class="image-div">
-                            <img [src]="element.car.image" *ngIf="!element.car.isImageLoading; else noImageFound"
-                                class="image">
+                            <img [src]="element.car.image" *ngIf="!element.car.isImageLoading" class="image">
                         </div>
                         <div class="advertisement-div">
                             <mat-card-header class="advertisement-card-header">

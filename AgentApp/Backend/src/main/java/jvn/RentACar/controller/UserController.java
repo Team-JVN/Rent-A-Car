@@ -6,6 +6,7 @@ import jvn.RentACar.exceptionHandler.InvalidUserDataException;
 import jvn.RentACar.mapper.ClientDtoMapper;
 import jvn.RentACar.model.UserTokenState;
 import jvn.RentACar.security.JwtAuthenticationRequest;
+import jvn.RentACar.service.AuthentificationService;
 import jvn.RentACar.service.ClientService;
 import jvn.RentACar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +30,12 @@ public class UserController {
 
     private ClientDtoMapper clientDtoMapper;
 
+    private AuthentificationService authentificationService;
+
     @PostMapping(value = "/login")
     public ResponseEntity<UserTokenState> login(@RequestBody JwtAuthenticationRequest authenticationRequest) {
         try {
-            UserTokenState userTokenState = userService.login(authenticationRequest);
+            UserTokenState userTokenState = authentificationService.login(authenticationRequest);
             if (userTokenState == null) {
                 throw new UsernameNotFoundException(String.format("Invalid email or password. Please try again."));
             }
@@ -45,7 +48,7 @@ public class UserController {
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordDTO changePasswordDTO) {
         try {
-            userService.changePassword(changePasswordDTO);
+            authentificationService.changePassword(changePasswordDTO);
         } catch (NullPointerException e) {
             throw new InvalidUserDataException("Invalid email or password.", HttpStatus.BAD_REQUEST);
         }
@@ -54,7 +57,8 @@ public class UserController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ClientDTO> register(@Valid @RequestBody ClientDTO clientDTO) {
-        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO))), HttpStatus.CREATED);
+        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO))),
+                HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/refresh", method = RequestMethod.POST)
@@ -63,9 +67,11 @@ public class UserController {
     }
 
     @Autowired
-    public UserController(UserService userService, ClientService clientService, ClientDtoMapper clientDtoMapper) {
+    public UserController(UserService userService, ClientService clientService, ClientDtoMapper clientDtoMapper,
+            AuthentificationService authentificationService) {
         this.userService = userService;
         this.clientService = clientService;
         this.clientDtoMapper = clientDtoMapper;
+        this.authentificationService = authentificationService;
     }
 }
