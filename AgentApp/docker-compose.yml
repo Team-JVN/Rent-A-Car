@@ -14,15 +14,15 @@ services:
             DATABASE_PASSWORD: RentACarTeam29
             DATABASE_DOMAIN: mysql
             DATABASE_SCHEMA: agentappdb
-        #     KEYSTORE: /etc/keystore/servers.keystore.p12
-        #     KEYSTORE_PASSWORD: password
-        #     KEYSTORE_ALIAS: servers
-        #     TRUSTSTORE: /etc/keystore/servers.truststore.p12
-        #     TRUSTSTORE_PASSWORD: password
+            KEYSTORE: /etc/keystore/agentapp.keystore.p12
+            KEYSTORE_PASSWORD: agentapp_pass
+            KEYSTORE_ALIAS: agentapp
+            TRUSTSTORE: /etc/keystore/agentapp.truststore.p12
+            TRUSTSTORE_PASSWORD: agentapp_pass
         #     RMQ_HOST: rabbitmq-broker
         #     RMQ_PORT: 5671
-        # volumes:
-        # - ./tls/certs/servers/keystore:/etc/keystore
+        volumes:
+            - ./tls/certs/agentapp/keystore:/etc/keystore
         depends_on: 
             - mysql
             # - rabbitmq-broker
