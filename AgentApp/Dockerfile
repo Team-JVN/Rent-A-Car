@@ -1,4 +1,4 @@
-FROM node:alpine3.11 AS front
+FROM node:12.7-alpine AS front
 
 LABEL maintainer="Tim 29"
 
