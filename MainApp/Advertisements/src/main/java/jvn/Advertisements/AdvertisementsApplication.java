@@ -1,4 +1,4 @@
-package jvn.Users;
+package jvn.Advertisements;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,10 +9,10 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
 @SpringBootApplication
 @EnableEurekaClient
-public class UsersApplication {
+public class AdvertisementsApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(UsersApplication.class, args);
+		SpringApplication.run(AdvertisementsApplication.class, args);
 	}
 
 	@Bean

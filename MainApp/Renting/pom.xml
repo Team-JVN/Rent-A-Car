@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>jvn</groupId>
-	<artifactId>Cars</artifactId>
+	<artifactId>Renting</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Cars</name>
-	<description>Service for car and codebooks management</description>
+	<name>Renting</name>
+	<description>Service for rentrequests, comments and messages managment</description>
 
 	<properties>
 		<java.version>1.8</java.version>
@@ -51,13 +51,13 @@
 					<artifactId>junit-vintage-engine</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>		
+		</dependency>
 		<dependency>
-			<groupId>org.modelmapper</groupId>
+    		<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
 			<version>2.3.7</version>
 		</dependency>
-		        <dependency>
+		<dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
             <version>2.2.2.RELEASE</version>
