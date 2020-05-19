@@ -47,11 +47,12 @@ public class UserController {
             if(authentificationService.userIsNeverLoggedIn(authenticationRequest.getUsername())){
                 return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
             }
-            throw new UsernameNotFoundException(String.format("Invalid email or password. Please try again."));
+            if(e.getMessage().equals("Blocked")){
+                throw new BlockedUserException("You are blocked so you can not sign in.",HttpStatus.BAD_REQUEST);
+            }
+            throw new UsernameNotFoundException("Invalid email or password. Please try again.");
         }catch (NullPointerException e){
-            throw new UsernameNotFoundException(String.format("Invalid email or password. Please try again."));
-        }catch(BlockedUserException e){
-            throw new BlockedUserException(String.format("You are blocked so you can not sign in."),HttpStatus.BAD_REQUEST);
+            throw new UsernameNotFoundException("Invalid email or password. Please try again.");
         }
     }
 

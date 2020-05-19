@@ -50,10 +50,10 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException,BlockedUserException {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         String ip = getClientIP();
         if (loginAttemptService.isBlocked(ip)) {
-            throw new BlockedUserException(String.format("You are blocked so you can not sign in.", username),HttpStatus.BAD_REQUEST);
+            throw new RuntimeException("Blocked");
         }
         User user = userRepository.findByEmail(username);
         if (user == null) {
