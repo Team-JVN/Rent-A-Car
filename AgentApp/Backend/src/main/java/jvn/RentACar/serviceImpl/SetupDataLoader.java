@@ -11,6 +11,7 @@ import jvn.RentACar.service.EmailNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,8 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private PasswordEncoder passwordEncoder;
 
     private EmailNotificationService emailNotificationService;
+
+    private Environment environment;
 
     @Override
     @Transactional
@@ -117,19 +120,25 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         sb.append(System.lineSeparator());
         sb.append("To do that click the following link:");
         sb.append(System.lineSeparator());
-        sb.append("http://localhost:4200/change-password");
+        sb.append(getLocalhostURL());
+        sb.append("change-password");
         String text = sb.toString();
 
         emailNotificationService.sendEmail(recipientEmail, subject, text);
     }
 
+    private String getLocalhostURL() {
+        return environment.getProperty("LOCALHOST_URL");
+    }
+
     @Autowired
     public SetupDataLoader(RoleRepository roleRepository, PermissionRepository permissionRepository, UserRepository userRepository,
-                           PasswordEncoder passwordEncoder, EmailNotificationService emailNotificationService) {
+                           PasswordEncoder passwordEncoder, EmailNotificationService emailNotificationService,Environment environment) {
         this.roleRepository = roleRepository;
         this.permissionRepository = permissionRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailNotificationService = emailNotificationService;
+        this.environment=environment;
     }
 }

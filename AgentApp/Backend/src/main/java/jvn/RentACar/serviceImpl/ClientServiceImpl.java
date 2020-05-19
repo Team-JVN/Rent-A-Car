@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.core.env.Environment;
 import java.util.List;
 
 @Service
@@ -26,6 +26,8 @@ public class ClientServiceImpl implements ClientService {
     private PasswordEncoder passwordEncoder;
 
     private EmailNotificationService emailNotificationService;
+
+    private Environment environment;
 
     @Override
     public Client create(Client client) {
@@ -107,7 +109,8 @@ public class ClientServiceImpl implements ClientService {
         sb.append(System.lineSeparator());
         sb.append("To activate your account click the following link:");
         sb.append(System.lineSeparator());
-        sb.append("http://localhost:4200/account-activated/" + id);
+        sb.append(getLocalhostURL());
+        sb.append("account-activated/" + id);
         String text = sb.toString();
 
         emailNotificationService.sendEmail(recipientEmail, subject, text);
@@ -127,7 +130,8 @@ public class ClientServiceImpl implements ClientService {
         sb.append(System.lineSeparator());
         sb.append("To do that click the following link:");
         sb.append(System.lineSeparator());
-        sb.append("http://localhost:4200/change-password");
+        sb.append(getLocalhostURL());
+        sb.append("change-password");
         String text = sb.toString();
 
         emailNotificationService.sendEmail(recipientEmail, subject, text);
@@ -135,10 +139,16 @@ public class ClientServiceImpl implements ClientService {
 
     @Autowired
     public ClientServiceImpl(ClientRepository clientRepository, UserService userService, PasswordEncoder passwordEncoder,
-                             EmailNotificationService emailNotificationService) {
+                             EmailNotificationService emailNotificationService,Environment environment) {
         this.clientRepository = clientRepository;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.emailNotificationService = emailNotificationService;
+        this.environment = environment;
+    }
+
+
+    private String getLocalhostURL() {
+        return environment.getProperty("LOCALHOST_URL");
     }
 }
