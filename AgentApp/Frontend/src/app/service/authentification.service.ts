@@ -60,6 +60,7 @@ export class AuthentificationService {
   clearLocalStorage() {
     this.access_token = null;
     this.refreshToken = null;
+    localStorage.removeItem('rentInfos');
     localStorage.removeItem('UserTokenState');
   }
 

@@ -33,7 +33,12 @@ export class LoginComponent implements OnInit {
         this.redirectToHomePage();
       },
       (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Login');
+        if (httpErrorResponse.status == 406) {
+          this.toastr.info("You have to change received generic password on first attempt to login.", 'Login');
+          this.router.navigate(['/change-password']);
+        } else {
+          this.toastr.error(httpErrorResponse.error.message, 'Login');
+        }
       }
     );
   }

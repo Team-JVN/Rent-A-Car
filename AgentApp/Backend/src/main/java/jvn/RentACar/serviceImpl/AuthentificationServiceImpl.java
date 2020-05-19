@@ -99,6 +99,21 @@ public class AuthentificationServiceImpl implements AuthentificationService {
 
     }
 
+    @Override
+    public boolean userIsNeverLoggedIn(String email) {
+        User user = userRepository.findByEmail(email);
+        if(user instanceof Agent){
+            if(((Agent) user).getStatus().equals(AgentStatus.INACTIVE)){
+                return true;
+            }
+        }else {
+            if(((Client) user).getStatus().equals(ClientStatus.NEVER_LOGGED_IN)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     private String getHashValue(String password) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         MessageDigest digest = MessageDigest.getInstance("SHA-1");
         digest.reset();

@@ -1,6 +1,8 @@
 package jvn.RentACar.repository;
 
+import jvn.RentACar.enumeration.ClientStatus;
 import jvn.RentACar.model.Client;
+import jvn.RentACar.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

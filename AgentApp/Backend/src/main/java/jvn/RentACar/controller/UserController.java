@@ -42,7 +42,12 @@ public class UserController {
                 throw new UsernameNotFoundException(String.format("Invalid email or password. Please try again."));
             }
             return new ResponseEntity<>(userTokenState, HttpStatus.OK);
-        } catch (AuthenticationException | NullPointerException e) {
+        } catch (AuthenticationException  e) {
+            if(authentificationService.userIsNeverLoggedIn(authenticationRequest.getUsername())){
+                return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+            }
+            throw new UsernameNotFoundException(String.format("Invalid email or password. Please try again."));
+        }catch (NullPointerException e){
             throw new UsernameNotFoundException(String.format("Invalid email or password. Please try again."));
         }
     }

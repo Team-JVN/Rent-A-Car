@@ -17,21 +17,19 @@ import java.util.Set;
 
 @Component
 public class TokenUtils {
-    @Value("rent-a-car")
+    @Value("${TOKEN_UTILS_APP_NAME}")
     private String APP_NAME;
 
-    @Value("somesecret")
+    @Value("${TOKEN_UTILS_SECRET}")
     public String SECRET;
 
-    // 15min
-    @Value("900000")
+    @Value("${TOKEN_UTILS_EXPIRES_IN}")
     private int EXPIRES_IN;
 
-    // 14 days
-    @Value("1209600000")
+    @Value("${TOKEN_UTILS_REFRESH_TOKEN_EXPIRES_IN}")
     private int REFRESH_TOKEN_EXPIRES_IN;
 
-    @Value("Authorization")
+    @Value("${TOKEN_UTILS_AUTH_HEADER}")
     private String AUTH_HEADER;
 
     static final String AUDIENCE_WEB = "web";

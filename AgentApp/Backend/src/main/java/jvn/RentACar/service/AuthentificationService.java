@@ -14,4 +14,6 @@ public interface AuthentificationService {
     void changePassword(ChangePasswordDTO changePasswordDTO) throws NullPointerException, UnsupportedEncodingException, NoSuchAlgorithmException;
 
     void checkPassword(String password) throws UnsupportedEncodingException, NoSuchAlgorithmException;
+
+    boolean userIsNeverLoggedIn(String email);
 }
