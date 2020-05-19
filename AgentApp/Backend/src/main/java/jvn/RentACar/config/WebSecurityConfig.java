@@ -2,12 +2,7 @@ package jvn.RentACar.config;
 
 import jvn.RentACar.security.RestAuthenticationEntryPoint;
 import jvn.RentACar.security.TokenAuthenticationFilter;
-import jvn.RentACar.security.TokenUtils;
 import jvn.RentACar.serviceImpl.UserServiceImpl;
-import org.apache.catalina.Context;
-import org.apache.catalina.connector.Connector;
-import org.apache.tomcat.util.descriptor.web.SecurityCollection;
-import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,8 +15,6 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
@@ -101,11 +94,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                 .cors().and()
 
                                 .addFilterBefore(new TokenAuthenticationFilter(jwtUserDetailsService.tokenUtils,
-                                                jwtUserDetailsService), BasicAuthenticationFilter.class).headers().contentSecurityPolicy(
+                                                jwtUserDetailsService), BasicAuthenticationFilter.class)
+                                .headers().contentSecurityPolicy(
                                                 "default-src 'self' https://localhost:8090/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-eval'; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;img-src 'self' data:");
 
                 http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
-//                 http.csrf().disable();
+                // http.csrf().disable();
         }
 
         @Override
@@ -113,6 +107,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 web.ignoring().antMatchers(HttpMethod.POST, "/api/auth/**");
                 web.ignoring().antMatchers(HttpMethod.PUT, "/api/auth");
+                web.ignoring().antMatchers(HttpMethod.PUT, "/api/client/activate**");
                 web.ignoring().antMatchers(HttpMethod.GET, "/api/advertisement/{id}");
                 web.ignoring().antMatchers(HttpMethod.GET, "/api/car/{id}/picture");
                 web.ignoring().antMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "/favicon.ico", "/**/*.html",

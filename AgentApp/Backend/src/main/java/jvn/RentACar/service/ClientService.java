@@ -16,5 +16,5 @@ public interface ClientService {
 
     void delete(Long id);
 
-    Client activateAccount(Long id);
+    Client activateAccount(String token);
 }
