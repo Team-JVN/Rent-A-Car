@@ -1,5 +1,4 @@
 import { UserTokenState } from './../model/userTokenState';
-
 import { ChangePassword } from './../model/changePassword';
 import { map } from 'rxjs/operators';
 import { User } from './../model/user';
@@ -49,6 +48,14 @@ export class AuthentificationService {
 
   changePassword(changePassword: ChangePassword) {
     return this.httpClient.put(this.url, changePassword);
+  }
+
+  requestToken(email: string) {
+    return this.httpClient.post(this.url, email);
+  }
+
+  resetPassword(token: string, newPassword: string) {
+    return this.httpClient.put(this.url, { token, newPassword });
   }
 
   logout() {

@@ -77,6 +77,8 @@ import { DeleteRentRequestGuard } from './guard/delete.rent.request.guard';
 import { ChangeRentRequestStatusGuard } from './guard/change.rent.request.status';
 import { ManageRoleGuard } from './guard/manage.role.guard';
 import { ActivateAccountComponent } from './component/authentification/activate-account/activate-account.component';
+import { ResetPasswordEnterEmailComponent } from './component/authentification/reset-password-enter-email/reset-password-enter-email.component';
+import { ResetPasswordEnterNewPassComponent } from './component/authentification/reset-password-enter-new-pass/reset-password-enter-new-pass.component';
 
 @NgModule({
   declarations: [
@@ -130,6 +132,8 @@ import { ActivateAccountComponent } from './component/authentification/activate-
     EditRoleComponent,
     ViewPermissionsComponent,
     ActivateAccountComponent,
+    ResetPasswordEnterEmailComponent,
+    ResetPasswordEnterNewPassComponent,
   ],
   imports: [
     BrowserModule,

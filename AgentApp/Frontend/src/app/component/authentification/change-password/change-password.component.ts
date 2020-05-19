@@ -34,14 +34,14 @@ export class ChangePasswordComponent implements OnInit {
 
   changePassword() {
     this.authentificationService.changePassword(new ChangePassword(this.changePasswordForm.value.email, this.changePasswordForm.value.oldPassword,
-      this.changePasswordForm.value.newPassword, this.changePasswordForm.value.repeatedPassword)).subscribe(
+      this.changePasswordForm.value.newPassword)).subscribe(
         () => {
           this.changePasswordForm.reset();
-          this.toastr.success('Success!', 'Change passsword');
+          this.toastr.success('Success!', 'Change password');
           this.authentificationService.logout();
         },
         (httpErrorResponse: HttpErrorResponse) => {
-          this.toastr.error(httpErrorResponse.error.message, 'Change passsword');
+          this.toastr.error(httpErrorResponse.error.message, 'Change password');
         }
       );
   }
