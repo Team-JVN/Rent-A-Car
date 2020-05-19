@@ -4,9 +4,14 @@ import jvn.RentACar.dto.request.ChangePasswordDTO;
 import jvn.RentACar.model.UserTokenState;
 import jvn.RentACar.security.JwtAuthenticationRequest;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+
 public interface AuthentificationService {
 
     UserTokenState login(JwtAuthenticationRequest authenticationRequest);
 
-    void changePassword(ChangePasswordDTO changePasswordDTO) throws NullPointerException;
+    void changePassword(ChangePasswordDTO changePasswordDTO) throws NullPointerException, UnsupportedEncodingException, NoSuchAlgorithmException;
+
+    void checkPassword(String password) throws UnsupportedEncodingException, NoSuchAlgorithmException;
 }

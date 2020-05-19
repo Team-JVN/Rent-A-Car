@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 
 @RestController
 @RequestMapping(value = "/api/auth", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -51,12 +53,19 @@ public class UserController {
             authentificationService.changePassword(changePasswordDTO);
         } catch (NullPointerException e) {
             throw new InvalidUserDataException("Invalid email or password.", HttpStatus.BAD_REQUEST);
+        } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
+            throw new InvalidUserDataException("Password can not be check. Please try again.", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ClientDTO> register(@Valid @RequestBody ClientDTO clientDTO) {
+        try {
+            authentificationService.checkPassword(clientDTO.getPassword());
+        } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
+            throw new InvalidUserDataException("Password can not be check. Please try again.", HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>(clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO))),
                 HttpStatus.CREATED);
     }
