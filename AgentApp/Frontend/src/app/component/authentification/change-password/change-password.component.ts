@@ -14,6 +14,9 @@ import { PasswordMatch } from 'src/app/validator/passwordMatch';
 export class ChangePasswordComponent implements OnInit {
 
   changePasswordForm: FormGroup;
+  hide = true;
+  newHide = true;
+  repeatedHide = true;
 
   constructor(private toastr: ToastrService, private authentificationService: AuthentificationService,
     private formBuilder: FormBuilder) { }

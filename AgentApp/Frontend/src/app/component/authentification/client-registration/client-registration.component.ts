@@ -15,6 +15,8 @@ import { RegistrationClient } from 'src/app/model/registrationClient';
 })
 export class ClientRegistrationComponent implements OnInit {
   registrationForm: FormGroup;
+  repeatHide = true;
+  hide = true;
 
   constructor(private toastr: ToastrService, private authentificationService: AuthentificationService,
     private formBuilder: FormBuilder, private router: Router) { }

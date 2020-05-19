@@ -19,7 +19,11 @@
             </mat-form-field>
 
             <mat-form-field class="form-full-width mt-2">
-                <input matInput placeholder="Password" type="password" formControlName="password" maxlength="64">
+                <input matInput placeholder="Password" [type]="hide ? 'password' : 'text'" formControlName="password"
+                    maxlength="64">
+                <span matSuffix class="ml-2">
+                    <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                </span>
                 <mat-error *ngIf="loginForm.get('password').errors && loginForm.get('password').errors['required']">
                     Please enter password.
                 </mat-error>
