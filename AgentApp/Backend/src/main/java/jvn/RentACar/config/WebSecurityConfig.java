@@ -101,11 +101,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                 .cors().and()
 
                                 .addFilterBefore(new TokenAuthenticationFilter(jwtUserDetailsService.tokenUtils,
-                                                jwtUserDetailsService), BasicAuthenticationFilter.class);
-//                                .headers().contentSecurityPolicy(
-//                                                "default-src 'self' https://localhost:8080/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-eval'; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;img-src 'self' data:");
+                                                jwtUserDetailsService), BasicAuthenticationFilter.class)
+                                .headers().contentSecurityPolicy(
+                                                "default-src 'self' https://localhost:8090/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-eval'; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;img-src 'self' data:");
 
-//                http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+                http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
                 // http.csrf().disable();
         }
 
