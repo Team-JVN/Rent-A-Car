@@ -1,5 +1,4 @@
 package jvn.RentACar.serviceImpl;
-
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -11,18 +10,18 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class LoginAttemptService {
+public class ChangePasswordAttemptService {
 
     private final int MAX_ATTEMPT = 3;
 
     @Autowired
     private HttpServletRequest request;
 
-    private LoadingCache<String, Integer> attemptsCache;
+    private LoadingCache<String, Integer> changePassAttemptsCache;
 
-    public LoginAttemptService() {
+    public ChangePasswordAttemptService() {
         super();
-        attemptsCache = CacheBuilder.newBuilder().
+        changePassAttemptsCache = CacheBuilder.newBuilder().
                 expireAfterWrite(1, TimeUnit.DAYS).build(new CacheLoader<String, Integer>() {
             public Integer load(String key) {
                 return 0;
@@ -30,26 +29,26 @@ public class LoginAttemptService {
         });
     }
 
-    public void loginSucceeded() {
+    public void changePassSucceeded() {
         String key = getClientIP();
-        attemptsCache.invalidate(key);
+        changePassAttemptsCache.invalidate(key);
     }
 
-    public void loginFailed() {
+    public void changePassFailed() {
         String key = getClientIP();
         int attempts = 0;
         try {
-            attempts = attemptsCache.get(key);
+            attempts = changePassAttemptsCache.get(key);
         } catch (ExecutionException e) {
             attempts = 0;
         }
         attempts++;
-        attemptsCache.put(key, attempts);
+        changePassAttemptsCache.put(key, attempts);
     }
 
     public boolean isBlocked(String key) {
         try {
-            return attemptsCache.get(key) >= MAX_ATTEMPT;
+            return changePassAttemptsCache.get(key) >= MAX_ATTEMPT;
         } catch (ExecutionException e) {
             return false;
         }

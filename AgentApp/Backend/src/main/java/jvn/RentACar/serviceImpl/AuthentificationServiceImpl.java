@@ -4,6 +4,7 @@ import jvn.RentACar.dto.request.ChangePasswordDTO;
 import jvn.RentACar.dto.response.CheckPassDTO;
 import jvn.RentACar.enumeration.AgentStatus;
 import jvn.RentACar.enumeration.ClientStatus;
+import jvn.RentACar.exceptionHandler.BlockedUserException;
 import jvn.RentACar.exceptionHandler.InvalidUserDataException;
 import jvn.RentACar.model.Agent;
 import jvn.RentACar.model.Client;
@@ -25,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -43,6 +45,10 @@ public class AuthentificationServiceImpl implements AuthentificationService {
     private PasswordEncoder passwordEncoder;
 
     private final RestTemplate restTemplate;
+
+    private HttpServletRequest request;
+
+    private ChangePasswordAttemptService changePasswordAttemptService;
 
     @Override
     public UserTokenState login(JwtAuthenticationRequest authenticationRequest) {
@@ -63,6 +69,11 @@ public class AuthentificationServiceImpl implements AuthentificationService {
 
     @Override
     public void changePassword(ChangePasswordDTO changePasswordDTO) throws NullPointerException, UnsupportedEncodingException, NoSuchAlgorithmException {
+        String ip = getClientIP();
+        if (changePasswordAttemptService.isBlocked(ip)) {
+            throw new BlockedUserException("You tried to log in too many times. Your account wil be blocked for the next 24 hours.",HttpStatus.BAD_REQUEST);
+        }
+
         User user = userRepository.findByEmail(changePasswordDTO.getEmail());
 
         if (user instanceof Client) {
@@ -72,12 +83,14 @@ public class AuthentificationServiceImpl implements AuthentificationService {
         }
 
         if (!passwordEncoder.matches(changePasswordDTO.getOldPassword(), user.getPassword())) {
+            changePasswordAttemptService.changePassFailed();
             throw new InvalidUserDataException("Invalid password.", HttpStatus.BAD_REQUEST);
         }
         checkPassword(changePasswordDTO.getNewPassword());
         user.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
         user.setLastPasswordResetDate(new Timestamp(DateTime.now().getMillis()));
         userRepository.save(user);
+        changePasswordAttemptService.changePassSucceeded();
     }
 
     @Override
@@ -121,12 +134,25 @@ public class AuthentificationServiceImpl implements AuthentificationService {
         return String.format("%040x", new BigInteger(1, digest.digest()));
     }
 
+    private String getClientIP() {
+        String xfHeader = request.getHeader("X-Forwarded-For");
+        if (xfHeader == null){
+            return request.getRemoteAddr();
+        }
+        String s = xfHeader.split(",")[0];
+        return s;
+    }
+    
     @Autowired
-    public AuthentificationServiceImpl(TokenUtils tokenUtils, AuthenticationManager authenticationManager, UserRepository userRepository, PasswordEncoder passwordEncoder, RestTemplateBuilder restTemplateBuilder) {
+    public AuthentificationServiceImpl(TokenUtils tokenUtils, AuthenticationManager authenticationManager, UserRepository userRepository,
+                                       PasswordEncoder passwordEncoder, RestTemplateBuilder restTemplateBuilder,HttpServletRequest request,
+                                       ChangePasswordAttemptService changePasswordAttemptService) {
         this.tokenUtils = tokenUtils;
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.restTemplate = restTemplateBuilder.build();
+        this.request=request;
+        this.changePasswordAttemptService=changePasswordAttemptService;
     }
 }
