@@ -137,7 +137,7 @@ public class ClientServiceImpl implements ClientService {
         sb.append("To activate your account click the following link:");
         sb.append(System.lineSeparator());
         sb.append(getLocalhostURL());
-        sb.append("account-activated/" + id);
+        sb.append("activate-account?t=" + token);
         String text = sb.toString();
 
         emailNotificationService.sendEmail(recipientEmail, subject, text);
@@ -166,9 +166,9 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Autowired
-    public ClientServiceImpl(ClientRepository clientRepository, UserService userService, PasswordEncoder passwordEncoder,
-                             EmailNotificationService emailNotificationService,Environment environment,VerificationTokenRepository verificationTokenRepository) {
-                             {
+    public ClientServiceImpl(ClientRepository clientRepository, UserService userService,
+            PasswordEncoder passwordEncoder, EmailNotificationService emailNotificationService, Environment environment,
+            VerificationTokenRepository verificationTokenRepository) {
         this.clientRepository = clientRepository;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
