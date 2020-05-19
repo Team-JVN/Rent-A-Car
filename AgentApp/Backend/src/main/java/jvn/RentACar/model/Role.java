@@ -24,7 +24,7 @@ public class Role {
     private String name;
 
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<User> cars = new HashSet<>();
+    private Set<User> users = new HashSet<>();
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "roles_permissions",

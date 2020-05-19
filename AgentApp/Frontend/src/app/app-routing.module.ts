@@ -1,3 +1,4 @@
+import { ActivateAccountComponent } from './component/authentification/activate-account/activate-account.component';
 import { GetMyRentRequestsGuard } from './guard/get.my.rent.requests.guard';
 import { GetReceivedRentRequestsGuard } from './guard/get.received.rent.requests.guard';
 import { ManageRentReportsGuard } from './guard/manage.rent.reports.guard';
@@ -7,7 +8,6 @@ import { ManagePriceListsGuard } from './guard/manage.price.lists.guard';
 import { ManageCarsGuard } from './guard/manage.cars.guard';
 import { ManageCodeBooksGuard } from './guard/manage.code.books.guard';
 import { ManageAdvertisemetsGuard } from './guard/manage.advertisements.guard';
-import { AccountActivatedComponent } from './component/authentification/account-activated/account-activated.component';
 import { EditRoleComponent } from './component/edit/edit-role/edit-role.component';
 import { ClientRentRequestDetailsComponent } from './component/details/client-rent-request-details/client-rent-request-details.component';
 import { RentRequestDetailsComponent } from './component/details/rent-request-details/rent-request-details.component';
@@ -130,8 +130,8 @@ const routes: Routes = [
     component: AdvertisementDetailsComponent,
   },
   {
-    path: "account-activated/:id",
-    component: AccountActivatedComponent,
+    path: "activate-account",
+    component: ActivateAccountComponent,
   },
   //******************* ERROR PAGES ************************
   {
