@@ -3,7 +3,7 @@ package jvn.RentACar.serviceImpl;
 import jvn.RentACar.common.RandomPasswordGenerator;
 import jvn.RentACar.enumeration.ClientStatus;
 import jvn.RentACar.exceptionHandler.InvalidClientDataException;
-import jvn.RentACar.exceptionHandler.InvalidVerificationTokenException;
+import jvn.RentACar.exceptionHandler.InvalidTokenException;
 import jvn.RentACar.model.Client;
 import jvn.RentACar.model.Role;
 import jvn.RentACar.model.VerificationToken;
@@ -71,7 +71,6 @@ public class ClientServiceImpl implements ClientService {
         }
     }
 
-
     @Override
     public Client get(Long id) {
         Client client = clientRepository.findOneById(id);
@@ -112,7 +111,7 @@ public class ClientServiceImpl implements ClientService {
     public Client activateAccount(String token) {
         VerificationToken verificationToken = verificationTokenRepository.findByTokenAndExpiryDateTimeAfter(token, LocalDateTime.now());
         if (verificationToken == null) {
-            throw new InvalidVerificationTokenException("This activation link is invalid or expired.", HttpStatus.NOT_FOUND);
+            throw new InvalidTokenException("This activation link is invalid or expired.", HttpStatus.BAD_REQUEST);
         }
         Client client = get(verificationToken.getClient().getId());
         client.setStatus(ClientStatus.ACTIVE);

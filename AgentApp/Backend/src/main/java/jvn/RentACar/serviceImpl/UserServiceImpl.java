@@ -2,12 +2,15 @@ package jvn.RentACar.serviceImpl;
 
 import jvn.RentACar.exceptionHandler.InvalidUserDataException;
 import jvn.RentACar.model.*;
+import jvn.RentACar.repository.ResetTokenRepository;
 import jvn.RentACar.repository.RoleRepository;
 import jvn.RentACar.repository.UserRepository;
 import jvn.RentACar.security.TokenUtils;
+import jvn.RentACar.service.EmailNotificationService;
 import jvn.RentACar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,11 +26,17 @@ import javax.servlet.http.HttpServletRequest;
 @Service
 public class UserServiceImpl implements UserDetailsService, UserService {
 
+    private Environment environment;
+
     private UserRepository userRepository;
 
     public TokenUtils tokenUtils;
 
     private RoleRepository roleRepository;
+
+    private ResetTokenRepository resetTokenRepository;
+
+    private EmailNotificationService emailNotificationService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -54,7 +63,6 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         }
     }
 
-
     @Override
     public Agent getLoginAgent() {
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
@@ -66,6 +74,24 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     public User getLoginUser() {
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findByEmail(currentUser.getName());
+    }
+
+    @Override
+    public void generateResetToken(String email) {
+        User user = findByEmail(email);
+        if (user == null) {
+            return;
+        }
+
+        ResetToken resetToken = new ResetToken(user);
+        ResetToken dbToken = resetTokenRepository.findByToken(resetToken.getToken());
+        while (dbToken != null) {
+            resetToken = new ResetToken(user);
+            dbToken = resetTokenRepository.findByToken(resetToken.getToken());
+        }
+        resetTokenRepository.save(resetToken);
+
+        composeAndSendEmail(user.getEmail(), resetToken.getToken());
     }
 
     @Override
@@ -83,10 +109,34 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         }
     }
 
+    private void composeAndSendEmail(String recipientEmail, String token) {
+        String subject = "Reset your password";
+        StringBuilder sb = new StringBuilder();
+        sb.append("You got this email because you requested a password reset.");
+        sb.append(System.lineSeparator());
+        sb.append(System.lineSeparator());
+        sb.append("To reset your password click the following link:");
+        sb.append(System.lineSeparator());
+        sb.append(getLocalhostURL());
+        sb.append("reset-password?t=");
+        sb.append(token);
+        String text = sb.toString();
+
+        emailNotificationService.sendEmail(recipientEmail, subject, text);
+    }
+
+    private String getLocalhostURL() {
+        return environment.getProperty("LOCALHOST_URL");
+    }
+
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, TokenUtils tokenUtils, RoleRepository roleRepository) {
+    public UserServiceImpl(UserRepository userRepository, TokenUtils tokenUtils, RoleRepository roleRepository,
+                           ResetTokenRepository resetTokenRepository, EmailNotificationService emailNotificationService, Environment environment) {
         this.userRepository = userRepository;
         this.tokenUtils = tokenUtils;
         this.roleRepository = roleRepository;
+        this.resetTokenRepository = resetTokenRepository;
+        this.emailNotificationService = emailNotificationService;
+        this.environment = environment;
     }
 }

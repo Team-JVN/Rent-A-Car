@@ -1,11 +1,9 @@
 package jvn.RentACar.service;
 
-import jvn.RentACar.dto.request.ChangePasswordDTO;
 import jvn.RentACar.model.Agent;
 import jvn.RentACar.model.Role;
 import jvn.RentACar.model.User;
 import jvn.RentACar.model.UserTokenState;
-import jvn.RentACar.security.JwtAuthenticationRequest;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -18,6 +16,8 @@ public interface UserService {
     Agent getLoginAgent();
 
     User getLoginUser();
+
+    void generateResetToken(String email);
 
     UserTokenState refreshAuthenticationToken(HttpServletRequest request);
 }

@@ -2,6 +2,8 @@ package jvn.RentACar.controller;
 
 import jvn.RentACar.dto.both.ClientDTO;
 import jvn.RentACar.dto.request.ChangePasswordDTO;
+import jvn.RentACar.dto.request.RequestTokenDTO;
+import jvn.RentACar.dto.request.ResetPasswordDTO;
 import jvn.RentACar.exceptionHandler.InvalidUserDataException;
 import jvn.RentACar.mapper.ClientDtoMapper;
 import jvn.RentACar.model.UserTokenState;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 
@@ -54,12 +57,12 @@ public class UserController {
         } catch (NullPointerException e) {
             throw new InvalidUserDataException("Invalid email or password.", HttpStatus.BAD_REQUEST);
         } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
-            throw new InvalidUserDataException("Password can not be check. Please try again.", HttpStatus.BAD_REQUEST);
+            throw new InvalidUserDataException("Password cannot be check. Please try again.", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ClientDTO> register(@Valid @RequestBody ClientDTO clientDTO) {
         try {
             authentificationService.checkPassword(clientDTO.getPassword());
@@ -70,6 +73,26 @@ public class UserController {
                 HttpStatus.CREATED);
     }
 
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> generateResetToken(@Valid @RequestBody RequestTokenDTO requestTokenDTO) {
+        userService.generateResetToken(requestTokenDTO.getEmail());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/reset-password", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> resetPassword(
+            @RequestParam @Pattern(regexp = "^([0-9a-fA-F]{8})-(([0-9a-fA-F]{4}-){3})([0-9a-fA-F]{12})$",
+                    message = "This reset token is invalid.") String t, @Valid @RequestBody ResetPasswordDTO resetPasswordDTO) {
+        try {
+            authentificationService.resetPassword(t, resetPasswordDTO);
+        } catch (NullPointerException e) {
+            throw new InvalidUserDataException("Invalid email or password.", HttpStatus.BAD_REQUEST);
+        } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
+            throw new InvalidUserDataException("Password cannot be check. Please try again.", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @RequestMapping(value = "/refresh", method = RequestMethod.POST)
     public ResponseEntity<UserTokenState> refreshAuthenticationToken(HttpServletRequest request) {
         return new ResponseEntity<>(userService.refreshAuthenticationToken(request), HttpStatus.OK);
@@ -77,7 +100,7 @@ public class UserController {
 
     @Autowired
     public UserController(UserService userService, ClientService clientService, ClientDtoMapper clientDtoMapper,
-            AuthentificationService authentificationService) {
+                          AuthentificationService authentificationService) {
         this.userService = userService;
         this.clientService = clientService;
         this.clientDtoMapper = clientDtoMapper;

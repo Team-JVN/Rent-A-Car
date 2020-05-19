@@ -12,9 +12,9 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class VerificationToken {
+public class ResetToken {
 
-    private static final int VERIFICATION_TOKEN_EXPIRY_TIME = 24;
+    private static final int RESET_TOKEN_EXPIRY_TIME = 45;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,14 +29,14 @@ public class VerificationToken {
     @Column(nullable = false)
     private LocalDateTime expiryDateTime;
 
-    @OneToOne(targetEntity = Client.class, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name = "client_id")
-    private Client client;
+    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
+    @JoinColumn(nullable = false, name = "user_id")
+    private User user;
 
-    public VerificationToken(Client client) {
+    public ResetToken(User user) {
         this.token = UUID.randomUUID().toString();
-        this.client = client;
+        this.user = user;
         this.createdDateTime = LocalDateTime.now();
-        this.expiryDateTime = createdDateTime.plusHours(VERIFICATION_TOKEN_EXPIRY_TIME);
+        this.expiryDateTime = createdDateTime.plusMinutes(RESET_TOKEN_EXPIRY_TIME);
     }
 }

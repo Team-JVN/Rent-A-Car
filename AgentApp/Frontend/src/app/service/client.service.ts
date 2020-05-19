@@ -33,9 +33,7 @@ export class ClientService {
   activateAccount(token: string) {
     let params = new HttpParams();
     params = params.append('t', token);
-    return this.httpClient.put(this.url + '/activate', {}, {
-      params: params
-    });
+    return this.httpClient.put(this.url + '/activate', {}, { params: params });
   }
 
 }
