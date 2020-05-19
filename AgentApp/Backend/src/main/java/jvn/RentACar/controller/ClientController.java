@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,9 +48,11 @@ public class ClientController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping(value = "/{id}/activate")
-    public ResponseEntity<ClientDTO> activateAccount(@PathVariable @Positive(message = "Id must be positive.") Long id) {
-        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.activateAccount(id)), HttpStatus.OK);
+    @PutMapping(value = "/activate")
+    public ResponseEntity<ClientDTO> activateAccount(
+            @RequestParam @Pattern(regexp = "^([0-9a-fA-F]{8})-(([0-9a-fA-F]{4}-){3})([0-9a-fA-F]{12})$",
+                    message = "This activation link is invalid.") String t) {
+        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.activateAccount(t)), HttpStatus.OK);
     }
 
     @Autowired

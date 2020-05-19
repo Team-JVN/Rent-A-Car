@@ -2,12 +2,7 @@ package jvn.RentACar.config;
 
 import jvn.RentACar.security.RestAuthenticationEntryPoint;
 import jvn.RentACar.security.TokenAuthenticationFilter;
-import jvn.RentACar.security.TokenUtils;
 import jvn.RentACar.serviceImpl.UserServiceImpl;
-import org.apache.catalina.Context;
-import org.apache.catalina.connector.Connector;
-import org.apache.tomcat.util.descriptor.web.SecurityCollection;
-import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,8 +15,6 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
@@ -29,95 +22,96 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-        @Autowired
-        private UserServiceImpl jwtUserDetailsService;
+    @Autowired
+    private UserServiceImpl jwtUserDetailsService;
 
-        @Autowired
-        private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    @Autowired
+    private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
-        @Bean
-        @Override
-        public AuthenticationManager authenticationManagerBean() throws Exception {
-                return super.authenticationManagerBean();
-        }
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 
-        @Autowired
-        public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-                auth.userDetailsService(jwtUserDetailsService).passwordEncoder(jwtUserDetailsService.passwordEncoder());
-        }
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(jwtUserDetailsService).passwordEncoder(jwtUserDetailsService.passwordEncoder());
+    }
 
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
-                http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 
-                                .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
+                .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
 
-                                .authorizeRequests().antMatchers("/api/auth/**").permitAll()
+                .authorizeRequests().antMatchers("/api/auth/**").permitAll()
 
-                                .antMatchers("/api/advertisement", "/api/advertisement/{id}",
-                                                "/api/advertisement/{id}/partial", "/api/advertisement/{id}/edit",
-                                                "/api/advertisement/all/{status}")
-                                .hasAuthority("MANAGE_ADVERTISEMENTS")
+                .antMatchers("/api/advertisement", "/api/advertisement/{id}",
+                        "/api/advertisement/{id}/partial", "/api/advertisement/{id}/edit",
+                        "/api/advertisement/all/{status}")
+                .hasAuthority("MANAGE_ADVERTISEMENTS")
 
-                                .antMatchers("/api/body-style", "/api/body-style/{id}", "/api/fuel-type",
-                                                "/api/fuel-type/{id}", "/api/gearbox-type", "/api/gearbox-type/{id}",
-                                                "/api/make/**")
-                                .hasAuthority("MANAGE_CODE_BOOKS")
+                .antMatchers("/api/body-style", "/api/body-style/{id}", "/api/fuel-type",
+                        "/api/fuel-type/{id}", "/api/gearbox-type", "/api/gearbox-type/{id}",
+                        "/api/make/**")
+                .hasAuthority("MANAGE_CODE_BOOKS")
 
-                                .antMatchers("/api/car", "/api/car/{id}", "/api/car/{id}/partial", "/api/car/{id}/edit")
-                                .hasAuthority("MANAGE_CARS")
+                .antMatchers("/api/car", "/api/car/{id}", "/api/car/{id}/partial", "/api/car/{id}/edit")
+                .hasAuthority("MANAGE_CARS")
 
-                                .antMatchers("/api/client", "/api/client/{id}").hasAuthority("MANAGE_CLIENTS")
+                .antMatchers("/api/client", "/api/client/{id}").hasAuthority("MANAGE_CLIENTS")
 
-                                .antMatchers("/api/price-list", "/api/price-list/{id}")
-                                .hasAuthority("MANAGE_PRICE_LISTS")
+                .antMatchers("/api/price-list", "/api/price-list/{id}")
+                .hasAuthority("MANAGE_PRICE_LISTS")
 
-                                .antMatchers(HttpMethod.GET, "/api/rent-report").hasAuthority("MANAGE_RENT_REPORTS")
-                                .antMatchers(HttpMethod.POST, "/api/rent-report").hasAuthority("MANAGE_RENT_REPORTS")
+                .antMatchers(HttpMethod.GET, "/api/rent-report").hasAuthority("MANAGE_RENT_REPORTS")
+                .antMatchers(HttpMethod.POST, "/api/rent-report").hasAuthority("MANAGE_RENT_REPORTS")
 
-                                .antMatchers("/api/role").hasAuthority("MANAGE_ROLES")
-                                .antMatchers(HttpMethod.GET, "/api/permission").hasAuthority("MANAGE_ROLES")
+                .antMatchers("/api/role").hasAuthority("MANAGE_ROLES")
+                .antMatchers(HttpMethod.GET, "/api/permission").hasAuthority("MANAGE_ROLES")
 
-                                .antMatchers(HttpMethod.POST, "/api/rent-request").hasAuthority("CREATE_RENT_REQUEST")
+                .antMatchers(HttpMethod.POST, "/api/rent-request").hasAuthority("CREATE_RENT_REQUEST")
 
-                                .antMatchers(HttpMethod.GET, "/api/rent-request/{status}/mine",
-                                                "/api/rent-request/{id}")
-                                .hasAuthority("GET_MY_RENT_REQUESTS")
+                .antMatchers(HttpMethod.GET, "/api/rent-request/{status}/mine",
+                        "/api/rent-request/{id}")
+                .hasAuthority("GET_MY_RENT_REQUESTS")
 
-                                .antMatchers(HttpMethod.GET,
-                                                "/api/advertisement/{advertisementId}/rent-requests/{status}",
-                                                "/api/rent-request/{id}")
-                                .hasAuthority("GET_RECEIVED_RENT_REQUESTS")
+                .antMatchers(HttpMethod.GET,
+                        "/api/advertisement/{advertisementId}/rent-requests/{status}",
+                        "/api/rent-request/{id}")
+                .hasAuthority("GET_RECEIVED_RENT_REQUESTS")
 
-                                .antMatchers(HttpMethod.DELETE, "/api/rent-request/{id}")
-                                .hasAuthority("DELETE_RENT_REQUEST")
+                .antMatchers(HttpMethod.DELETE, "/api/rent-request/{id}")
+                .hasAuthority("DELETE_RENT_REQUEST")
 
-                                .antMatchers(HttpMethod.PUT, "/api/rent-request/{id}")
-                                .hasAuthority("CHANGE_RENT_REQUEST_STATUS")
+                .antMatchers(HttpMethod.PUT, "/api/rent-request/{id}")
+                .hasAuthority("CHANGE_RENT_REQUEST_STATUS")
 
-                                .anyRequest().authenticated().and()
+                .anyRequest().authenticated().and()
 
-                                .cors().and()
+                .cors().and()
 
-                                .addFilterBefore(
-                                                new TokenAuthenticationFilter(jwtUserDetailsService.tokenUtils,
-                                                                jwtUserDetailsService),
-                                                BasicAuthenticationFilter.class);
+                .addFilterBefore(
+                        new TokenAuthenticationFilter(jwtUserDetailsService.tokenUtils,
+                                jwtUserDetailsService),
+                        BasicAuthenticationFilter.class);
 
-                // .headers().contentSecurityPolicy("default-src 'self'
-                // http://localhost:8080/");
-                http.csrf().disable();
-        }
+        // .headers().contentSecurityPolicy("default-src 'self'
+        // http://localhost:8080/");
+        http.csrf().disable();
+    }
 
-        @Override
-        public void configure(WebSecurity web) throws Exception {
+    @Override
+    public void configure(WebSecurity web) throws Exception {
 
-                web.ignoring().antMatchers(HttpMethod.POST, "/api/auth/**");
-                web.ignoring().antMatchers(HttpMethod.PUT, "/api/auth");
-                web.ignoring().antMatchers(HttpMethod.GET, "/api/advertisement/{id}");
-                web.ignoring().antMatchers(HttpMethod.GET, "/api/car/{id}/picture");
-                web.ignoring().antMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "/favicon.ico", "/**/*.html",
-                                "/**/*.css", "/**/*.js", "/assets/**", "/*.jpg");
-        }
+        web.ignoring().antMatchers(HttpMethod.POST, "/api/auth/**");
+        web.ignoring().antMatchers(HttpMethod.PUT, "/api/auth");
+        web.ignoring().antMatchers(HttpMethod.PUT, "/api/client/activate**");
+        web.ignoring().antMatchers(HttpMethod.GET, "/api/advertisement/{id}");
+        web.ignoring().antMatchers(HttpMethod.GET, "/api/car/{id}/picture");
+        web.ignoring().antMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "/favicon.ico", "/**/*.html",
+                "/**/*.css", "/**/*.js", "/assets/**", "/*.jpg");
+    }
 
 }

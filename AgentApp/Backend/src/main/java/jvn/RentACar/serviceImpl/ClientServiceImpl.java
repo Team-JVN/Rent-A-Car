@@ -3,9 +3,12 @@ package jvn.RentACar.serviceImpl;
 import jvn.RentACar.common.RandomPasswordGenerator;
 import jvn.RentACar.enumeration.ClientStatus;
 import jvn.RentACar.exceptionHandler.InvalidClientDataException;
+import jvn.RentACar.exceptionHandler.InvalidVerificationTokenException;
 import jvn.RentACar.model.Client;
 import jvn.RentACar.model.Role;
+import jvn.RentACar.model.VerificationToken;
 import jvn.RentACar.repository.ClientRepository;
+import jvn.RentACar.repository.VerificationTokenRepository;
 import jvn.RentACar.service.ClientService;
 import jvn.RentACar.service.EmailNotificationService;
 import jvn.RentACar.service.UserService;
@@ -14,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -26,6 +30,8 @@ public class ClientServiceImpl implements ClientService {
     private PasswordEncoder passwordEncoder;
 
     private EmailNotificationService emailNotificationService;
+
+    private VerificationTokenRepository verificationTokenRepository;
 
     @Override
     public Client create(Client client) {
@@ -44,13 +50,23 @@ public class ClientServiceImpl implements ClientService {
             String generatedPassword = randomPasswordGenerator.generatePassword();
             client.setPassword(passwordEncoder.encode(generatedPassword));
             client.setStatus(ClientStatus.NEVER_LOGGED_IN);
+
             composeAndSendEmailToChangePassword(client.getEmail(), generatedPassword);
             return clientRepository.save(client);
         } else {
             client.setPassword(passwordEncoder.encode(client.getPassword()));
             client.setStatus(ClientStatus.APPROVED);
             Client savedClient = clientRepository.save(client);
-            composeAndSendEmailToActivate(client.getEmail(), savedClient.getId());
+
+            VerificationToken verificationToken = new VerificationToken(savedClient);
+            VerificationToken dbToken = verificationTokenRepository.findByToken(verificationToken.getToken());
+            while (dbToken != null) {
+                verificationToken = new VerificationToken(savedClient);
+                dbToken = verificationTokenRepository.findByToken(verificationToken.getToken());
+            }
+            verificationTokenRepository.save(verificationToken);
+
+            composeAndSendEmailToActivate(client.getEmail(), verificationToken.getToken());
             return savedClient;
         }
     }
@@ -93,13 +109,19 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Client activateAccount(Long id) {
-        Client client = get(id);
+    public Client activateAccount(String token) {
+        VerificationToken verificationToken = verificationTokenRepository.findByTokenAndExpiryDateTimeAfter(token, LocalDateTime.now());
+        if (verificationToken == null) {
+            throw new InvalidVerificationTokenException("This activation link is invalid or expired.", HttpStatus.NOT_FOUND);
+        }
+        Client client = get(verificationToken.getClient().getId());
         client.setStatus(ClientStatus.ACTIVE);
+        verificationTokenRepository.deleteById(verificationToken.getId());
+
         return clientRepository.save(client);
     }
 
-    private void composeAndSendEmailToActivate(String recipientEmail, Long id) {
+    private void composeAndSendEmailToActivate(String recipientEmail, String token) {
         String subject = "Activate your account";
         StringBuilder sb = new StringBuilder();
         sb.append("You have successfully registered to the Rent-a-Car website.");
@@ -107,7 +129,7 @@ public class ClientServiceImpl implements ClientService {
         sb.append(System.lineSeparator());
         sb.append("To activate your account click the following link:");
         sb.append(System.lineSeparator());
-        sb.append("http://localhost:4200/account-activated/" + id);
+        sb.append("http://localhost:4200/activate-account?t=" + token);
         String text = sb.toString();
 
         emailNotificationService.sendEmail(recipientEmail, subject, text);
@@ -135,10 +157,11 @@ public class ClientServiceImpl implements ClientService {
 
     @Autowired
     public ClientServiceImpl(ClientRepository clientRepository, UserService userService, PasswordEncoder passwordEncoder,
-                             EmailNotificationService emailNotificationService) {
+                             EmailNotificationService emailNotificationService, VerificationTokenRepository verificationTokenRepository) {
         this.clientRepository = clientRepository;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.emailNotificationService = emailNotificationService;
+        this.verificationTokenRepository = verificationTokenRepository;
     }
 }
