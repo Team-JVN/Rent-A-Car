@@ -2,6 +2,7 @@ package jvn.RentACar.controller;
 
 import jvn.RentACar.dto.both.ClientDTO;
 import jvn.RentACar.dto.request.ChangePasswordDTO;
+import jvn.RentACar.exceptionHandler.BlockedUserException;
 import jvn.RentACar.exceptionHandler.InvalidUserDataException;
 import jvn.RentACar.mapper.ClientDtoMapper;
 import jvn.RentACar.model.UserTokenState;
@@ -49,6 +50,8 @@ public class UserController {
             throw new UsernameNotFoundException(String.format("Invalid email or password. Please try again."));
         }catch (NullPointerException e){
             throw new UsernameNotFoundException(String.format("Invalid email or password. Please try again."));
+        }catch(BlockedUserException e){
+            throw new BlockedUserException(String.format("You are blocked so you can not sign in."),HttpStatus.BAD_REQUEST);
         }
     }
 

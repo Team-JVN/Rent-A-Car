@@ -1,5 +1,6 @@
 package jvn.RentACar.serviceImpl;
 
+import jvn.RentACar.exceptionHandler.BlockedUserException;
 import jvn.RentACar.exceptionHandler.InvalidUserDataException;
 import jvn.RentACar.model.*;
 import jvn.RentACar.repository.RoleRepository;
@@ -29,6 +30,10 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
     private RoleRepository roleRepository;
 
+    private LoginAttemptService loginAttemptService;
+
+    private HttpServletRequest request;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12); // recommended work rounds is 12 (default is 10)
@@ -45,7 +50,11 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException,BlockedUserException {
+        String ip = getClientIP();
+        if (loginAttemptService.isBlocked(ip)) {
+            throw new BlockedUserException(String.format("You are blocked so you can not sign in.", username),HttpStatus.BAD_REQUEST);
+        }
         User user = userRepository.findByEmail(username);
         if (user == null) {
             throw new UsernameNotFoundException(String.format("No user found with email '%s'.", username));
@@ -83,10 +92,20 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         }
     }
 
+    private String getClientIP() {
+        String xfHeader = request.getHeader("X-Forwarded-For");
+        if (xfHeader == null){
+            return request.getRemoteAddr();
+        }
+        return xfHeader.split(",")[0];
+    }
+
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, TokenUtils tokenUtils, RoleRepository roleRepository) {
+    public UserServiceImpl(UserRepository userRepository, TokenUtils tokenUtils, RoleRepository roleRepository,LoginAttemptService loginAttemptService,HttpServletRequest request) {
         this.userRepository = userRepository;
         this.tokenUtils = tokenUtils;
         this.roleRepository = roleRepository;
+        this.loginAttemptService=loginAttemptService;
+        this.request=request;
     }
 }
