@@ -1,6 +1,7 @@
 package jvn.RentACar.controller;
 
 import jvn.RentACar.dto.both.ClientDTO;
+import jvn.RentACar.exceptionHandler.InvalidTokenException;
 import jvn.RentACar.mapper.ClientDtoMapper;
 import jvn.RentACar.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +29,11 @@ public class ClientController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ClientDTO> create(@Valid @RequestBody ClientDTO clientDTO) {
-        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO))), HttpStatus.CREATED);
+        try {
+            return new ResponseEntity<>(clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO))), HttpStatus.CREATED);
+        } catch (NoSuchAlgorithmException e) {
+            throw new InvalidTokenException("Activation token cannot be generated. Please try again.", HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping
@@ -52,7 +58,11 @@ public class ClientController {
     public ResponseEntity<ClientDTO> activateAccount(
             @RequestParam @Pattern(regexp = "^([0-9a-fA-F]{8})-(([0-9a-fA-F]{4}-){3})([0-9a-fA-F]{12})$",
                     message = "This activation link is invalid.") String t) {
-        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.activateAccount(t)), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(clientDtoMapper.toDto(clientService.activateAccount(t)), HttpStatus.OK);
+        } catch (NoSuchAlgorithmException e) {
+            throw new InvalidTokenException("Activation token cannot be checked. Please try again.", HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Autowired

@@ -25,8 +25,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
@@ -65,7 +65,7 @@ public class AuthentificationServiceImpl implements AuthentificationService {
     }
 
     @Override
-    public void changePassword(ChangePasswordDTO changePasswordDTO) throws NullPointerException, UnsupportedEncodingException, NoSuchAlgorithmException {
+    public void changePassword(ChangePasswordDTO changePasswordDTO) throws NullPointerException, NoSuchAlgorithmException {
         User user = userRepository.findByEmail(changePasswordDTO.getEmail());
 
         if (user instanceof Client) {
@@ -84,7 +84,7 @@ public class AuthentificationServiceImpl implements AuthentificationService {
     }
 
     @Override
-    public void checkPassword(String password) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public void checkPassword(String password) throws NoSuchAlgorithmException {
         String url = "https://api.badpasswordcheck.com/check/" + getHashValue(password);
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "1c535167-54e8-4a11-9e2d-21fda54292e1");
@@ -97,13 +97,13 @@ public class AuthentificationServiceImpl implements AuthentificationService {
                 throw new InvalidUserDataException("This password isn't secure. Please choose another one.", HttpStatus.BAD_REQUEST);
             }
         } else {
-            throw new InvalidUserDataException("Password can not be check. Please try again.", HttpStatus.BAD_REQUEST);
+            throw new InvalidUserDataException("Password can not be checked. Please try again.", HttpStatus.BAD_REQUEST);
         }
     }
 
     @Override
-    public void resetPassword(String token, ResetPasswordDTO resetPasswordDTO) throws NullPointerException, UnsupportedEncodingException, NoSuchAlgorithmException {
-        ResetToken resetToken = resetTokenRepository.findByTokenAndExpiryDateTimeAfter(token, LocalDateTime.now());
+    public void resetPassword(String token, ResetPasswordDTO resetPasswordDTO) throws NullPointerException, NoSuchAlgorithmException {
+        ResetToken resetToken = resetTokenRepository.findByTokenAndExpiryDateTimeAfter(getTokenHash(token), LocalDateTime.now());
         if (resetToken == null) {
             throw new InvalidTokenException("This reset token is invalid or expired.", HttpStatus.BAD_REQUEST);
         }
@@ -117,10 +117,17 @@ public class AuthentificationServiceImpl implements AuthentificationService {
         resetTokenRepository.deleteById(resetToken.getId());
     }
 
-    private String getHashValue(String password) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+    private String getHashValue(String password) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-1");
         digest.reset();
-        digest.update(password.getBytes("utf8"));
+        digest.update(password.getBytes(StandardCharsets.UTF_8));
+        return String.format("%040x", new BigInteger(1, digest.digest()));
+    }
+
+    private String getTokenHash(String token) throws NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-512");
+        digest.reset();
+        digest.update(token.getBytes());
         return String.format("%040x", new BigInteger(1, digest.digest()));
     }
 

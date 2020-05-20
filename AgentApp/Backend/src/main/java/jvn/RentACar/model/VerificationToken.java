@@ -14,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class VerificationToken {
 
-    private static final int VERIFICATION_TOKEN_EXPIRY_TIME = 24;
+    private static final int VERIFICATION_TOKEN_EXPIRY_TIME = 3;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

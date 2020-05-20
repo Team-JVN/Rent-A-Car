@@ -1,5 +1,7 @@
 package jvn.RentACar.serviceImpl;
 
+import jvn.RentACar.enumeration.AgentStatus;
+import jvn.RentACar.enumeration.ClientStatus;
 import jvn.RentACar.exceptionHandler.InvalidUserDataException;
 import jvn.RentACar.model.*;
 import jvn.RentACar.repository.ResetTokenRepository;
@@ -22,6 +24,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 @Service
 public class UserServiceImpl implements UserDetailsService, UserService {
@@ -77,13 +82,24 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     }
 
     @Override
-    public void generateResetToken(String email) {
+    public void generateResetToken(String email) throws NoSuchAlgorithmException {
         User user = findByEmail(email);
         if (user == null) {
             return;
         }
 
+        if (user instanceof Client && ((Client) user).getStatus() != ClientStatus.ACTIVE) {
+            composeAndSendEmail(user.getEmail());
+            return;
+        } else if (user instanceof Agent && ((Agent) user).getStatus() != AgentStatus.ACTIVE) {
+            composeAndSendEmail(user.getEmail());
+            return;
+        }
+
         ResetToken resetToken = new ResetToken(user);
+        String nonHashedToken = resetToken.getToken();
+        resetToken.setToken(getTokenHash(nonHashedToken));
+
         ResetToken dbToken = resetTokenRepository.findByToken(resetToken.getToken());
         while (dbToken != null) {
             resetToken = new ResetToken(user);
@@ -91,7 +107,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         }
         resetTokenRepository.save(resetToken);
 
-        composeAndSendEmail(user.getEmail(), resetToken.getToken());
+        composeAndSendResetLink(user.getEmail(), nonHashedToken);
     }
 
     @Override
@@ -109,7 +125,27 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         }
     }
 
-    private void composeAndSendEmail(String recipientEmail, String token) {
+    private String getTokenHash(String token) throws NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-512");
+        digest.reset();
+        digest.update(token.getBytes());
+        return String.format("%040x", new BigInteger(1, digest.digest()));
+    }
+
+    private void composeAndSendEmail(String recipientEmail) {
+        String subject = "Reset your password";
+        StringBuilder sb = new StringBuilder();
+        sb.append("You got this email because you requested a password reset.");
+        sb.append(System.lineSeparator());
+        sb.append(System.lineSeparator());
+        sb.append("Your account is not active, therefore your password cannot be reset. ");
+        sb.append("To activate it, use the previously received activation link or change the previously received generic password.");
+        String text = sb.toString();
+
+        emailNotificationService.sendEmail(recipientEmail, subject, text);
+    }
+
+    private void composeAndSendResetLink(String recipientEmail, String token) {
         String subject = "Reset your password";
         StringBuilder sb = new StringBuilder();
         sb.append("You got this email because you requested a password reset.");
