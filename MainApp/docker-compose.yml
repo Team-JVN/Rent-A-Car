@@ -14,7 +14,7 @@ services:
         ports:
         - "8080:8083"
         environment:
-            - REGISTRY_HOST=eureka-serviceregistry
+            REGISTRY_HOST: eureka-serviceregistry
         tty: true
         depends_on:
             - eureka-serviceregistry

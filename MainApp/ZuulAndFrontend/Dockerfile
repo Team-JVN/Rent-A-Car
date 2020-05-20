@@ -5,11 +5,11 @@ LABEL maintainer="Tim 29"
 WORKDIR /usr/src/zuul 
 COPY Frontend .
 RUN ["npm", "install"]
-RUN ["npm", "install","ng-starrating@1.0.11"]
-RUN [ "npm", "run", "build", "--prod"]
+RUN ["npm", "install", "ng-starrating@1.0.11"]
+RUN ["npm", "run", "build", "--prod"]
 
 
-FROM maven:3.6.3-ibmjava-8-alpine AS appServer
+FROM maven:3.6.3-ibmjava-8-alpine AS backend
 
 WORKDIR /usr/src/zuul
 COPY Zuul .
@@ -18,9 +18,9 @@ RUN ["mvn", "package", "-DskipTests"]
 
 
 FROM openjdk:8-jdk-alpine
-EXPOSE 8080
+EXPOSE 8083
 WORKDIR /app
-COPY --from=appServer /usr/src/zuul/target/zuul-1.0.0.jar  ./
+COPY --from=backend /usr/src/zuul/target/zuul-1.0.0.jar  ./
 
 CMD ["java", "-jar", "zuul-1.0.0.jar"]
 

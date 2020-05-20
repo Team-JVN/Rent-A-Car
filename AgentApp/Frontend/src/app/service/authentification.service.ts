@@ -1,11 +1,10 @@
 import { UserTokenState } from './../model/userTokenState';
-
 import { ChangePassword } from './../model/changePassword';
 import { map } from 'rxjs/operators';
 import { User } from './../model/user';
 import { environment } from './../../environments/environment';
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import { RegistrationClient } from '../model/registrationClient';
@@ -44,11 +43,21 @@ export class AuthentificationService {
   }
 
   register(client: RegistrationClient) {
-    return this.httpClient.post(this.url, client);
+    return this.httpClient.post(this.url + "/register", client);
   }
 
   changePassword(changePassword: ChangePassword) {
     return this.httpClient.put(this.url, changePassword);
+  }
+
+  requestToken(email: string) {
+    return this.httpClient.post(this.url, { email: email });
+  }
+
+  resetPassword(token: string, newPassword: string) {
+    let params = new HttpParams();
+    params = params.append('t', token);
+    return this.httpClient.put(this.url + '/reset-password', { newPassword: newPassword }, { params: params });
   }
 
   logout() {

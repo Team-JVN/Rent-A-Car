@@ -2,11 +2,12 @@ package jvn.RentACar.service;
 
 import jvn.RentACar.model.Client;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public interface ClientService {
 
-    Client create(Client client);
+    Client create(Client client) throws NoSuchAlgorithmException;
 
     Client get(Long id);
 
@@ -16,5 +17,5 @@ public interface ClientService {
 
     void delete(Long id);
 
-    Client activateAccount(String token);
+    Client activateAccount(String token) throws NoSuchAlgorithmException;
 }

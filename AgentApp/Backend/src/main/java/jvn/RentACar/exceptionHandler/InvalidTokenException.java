@@ -6,11 +6,11 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @Setter
-public class InvalidVerificationTokenException extends RuntimeException {
+public class InvalidTokenException extends RuntimeException {
 
     private HttpStatus httpStatus;
 
-    public InvalidVerificationTokenException(String message, HttpStatus httpStatus) {
+    public InvalidTokenException(String message, HttpStatus httpStatus) {
         super(message);
         this.httpStatus = httpStatus;
     }

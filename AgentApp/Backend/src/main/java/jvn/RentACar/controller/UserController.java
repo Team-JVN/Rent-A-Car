@@ -3,6 +3,9 @@ package jvn.RentACar.controller;
 import jvn.RentACar.dto.both.ClientDTO;
 import jvn.RentACar.dto.request.ChangePasswordDTO;
 import jvn.RentACar.exceptionHandler.BlockedUserException;
+import jvn.RentACar.dto.request.RequestTokenDTO;
+import jvn.RentACar.dto.request.ResetPasswordDTO;
+import jvn.RentACar.exceptionHandler.InvalidTokenException;
 import jvn.RentACar.exceptionHandler.InvalidUserDataException;
 import jvn.RentACar.mapper.ClientDtoMapper;
 import jvn.RentACar.model.UserTokenState;
@@ -20,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.io.UnsupportedEncodingException;
+import javax.validation.constraints.Pattern;
 import java.security.NoSuchAlgorithmException;
 
 @RestController
@@ -43,15 +46,17 @@ public class UserController {
                 throw new UsernameNotFoundException(String.format("Invalid email or password. Please try again."));
             }
             return new ResponseEntity<>(userTokenState, HttpStatus.OK);
-        } catch (AuthenticationException  e) {
-            if(authentificationService.userIsNeverLoggedIn(authenticationRequest.getUsername())){
+        } catch (AuthenticationException e) {
+            if (authentificationService.userIsNeverLoggedIn(authenticationRequest.getUsername())) {
                 return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
             }
-            if(e.getMessage().equals("Blocked")){
-                throw new BlockedUserException("You tried to log in too many times. Youraccount wil be blocked for the next 24 hours.",HttpStatus.BAD_REQUEST);
+            if (e.getMessage().equals("Blocked")) {
+                throw new BlockedUserException(
+                        "You tried to log in too many times. Youraccount wil be blocked for the next 24 hours.",
+                        HttpStatus.BAD_REQUEST);
             }
             throw new UsernameNotFoundException("Invalid email or password. Please try again.");
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             throw new UsernameNotFoundException("Invalid email or password. Please try again.");
         }
     }
@@ -62,21 +67,53 @@ public class UserController {
             authentificationService.changePassword(changePasswordDTO);
         } catch (NullPointerException e) {
             throw new InvalidUserDataException("Invalid email or password.", HttpStatus.BAD_REQUEST);
-        } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
-            throw new InvalidUserDataException("Password can not be check. Please try again.", HttpStatus.BAD_REQUEST);
+        } catch (NoSuchAlgorithmException e) {
+            throw new InvalidUserDataException("Password cannot be checked. Please try again.", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ClientDTO> register(@Valid @RequestBody ClientDTO clientDTO) {
         try {
             authentificationService.checkPassword(clientDTO.getPassword());
-        } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
-            throw new InvalidUserDataException("Password can not be check. Please try again.", HttpStatus.BAD_REQUEST);
+        } catch (NoSuchAlgorithmException e) {
+            throw new InvalidUserDataException("Password cannot be check. Please try again.", HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO))),
-                HttpStatus.CREATED);
+        try {
+            return new ResponseEntity<>(
+                    clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO))),
+                    HttpStatus.CREATED);
+        } catch (NoSuchAlgorithmException e) {
+            throw new InvalidTokenException("Activation token cannot be generated. Please try again.",
+                    HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> generateResetToken(@Valid @RequestBody RequestTokenDTO requestTokenDTO) {
+        try {
+            userService.generateResetToken(requestTokenDTO.getEmail());
+        } catch (NoSuchAlgorithmException e) {
+            throw new InvalidTokenException("Reset token cannot be generated. Please try again.",
+                    HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/reset-password", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> resetPassword(
+            @RequestParam @Pattern(regexp = "^([0-9a-fA-F]{8})-(([0-9a-fA-F]{4}-){3})([0-9a-fA-F]{12})$", message = "This reset token is invalid.") String t,
+            @Valid @RequestBody ResetPasswordDTO resetPasswordDTO) {
+        try {
+            authentificationService.resetPassword(t, resetPasswordDTO);
+        } catch (NullPointerException e) {
+            throw new InvalidUserDataException("Invalid email or password.", HttpStatus.BAD_REQUEST);
+        } catch (NoSuchAlgorithmException e) {
+            throw new InvalidUserDataException("Reset token or new password cannot be checked. Please try again.",
+                    HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/refresh", method = RequestMethod.POST)

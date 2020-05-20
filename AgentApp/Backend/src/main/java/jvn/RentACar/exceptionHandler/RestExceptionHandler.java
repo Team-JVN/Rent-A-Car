@@ -21,8 +21,8 @@ import java.util.List;
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(InvalidVerificationTokenException.class)
-    protected ResponseEntity<Object> handleInvalidVerificationTokenDataException(InvalidVerificationTokenException ex) {
+    @ExceptionHandler(InvalidTokenException.class)
+    protected ResponseEntity<Object> handleInvalidTokenDataException(InvalidTokenException ex) {
         ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
         return buildResponseEntity(error);
     }

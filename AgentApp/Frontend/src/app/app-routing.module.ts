@@ -1,3 +1,5 @@
+import { ResetPasswordEnterNewPassComponent } from './component/authentification/reset-password-enter-new-pass/reset-password-enter-new-pass.component';
+import { ResetPasswordEnterEmailComponent } from './component/authentification/reset-password-enter-email/reset-password-enter-email.component';
 import { ActivateAccountComponent } from './component/authentification/activate-account/activate-account.component';
 import { GetMyRentRequestsGuard } from './guard/get.my.rent.requests.guard';
 import { GetReceivedRentRequestsGuard } from './guard/get.received.rent.requests.guard';
@@ -132,6 +134,14 @@ const routes: Routes = [
   {
     path: "activate-account",
     component: ActivateAccountComponent,
+  },
+  {
+    path: "forgot-password",
+    component: ResetPasswordEnterEmailComponent,
+  },
+  {
+    path: "reset-password",
+    component: ResetPasswordEnterNewPassComponent,
   },
   //******************* ERROR PAGES ************************
   {

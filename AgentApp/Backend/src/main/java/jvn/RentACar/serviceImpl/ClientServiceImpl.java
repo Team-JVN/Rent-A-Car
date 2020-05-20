@@ -3,7 +3,7 @@ package jvn.RentACar.serviceImpl;
 import jvn.RentACar.common.RandomPasswordGenerator;
 import jvn.RentACar.enumeration.ClientStatus;
 import jvn.RentACar.exceptionHandler.InvalidClientDataException;
-import jvn.RentACar.exceptionHandler.InvalidVerificationTokenException;
+import jvn.RentACar.exceptionHandler.InvalidTokenException;
 import jvn.RentACar.model.Client;
 import jvn.RentACar.model.Role;
 import jvn.RentACar.model.VerificationToken;
@@ -18,6 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.core.env.Environment;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -36,7 +39,7 @@ public class ClientServiceImpl implements ClientService {
     private VerificationTokenRepository verificationTokenRepository;
 
     @Override
-    public Client create(Client client) {
+    public Client create(Client client) throws NoSuchAlgorithmException {
         if (clientRepository.findByPhoneNumber(client.getPhoneNumber()) != null) {
             throw new InvalidClientDataException("Client with same phone number already exists.",
                     HttpStatus.BAD_REQUEST);
@@ -63,6 +66,9 @@ public class ClientServiceImpl implements ClientService {
             Client savedClient = clientRepository.save(client);
 
             VerificationToken verificationToken = new VerificationToken(savedClient);
+            String nonHashedToken = verificationToken.getToken();
+            verificationToken.setToken(getTokenHash(nonHashedToken));
+
             VerificationToken dbToken = verificationTokenRepository.findByToken(verificationToken.getToken());
             while (dbToken != null) {
                 verificationToken = new VerificationToken(savedClient);
@@ -70,7 +76,7 @@ public class ClientServiceImpl implements ClientService {
             }
             verificationTokenRepository.save(verificationToken);
 
-            composeAndSendEmailToActivate(client.getEmail(), verificationToken.getToken());
+            composeAndSendEmailToActivate(client.getEmail(), nonHashedToken);
             return savedClient;
         }
     }
@@ -114,18 +120,24 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Client activateAccount(String token) {
-        VerificationToken verificationToken = verificationTokenRepository.findByTokenAndExpiryDateTimeAfter(token,
-                LocalDateTime.now());
+    public Client activateAccount(String token) throws NoSuchAlgorithmException {
+        VerificationToken verificationToken = verificationTokenRepository
+                .findByTokenAndExpiryDateTimeAfter(getTokenHash(token), LocalDateTime.now());
         if (verificationToken == null) {
-            throw new InvalidVerificationTokenException("This activation link is invalid or expired.",
-                    HttpStatus.NOT_FOUND);
+            throw new InvalidTokenException("This activation link is invalid or expired.", HttpStatus.BAD_REQUEST);
         }
         Client client = get(verificationToken.getClient().getId());
         client.setStatus(ClientStatus.ACTIVE);
         verificationTokenRepository.deleteById(verificationToken.getId());
 
         return clientRepository.save(client);
+    }
+
+    private String getTokenHash(String token) throws NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-512");
+        digest.reset();
+        digest.update(token.getBytes());
+        return String.format("%040x", new BigInteger(1, digest.digest()));
     }
 
     private void composeAndSendEmailToActivate(String recipientEmail, String token) {
