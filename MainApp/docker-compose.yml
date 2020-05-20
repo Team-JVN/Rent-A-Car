@@ -140,7 +140,7 @@ services:
             - main-app-tls
 
     agentapp:
-        build: .
+        build: ./AgentApp
         image: jelenapopov/agentapp
         container_name: agentapp
         restart: on-failure
