@@ -18,9 +18,11 @@ RUN ["mvn", "package", "-DskipTests"]
 
 
 FROM openjdk:8-jdk-alpine
-EXPOSE 8083
+
 WORKDIR /app
 COPY --from=backend /usr/src/zuul/target/zuul-1.0.0.jar  ./
+
+EXPOSE 8083
 
 CMD ["java", "-jar", "zuul-1.0.0.jar"]
 
