@@ -45,10 +45,10 @@ services:
             REGISTRY_HOST: eureka-serviceregistry
             DATABASE_USERNAME: rentacar
             DATABASE_PASSWORD: RentACarTeam29
-            DATABASE_DOMAIN: mysql
+            DATABASE_DOMAIN: mainapp-mysql
             DATABASE_SCHEMA: rentacardb
         depends_on:
-            - mysql
+            - mainapp-mysql
             - eureka-serviceregistry
             - rabbitmq-broker
         #   - axon-server
@@ -66,10 +66,10 @@ services:
             REGISTRY_HOST: eureka-serviceregistry
             DATABASE_USERNAME: rentacar
             DATABASE_PASSWORD: RentACarTeam29
-            DATABASE_DOMAIN: mysql
+            DATABASE_DOMAIN: mainapp-mysql
             DATABASE_SCHEMA: rentacardb
         depends_on: 
-            - mysql
+            - mainapp-mysql
             - eureka-serviceregistry
             - rabbitmq-broker
         #   - axon-server
@@ -87,10 +87,10 @@ services:
             REGISTRY_HOST: eureka-serviceregistry
             DATABASE_USERNAME: rentacar
             DATABASE_PASSWORD: RentACarTeam29
-            DATABASE_DOMAIN: mysql
+            DATABASE_DOMAIN: mainapp-mysql
             DATABASE_SCHEMA: rentacardb
         depends_on:
-            - mysql
+            - mainapp-mysql
             - eureka-serviceregistry
             - rabbitmq-broker
         #   - axon-server
@@ -108,10 +108,10 @@ services:
             REGISTRY_HOST: eureka-serviceregistry
             DATABASE_USERNAME: rentacar
             DATABASE_PASSWORD: RentACarTeam29
-            DATABASE_DOMAIN: mysql
+            DATABASE_DOMAIN: mainapp-mysql
             DATABASE_SCHEMA: rentacardb
         depends_on:
-            - mysql
+            - mainapp-mysql
             - eureka-serviceregistry
             - rabbitmq-broker
         #   - axon-server

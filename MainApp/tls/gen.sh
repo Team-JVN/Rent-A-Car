@@ -198,7 +198,7 @@ openssl req \
     -config etc/client.conf \
     -out "certs/${MAIN_APP_CLIENT_NAME}/${MAIN_APP_CLIENT_NAME}.csr" \
     -keyout "certs/${MAIN_APP_CLIENT_NAME}/${MAIN_APP_CLIENT_NAME}.key" \
-    -subj "/C=NO/O=Green AS/OU=Green Certificate Authority/CN=Team 29" || exit
+    -subj "/C=NO/O=Green AS/OU=Green Certificate Authority/CN=Team 29 Main App" || exit
     
 # Create TLS client certificate (for web browser) - Main App
 openssl ca \
