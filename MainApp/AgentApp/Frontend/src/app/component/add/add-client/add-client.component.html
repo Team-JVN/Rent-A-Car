@@ -1,0 +1,44 @@
+<h1 mat-dialog-title>Add new Client</h1>
+<mat-dialog-content class="dialog-class">
+    <form [formGroup]="createForm" class="form-full-width">
+        <mat-form-field class="form-full-width">
+            <input matInput placeholder="Name" formControlName="name">
+            <mat-error *ngIf="createForm.get('name').errors && createForm.get('name').errors['required']">
+                Please enter client's name.
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field class="form-full-width">
+            <input matInput placeholder="Email" type="email" formControlName="email">
+            <mat-error *ngIf="createForm.get('email').errors && createForm.get('email').errors['required']">
+                Please enter email address.
+            </mat-error>
+            <mat-error *ngIf="createForm.get('email').errors && createForm.get('email').errors['email']">
+                Please enter valid email address.
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field class="form-full-width">
+            <input matInput placeholder="Address" formControlName="address">
+            <mat-error *ngIf="createForm.get('address').errors && createForm.get('address').errors['required']">
+                Please enter address.
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field class="form-full-width mt-2">
+            <input matInput placeholder="Phone number" formControlName="phoneNumber">
+            <mat-error *ngIf="createForm.get('phoneNumber').errors && createForm.get('phoneNumber').errors['required']">
+                Please enter phone number.
+            </mat-error>
+            <mat-error *ngIf="createForm.get('phoneNumber').errors && createForm.get('phoneNumber').errors['pattern']">
+                Phone number must begin with 0 and can contain digits only.
+            </mat-error>
+            <mat-error *ngIf="createForm.get('phoneNumber').errors && (createForm.get('phoneNumber').errors['minlength'] 
+                 || createForm.get('phoneNumber').errors && createForm.get('phoneNumber').errors['maxlength'])">
+                Phone number can contain between 9 and 10 digits.
+            </mat-error>
+        </mat-form-field>
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-raised-button color="primary" (click)="create()" class="mb-3"
+        [disabled]="!createForm.valid">Add</button>
+</mat-dialog-actions>

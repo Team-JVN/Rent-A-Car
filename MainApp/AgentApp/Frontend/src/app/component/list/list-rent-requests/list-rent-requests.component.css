@@ -1,0 +1,92 @@
+mat-card {
+    max-width: 750px;
+    margin: 2em auto;
+    z-index: 0;
+}
+
+.mat-select-status{
+    margin:0;
+}
+
+.element-detail {
+    overflow: hidden;
+}
+
+.item-card {
+    width: 99%;
+    background-color: #F5F5F5;    
+    margin: 0.7em auto;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.table th {
+    vertical-align: middle;
+}
+
+.first{
+    font-weight: 550;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+tr.detail-row {
+    height: 0;
+}
+
+.element-row td {
+    border-bottom-width: 0;
+}
+
+tr.element-row:not(.expanded-row):hover {
+    background: lightgray;
+    cursor: pointer;
+}
+
+tr.element-row:not(.expanded-row):active {
+    background: #efefef;
+}
+
+.expendable-table{
+    width: 100%;
+}
+
+.btn-adv-details{
+    font-weight: 500;
+    font-size: 20px;
+    color: #3f51b5;
+}
+
+.btn-adv-details:hover{
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.mat-card-title-rent-info{
+    font-weight: 500;
+    font-size: 20px;
+}
+
+.first-column{
+    width: 110px;
+}
+
+.second-column{
+    width: 150px;
+}
+
+.buttons-width {
+    width: 200px;
+}
+
+.status-filter {    
+    font-size: 110%;
+}
+
+.filter-span {
+    margin-right: 20px;
+}

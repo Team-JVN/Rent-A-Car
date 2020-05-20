@@ -1,0 +1,34 @@
+<h1 mat-dialog-title>Edit Price List</h1>
+<mat-dialog-content class="dialog-class">
+    <form [formGroup]="editForm" class="form-full-width">
+        <mat-form-field class="form-full-width">
+            <input matInput type="number" placeholder="Price Per Day" formControlName="pricePerDay" min="1">
+            <span matSuffix class="ml-2">€</span>
+            <mat-error *ngIf="editForm.get('pricePerDay').errors && editForm.get('pricePerDay').errors['required']">
+                Please enter price per day.
+            </mat-error>
+            <mat-error *ngIf="editForm.get('pricePerDay').errors && editForm.get('pricePerDay').errors['min']">
+                Price must be a positive decimal number.
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field class="form-full-width">
+            <input matInput type="number" placeholder="Price Per Kilometre" formControlName="pricePerKm" min="1">
+            <span matSuffix class="ml-2">€</span>
+            <mat-error *ngIf="editForm.get('pricePerKm').errors && editForm.get('pricePerKm').errors['min']">
+                Price must be a positive decimal number.
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field class="form-full-width">
+            <input matInput type="number" placeholder="Price For Collision Damage Waiver" formControlName="priceForCDW"
+                min="1">
+            <span matSuffix class="ml-2">€</span>
+            <mat-error *ngIf="editForm.get('priceForCDW').errors && editForm.get('priceForCDW').errors['min']">
+                Price must be a positive decimal number.
+            </mat-error>
+        </mat-form-field>
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-raised-button color="primary" (click)="edit()" [disabled]="!editForm.valid">Edit</button>
+</mat-dialog-actions>

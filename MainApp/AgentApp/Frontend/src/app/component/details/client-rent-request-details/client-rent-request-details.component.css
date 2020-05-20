@@ -1,0 +1,97 @@
+mat-card {
+    max-width: 800px;
+}
+
+.div-page {
+    max-width: 1050px;
+    margin: 2em auto;
+}
+.buttons-width {
+    width: 160px;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.item-card {
+    width: 100%;
+    background-color: #F5F5F5;    
+    margin: 0.7em auto;
+}
+
+.message-card {
+    width: 100%;
+}
+
+.chat-box {
+    display: flex;
+    align-items: stretch;
+    background: #fffffe;
+    box-shadow: 0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12);
+    transition: box-shadow 280ms cubic-bezier(.4,0,.2,1);
+    border-radius: 4px;
+    max-width: 750px;
+    width: calc(100% - 20px);
+    height: 500px;
+    max-height: calc(100% - 20px)
+}
+
+.received-card {
+    width: 80%;
+    background-color: #20D1F1;    
+    margin: 0.7em auto;
+}
+
+.sent-card {
+    width: 80%;
+    background-color: #325FAA;    
+    margin: 0.7em auto;
+}
+
+.btn-adv-details{
+    font-weight: 500;
+    font-size: 20px;
+    color: #3f51b5;
+}
+
+.btn-adv-details:hover{
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+
+.mat-card-title-rent-info{
+    font-weight: 500;
+    font-size: 20px;
+}
+
+.first-column{
+    width: 110px;
+}
+
+.second-column{
+    width: 150px;
+}
+
+.buttons-width {
+    width: 150px;
+}
+
+.status-filter {    
+    font-size: 110%;
+}
+
+.filter-span {
+    margin-right: 20px;
+}
+
+.div-scroll{
+    height:300px;
+    overflow-x:hidden;
+    overflow-y: auto;
+}
+
+.form-full-width {
+    width: 100%;
+}

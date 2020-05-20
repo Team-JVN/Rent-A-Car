@@ -1,0 +1,34 @@
+<h1 mat-dialog-title>Edit Client</h1>
+<mat-dialog-content class="dialog-class">
+    <form [formGroup]="editForm" class="form-full-width">
+        <mat-form-field class="form-full-width">
+            <input matInput placeholder="Name" formControlName="name">
+            <mat-error *ngIf="editForm.get('name').errors && editForm.get('name').errors['required']">
+                Please enter client's name.
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field class="form-full-width">
+            <input matInput placeholder="Address" formControlName="address">
+            <mat-error *ngIf="editForm.get('address').errors && editForm.get('address').errors['required']">
+                Please enter address.
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field class="form-full-width mt-2">
+            <input matInput placeholder="Phone number" formControlName="phoneNumber">
+            <mat-error *ngIf="editForm.get('phoneNumber').errors && editForm.get('phoneNumber').errors['required']">
+                Please enter phone number.
+            </mat-error>
+            <mat-error *ngIf="editForm.get('phoneNumber').errors && editForm.get('phoneNumber').errors['pattern']">
+                Phone number must begin with 0 and can contain digits only.
+            </mat-error>
+            <mat-error *ngIf="editForm.get('phoneNumber').errors && (editForm.get('phoneNumber').errors['minlength'] 
+                 || editForm.get('phoneNumber').errors && editForm.get('phoneNumber').errors['maxlength'])">
+                Phone number can contain between 9 and 10 digits.
+            </mat-error>
+        </mat-form-field>
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-raised-button color="primary" (click)="edit()" class="mb-3" [disabled]="!editForm.valid">Edit</button>
+</mat-dialog-actions>
