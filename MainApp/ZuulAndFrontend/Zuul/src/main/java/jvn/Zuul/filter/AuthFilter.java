@@ -46,29 +46,28 @@ public class AuthFilter extends ZuulFilter {
         HttpServletRequest request = ctx.getRequest();
         String header = request.getHeader("Authorization");
 
-//        if (header == null || header.isEmpty() || !header.startsWith("Bearer ")) {
-//            ctx.setResponseStatusCode(401);
-//            ctx.setSendZuulResponse(false);
-//        }else {
-//            try {
-//                System.out.println("Verifikacija");
-//                authClient.verify();
-//
-//            } catch (FeignException.NotFound e) {
-//                setFailedRequest("Consumer does not exist!", 403);
-//            }
-//        }
+        // if (header == null || header.isEmpty() || !header.startsWith("Bearer ")) {
+        // ctx.setResponseStatusCode(401);
+        // ctx.setSendZuulResponse(false);
+        // }else {
+        // try {
+        // System.out.println("Verifikacija");
+        // authClient.verify();
+        //
+        // } catch (FeignException.NotFound e) {
+        // setFailedRequest("Consumer does not exist!", 403);
+        // }
+        // }
 
-        try {
-            System.out.println("Verifikacija");
-            authClient.verify();
+        // try {
+        // System.out.println("Verifikacija");
+        // authClient.verify();
 
-        } catch (FeignException.NotFound e) {
-            setFailedRequest("User does not exist!", 403);
-        }
+        // } catch (FeignException.NotFound e) {
+        // setFailedRequest("User does not exist!", 403);
+        // }
 
         return null;
     }
 
 }
-
