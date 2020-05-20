@@ -2,6 +2,10 @@
 
 This microservice web application offers its users rent-a-car management on-line. They can advertise cars for rent and create rent requests. 
 
+## KT 1
+
+Click on [this link](https://github.com/Team-JVN/Rent-A-Car/blob/master/XWS_KT1_Tim29.pdf) to view microservice achitecture model.
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
