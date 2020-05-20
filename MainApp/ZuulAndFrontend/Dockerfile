@@ -21,18 +21,6 @@ FROM openjdk:8-jdk-alpine
 
 WORKDIR /app
 COPY --from=backend /usr/src/zuul/target/zuul-1.0.0.jar  ./
-
 EXPOSE 8083
 
 CMD ["java", "-jar", "zuul-1.0.0.jar"]
-
-
-# FROM openjdk:8-jdk-alpine
-
-# LABEL maintainer="Tim 29"
-
-# COPY Zuul/entrypoint.sh /entrypoint.sh
-# COPY Zuul/target/zuul-1.0.0.jar zuul-1.0.0.jar
-# RUN chmod +x /entrypoint.sh
-
-# CMD ["/entrypoint.sh"]

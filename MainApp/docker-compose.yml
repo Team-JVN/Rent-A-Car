@@ -22,8 +22,32 @@ services:
         tty: true
         depends_on:
             - eureka-serviceregistry
+            - advertisements
             - cars
+            - renting
+            - users
             # - axon-server
+
+    advertisements:
+        build: ./Advertisements
+        image: nikolabrodic/advertisements
+        container_name: advertisements
+        restart: on-failure
+        networks:
+            - main-app-tls
+        ports:
+            - 8081:8081
+        environment:
+            REGISTRY_HOST: eureka-serviceregistry
+            DATABASE_USERNAME: rentacar
+            DATABASE_PASSWORD: RentACarTeam29
+            DATABASE_DOMAIN: mysql
+            DATABASE_SCHEMA: rentacardb
+        depends_on:
+            - mysql
+            - eureka-serviceregistry
+        #   - rabbitmq-broker
+        #   - axon-server
 
     cars:
         build: ./Cars
@@ -42,6 +66,48 @@ services:
             DATABASE_SCHEMA: rentacardb
         tty: true
         depends_on: 
+            - mysql
+            - eureka-serviceregistry
+        #   - rabbitmq-broker
+        #   - axon-server
+
+    renting:
+        build: ./Renting
+        image: nikolabrodic/renting
+        container_name: renting
+        restart: on-failure
+        networks:
+            - main-app-tls
+        ports:
+            - 8085:8085
+        environment:
+            REGISTRY_HOST: eureka-serviceregistry
+            DATABASE_USERNAME: rentacar
+            DATABASE_PASSWORD: RentACarTeam29
+            DATABASE_DOMAIN: mysql
+            DATABASE_SCHEMA: rentacardb
+        depends_on:
+            - mysql
+            - eureka-serviceregistry
+        #   - rabbitmq-broker
+        #   - axon-server
+
+    users:
+        build: ./Users
+        image: nikolabrodic/users
+        container_name: users
+        restart: on-failure
+        networks:
+            - main-app-tls
+        ports:
+            - 8084:8084
+        environment:
+            REGISTRY_HOST: eureka-serviceregistry
+            DATABASE_USERNAME: rentacar
+            DATABASE_PASSWORD: RentACarTeam29
+            DATABASE_DOMAIN: mysql
+            DATABASE_SCHEMA: rentacardb
+        depends_on:
             - mysql
             - eureka-serviceregistry
         #   - rabbitmq-broker
