@@ -24,12 +24,15 @@ services:
             KEYSTORE_ALIAS: MAIN_APP_CLIENT_ALIAS
             TRUSTSTORE: /etc/keystore/MAIN_APP_NAME.truststore.p12
             TRUSTSTORE_PASSWORD: MAIN_APP_KEYSTORE_PASSWORD
+        volumes:
+            - ./tls/certs/mainapp/keystore:/etc/keystore
         depends_on:
             - eureka-serviceregistry
             - advertisements
             - cars
             - renting
             - users
+            - rabbitmq-broker
             # - axon-server
 
     advertisements:

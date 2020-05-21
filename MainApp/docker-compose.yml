@@ -24,12 +24,15 @@ services:
             KEYSTORE_ALIAS: mainapp
             TRUSTSTORE: /etc/keystore/mainapp.truststore.p12
             TRUSTSTORE_PASSWORD: mainapp_pass
+        volumes:
+            - ./tls/certs/mainapp/keystore:/etc/keystore
         depends_on:
             - eureka-serviceregistry
             - advertisements
             - cars
             - renting
             - users
+            - rabbitmq-broker
             # - axon-server
 
     advertisements:
@@ -127,8 +130,8 @@ services:
             MYSQL_USER: rentacar
             MYSQL_PASSWORD: RentACarTeam29
             MYSQL_DATABASE: rentacardb
-        # volumes:
-        #     - mainapp-mysql-data:/var/lib/mysql
+        volumes:
+            - mainapp-mysql-data:/var/lib/mysql
     
     rabbitmq-broker:
         image: rabbitmq:management-alpine
@@ -174,14 +177,12 @@ services:
             MYSQL_USER: rentacar
             MYSQL_PASSWORD: RentACarTeam29
             MYSQL_DATABASE: agentappdb
-        # volumes:
-        #     - agentapp-mysql-data:/var/lib/mysql
-# volumes:
-#     agentapp-mysql-data:
-#         - D:\DockerVM\Volumes
-#     mainapp-mysql-data:
-#         - D:\DockerVM\Volumes
-#     logs:
+        volumes:
+            - agentapp-mysql-data:/var/lib/mysql
+volumes:
+    agentapp-mysql-data:
+    mainapp-mysql-data:
+    logs:
     
 networks:
     agent-app-tls:
