@@ -21,7 +21,7 @@ services:
             REGISTRY_HOST: eureka-serviceregistry
             KEYSTORE: /etc/keystore/mainapp.keystore.p12
             KEYSTORE_PASSWORD: mainapp_pass
-            KEYSTORE_ALIAS: MAIN_APP_CLIENT_ALIAS
+            KEYSTORE_ALIAS: mainapp
             TRUSTSTORE: /etc/keystore/mainapp.truststore.p12
             TRUSTSTORE_PASSWORD: mainapp_pass
         depends_on:
@@ -127,8 +127,8 @@ services:
             MYSQL_USER: rentacar
             MYSQL_PASSWORD: RentACarTeam29
             MYSQL_DATABASE: rentacardb
-        volumes:
-            - mainapp-mysql-data:/var/lib/mysql
+        # volumes:
+        #     - mainapp-mysql-data:/var/lib/mysql
     
     rabbitmq-broker:
         image: rabbitmq:management-alpine
@@ -174,12 +174,14 @@ services:
             MYSQL_USER: rentacar
             MYSQL_PASSWORD: RentACarTeam29
             MYSQL_DATABASE: agentappdb
-        volumes:
-            - agentapp-mysql-data:/var/lib/mysql       
-volumes:
-    agentapp-mysql-data:
-    mainapp-mysql-data:
-    logs:
+        # volumes:
+        #     - agentapp-mysql-data:/var/lib/mysql
+# volumes:
+#     agentapp-mysql-data:
+#         - D:\DockerVM\Volumes
+#     mainapp-mysql-data:
+#         - D:\DockerVM\Volumes
+#     logs:
     
 networks:
     agent-app-tls:
