@@ -99,7 +99,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                                 "default-src 'self' https://localhost:8090/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-eval'; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;img-src 'self' data:");
 
                 http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
-                // http.csrf().disable();
+//                 http.csrf().disable();
         }
 
         @Override
@@ -110,7 +110,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 web.ignoring().antMatchers(HttpMethod.PUT, "/api/client/activate**");
                 web.ignoring().antMatchers(HttpMethod.GET, "/api/advertisement/{id}");
                 web.ignoring().antMatchers(HttpMethod.GET, "/api/car/{id}/picture");
-                web.ignoring().antMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "/favicon.ico", "/**/*.html",
+                web.ignoring().antMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "/favicon.ico","/favicon.png", "/**/*.html",
                                 "/**/*.css", "/**/*.js", "/assets/**", "/*.jpg");
         }
 

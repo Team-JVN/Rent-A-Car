@@ -22,6 +22,7 @@ export class ClientRegistrationComponent implements OnInit {
     private formBuilder: FormBuilder, private router: Router) { }
 
   ngOnInit() {
+    this.authentificationService.logout();
     this.registrationForm = this.formBuilder.group({
       email: new FormControl(null, [Validators.required, Validators.email]),
       password: new FormControl(null, [Validators.required, Validators.minLength(8), Validators.maxLength(64), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,64}$')]),
