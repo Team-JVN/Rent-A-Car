@@ -97,7 +97,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                 .headers().contentSecurityPolicy(
                                                 "default-src 'self' https://localhost:8090/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-eval'; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;img-src 'self' data:");
                 //  http.addFilterAfter(new CsrfTokenResponseHeaderBindingFilter(), CsrfFilter.class);
-                http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+                // http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
                http.csrf().disable();
         }
 
