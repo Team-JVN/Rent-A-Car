@@ -22,7 +22,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { LayoutModule } from '@angular/cdk/layout';
 import { ToastrModule } from 'ngx-toastr';
 import { NgxGalleryModule } from 'ngx-gallery';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS, HttpClientXsrfModule } from '@angular/common/http';
 import { ListBodyStylesComponent } from './component/list/list-body-styles/list-body-styles.component';
 import { AddBodyStyleComponent } from './component/add/add-body-style/add-body-style.component';
 import { EditBodyStyleComponent } from './component/edit/edit-body-style-component/edit-body-style-component.component';
@@ -154,6 +154,10 @@ import { ResetPasswordEnterNewPassComponent } from './component/authentification
     NgxDropzoneModule,
     NgxGalleryModule,
     RatingModule,
+    // HttpClientXsrfModule.withOptions({
+    //   cookieName: 'XSRF-TOKEN',
+    //   headerName: 'X-XSRF-TOKEN',
+    // }),
   ],
   entryComponents: [
     AddBodyStyleComponent,
