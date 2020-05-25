@@ -12,7 +12,8 @@ export class GetReceivedRentRequestsGuard implements CanActivate {
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
 
         if (this.authentificationService.isLoggedIn()) {
-            if (this.authentificationService.hasPermission("GET_RECEIVED_RENT_REQUEST")) {
+            console.log(this.authentificationService.permissions);
+            if (this.authentificationService.hasPermission("GET_RECEIVED_RENT_REQUESTS")) {
                 return true;
             }
             else {

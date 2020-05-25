@@ -78,10 +78,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                 .hasAuthority("GET_MY_RENT_REQUESTS")
 
                                 .antMatchers(HttpMethod.GET,
-                                                "/api/advertisement/{advertisementId}/rent-requests/{status}",
-                                                "/api/rent-request/{id}")
+                                                "/api/advertisement/{advertisementId}/rent-requests/{status}")
                                 .hasAuthority("GET_RECEIVED_RENT_REQUESTS")
-
+                                .antMatchers(HttpMethod.GET,
+                                "/api/rent-request/{id}")
+                                .hasAuthority("GET_RECEIVED_RENT_REQUESTS")
+                                
                                 .antMatchers(HttpMethod.DELETE, "/api/rent-request/{id}")
                                 .hasAuthority("DELETE_RENT_REQUEST")
 
@@ -95,7 +97,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                 .addFilterBefore(new TokenAuthenticationFilter(jwtUserDetailsService.tokenUtils,
                                                 jwtUserDetailsService), BasicAuthenticationFilter.class)
                                 .headers().contentSecurityPolicy(
-                                                "default-src 'self' https://localhost:8090/;img-src 'self' blob: data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-eval'; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;img-src 'self' data:");
+                                                "default-src 'self' https://localhost:8090/;img-src 'self' blob: data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-eval'; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;");
                 //  http.addFilterAfter(new CsrfTokenResponseHeaderBindingFilter(), CsrfFilter.class);
                 // http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
                http.csrf().disable();

@@ -52,7 +52,7 @@ public class UserController {
             }
             if (e.getMessage().equals("Blocked")) {
                 throw new BlockedUserException(
-                        "You tried to log in too many times. Youraccount wil be blocked for the next 24 hours.",
+                        "You tried to log in too many times. Your account wil be blocked for the next 24 hours.",
                         HttpStatus.BAD_REQUEST);
             }
             throw new UsernameNotFoundException("Invalid email or password. Please try again.");
