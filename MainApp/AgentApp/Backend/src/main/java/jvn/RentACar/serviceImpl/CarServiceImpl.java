@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.springframework.beans.factory.annotation.Value;
 import java.io.File;
 import java.time.LocalDate;
 import java.util.List;
@@ -25,7 +25,9 @@ import java.util.Set;
 
 @Service
 public class CarServiceImpl implements CarService {
-    private final String PATH = "src" + File.separator + "main" + File.separator + "resources" + File.separator + "uploadedPictures" + File.separator;
+
+    @Value("${UPLOADED_PICTURES_PATH:src/main/resources/uploadedPictures/}")
+    private String UPLOADED_PICTURES_PATH;
 
     private CarRepository carRepository;
 
@@ -65,13 +67,13 @@ public class CarServiceImpl implements CarService {
         car.setCommentsCount(0);
         car.setAvgRating(0.0);
         Car savedCar = carRepository.saveAndFlush(car);
-        pictureService.savePictures(multipartFiles, PATH, savedCar);
+        pictureService.savePictures(multipartFiles, UPLOADED_PICTURES_PATH, savedCar);
         return savedCar;
     }
 
     @Override
     public Resource get(String fileName) {
-        return pictureService.loadFileAsResource(fileName, PATH);
+        return pictureService.loadFileAsResource(fileName, UPLOADED_PICTURES_PATH);
     }
 
     @Override
@@ -101,7 +103,7 @@ public class CarServiceImpl implements CarService {
         car.setKidsSeats(carDTO.getKidsSeats());
         car.setAvailableTracking(carDTO.getAvailableTracking());
         Car newCar = carRepository.save(car);
-        pictureService.editCarPictures(multipartFiles, PATH, car);
+        pictureService.editCarPictures(multipartFiles, UPLOADED_PICTURES_PATH, car);
         return newCar;
     }
 
@@ -122,7 +124,7 @@ public class CarServiceImpl implements CarService {
         car.setKidsSeats(carDTO.getKidsSeats());
         car.setAvailableTracking(carDTO.getAvailableTracking());
         Car newCar = carRepository.save(car);
-        pictureService.editCarPictures(multipartFiles, PATH, car);
+        pictureService.editCarPictures(multipartFiles, UPLOADED_PICTURES_PATH, car);
         return newCar;
     }
 

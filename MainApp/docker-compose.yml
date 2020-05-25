@@ -161,8 +161,10 @@ services:
             KEYSTORE_ALIAS: agentapp
             TRUSTSTORE: /etc/keystore/agentapp.truststore.p12
             TRUSTSTORE_PASSWORD: agentapp_pass
+            UPLOADED_PICTURES_PATH: /etc/uploadedPictures/
         volumes:
             - ./tls/certs/agentapp/keystore:/etc/keystore
+            - ./AgentApp/src/main/resources/uploadedPictures/:/etc/uploadedPictures/
         depends_on: 
             - agentapp-mysql
 
