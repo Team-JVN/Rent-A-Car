@@ -12,7 +12,7 @@ public class AdvertisementController {
 
     @RequestMapping("/hello")
     public String hello() {
-        return "Hello world 2";
+        return "Hello from Advertisement Service";
     }
 
 }

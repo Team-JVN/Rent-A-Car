@@ -12,6 +12,6 @@ public class RentRequestController {
 
     @RequestMapping("/hello")
     public String hello() {
-        return "Hello world 2";
+        return "Hello from Renting Service";
     }
 }

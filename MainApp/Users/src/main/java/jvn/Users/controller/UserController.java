@@ -13,6 +13,6 @@ public class UserController {
 
     @RequestMapping("/hello")
     public String hello() {
-        return "Hello world 2";
+        return "Hello from User Service";
     }
 }

@@ -17,7 +17,7 @@ public class CarController {
 
     @RequestMapping("/hello")
     public String hello() {
-        return "Hello world 2";
+        return "Hello from Car Service";
     }
 
     @GetMapping("/verify/{email}")
