@@ -179,6 +179,8 @@ import { EditAdminComponent } from "./component/edit/edit-personal-info/edit-adm
     AddAgentComponent,
     AddAdminComponent,
     AddMakeComponent,
+    AddModelComponent,
+    ConfirmDialogDeleteMakeComponent,
     EditModelComponent,
     EditMakeComponent,
     ReviewFeedbackComponent,
