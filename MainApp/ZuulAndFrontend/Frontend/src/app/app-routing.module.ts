@@ -27,6 +27,8 @@ import { ManageUsersComponent } from "./component/manage-users/manage-users.comp
 import { EditClientInfoComponent } from "./component/edit/edit-personal-info/edit-client/edit-client-info.component";
 import { EditAgentComponent } from "./component/edit/edit-personal-info/edit-agent/edit-agent.component";
 import { EditAdminComponent } from "./component/edit/edit-personal-info/edit-admin/edit-admin.component";
+import { ResetPasswordEnterNewPassComponent } from './component/authentification/reset-password-enter-new-pass/reset-password-enter-new-pass.component';
+import { ResetPasswordEnterEmailComponent } from './component/authentification/reset-password-enter-email/reset-password-enter-email.component';
 
 const routes: Routes = [
   {
@@ -76,6 +78,14 @@ const routes: Routes = [
   {
     path: 'client-rent-request/:id',
     component: ClientRentRequestDetailsComponent
+  },
+  {
+    path: "reset-password",
+    component: ResetPasswordEnterNewPassComponent,
+  },
+  {
+    path: "forgot-password",
+    component: ResetPasswordEnterEmailComponent,
   },
   {
     path: "login",
@@ -139,7 +149,7 @@ const routes: Routes = [
     component: NonAuthorizedErrorPageComponent,
   },
   {
-    path: "",
+    path: "advertisements",
     component: ListAdvertisementsComponent,
   },
 ];

@@ -21,6 +21,8 @@ export const environment = {
   message: "/renting/api/message",
   comment: '/renting/api/comment',
   rentReport: "/renting/api/rent-report",
+  role: "/users/api/role",
+  permission: "/users/api/permission",
 };
 
 /*

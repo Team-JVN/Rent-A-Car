@@ -1,14 +1,14 @@
-
+import { UserTokenState } from './../model/userTokenState';
 import { ChangePassword } from './../model/changePassword';
 import { map } from 'rxjs/operators';
 import { User } from './../model/user';
 import { environment } from './../../environments/environment';
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { LoggedInUser } from '../model/loggedInUser';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import { RegistrationClient } from '../model/registrationClient';
+import { Permission } from '../model/permission';
 
 @Injectable({
   providedIn: 'root'
@@ -17,63 +17,140 @@ export class AuthentificationService {
 
   url = environment.baseUrl + environment.auth;
   access_token = null;
-  loggedInUserSubject: BehaviorSubject<LoggedInUser>;
-  loggedInUser: Observable<LoggedInUser>;
+  userTokenStateSubject: BehaviorSubject<UserTokenState>;
+  userTokenState: Observable<UserTokenState>;
+  role: String;
+  permissions: Permission[] = [];
+  loggedInUserEmail: string;
+  refreshToken = null;
 
   constructor(private httpClient: HttpClient, private router: Router) {
-    this.loggedInUserSubject = new BehaviorSubject<LoggedInUser>(JSON.parse(localStorage.getItem('LoggedInUser')));
-    this.loggedInUser = this.loggedInUserSubject.asObservable();
+    this.userTokenStateSubject = new BehaviorSubject<UserTokenState>(JSON.parse(localStorage.getItem('UserTokenState')));
+    this.userTokenState = this.userTokenStateSubject.asObservable();
+    if (this.userTokenStateSubject) {
+      this.decodeJwtToken();
+    }
   }
 
-
   login(user: User) {
-    return this.httpClient.post(this.url + "/login", user).pipe(map((res: LoggedInUser) => {
-      this.access_token = res.userTokenState.accessToken;
-      console.log(res)
-      localStorage.setItem('LoggedInUser', JSON.stringify(res));
-      this.loggedInUserSubject.next(res);
+    return this.httpClient.post(this.url + "/login", user).pipe(map((res: UserTokenState) => {
+      this.access_token = res.accessToken;
+      this.refreshToken = res.refreshToken;
+      localStorage.setItem('UserTokenState', JSON.stringify(res));
+      this.userTokenStateSubject.next(res);
+      this.decodeJwtToken();
     }));
   }
 
-
   register(client: RegistrationClient) {
-    return this.httpClient.post(this.url, client);
+    return this.httpClient.post(this.url + "/register", client);
   }
 
   changePassword(changePassword: ChangePassword) {
     return this.httpClient.put(this.url, changePassword);
   }
 
+  requestToken(email: string) {
+    return this.httpClient.post(this.url, { email: email });
+  }
+
+  resetPassword(token: string, newPassword: string) {
+    let params = new HttpParams();
+    params = params.append('t', token);
+    return this.httpClient.put(this.url + '/reset-password', { newPassword: newPassword }, { params: params });
+  }
+
   logout() {
-    this.access_token = null;
-    localStorage.removeItem('LoggedInUser');
+    //TODO: Delete everything from localstorage
+    this.clearLocalStorage();
     this.router.navigate(['/login']);
   }
 
-  getLoggedInUser(): LoggedInUser {
-    return this.loggedInUserSubject.value;
+  clearLocalStorage() {
+    this.access_token = null;
+    this.refreshToken = null;
+    localStorage.removeItem('rentInfos');
+    localStorage.removeItem('UserTokenState');
+  }
+
+  getUserTokenState(): UserTokenState {
+    if (this.userTokenStateSubject.value) {
+      return this.userTokenStateSubject.value;
+    }
+    return null;
   }
 
   isLoggedIn() {
-    return localStorage.getItem('LoggedInUser') !== null;
+    return localStorage.getItem('UserTokenState') !== null;
   }
 
-  isAdmin() {
-    console.log(this.loggedInUserSubject.value)
-    if (this.isLoggedIn()) {
-      return this.loggedInUserSubject.value.role === "ROLE_ADMIN";
+  decodeJwtToken() {
+    if (!this.userTokenStateSubject.value) {
+      return;
     }
+    let jwtData = this.userTokenStateSubject.value.accessToken.split('.')[1];
+    let decodedJwtJsonData = JSON.parse(window.atob(jwtData));
+    this.role = decodedJwtJsonData.role;
+    this.permissions = decodedJwtJsonData.permissions;
+    this.loggedInUserEmail = decodedJwtJsonData.sub;
+    console.log(this.permissions);
+    return decodedJwtJsonData;
+  }
+
+  hasPermission(permissionName: string): boolean {
+    if (!this.permissions) {
+      return false;
+    }
+    let permission = this.permissions.find(permission => permission.name === permissionName);
+    if (permission) {
+      return true;
+    }
+    return false;
   }
 
   isAgent() {
-    if (this.isLoggedIn()) {
-      return this.loggedInUserSubject.value.role === "ROLE_AGENT";
+    if (this.role) {
+      return this.role === "ROLE_AGENT";
     }
+    return true;
   }
 
-  isClient() {
-    if (this.isLoggedIn()) {
-      return this.loggedInUserSubject.value.role === "ROLE_CLIENT";
+  isAdmin() {
+    if (this.role) {
+      return this.role === "ROLE_ADMIN";
     }
+    return true;
+  }
+
+
+  isClient() {
+    if (this.role) {
+      return this.role === "ROLE_CLIENT";
+    }
+    return true;
+  }
+
+  getLoggedInUserEmail() {
+    return this.loggedInUserEmail;
+  }
+
+  refreshAccessToken() {
+    return this.httpClient.post(this.url + "/refresh", null);
+  }
+
+  getAccessToken() {
+    return this.access_token;
+  }
+
+  getRefreshToken() {
+    return this.refreshToken;
+  }
+
+  setNewAccessToken(res: UserTokenState) {
+    this.access_token = res.accessToken;
+    this.refreshToken = res.refreshToken;
+    localStorage.setItem('UserTokenState', JSON.stringify(res));
+    this.userTokenStateSubject.next(res);
+    this.decodeJwtToken();
   }
 }
