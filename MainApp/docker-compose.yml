@@ -150,7 +150,7 @@ services:
         networks:
             - agent-app-tls
         ports:
-            - 8090:8080
+            - 8090:8090
         environment:
             DATABASE_USERNAME: rentacar
             DATABASE_PASSWORD: RentACarTeam29
