@@ -9,7 +9,7 @@ public interface ClientService {
 
     Client create(Client client) throws NoSuchAlgorithmException;
 
-//    Client get(Long id);
+    Client get(Long id);
 //
 //    List<Client> get();
 //
@@ -17,5 +17,5 @@ public interface ClientService {
 //
 //    void delete(Long id);
 //
-//    Client activateAccount(String token) throws NoSuchAlgorithmException;
+    Client activateAccount(String token) throws NoSuchAlgorithmException;
 }

@@ -15,6 +15,8 @@ import { RegistrationClient } from 'src/app/model/registrationClient';
 })
 export class ClientRegistrationComponent implements OnInit {
   registrationForm: FormGroup;
+  repeatHide = true;
+  hide = true;
 
   constructor(private toastr: ToastrService, private authentificationService: AuthentificationService,
     private formBuilder: FormBuilder, private router: Router) { }
@@ -22,8 +24,8 @@ export class ClientRegistrationComponent implements OnInit {
   ngOnInit() {
     this.registrationForm = this.formBuilder.group({
       email: new FormControl(null, [Validators.required, Validators.email]),
-      password: new FormControl(null, [Validators.required, Validators.minLength(8), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$')]),
-      repeatedPassword: new FormControl(null, [Validators.required, Validators.minLength(8), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$')]),
+      password: new FormControl(null, [Validators.required, Validators.minLength(8), Validators.maxLength(64), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,64}$')]),
+      repeatedPassword: new FormControl(null, [Validators.required, Validators.minLength(8), Validators.maxLength(64), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,64}$')]),
       firstName: new FormControl(null, Validators.required),
       lastName: new FormControl(null, Validators.required),
       address: new FormControl(null, Validators.required),
@@ -39,13 +41,13 @@ export class ClientRegistrationComponent implements OnInit {
       return;
     }
 
-    const name = this.registrationForm.value.firstName + '|' + this.registrationForm.value.lastName;
+    const name = this.registrationForm.value.firstName + ' ' + this.registrationForm.value.lastName;
     const client = new RegistrationClient(name, this.registrationForm.value.email, this.registrationForm.value.password, this.registrationForm.value.address,
       this.registrationForm.value.phoneNumber)
     this.authentificationService.register(client).subscribe(
       () => {
         this.registrationForm.reset();
-        this.toastr.success('Success!', 'Registration');
+        this.toastr.success('Success', 'Registration');
         this.router.navigate(['/client/pending-approval']);
       },
       (httpErrorResponse: HttpErrorResponse) => {

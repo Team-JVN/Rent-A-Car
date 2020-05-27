@@ -29,6 +29,7 @@ import { EditAgentComponent } from "./component/edit/edit-personal-info/edit-age
 import { EditAdminComponent } from "./component/edit/edit-personal-info/edit-admin/edit-admin.component";
 import { ResetPasswordEnterNewPassComponent } from './component/authentification/reset-password-enter-new-pass/reset-password-enter-new-pass.component';
 import { ResetPasswordEnterEmailComponent } from './component/authentification/reset-password-enter-email/reset-password-enter-email.component';
+import { EditRoleComponent } from './component/edit/edit-role/edit-role.component';
 
 const routes: Routes = [
   {
@@ -138,6 +139,11 @@ const routes: Routes = [
   {
     path: "models/:id",
     component: ListModelsComponent,
+  },
+  /** MANAGE ROLES */
+  {
+    path: "role",
+    component: EditRoleComponent,
   },
   //******************* ERROR PAGES ************************
   {

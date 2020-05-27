@@ -65,32 +65,19 @@ public class ClientServiceImpl implements ClientService {
             client.setPassword(passwordEncoder.encode(client.getPassword()));
             client.setStatus(ClientStatus.AWAITING);
             Client savedClient = clientRepository.save(client);
-
-            VerificationToken verificationToken = new VerificationToken(savedClient);
-            String nonHashedToken = verificationToken.getToken();
-            verificationToken.setToken(getTokenHash(nonHashedToken));
-
-            VerificationToken dbToken = verificationTokenRepository.findByToken(verificationToken.getToken());
-            while (dbToken != null) {
-                verificationToken = new VerificationToken(savedClient);
-                dbToken = verificationTokenRepository.findByToken(verificationToken.getToken());
-            }
-            verificationTokenRepository.save(verificationToken);
-
-            composeAndSendEmailToActivate(client.getEmail(), nonHashedToken);
             return savedClient;
         }
     }
 
-//    @Override
-//    public Client get(Long id) {
-//        Client client = clientRepository.findOneById(id);
-//        if (client == null) {
-//            throw new InvalidClientDataException("This client doesn't exist.", HttpStatus.NOT_FOUND);
-//        }
-//        return client;
-//    }
-//
+    @Override
+    public Client get(Long id) {
+        Client client = clientRepository.findOneById(id);
+        if (client == null) {
+            throw new InvalidClientDataException("This client doesn't exist.", HttpStatus.NOT_FOUND);
+        }
+        return client;
+    }
+
 //    @Override
 //    public List<Client> get() {
 //        return clientRepository.findAll();
@@ -120,19 +107,19 @@ public class ClientServiceImpl implements ClientService {
 //        clientRepository.deleteById(id);
 //    }
 //
-//    @Override
-//    public Client activateAccount(String token) throws NoSuchAlgorithmException {
-//        VerificationToken verificationToken = verificationTokenRepository
-//                .findByTokenAndExpiryDateTimeAfter(getTokenHash(token), LocalDateTime.now());
-//        if (verificationToken == null) {
-//            throw new InvalidTokenException("This activation link is invalid or expired.", HttpStatus.BAD_REQUEST);
-//        }
-//        Client client = get(verificationToken.getClient().getId());
-//        client.setStatus(ClientStatus.ACTIVE);
-//        verificationTokenRepository.deleteById(verificationToken.getId());
-//
-//        return clientRepository.save(client);
-//    }
+    @Override
+    public Client activateAccount(String token) throws NoSuchAlgorithmException {
+        VerificationToken verificationToken = verificationTokenRepository
+                .findByTokenAndExpiryDateTimeAfter(getTokenHash(token), LocalDateTime.now());
+        if (verificationToken == null) {
+            throw new InvalidTokenException("This activation link is invalid or expired.", HttpStatus.BAD_REQUEST);
+        }
+        Client client = get(verificationToken.getClient().getId());
+        client.setStatus(ClientStatus.ACTIVE);
+        verificationTokenRepository.deleteById(verificationToken.getId());
+
+        return clientRepository.save(client);
+    }
 
     private String getTokenHash(String token) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-512");

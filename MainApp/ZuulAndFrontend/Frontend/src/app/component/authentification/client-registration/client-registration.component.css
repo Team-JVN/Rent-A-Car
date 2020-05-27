@@ -6,3 +6,7 @@ mat-card {
 .form-full-width {
     width: 100%;
 }
+
+.hide-btn {
+    cursor: default;
+}

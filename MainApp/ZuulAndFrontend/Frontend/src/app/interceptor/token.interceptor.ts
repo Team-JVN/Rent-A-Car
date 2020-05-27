@@ -16,7 +16,7 @@ export class TokenInterceptor implements HttpInterceptor {
                 if (this.userTokenState.refreshToken) {
                     request = request.clone({
                         setHeaders: {
-                            Authorization: `Bearer ${this.userTokenState.refreshToken}`
+                            Auth: `Bearer ${this.userTokenState.refreshToken}`
                         }
                     });
                 }
@@ -24,7 +24,7 @@ export class TokenInterceptor implements HttpInterceptor {
                 if (this.userTokenState.accessToken) {
                     request = request.clone({
                         setHeaders: {
-                            Authorization: `Bearer ${this.userTokenState.accessToken}`
+                            Auth: `Bearer ${this.userTokenState.accessToken}`
                         }
                     });
                 }

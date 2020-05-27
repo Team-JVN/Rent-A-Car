@@ -68,9 +68,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.PUT, "/api/agent")
                 .hasAuthority("AGENT_EDIT_PROFILE")
 
-                .antMatchers("/api/role").hasAuthority("MANAGE_ROLES")
-                .antMatchers(HttpMethod.GET, "/api/permission").hasAuthority("MANAGE_ROLES")
-
                 .anyRequest().authenticated().and()
 
                 .cors().and()
@@ -82,6 +79,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         //  http.addFilterAfter(new CsrfTokenResponseHeaderBindingFilter(), CsrfFilter.class);
         // http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
         http.csrf().disable();
+
+//                        .antMatchers("/api/role").hasAuthority("MANAGE_ROLES")
+//                .antMatchers(HttpMethod.GET, "/api/permission").hasAuthority("MANAGE_ROLES")
     }
 
     @Override

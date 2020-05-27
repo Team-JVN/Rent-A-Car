@@ -76,9 +76,13 @@ import { ActivateAccountComponent } from './component/authentification/activate-
 import { ResetPasswordEnterEmailComponent } from './component/authentification/reset-password-enter-email/reset-password-enter-email.component';
 import { ResetPasswordEnterNewPassComponent } from './component/authentification/reset-password-enter-new-pass/reset-password-enter-new-pass.component';
 import { ErrorInterceptor } from './interceptor/error.interceptor';
+import { EditRoleComponent } from './component/edit/edit-role/edit-role.component';
+import { ViewPermissionsComponent } from './component/view/view-permissions/view-permissions.component';
+import { ReplacePipe } from './util/replace.pipe';
 
 @NgModule({
   declarations: [
+    ReplacePipe,
     AppComponent,
     ListBodyStylesComponent,
     HeaderComponent,
@@ -141,6 +145,8 @@ import { ErrorInterceptor } from './interceptor/error.interceptor';
     ActivateAccountComponent,
     ResetPasswordEnterEmailComponent,
     ResetPasswordEnterNewPassComponent,
+    EditRoleComponent,
+    ViewPermissionsComponent,
   ],
   imports: [
     BrowserModule,

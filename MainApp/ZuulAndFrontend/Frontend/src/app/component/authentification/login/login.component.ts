@@ -48,6 +48,8 @@ export class LoginComponent implements OnInit {
       this.router.navigate(['/advertisements']);
     } else if (this.authentificationService.isClient()) {
       this.router.navigate(['/search-advertisements']);
+    } else if (this.authentificationService.isAdmin()) {
+      this.router.navigate(['/advertisements']);
     } else {
       this.authentificationService.logout();
     }
