@@ -2,8 +2,6 @@ uploadedPictures/*
 
 !uploadedPictures/.gitkeep
 
-h2-db-data/**
-
 # Compiled class file
 *.class
 
