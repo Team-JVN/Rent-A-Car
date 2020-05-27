@@ -1,5 +1,6 @@
 package jvn.Advertisements.exceptionHandler;
 
+import feign.FeignException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 import java.util.List;
 
@@ -28,6 +30,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(InvalidAdvertisementDataException.class)
     protected ResponseEntity<Object> handleInvalidAdvertisementDataException(InvalidAdvertisementDataException ex) {
+        ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
+        return buildResponseEntity(error);
+    }
+
+    @ExceptionHandler(InvalidCarDataException.class)
+    protected ResponseEntity<Object> handleInvalidCarDataException(InvalidCarDataException ex) {
         ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
         return buildResponseEntity(error);
     }
@@ -64,6 +72,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST, stringBuilder.toString());
         return buildResponseEntity(error);
+    }
+
+    @ExceptionHandler(FeignException.NotFound.class)
+    public ResponseEntity<?> handleFeignNotFoundException(FeignException e,
+                                                          HttpServletResponse response) {
+        return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     private ResponseEntity<Object> buildResponseEntity(ErrorResponse error) {

@@ -22,7 +22,6 @@ public class CreateAdvertisementDtoMapper implements MapperInterface<Advertiseme
         if (dto.getDateTo() != null) {
             entity.setDateTo(getDateConverted(dto.getDateTo()));
         }
-
         return entity;
     }
 

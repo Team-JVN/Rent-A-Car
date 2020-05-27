@@ -1,4 +1,5 @@
 package jvn.Advertisements.serviceImpl;
+import jvn.Advertisements.client.CarClient;
 import jvn.Advertisements.enumeration.LogicalStatus;
 import jvn.Advertisements.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.Advertisements.mapper.AdvertisementDtoMapper;
@@ -24,12 +25,15 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     private AdvertisementDtoMapper advertisementMapper;
 
+    private CarClient carClient;
+
     @Override
     public Advertisement create(Advertisement createAdvertisementDTO) {
 
         checkDate(createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
-//        checkOwner(createAdvertisementDTO.getCar());
+        carClient.verify(createAdvertisementDTO.getCar());
         //TODO: Treba  car servisu da dodas metodu koja ce proveriti da li car postoji i da li je ulogovani korisnik vlasnik tog car-a
+        //        checkOwner(createAdvertisementDTO.getCar());
         checkIfCarIsAvailable(createAdvertisementDTO.getCar(), createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
         createAdvertisementDTO.setPriceList(priceListService.get(createAdvertisementDTO.getPriceList().getId()));
         PriceList priceList = createAdvertisementDTO.getPriceList();
@@ -87,9 +91,10 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     }
 
     @Autowired
-    public AdvertisementServiceImpl(PriceListService priceListService,
+    public AdvertisementServiceImpl(PriceListService priceListService,CarClient carClient,
                                     AdvertisementRepository advertisementRepository, AdvertisementDtoMapper advertisementMapper) {
         this.priceListService = priceListService;
+        this.carClient=carClient;
         this.advertisementRepository = advertisementRepository;
         this.advertisementMapper = advertisementMapper;
     }

@@ -197,7 +197,8 @@ import { ReplacePipe } from './util/replace.pipe';
     ReviewFeedbackComponent,
     LeaveFeedbackComponent,
     EditClientInfoComponent,
-    EditAdminComponent
+    EditAdminComponent,
+    AddModelComponent
   ],
   providers: [
     {
