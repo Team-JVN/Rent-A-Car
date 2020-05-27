@@ -190,6 +190,8 @@ import { ReplacePipe } from './util/replace.pipe';
     AddAgentComponent,
     AddAdminComponent,
     AddMakeComponent,
+    AddModelComponent,
+    ConfirmDialogDeleteMakeComponent,
     EditModelComponent,
     EditMakeComponent,
     ReviewFeedbackComponent,

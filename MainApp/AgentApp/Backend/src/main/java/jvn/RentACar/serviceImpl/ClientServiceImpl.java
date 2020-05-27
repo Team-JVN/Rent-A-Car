@@ -13,10 +13,10 @@ import jvn.RentACar.service.ClientService;
 import jvn.RentACar.service.EmailNotificationService;
 import jvn.RentACar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.core.env.Environment;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -36,6 +36,7 @@ public class ClientServiceImpl implements ClientService {
     private EmailNotificationService emailNotificationService;
 
     private Environment environment;
+
     private VerificationTokenRepository verificationTokenRepository;
 
     @Override
@@ -179,8 +180,8 @@ public class ClientServiceImpl implements ClientService {
 
     @Autowired
     public ClientServiceImpl(ClientRepository clientRepository, UserService userService,
-            PasswordEncoder passwordEncoder, EmailNotificationService emailNotificationService, Environment environment,
-            VerificationTokenRepository verificationTokenRepository) {
+                             PasswordEncoder passwordEncoder, EmailNotificationService emailNotificationService, Environment environment,
+                             VerificationTokenRepository verificationTokenRepository) {
         this.clientRepository = clientRepository;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
