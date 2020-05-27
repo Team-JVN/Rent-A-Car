@@ -1,10 +1,13 @@
 package jvn.Advertisements.serviceImpl;
+
 import jvn.Advertisements.client.CarClient;
 import jvn.Advertisements.enumeration.LogicalStatus;
 import jvn.Advertisements.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.Advertisements.mapper.AdvertisementDtoMapper;
+import jvn.Advertisements.mapper.AdvertisementMessageDtoMapper;
 import jvn.Advertisements.model.Advertisement;
 import jvn.Advertisements.model.PriceList;
+import jvn.Advertisements.producer.AdvertisementProducer;
 import jvn.Advertisements.repository.AdvertisementRepository;
 import jvn.Advertisements.service.AdvertisementService;
 import jvn.Advertisements.service.PriceListService;
@@ -13,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -24,6 +26,10 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     private AdvertisementRepository advertisementRepository;
 
     private AdvertisementDtoMapper advertisementMapper;
+
+    private AdvertisementMessageDtoMapper advertisementMessageMapper;
+
+    private AdvertisementProducer advertisementProducer;
 
     private CarClient carClient;
 
@@ -48,7 +54,10 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         } else {
             createAdvertisementDTO.setCDW(false);
         }
-        return advertisementRepository.save(createAdvertisementDTO);
+
+        Advertisement savedAdvertisement = advertisementRepository.save(createAdvertisementDTO);
+        advertisementProducer.send(advertisementMessageMapper.toDto(savedAdvertisement));
+        return savedAdvertisement;
     }
 
     public List<Advertisement> getAll(String status) {
@@ -91,11 +100,14 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     }
 
     @Autowired
-    public AdvertisementServiceImpl(PriceListService priceListService,CarClient carClient,
-                                    AdvertisementRepository advertisementRepository, AdvertisementDtoMapper advertisementMapper) {
+    public AdvertisementServiceImpl(PriceListService priceListService, CarClient carClient, AdvertisementRepository advertisementRepository,
+                                    AdvertisementDtoMapper advertisementMapper, AdvertisementMessageDtoMapper advertisementMessageMapper,
+                                    AdvertisementProducer advertisementProducer) {
         this.priceListService = priceListService;
-        this.carClient=carClient;
+        this.carClient = carClient;
         this.advertisementRepository = advertisementRepository;
         this.advertisementMapper = advertisementMapper;
+        this.advertisementMessageMapper = advertisementMessageMapper;
+        this.advertisementProducer = advertisementProducer;
     }
 }
