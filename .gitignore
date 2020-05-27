@@ -1,7 +1,3 @@
-uploadedPictures/*
-
-!uploadedPictures/.gitkeep
-
 # Compiled class file
 *.class
 
