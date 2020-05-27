@@ -93,6 +93,16 @@ public class TokenUtils {
                 && !isCreatedBeforeLastPasswordReset(created, user.getLastPasswordResetDate()));
     }
 
+    public Boolean isTokenValid(User user,String token){
+        if(isTokenExpired(token)){
+            return false;
+        }
+        final Date created = getIssuedAtDateFromToken(token);
+        if(!isCreatedBeforeLastPasswordReset(created,user.getLastPasswordResetDate())){
+            return false;
+        }
+        return true;
+    }
     public String getUsernameFromToken(String token) {
         String username;
         try {
@@ -144,11 +154,11 @@ public class TokenUtils {
         return request.getHeader(AUTH_HEADER);
     }
 
-    private Boolean isCreatedBeforeLastPasswordReset(Date created, Date lastPasswordReset) {
+    public Boolean isCreatedBeforeLastPasswordReset(Date created, Date lastPasswordReset) {
         return (lastPasswordReset != null && created.before(lastPasswordReset));
     }
 
-    private Boolean isTokenExpired(String token) {
+    public Boolean isTokenExpired(String token) {
         final Date expiration = this.getExpirationDateFromToken(token);
         return expiration.before(timeProvider.now());
     }

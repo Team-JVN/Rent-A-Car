@@ -2,6 +2,8 @@ package jvn.Users.service;
 
 import jvn.Users.dto.request.ChangePasswordDTO;
 import jvn.Users.dto.request.ResetPasswordDTO;
+import jvn.Users.dto.response.UserDTO;
+import jvn.Users.model.User;
 import jvn.Users.model.UserTokenState;
 import jvn.Users.security.JwtAuthenticationRequest;
 

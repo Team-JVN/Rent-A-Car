@@ -2,12 +2,14 @@ package jvn.Users.controller;
 
 import jvn.Users.dto.both.ClientDTO;
 import jvn.Users.dto.request.ChangePasswordDTO;
+import jvn.Users.dto.response.UserDTO;
 import jvn.Users.exceptionHandler.BlockedUserException;
 import jvn.Users.dto.request.RequestTokenDTO;
 import jvn.Users.dto.request.ResetPasswordDTO;
 import jvn.Users.exceptionHandler.InvalidTokenException;
 import jvn.Users.exceptionHandler.InvalidUserDataException;
 import jvn.Users.mapper.ClientDtoMapper;
+import jvn.Users.mapper.UserDtoMapper;
 import jvn.Users.model.UserTokenState;
 import jvn.Users.security.JwtAuthenticationRequest;
 import jvn.Users.service.AuthentificationService;
@@ -38,6 +40,7 @@ public class UserController {
 
     private AuthentificationService authentificationService;
 
+    private UserDtoMapper userDtoMapper;
 
     @RequestMapping("/health")
     public String health() {
@@ -127,12 +130,18 @@ public class UserController {
         return new ResponseEntity<>(userService.refreshAuthenticationToken(request), HttpStatus.OK);
     }
 
+    @GetMapping("/verify")
+    public ResponseEntity<UserDTO> verify() {
+        return new ResponseEntity<>(userDtoMapper.toDto(this.userService.verify()), HttpStatus.OK);
+    }
+
     @Autowired
     public UserController(UserService userService, ClientService clientService, ClientDtoMapper clientDtoMapper,
-                          AuthentificationService authentificationService) {
+                          AuthentificationService authentificationService,UserDtoMapper userDtoMapper) {
         this.userService = userService;
         this.clientService = clientService;
         this.clientDtoMapper = clientDtoMapper;
         this.authentificationService = authentificationService;
+        this.userDtoMapper = userDtoMapper;
     }
 }

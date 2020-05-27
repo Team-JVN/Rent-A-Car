@@ -3,6 +3,7 @@ package jvn.Advertisements.controller;
 import jvn.Advertisements.dto.both.PriceListDTO;
 import jvn.Advertisements.mapper.PriceListDtoMapper;
 import jvn.Advertisements.service.PriceListService;
+import org.apache.commons.fileupload.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.util.List;
@@ -24,8 +26,11 @@ public class PriceListController {
 
     private PriceListDtoMapper priceListDtoMapper;
 
+    private HttpServletRequest request;
+
     @GetMapping("/{id}")
     public ResponseEntity<PriceListDTO> get(@PathVariable @Positive(message = "Id must be positive.") Long id) {
+
         return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.get(id)), HttpStatus.OK);
     }
 
@@ -53,9 +58,10 @@ public class PriceListController {
     }
 
     @Autowired
-    public PriceListController(PriceListService priceListService, PriceListDtoMapper priceListDtoMapper) {
+    public PriceListController(PriceListService priceListService, PriceListDtoMapper priceListDtoMapper,HttpServletRequest request) {
         this.priceListService = priceListService;
         this.priceListDtoMapper = priceListDtoMapper;
+        this.request = request;
     }
 
 
