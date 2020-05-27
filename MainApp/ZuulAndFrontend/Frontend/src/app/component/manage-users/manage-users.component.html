@@ -13,12 +13,10 @@
             <div class="status-filter">
               <span class="filter-span">Filter by status:</span>
               <mat-form-field>
-                <mat-select
-                  [(ngModel)]="status"
-                  (selectionChange)="fetchAllClients(status)"
-                >
+                <mat-select [(ngModel)]="status" (selectionChange)="fetchAllClients(status)">
                   <mat-option value="all" selected>- All -</mat-option>
-                  <mat-option value="inactive">Inactive</mat-option>
+                  <mat-option value="awaiting">Awaiting</mat-option>
+                  <mat-option value="approved">Approved</mat-option>
                   <mat-option value="active">Active</mat-option>
                   <mat-option value="blocked">Blocked</mat-option>
                 </mat-select>
@@ -26,65 +24,50 @@
               <br /><br />
             </div>
             <div>
-              <!-- TODO: add [dataSource]="dataSource" -->
-              <table mat-table class="mat-elevation-z8">
+              <table mat-table [dataSource]="clientsDataSource" class="mat-elevation-z8">
                 <ng-container matColumnDef="name">
                   <th mat-header-cell *matHeaderCellDef>Name</th>
-                  <td mat-cell *matCellDef="let element">DATA</td>
+                  <td mat-cell *matCellDef="let element">{{element.name}}</td>
                 </ng-container>
 
                 <ng-container matColumnDef="email">
                   <th mat-header-cell *matHeaderCellDef>Email</th>
-                  <td mat-cell *matCellDef="let element">DATA</td>
-                </ng-container>
-
-                <ng-container matColumnDef="address">
-                  <th mat-header-cell *matHeaderCellDef>Address</th>
-                  <td mat-cell *matCellDef="let element">DATA</td>
-                </ng-container>
-
-                <ng-container matColumnDef="number">
-                  <th mat-header-cell *matHeaderCellDef>Phone number</th>
-                  <td mat-cell *matCellDef="let element">DATA</td>
+                  <td mat-cell *matCellDef="let element">{{element.email}}</td>
                 </ng-container>
 
                 <ng-container matColumnDef="canceledReservationCounter">
                   <th mat-header-cell *matHeaderCellDef>
                     Canceled Reservation Counter
                   </th>
-                  <td mat-cell *matCellDef="let element">DATA</td>
+                  <td mat-cell *matCellDef="let element">{{element.canceledReservationCounter}}</td>
                 </ng-container>
 
                 <ng-container matColumnDef="rejectedCommentsCounter">
                   <th mat-header-cell *matHeaderCellDef>
                     Rejected Comments Counter
                   </th>
-                  <td mat-cell *matCellDef="let element">DATA</td>
+                  <td mat-cell *matCellDef="let element">{{element.rejectedCommentsCounter}}</td>
                 </ng-container>
 
-                <ng-container matColumnDef="delete">
-                  <th mat-header-cell *matHeaderCellDef>Delete client</th>
-                  <td mat-cell *matCellDef="let element">DATA</td>
+                <ng-container matColumnDef="buttons">
+                  <th mat-header-cell *matHeaderCellDef class="buttons-width">&nbsp;</th>
+                  <td mat-cell *matCellDef="let element">
+                    <button mat-icon-button aria-label="Edit" *ngIf="element.status === 'AWAITING'" color="primary"
+                      (click)="approve(element)">
+                      <mat-icon>check</mat-icon>
+                    </button>
+                    <button mat-icon-button aria-label="Edit" color="primary" *ngIf="element.status === 'AWAITING'"
+                      (click)="reject(element)">
+                      <mat-icon>cancel</mat-icon>
+                    </button>
+                    <button mat-icon-button aria-label="Delete" color="warn" (click)="delete(element)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </td>
                 </ng-container>
 
-                <ng-container matColumnDef="block">
-                  <th mat-header-cell *matHeaderCellDef>Block client</th>
-                  <td mat-cell *matCellDef="let element">DATA</td>
-                </ng-container>
-                <!-- 
-                <ng-container matColumnDef="symbol">
-                  <th mat-header-cell *matHeaderCellDef>Address</th>
-                  <td mat-cell *matCellDef="let element">DATA</td>
-                </ng-container> -->
-
-                <tr
-                  mat-header-row
-                  *matHeaderRowDef="displayedColumnsClient"
-                ></tr>
-                <tr
-                  mat-row
-                  *matRowDef="let row; columns: displayedColumnsClient"
-                ></tr>
+                <tr mat-header-row *matHeaderRowDef="displayedColumnsClient"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumnsClient"></tr>
               </table>
             </div>
           </div>
@@ -95,10 +78,7 @@
             <div class="status-filter">
               <span class="filter-span">Filter by status:</span>
               <mat-form-field>
-                <mat-select
-                  [(ngModel)]="status"
-                  (selectionChange)="fetchAllClients(status)"
-                >
+                <mat-select [(ngModel)]="status" (selectionChange)="fetchAllClients(status)">
                   <mat-option value="all" selected>- All -</mat-option>
                   <mat-option value="inactive">Inactive</mat-option>
                   <mat-option value="active">Active</mat-option>
@@ -107,11 +87,7 @@
               </mat-form-field>
             </div>
             <div align="end">
-              <button
-                mat-raised-button
-                color="primary"
-                (click)="newAgentDialog()"
-              >
+              <button mat-raised-button color="primary" (click)="newAgentDialog()">
                 Create New
               </button>
             </div>
@@ -144,9 +120,13 @@
                   <td mat-cell *matCellDef="let element">DATA</td>
                 </ng-container>
 
-                <ng-container matColumnDef="delete">
-                  <th mat-header-cell *matHeaderCellDef>Delete agent</th>
-                  <td mat-cell *matCellDef="let element">DATA</td>
+                <ng-container matColumnDef="buttons">
+                  <th mat-header-cell *matHeaderCellDef class="buttons-width">&nbsp;</th>
+                  <td mat-cell *matCellDef="let element">
+                    <button mat-icon-button aria-label="Delete" color="warn" (click)="deleteAgent(element)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </td>
                 </ng-container>
                 <!-- 
                 <ng-container matColumnDef="symbol">
@@ -154,14 +134,8 @@
                   <td mat-cell *matCellDef="let element">DATA</td>
                 </ng-container> -->
 
-                <tr
-                  mat-header-row
-                  *matHeaderRowDef="displayedColumnsAgent"
-                ></tr>
-                <tr
-                  mat-row
-                  *matRowDef="let row; columns: displayedColumnsAgent"
-                ></tr>
+                <tr mat-header-row *matHeaderRowDef="displayedColumnsAgent"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumnsAgent"></tr>
               </table>
             </div>
           </div>
@@ -172,10 +146,7 @@
             <div class="status-filter">
               <span class="filter-span">Filter by status:</span>
               <mat-form-field>
-                <mat-select
-                  [(ngModel)]="status"
-                  (selectionChange)="fetchAllClients(status)"
-                >
+                <mat-select [(ngModel)]="status" (selectionChange)="fetchAllClients(status)">
                   <mat-option value="all" selected>- All -</mat-option>
                   <mat-option value="inactive">Inactive</mat-option>
                   <mat-option value="active">Active</mat-option>
@@ -184,11 +155,7 @@
               </mat-form-field>
             </div>
             <div align="end">
-              <button
-                mat-raised-button
-                color="primary"
-                (click)="newAdminDialog()"
-              >
+              <button mat-raised-button color="primary" (click)="newAdminDialog()">
                 Create New
               </button>
             </div>
@@ -206,9 +173,13 @@
                   <td mat-cell *matCellDef="let element">DATA</td>
                 </ng-container>
 
-                <ng-container matColumnDef="delete">
-                  <th mat-header-cell *matHeaderCellDef>Delete admin</th>
-                  <td mat-cell *matCellDef="let element">DATA</td>
+                <ng-container matColumnDef="buttons">
+                  <th mat-header-cell *matHeaderCellDef class="buttons-width">&nbsp;</th>
+                  <td mat-cell *matCellDef="let element">
+                    <button mat-icon-button aria-label="Delete" color="warn" (click)="deleteAdmin(element)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </td>
                 </ng-container>
 
                 <!-- 
@@ -217,14 +188,8 @@
                   <td mat-cell *matCellDef="let element">DATA</td>
                 </ng-container> -->
 
-                <tr
-                  mat-header-row
-                  *matHeaderRowDef="displayedColumnsAdmin"
-                ></tr>
-                <tr
-                  mat-row
-                  *matRowDef="let row; columns: displayedColumnsAdmin"
-                ></tr>
+                <tr mat-header-row *matHeaderRowDef="displayedColumnsAdmin"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumnsAdmin"></tr>
               </table>
             </div>
           </div>

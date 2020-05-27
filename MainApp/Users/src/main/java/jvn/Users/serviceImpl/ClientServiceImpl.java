@@ -78,11 +78,17 @@ public class ClientServiceImpl implements ClientService {
         return client;
     }
 
-//    @Override
-//    public List<Client> get() {
-//        return clientRepository.findAll();
-//    }
-//
+    @Override
+    public List<Client> get(String status) {
+        List<Client> clients = null;
+        if(status.equals("all")){
+            clients = clientRepository.findByStatusNot(ClientStatus.DELETED);
+        }else {
+            clients = clientRepository.findByStatus(getClientStatus(status));
+        }
+        return clients;
+    }
+
 //    @Override
 //    public Client edit(Long id, Client client) {
 //        Client dbClient = get(client.getId());
@@ -106,7 +112,7 @@ public class ClientServiceImpl implements ClientService {
 //        dbClient.setRole(null);
 //        clientRepository.deleteById(id);
 //    }
-//
+
     @Override
     public Client activateAccount(String token) throws NoSuchAlgorithmException {
         VerificationToken verificationToken = verificationTokenRepository
@@ -121,6 +127,36 @@ public class ClientServiceImpl implements ClientService {
         return clientRepository.save(client);
     }
 
+    @Override
+    public Client approveRequestToRegister(Long id) throws NoSuchAlgorithmException {
+        Client client = get(id);
+        if(client.getStatus().equals(ClientStatus.AWAITING)){
+            client.setStatus(ClientStatus.APPROVED);
+            client = clientRepository.save(client);
+            VerificationToken verificationToken = new VerificationToken(client);
+            String nonHashedToken = verificationToken.getToken();
+            verificationToken.setToken(getTokenHash(nonHashedToken));
+
+            VerificationToken dbToken = verificationTokenRepository.findByToken(verificationToken.getToken());
+            while (dbToken != null) {
+                verificationToken = new VerificationToken(client);
+                dbToken = verificationTokenRepository.findByToken(verificationToken.getToken());
+            }
+            verificationTokenRepository.save(verificationToken);
+
+            composeAndSendEmailToActivate(client.getEmail(), nonHashedToken);
+            return client;
+        }
+        throw new InvalidClientDataException("This client is already approved or rejected.", HttpStatus.BAD_REQUEST);
+    }
+
+    private ClientStatus getClientStatus(String status) {
+        try {
+            return ClientStatus.valueOf(status.toUpperCase());
+        } catch (Exception e) {
+            throw new InvalidClientDataException("Please choose valid client's status", HttpStatus.NOT_FOUND);
+        }
+    }
     private String getTokenHash(String token) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-512");
         digest.reset();

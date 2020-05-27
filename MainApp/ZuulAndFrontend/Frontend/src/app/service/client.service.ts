@@ -22,8 +22,15 @@ export class ClientService {
     return this.httpClient.put(this.url + '/' + client.id, client);
   }
 
+  public approve(id: number) {
+    return this.httpClient.put(this.url + '/' + id + '/approve', null);
+  }
   public getClients() {
     return this.httpClient.get(this.url);
+  }
+
+  public getAll(status: string) {
+    return this.httpClient.get(this.url + '/all/' + status);
   }
 
   public delete(id: number): any {

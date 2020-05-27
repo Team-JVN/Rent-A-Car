@@ -33,5 +33,11 @@ public class ClientDTO {
     @Size(min = 9, max = 10, message = "Phone number can contain between 9 and 10 digits.")
     @Pattern(regexp = "0[0-9]+", message = " Phone number must begin with 0 and can contain digits only.")
     private String phoneNumber;
+
+    private String status;
+
+    private Integer canceledReservationCounter;
+
+    private Integer rejectedCommentsCounter;
 }
 
