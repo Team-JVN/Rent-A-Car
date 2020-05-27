@@ -1,4 +1,4 @@
-h2-db-data/
+src/main/resources/h2-db-data/
 
 HELP.md
 target/
