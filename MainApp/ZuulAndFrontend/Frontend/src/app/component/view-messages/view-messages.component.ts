@@ -32,8 +32,8 @@ export class ViewMessagesComponent implements OnInit {
       this.toastr.error("Please enter message's text", 'Send message');
       return;
     }
-    const loggedInUser = this.authentificationService.getLoggedInUser();
-    const messsage = new Message(message, new UserInfo(loggedInUser.email));
+    const loggedInUser = this.authentificationService.getLoggedInUserEmail();
+    const messsage = new Message(message, new UserInfo(loggedInUser));
 
     this.messageService.send(messsage).subscribe(
       (data: Message) => {

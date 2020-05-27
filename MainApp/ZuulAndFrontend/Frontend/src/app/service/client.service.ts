@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { Client } from './../model/client';
 import { environment } from './../../environments/environment';
@@ -28,6 +28,12 @@ export class ClientService {
 
   public delete(id: number): any {
     return this.httpClient.delete(this.url + '/' + id);
+  }
+
+  activateAccount(token: string) {
+    let params = new HttpParams();
+    params = params.append('t', token);
+    return this.httpClient.put(this.url + '/activate', {}, { params: params });
   }
 
 }

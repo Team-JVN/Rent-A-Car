@@ -72,7 +72,10 @@ public class CarServiceImpl implements CarService {
     public Resource get(String fileName) {
         return pictureService.loadFileAsResource(fileName, UPLOADED_PICTURES_PATH);
     }
-
+    @Override
+    public List<Car> get() {
+        return carRepository.findAllByLogicalStatusNot(LogicalStatus.DELETED);
+    }
     /*
         @Override
         public List<Car> get() {

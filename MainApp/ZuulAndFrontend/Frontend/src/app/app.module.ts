@@ -1,5 +1,4 @@
-import { AgentGuard } from './guard/agent.guard';
-import { AdminGuard } from './guard/admin.guard';
+
 import { TokenInterceptor } from './interceptor/token.interceptor';
 import { AddRentRequestComponent } from './component/add/add-rent-request/add-rent-request.component';
 import { HeaderComponent } from './component/header/header.component';
@@ -68,15 +67,22 @@ import { LeaveFeedbackComponent } from './component/add/leave-feedback/leave-fee
 import { RentingCartComponent } from './component/renting-cart/renting-cart.component';
 import { CarsStatisticsComponent } from './component/list/cars-statistics/cars-statistics.component';
 import { TableForStatisticsComponent } from './component/list/table-for-statistics/table-for-statistics.component';
-import { ClientGuard } from './guard/client.guard';
 import { EditAdvertisementPartialComponent } from './component/edit/edit-advertisement-partial/edit-advertisement-partial.component';
 import { ManageUsersComponent } from "./component/manage-users/manage-users.component";
 import { EditClientInfoComponent } from "./component/edit/edit-personal-info/edit-client/edit-client-info.component";
 import { EditAgentComponent } from "./component/edit/edit-personal-info/edit-agent/edit-agent.component";
 import { EditAdminComponent } from "./component/edit/edit-personal-info/edit-admin/edit-admin.component";
+import { ActivateAccountComponent } from './component/authentification/activate-account/activate-account.component';
+import { ResetPasswordEnterEmailComponent } from './component/authentification/reset-password-enter-email/reset-password-enter-email.component';
+import { ResetPasswordEnterNewPassComponent } from './component/authentification/reset-password-enter-new-pass/reset-password-enter-new-pass.component';
+import { ErrorInterceptor } from './interceptor/error.interceptor';
+import { EditRoleComponent } from './component/edit/edit-role/edit-role.component';
+import { ViewPermissionsComponent } from './component/view/view-permissions/view-permissions.component';
+import { ReplacePipe } from './util/replace.pipe';
 
 @NgModule({
   declarations: [
+    ReplacePipe,
     AppComponent,
     ListBodyStylesComponent,
     HeaderComponent,
@@ -136,6 +142,11 @@ import { EditAdminComponent } from "./component/edit/edit-personal-info/edit-adm
     EditClientInfoComponent,
     EditAgentComponent,
     EditAdminComponent,
+    ActivateAccountComponent,
+    ResetPasswordEnterEmailComponent,
+    ResetPasswordEnterNewPassComponent,
+    EditRoleComponent,
+    ViewPermissionsComponent,
   ],
   imports: [
     BrowserModule,
@@ -186,17 +197,15 @@ import { EditAdminComponent } from "./component/edit/edit-personal-info/edit-adm
     ReviewFeedbackComponent,
     LeaveFeedbackComponent,
     EditClientInfoComponent,
-    EditAdminComponent
+    EditAdminComponent,
+    AddModelComponent
   ],
   providers: [
     {
       provide: HAMMER_GESTURE_CONFIG, useClass: CustomHammerConfig
     },
     { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
-    // { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
-    AdminGuard,
-    AgentGuard,
-    ClientGuard
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
   ],
   bootstrap: [AppComponent]
 })

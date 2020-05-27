@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Cars.dto.both.CarDTO;
 import jvn.Cars.dto.request.CarEditDTO;
 import jvn.Cars.dto.request.CreateCarDTO;
+import jvn.Cars.dto.response.CarWithAllInformationDTO;
+import jvn.Cars.dto.response.CarWithPicturesDTO;
 import jvn.Cars.exceptionHandler.InvalidCarDataException;
 import jvn.Cars.mapper.CarDtoMapper;
+import jvn.Cars.mapper.CarWithAllInformationDtoMapper;
 import jvn.Cars.mapper.CarWithPicturesDtoMapper;
 import jvn.Cars.mapper.CreateCarDtoMapper;
 import jvn.Cars.service.CarService;
@@ -26,6 +29,7 @@ import javax.validation.constraints.Positive;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Validated
 @RestController
@@ -40,6 +44,8 @@ public class CarController {
     private CreateCarDtoMapper createCarDtoMapper;
 
     private CarWithPicturesDtoMapper carWithPicturesDtoMapper;
+
+    private CarWithAllInformationDtoMapper carWithAllInformationDtoMapper;
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CarDTO> create(@RequestParam("carData") String jsonString, @RequestParam("files") List<MultipartFile> multipartFiles) {
@@ -56,14 +62,19 @@ public class CarController {
         return new ResponseEntity<>(carDTO, HttpStatus.CREATED);
     }
 
-    /*
-        @GetMapping
-        public ResponseEntity<List<CarWithPicturesDTO>> get() {
-            List<CarWithPicturesDTO> list = carService.get().stream().map(carWithPicturesDtoMapper::toDto).
-                    collect(Collectors.toList());
-            return new ResponseEntity<>(list, HttpStatus.OK);
-        }
-    */
+
+    @GetMapping
+    public ResponseEntity<List<CarWithPicturesDTO>> get() {
+        List<CarWithPicturesDTO> list = carService.get().stream().map(carWithPicturesDtoMapper::toDto).
+                collect(Collectors.toList());
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @GetMapping("/verify/{carId}")
+    public ResponseEntity<CarWithAllInformationDTO> verify(@PathVariable("carId") @Positive(message = "Id must be positive.") Long carId) {
+        return new ResponseEntity<>(carWithAllInformationDtoMapper.toDto(carService.get(carId)), HttpStatus.OK);
+    }
+
     @GetMapping(value = "/{id}/picture", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
     public ResponseEntity<Resource> get(@PathVariable @Positive(message = "Id must be positive.") Long id,
                                         @RequestParam(value = "fileName") String fileName) {
@@ -142,10 +153,11 @@ public class CarController {
 
     @Autowired
     public CarController(CarService carService, CarDtoMapper carMapper, CreateCarDtoMapper createCarDtoMapper,
-                         CarWithPicturesDtoMapper carWithPicturesDtoMapper) {
+                         CarWithPicturesDtoMapper carWithPicturesDtoMapper,CarWithAllInformationDtoMapper carWithAllInformationDtoMapper) {
         this.carService = carService;
         this.carMapper = carMapper;
         this.createCarDtoMapper = createCarDtoMapper;
         this.carWithPicturesDtoMapper = carWithPicturesDtoMapper;
+        this.carWithAllInformationDtoMapper = carWithAllInformationDtoMapper;
     }
 }

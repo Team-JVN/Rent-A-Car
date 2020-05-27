@@ -12,9 +12,9 @@ public interface CarService {
     Car get(Long id);
 
     Resource get(String fileName);
-/*
-    List<Car> get();
 
+    List<Car> get();
+/*
     Car editAll(Long id, CarDTO carDTO, List<MultipartFile> multipartFiles);
 
     Car editPartial(Long id, CarEditDTO carDTO, List<MultipartFile> multipartFiles);

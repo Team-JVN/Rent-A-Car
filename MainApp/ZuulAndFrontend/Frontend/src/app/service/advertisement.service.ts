@@ -5,6 +5,7 @@ import { environment } from './../../environments/environment';
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { CreateAdvertisement } from '../model/createAdvertisement';
 @Injectable({
   providedIn: 'root'
 })
@@ -15,7 +16,7 @@ export class AdvertisementService {
 
   constructor(private httpClient: HttpClient) { }
 
-  public create(advertisement: AdvertisementWithPictures): any {
+  public create(advertisement: CreateAdvertisement): any {
     return this.httpClient.post(this.url, advertisement);
   }
 

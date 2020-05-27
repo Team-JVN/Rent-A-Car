@@ -44,7 +44,7 @@ public class AuthFilter extends ZuulFilter {
 
         RequestContext ctx = RequestContext.getCurrentContext();
         HttpServletRequest request = ctx.getRequest();
-        String header = request.getHeader("Authorization");
+        String header = request.getHeader("Auth");
 
         // if (header == null || header.isEmpty() || !header.startsWith("Bearer ")) {
         // ctx.setResponseStatusCode(401);

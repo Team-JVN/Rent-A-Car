@@ -14,6 +14,7 @@ import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms'
 import { AddCarComponent } from '../add-car/add-car.component';
 import { AdvertisementService } from 'src/app/service/advertisement.service';
 import { formatDate, DatePipe } from '@angular/common';
+import { CreateAdvertisement } from 'src/app/model/createAdvertisement';
 
 @Component({
   selector: 'app-add-advertisement',
@@ -120,7 +121,7 @@ export class AddAdvertisementComponent implements OnInit {
       cdw = false;
     }
 
-    const advertisement = new AdvertisementWithPictures(this.carForm.value.car, this.priceListForm.value.priceList,
+    const advertisement = new CreateAdvertisement(this.carForm.value.car.id, this.priceListForm.value.priceList,
       this.dateForm.value.discount, this.dateForm.value.kilometresLimit, cdw, this.dateForm.value.pickUpPoint, validFrom);
 
     this.advertisementService.create(advertisement).subscribe(
