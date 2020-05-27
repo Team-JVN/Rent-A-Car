@@ -19,9 +19,7 @@ public class AdvertisementConsumer {
     @RabbitListener(queues = RabbitMQConfiguration.QUEUE_NAME)
     public void listen(String advertisementMessageStr) {
         Advertisement advertisement = stringToObject(advertisementMessageStr);
-        if (advertisement != null) {
-            advertisementRepository.save(advertisement);
-        }
+        advertisementRepository.save(advertisement);
     }
 
     private Advertisement stringToObject(String advertisementMessageStr) {

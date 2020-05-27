@@ -19,7 +19,7 @@ import javax.validation.constraints.Positive;
 import java.text.ParseException;
 import java.util.List;
 import java.util.stream.Collectors;
-@CrossOrigin
+
 @Validated
 @RestController
 @RequestMapping(value = "/api/advertisement", produces = MediaType.APPLICATION_JSON_VALUE)

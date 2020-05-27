@@ -1,6 +1,8 @@
 package jvn.Advertisements.serviceImpl;
 
 import jvn.Advertisements.client.CarClient;
+import jvn.Advertisements.dto.message.AdvertisementMessageDTO;
+import jvn.Advertisements.dto.response.CarWithAllInformationDTO;
 import jvn.Advertisements.enumeration.LogicalStatus;
 import jvn.Advertisements.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.Advertisements.mapper.AdvertisementDtoMapper;
@@ -37,7 +39,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     public Advertisement create(Advertisement createAdvertisementDTO) {
 
         checkDate(createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
-        carClient.verify(createAdvertisementDTO.getCar());
+        CarWithAllInformationDTO carDTO = carClient.verify(createAdvertisementDTO.getCar());
         //TODO: Treba  car servisu da dodas metodu koja ce proveriti da li car postoji i da li je ulogovani korisnik vlasnik tog car-a
         //        checkOwner(createAdvertisementDTO.getCar());
         checkIfCarIsAvailable(createAdvertisementDTO.getCar(), createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
@@ -56,7 +58,9 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         }
 
         Advertisement savedAdvertisement = advertisementRepository.save(createAdvertisementDTO);
-        advertisementProducer.send(advertisementMessageMapper.toDto(savedAdvertisement));
+        AdvertisementMessageDTO advertisementMessageDTO = advertisementMessageMapper.toDto(savedAdvertisement);
+        advertisementMessageDTO.setCar(carDTO);
+        advertisementProducer.send(advertisementMessageDTO);
         return savedAdvertisement;
     }
 

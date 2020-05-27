@@ -14,27 +14,26 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 public class Car {
-
     @Id
     private Long id;
 
     @Column(nullable = false)
     private LogicalStatus logicalStatus = LogicalStatus.EXISTING;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Make make;
+    @Column(nullable = false)
+    private String make;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Model model;
+    @Column(nullable = false)
+    private String model;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private FuelType fuelType;
+    @Column(nullable = false)
+    private String fuelType;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private GearboxType gearBoxType;
+    @Column(nullable = false)
+    private String gearBoxType;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private BodyStyle bodyStyle;
+    @Column(nullable = false)
+    private String bodyStyle;
 
     @Column(nullable = false)
     private Integer mileageInKm;
@@ -42,9 +41,8 @@ public class Car {
     @Column(nullable = false)
     private Integer kidsSeats;
 
-    //Edit will not working when you put CascadeType.ALL and FetchType.EAGER
-    @OneToMany(mappedBy = "car")
-    private Set<Picture> pictures = new HashSet<>();
+    @ElementCollection
+    private Set<String> pictures = new HashSet<>();
 
     @Column(nullable = false)
     private Boolean availableTracking;

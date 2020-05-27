@@ -18,23 +18,23 @@ public class CarWithAllInformationDTO {
     @NotNull(message = "Id is null.")
     private Long id;
 
-    @NotBlank(message ="Logical status is blank.")
+    @NotBlank(message ="Logical status is empty.")
     private String logicalStatus;
 
-    @NotNull(message = "Make is empty.")
-    private MakeDTO make;
+    @NotBlank(message = "Make is empty.")
+    private String make;
 
-    @NotNull(message = "Model is empty.")
-    private ModelDTO model;
+    @NotBlank(message = "Model is empty.")
+    private String model;
 
-    @NotNull(message = "Fuel type is null.")
-    private FuelTypeDTO fuelType;
+    @NotBlank(message = "Fuel type is empty.")
+    private String fuelType;
 
-    @NotNull(message = "Gearbox type is null.")
-    private GearboxTypeDTO gearBoxType;
+    @NotBlank(message = "Gearbox type is empty.")
+    private String gearBoxType;
 
-    @NotNull(message = "Body style is null.")
-    private BodyStyleDTO bodyStyle;
+    @NotBlank(message = "Body style is empty.")
+    private String bodyStyle;
 
     @NotNull(message = "Mileage is null.")
     @Min(value = 0, message = "Mileage must be positive number.")
@@ -57,9 +57,8 @@ public class CarWithAllInformationDTO {
     private Integer commentsCount;
 
     @NotEmpty(message = "Pictures are null.")
-    private List<PicturesDTO> pictures;
+    private List<String> pictures;
 
     @NotNull(message = "Owner is null")
     private Long owner;
 }
-

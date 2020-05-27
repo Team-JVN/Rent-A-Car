@@ -185,7 +185,7 @@ services:
     #         UPLOADED_PICTURES_PATH: /etc/uploadedPictures/
     #     volumes:
     #         - ./tls/certs/agentapp/keystore:/etc/keystore
-    #         - ./AgentApp/src/main/resources/uploadedPictures/:/etc/uploadedPictures/
+    #         - ./AgentApp/Backend/src/main/resources/uploadedPictures/:/etc/uploadedPictures/
     #     depends_on: 
     #         - agentapp-mysql
 

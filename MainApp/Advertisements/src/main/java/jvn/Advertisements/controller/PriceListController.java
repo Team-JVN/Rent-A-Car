@@ -14,7 +14,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.util.List;
 import java.util.stream.Collectors;
-@CrossOrigin
+
 @Validated
 @RestController
 @RequestMapping(value = "/api/price-list", produces = MediaType.APPLICATION_JSON_VALUE)
