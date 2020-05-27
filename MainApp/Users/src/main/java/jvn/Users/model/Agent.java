@@ -35,4 +35,5 @@ public class Agent extends User {
         this.taxIdNumber = taxIdNumber;
         this.status = AgentStatus.INACTIVE;
     }
+
 }

@@ -1,5 +1,6 @@
 package jvn.Users.controller;
 
+import jvn.Users.dto.both.AgentDTO;
 import jvn.Users.dto.both.ClientDTO;
 import jvn.Users.dto.request.ChangePasswordDTO;
 import jvn.Users.exceptionHandler.BlockedUserException;
@@ -7,9 +8,11 @@ import jvn.Users.dto.request.RequestTokenDTO;
 import jvn.Users.dto.request.ResetPasswordDTO;
 import jvn.Users.exceptionHandler.InvalidTokenException;
 import jvn.Users.exceptionHandler.InvalidUserDataException;
+import jvn.Users.mapper.AgentDtoMapper;
 import jvn.Users.mapper.ClientDtoMapper;
 import jvn.Users.model.UserTokenState;
 import jvn.Users.security.JwtAuthenticationRequest;
+import jvn.Users.service.AgentService;
 import jvn.Users.service.AuthentificationService;
 import jvn.Users.service.ClientService;
 import jvn.Users.service.UserService;
@@ -25,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
 
 @RestController
 @RequestMapping(value = "/api/auth", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -34,7 +38,11 @@ public class UserController {
 
     private ClientService clientService;
 
+    private AgentService agentService;
+
     private ClientDtoMapper clientDtoMapper;
+
+    private AgentDtoMapper agentDtoMapper;
 
     private AuthentificationService authentificationService;
 
@@ -95,6 +103,22 @@ public class UserController {
                     HttpStatus.BAD_REQUEST);
         }
     }
+    @PostMapping(value = "/register-agent", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AgentDTO> registerAgent(@Valid @RequestBody AgentDTO agentDTO) {
+        try {
+            authentificationService.checkPassword(agentDTO.getPassword());
+        } catch (NoSuchAlgorithmException e) {
+            throw new InvalidUserDataException("Password cannot be check. Please try again.", HttpStatus.BAD_REQUEST);
+        }
+        try {
+            return new ResponseEntity<>(
+                    agentDtoMapper.toDto(agentService.create(agentDtoMapper.toEntity(agentDTO))),
+                    HttpStatus.CREATED);
+        } catch (ParseException e) {
+            throw new InvalidTokenException("Activation token cannot be generated. Please try again.",
+                    HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> generateResetToken(@Valid @RequestBody RequestTokenDTO requestTokenDTO) {
@@ -129,10 +153,13 @@ public class UserController {
 
     @Autowired
     public UserController(UserService userService, ClientService clientService, ClientDtoMapper clientDtoMapper,
-                          AuthentificationService authentificationService) {
+                          AuthentificationService authentificationService, AgentDtoMapper agentDtoMapper,
+                          AgentService agentService) {
         this.userService = userService;
         this.clientService = clientService;
         this.clientDtoMapper = clientDtoMapper;
         this.authentificationService = authentificationService;
+        this.agentDtoMapper = agentDtoMapper;
+        this.agentService = agentService;
     }
 }
