@@ -93,16 +93,7 @@ public class TokenUtils {
                 && !isCreatedBeforeLastPasswordReset(created, user.getLastPasswordResetDate()));
     }
 
-    public Boolean isTokenValid(User user,String token){
-        if(isTokenExpired(token)){
-            return false;
-        }
-        final Date created = getIssuedAtDateFromToken(token);
-        if(!isCreatedBeforeLastPasswordReset(created,user.getLastPasswordResetDate())){
-            return false;
-        }
-        return true;
-    }
+
     public String getUsernameFromToken(String token) {
         String username;
         try {

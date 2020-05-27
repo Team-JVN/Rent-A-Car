@@ -6,6 +6,7 @@ import com.netflix.zuul.context.RequestContext;
 import feign.FeignException;
 import jvn.Zuul.client.AuthClient;
 import jvn.Zuul.dto.UserDTO;
+import jvn.Zuul.exceptions.InvalidUserDataException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -64,7 +65,7 @@ public class AuthFilter extends ZuulFilter {
                 System.out.println("Verifikacija");
                 UserDTO userDTO= authClient.verify(header);
                 ctx.addZuulRequestHeader("user",jsonToString(userDTO));
-            } catch (FeignException.NotFound e) {
+            } catch (FeignException.NotFound | InvalidUserDataException e) {
                 setFailedRequest("Something is wrong. Please try againg.", 403);
             }
         }
