@@ -10,9 +10,9 @@ import java.util.List;
 @Repository
 public interface PriceListRepository extends JpaRepository<PriceList, Long> {
 
-    PriceList findOneByIdAndStatusNot(Long id, LogicalStatus logicalStatus);
+    PriceList findOneByIdAndStatusNotAndOwnerId(Long id, LogicalStatus logicalStatus,Long ownerId);
 
-    List<PriceList> findByStatus(LogicalStatus status);
+    List<PriceList> findByStatusAndOwnerId(LogicalStatus status,Long ownerId);
 
     PriceList findByIdAndStatusNotAndAdvertisementsLogicalStatusNot(Long id, LogicalStatus logicalStatus, LogicalStatus logicalStatusNot);
 }

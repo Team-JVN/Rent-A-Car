@@ -1,6 +1,9 @@
 package jvn.Advertisements.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Advertisements.dto.request.CreateAdvertisementDTO;
+import jvn.Advertisements.dto.request.UserDTO;
 import jvn.Advertisements.dto.response.AdvertisementDTO;
 import jvn.Advertisements.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.Advertisements.mapper.AdvertisementDtoMapper;
@@ -13,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
@@ -30,11 +34,15 @@ public class AdvertisementController {
 
     private AdvertisementDtoMapper advertisementDtoMapper;
 
+    private ObjectMapper objectMapper;
+
+    private HttpServletRequest request;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AdvertisementDTO> create(@Valid @RequestBody CreateAdvertisementDTO createAdvertisementDTO) {
         try {
-            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.create(createAdvertisementDtoMapper.toEntity(createAdvertisementDTO))),
+            UserDTO userDTO = stringToObject(request.getHeader("user"));
+            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.create(createAdvertisementDtoMapper.toEntity(createAdvertisementDTO),userDTO)),
                     HttpStatus.CREATED);
         } catch (ParseException e) {
             throw new InvalidAdvertisementDataException("Please choose valid date.", HttpStatus.BAD_REQUEST);
@@ -49,11 +57,24 @@ public class AdvertisementController {
 //        return new ResponseEntity<>(list, HttpStatus.OK);
 //    }
 
+    private UserDTO stringToObject(String user) {
+        try {
+            return objectMapper.readValue(user, UserDTO.class);
+        } catch (JsonProcessingException e) {
+            //TODO: Add to log and delete return null;
+            return null;
+        }
+    }
+
     @Autowired
     public AdvertisementController(AdvertisementService advertisementService, CreateAdvertisementDtoMapper createAdvertisementDtoMapper,
-                                   AdvertisementDtoMapper advertisementDtoMapper) {
+                                   AdvertisementDtoMapper advertisementDtoMapper, ObjectMapper objectMapper,HttpServletRequest request) {
         this.advertisementService = advertisementService;
         this.createAdvertisementDtoMapper = createAdvertisementDtoMapper;
         this.advertisementDtoMapper = advertisementDtoMapper;
+        this.objectMapper = objectMapper;
+        this.request = request;
     }
+
+
 }
