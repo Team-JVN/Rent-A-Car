@@ -1,3 +1,4 @@
+import { AdvertisementFromSearch } from './../../../model/advertisementFromSearch';
 import { SearchParams } from './../../../model/searchParams';
 import { SearchService } from './../../../service/search.service';
 import { MakeService } from './../../../service/make.service';
@@ -41,7 +42,7 @@ const DateValidator: ValidatorFn = (fg: FormGroup) => {
 export class SearchAdvertisementsComponent implements OnInit {
 
   displayedColumns: string[] = ['advertisement'];
-  advertisementsDataSource: MatTableDataSource<AdvertisementWithPictures>;
+  advertisementsDataSource: MatTableDataSource<AdvertisementFromSearch>;
   searchForm: FormGroup;
   fuelTypes: FuelType[] = [];
   gearBoxTypes: GearBoxType[] = [];
@@ -50,6 +51,7 @@ export class SearchAdvertisementsComponent implements OnInit {
   models: Model[] = [];
   status: string = 'all';
   minRating: number = 0.0;
+  minDate: Date;
 
   constructor(
     public router: Router,
@@ -67,6 +69,9 @@ export class SearchAdvertisementsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.minDate = new Date();
+    this.minDate.setDate(this.minDate.getDate() + 2);
+
     this.searchForm = this.formBuilder.group({
       dateFrom: new FormControl(null, Validators.required),
       timeFrom: new FormControl(null, Validators.required),
@@ -87,7 +92,7 @@ export class SearchAdvertisementsComponent implements OnInit {
     }, {
       validator: [DateValidator]
     })
-    this.fetchAll('active');
+    this.fetchAll();
 
     this.fetchMakes();
     this.fetchFuelTypes();
@@ -95,10 +100,12 @@ export class SearchAdvertisementsComponent implements OnInit {
     this.fetchBodyStyles();
   }
 
+  //TODO: change from AdvertisementWithPictures to AdvertisementFromSearch
   rent(element: AdvertisementWithPictures) {
     this.dialog.open(AddRentRequestComponent, { data: element });
   }
 
+  //TODO: change from AdvertisementWithPictures to AdvertisementFromSearch
   viewDetails(element: AdvertisementWithPictures) {
     this.router.navigate(['/advertisement/' + element.id]);
   }
@@ -123,16 +130,16 @@ export class SearchAdvertisementsComponent implements OnInit {
     const dateTo = formatDate(this.searchForm.value.dateTo, 'yyyy-MM-dd', 'en-US')
     const dateTimeTo = dateTo + ' ' + this.searchForm.value.timeTo;
 
-    const searchParams = new SearchParams(dateTimeFrom, dateTimeTo, this.searchForm.value.pickUpPoint, this.searchForm.value.make,
-      this.searchForm.value.model, this.searchForm.value.fuelType, this.searchForm.value.gearBoxType, this.searchForm.value.bodyStyle,
-      this.minRating, this.searchForm.value.minPricePerDay, this.searchForm.value.maxPricePerDay, this.searchForm.value.kidsSeats,
-      this.searchForm.value.mileageInKm, this.searchForm.value.kilometresLimit, this.searchForm.value.cdw);
+    const searchParams = new SearchParams(dateTimeFrom, dateTimeTo, this.searchForm.value.pickUpPoint, this.searchForm.value.make.name,
+      this.searchForm.value.model.name, this.searchForm.value.fuelType.name, this.searchForm.value.gearBoxType.name,
+      this.searchForm.value.bodyStyle.name, this.minRating, this.searchForm.value.minPricePerDay, this.searchForm.value.maxPricePerDay,
+      this.searchForm.value.kidsSeats, this.searchForm.value.mileageInKm, this.searchForm.value.kilometresLimit, this.searchForm.value.cdw);
 
     this.searchService.searchAdvertisements(searchParams).subscribe(
-      (data: AdvertisementWithPictures[]) => {
-        // data.forEach(adWithPicturesDTO => {
-        //   this.getPicture(adWithPicturesDTO);
-        // });
+      (data: AdvertisementFromSearch[]) => {
+        data.forEach(adFromSearch => {
+          this.getPicture(adFromSearch);
+        });
         this.advertisementsDataSource = new MatTableDataSource(data);
       },
       (httpErrorResponse: HttpErrorResponse) => {
@@ -141,6 +148,7 @@ export class SearchAdvertisementsComponent implements OnInit {
     );
   }
 
+  //TODO: change from AdvertisementWithPictures to AdvertisementFromSearch
   checkIfCanRentAdvertisement(element: AdvertisementWithPictures): boolean {
     if (!element.dateTo) {
       return true;
@@ -151,16 +159,16 @@ export class SearchAdvertisementsComponent implements OnInit {
     return false;
   }
 
-  fetchAll(status: string) {
-    this.advertisementService.getAll(status).subscribe(
-      (data: AdvertisementWithPictures[]) => {
-        data.forEach(adWithPicturesDTO => {
-          this.getPicture(adWithPicturesDTO);
+  fetchAll() {
+    this.searchService.getAll().subscribe(
+      (data: AdvertisementFromSearch[]) => {
+        data.forEach(adFromSearch => {
+          this.getPicture(adFromSearch);
         });
         this.advertisementsDataSource = new MatTableDataSource(data);
       },
       (httpErrorResponse: HttpErrorResponse) => {
-        const data: AdvertisementWithPictures[] = []
+        const data: AdvertisementFromSearch[] = []
         this.advertisementsDataSource = new MatTableDataSource(data)
         this.toastr.error(httpErrorResponse.error.message, 'Show Advertisements');
       }
@@ -227,11 +235,11 @@ export class SearchAdvertisementsComponent implements OnInit {
     );
   }
 
-  getPicture(adWithPicturesDTO: AdvertisementWithPictures) {
-    this.carService.getPicture(adWithPicturesDTO.car.pictures[0].data, adWithPicturesDTO.car.id).subscribe(
+  getPicture(adFromSearch: AdvertisementFromSearch) {
+    this.carService.getPicture(adFromSearch.car.pictures[0], adFromSearch.car.id).subscribe(
       (data) => {
-        this.createImageFromBlob(data, adWithPicturesDTO);
-        adWithPicturesDTO.car.isImageLoading = false;
+        this.createImageFromBlob(data, adFromSearch);
+        adFromSearch.car.isImageLoading = false;
       },
       (httpErrorResponse: HttpErrorResponse) => {
         this.toastr.error(httpErrorResponse.error.message, 'Get picture');
@@ -239,10 +247,10 @@ export class SearchAdvertisementsComponent implements OnInit {
     );
   }
 
-  createImageFromBlob(image: Blob, adWithPicturesDTO: AdvertisementWithPictures) {
+  createImageFromBlob(image: Blob, adFromSearch: AdvertisementFromSearch) {
     let reader = new FileReader();
     reader.addEventListener("load", () => {
-      adWithPicturesDTO.car.image = reader.result;
+      adFromSearch.car.image = reader.result;
     }, false);
 
     if (image) {

@@ -1,5 +1,6 @@
 package jvn.SearchService.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jvn.SearchService.enumeration.LogicalStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,6 +28,7 @@ public class PriceList {
     @Column
     private Double priceForCDW;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "priceList", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Advertisement> advertisements = new HashSet<>();
 

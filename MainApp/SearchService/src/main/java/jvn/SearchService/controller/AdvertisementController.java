@@ -7,10 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -20,6 +17,11 @@ import java.util.List;
 public class AdvertisementController {
 
     private AdvertisementService advertisementService;
+
+    @GetMapping
+    public ResponseEntity<List<Advertisement>> getAll() {
+        return new ResponseEntity<>(advertisementService.getAll(), HttpStatus.OK);
+    }
 
     @PostMapping("/search")
     public ResponseEntity<List<Advertisement>> searchAdvertisements(@Valid @RequestBody SearchParamsDTO searchParamsDTO) {

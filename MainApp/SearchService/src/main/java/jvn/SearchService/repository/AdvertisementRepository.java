@@ -11,9 +11,16 @@ import java.util.List;
 @Repository
 public interface AdvertisementRepository extends JpaRepository<Advertisement, Long> {
 
-    List<Advertisement> findByCarAndLogicalStatusNotAndDateToEquals(Long id, LogicalStatus status, LocalDate localDate);
+    List<Advertisement> findByLogicalStatus(LogicalStatus logicalStatus);
 
-    List<Advertisement> findByCarAndLogicalStatusNotAndDateToGreaterThanEqual(Long id, LogicalStatus status, LocalDate localDateFrom);
+    // With CDW available
+    List<Advertisement> findByCDWAndLogicalStatusAndDateFromLessThanEqualAndDateToGreaterThanEqualAndKilometresLimitGreaterThanEqualAndPickUpPointContainsIgnoringCaseAndCarMakeAndCarModelAndCarFuelTypeAndCarGearBoxTypeAndCarBodyStyleAndCarMileageInKmLessThanEqualAndCarKidsSeatsGreaterThanEqualAndCarAvgRatingGreaterThanEqualAndPriceListPricePerDayBetween(
+            Boolean cdw, LogicalStatus logicalStatus, LocalDate dateFrom, LocalDate dateTo, Integer minKilometresLimit, String pickUpPoint, String make, String model, String fuelType, String gearBoxType, String bodyStyle, Integer maxMileageInKm, Integer minKidsSeats, Double minRating, Double minPricePerDay, Double maxPricePerDay
+    );
 
-    List<Advertisement> findByCarAndLogicalStatusNotAndDateFromLessThanEqualAndDateToGreaterThanEqual(Long id, LogicalStatus status, LocalDate localDateTo, LocalDate localDateFrom);
+    // Without CDW available
+    List<Advertisement> findByLogicalStatusAndDateFromLessThanEqualAndDateToGreaterThanEqualAndKilometresLimitGreaterThanEqualAndPickUpPointContainsIgnoringCaseAndCarMakeAndCarModelAndCarFuelTypeAndCarGearBoxTypeAndCarBodyStyleAndCarMileageInKmLessThanEqualAndCarKidsSeatsGreaterThanEqualAndCarAvgRatingGreaterThanEqualAndPriceListPricePerDayBetween(
+            LogicalStatus logicalStatus, LocalDate dateFrom, LocalDate dateTo, Integer minKilometresLimit, String pickUpPoint, String make, String model, String fuelType, String gearBoxType, String bodyStyle, Integer maxMileageInKm, Integer minKidsSeats, Double minRating, Double minPricePerDay, Double maxPricePerDay
+    );
+
 }

@@ -14,6 +14,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.ConstraintViolationException;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -26,12 +27,23 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(error);
     }
 
+    @ExceptionHandler(InvalidSearchDataException.class)
+    protected ResponseEntity<Object> handleInvalidSearchDataException(InvalidSearchDataException ex) {
+        ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
+        return buildResponseEntity(error);
+    }
+
+    @ExceptionHandler(DateTimeParseException.class)
+    public ResponseEntity<Object> handleDateTimeParseException() {
+        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST, "Invalid date and time format.");
+        return buildResponseEntity(error);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleOtherExceptions() {
         ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST, "Unknown error occurred. Please try again.");
         return buildResponseEntity(error);
     }
-
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {

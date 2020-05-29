@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface AdvertisementService {
 
+    List<Advertisement> getAll();
+
     List<Advertisement> searchAdvertisements(SearchParamsDTO searchParamsDTO);
 }
 

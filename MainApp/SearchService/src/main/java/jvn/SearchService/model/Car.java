@@ -1,5 +1,6 @@
 package jvn.SearchService.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jvn.SearchService.enumeration.LogicalStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -50,6 +51,7 @@ public class Car {
     @Column(nullable = false)
     private Long owner;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Advertisement> advertisements = new HashSet<>();
 
