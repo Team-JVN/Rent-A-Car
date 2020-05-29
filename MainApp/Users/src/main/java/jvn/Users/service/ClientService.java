@@ -12,7 +12,7 @@ public interface ClientService {
 
     Client get(Long id, ClientStatus status);
 
-    List<Client> get(String status);
+    List<Client> get(String status,Long id);
 
 //    Client edit(Long id, Client client);
 //

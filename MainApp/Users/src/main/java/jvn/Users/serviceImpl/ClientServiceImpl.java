@@ -80,12 +80,12 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public List<Client> get(String status) {
+    public List<Client> get(String status,Long id) {
         List<Client> clients;
         if(status.equals("all")){
-            clients = clientRepository.findByStatusNot(ClientStatus.DELETED);
+            clients = clientRepository.findByStatusNotAndIdNot(ClientStatus.DELETED,id);
         }else {
-            clients = clientRepository.findByStatus(getClientStatus(status));
+            clients = clientRepository.findByStatusAndIdNot(getClientStatus(status),id);
         }
         return clients;
     }

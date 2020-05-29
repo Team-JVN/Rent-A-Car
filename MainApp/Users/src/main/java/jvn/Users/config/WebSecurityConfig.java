@@ -55,8 +55,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .hasAuthority("ADMIN_EDIT_PROFILE")
 
                 .antMatchers("/api/client", "/api/client/{status}",
-                        "/api/client/{id}", "/api/advertisement/{id}/block","/api/advertisement/{id}/approve",
-                        "/api/advertisement/{id}/reject")
+                        "/api/client/{id}", "/api/client/{id}/block","/api/client/{id}/approve",
+                        "/api/client/{id}/reject")
                 .hasAuthority("MANAGE_CLIENTS")
 
                 .antMatchers(HttpMethod.PUT, "/api/client")

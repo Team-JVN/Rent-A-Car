@@ -34,6 +34,9 @@ public class AgentDTO {
     @Pattern(regexp = "0[0-9]+", message = " Phone number must begin with 0 and can contain digits only.")
     private String phoneNumber;
 
+    @NotBlank(message = "Taxpayer identification number  is empty.")
+    @Size(min = 9, max = 9, message = " Taxpayer identification number must have 9 digits.")
+    @Pattern(regexp = "[1-9][0-9]+", message = "Taxpayer identification number is not valid.")
     private String taxIdNumber;
 
 }

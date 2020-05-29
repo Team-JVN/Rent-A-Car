@@ -1,3 +1,9 @@
+import { AuthentificationService } from './../../service/authentification.service';
+import { AdminService } from './../../service/admin.service';
+import { ConfirmDialogDeleteAdminComponent } from './../confirm-dialog/confirm-dialog-delete-admin/confirm-dialog-delete-admin.component';
+import { ConfirmDialogDeleteAgentComponent } from './../confirm-dialog/confirm-dialog-delete-agent/confirm-dialog-delete-agent.component';
+import { Admin } from './../../model/admin';
+import { Agent } from './../../model/agent';
 import { ConfirmDeleteClientComponent } from './../confirm-dialog/confirm-delete-client/confirm-delete-client.component';
 import { ClientService } from './../../service/client.service';
 import { Client } from './../../model/client';
@@ -16,6 +22,7 @@ import { Subscription } from "rxjs";
 import { MatTableDataSource } from '@angular/material/table';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RejectRequestToRegisterComponent } from '../reject-request-to-register/reject-request-to-register.component';
+import { AgentService } from 'src/app/service/agent.service';
 
 @Component({
   selector: "app-manage-users",
@@ -24,47 +31,47 @@ import { RejectRequestToRegisterComponent } from '../reject-request-to-register/
 })
 export class ManageUsersComponent implements OnInit {
   status: string = "all";
+  agentStatus: string = "all";
+  adminStatus: string = "all";
   createClientSuccess: Subscription;
+  createAgentSuccess: Subscription;
+  createAminSuccess: Subscription;
+
   rejectClientSuccess: Subscription;
   deleteClientSuccess: Subscription;
+  deleteAgentSuccess: Subscription;
+  deleteAdminSuccess: Subscription;
 
   clientsDataSource: MatTableDataSource<Client>;
+  agentsDataSource: MatTableDataSource<Agent>;
+  adminsDataSource: MatTableDataSource<Admin>;
 
-  displayedColumnsClient: string[] = [
-    "name",
-    "email",
-    "canceledReservationCounter",
-    "rejectedCommentsCounter",
-    "buttons"
-  ];
-  displayedColumnsAgent: string[] = [
-    "name",
-    "email",
-    "address",
-    "number",
-    "taxIdNumber",
-    "buttons",
-  ];
+  displayedColumnsClient: string[] = ["name", "email", "canceledReservationCounter", "rejectedCommentsCounter", "buttons"];
+  displayedColumnsAgent: string[] = ["name", "email", "address", "number", "taxIdNumber", "buttons"];
   displayedColumnsAdmin: string[] = ["name", "email", "buttons"];
 
-  constructor(
-    private toastr: ToastrService,
-    private formBuilder: FormBuilder,
-    public dialog: MatDialog,
-    private clientService: ClientService
-  ) { }
+  constructor(private toastr: ToastrService, private formBuilder: FormBuilder, public dialog: MatDialog, private clientService: ClientService,
+    private agentService: AgentService, public adminService: AdminService, public authentificationService: AuthentificationService) { }
 
   ngOnInit() {
     this.fetchAllClients("all");
+    this.fetchAllAgents('all');
+    this.fetchAllAdmins('all');
     this.createClientSuccess = this.clientService.createSuccessEmitter.subscribe(
       () => {
         this.fetchAllClients('all');
       }
     );
 
-    this.createClientSuccess = this.clientService.createSuccessEmitter.subscribe(
+    this.createAgentSuccess = this.agentService.createSuccessEmitter.subscribe(
       () => {
-        this.fetchAllClients('all');
+        this.fetchAllAgents('all');
+      }
+    );
+
+    this.createAminSuccess = this.adminService.createSuccessEmitter.subscribe(
+      () => {
+        this.fetchAllAdmins('all');
       }
     );
 
@@ -79,6 +86,18 @@ export class ManageUsersComponent implements OnInit {
         this.fetchAllClients('all');
       }
     );
+
+    this.deleteAgentSuccess = this.agentService.deleteSuccessEmitter.subscribe(
+      () => {
+        this.fetchAllAgents('all');
+      }
+    );
+
+    this.deleteAdminSuccess = this.adminService.deleteSuccessEmitter.subscribe(
+      () => {
+        this.fetchAllAdmins('all');
+      }
+    );
   }
 
   fetchAllClients(status: string) {
@@ -90,6 +109,33 @@ export class ManageUsersComponent implements OnInit {
         const data: Client[] = []
         this.clientsDataSource = new MatTableDataSource(data)
         this.toastr.error(httpErrorResponse.error.message, 'Show clients');
+      }
+    );
+  }
+
+
+  fetchAllAgents(status: string) {
+    this.agentService.getAll(status).subscribe(
+      (data: Agent[]) => {
+        this.agentsDataSource = new MatTableDataSource(data);
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        const data: Agent[] = []
+        this.agentsDataSource = new MatTableDataSource(data)
+        this.toastr.error(httpErrorResponse.error.message, 'Show agents');
+      }
+    );
+  }
+
+  fetchAllAdmins(status: string) {
+    this.adminService.getAll(status).subscribe(
+      (data: Admin[]) => {
+        this.adminsDataSource = new MatTableDataSource(data);
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        const data: Admin[] = []
+        this.adminsDataSource = new MatTableDataSource(data)
+        this.toastr.error(httpErrorResponse.error.message, 'Show admins');
       }
     );
   }
@@ -186,13 +232,14 @@ export class ManageUsersComponent implements OnInit {
     );
   }
 
-  deleteAgent(element) {
-
+  deleteAgent(element: Agent) {
+    this.dialog.open(ConfirmDialogDeleteAgentComponent, { data: { agent: element } });
   }
 
-  deleteAdmin(element) {
-
+  deleteAdmin(element: Admin) {
+    this.dialog.open(ConfirmDialogDeleteAdminComponent, { data: { admin: element } });
   }
+
   newAgentDialog() {
     this.dialog.open(AddAgentComponent);
   }

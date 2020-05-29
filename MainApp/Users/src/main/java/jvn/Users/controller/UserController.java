@@ -112,14 +112,8 @@ public class UserController {
         } catch (NoSuchAlgorithmException e) {
             throw new InvalidUserDataException("Password cannot be check. Please try again.", HttpStatus.BAD_REQUEST);
         }
-        try {
-            return new ResponseEntity<>(
-                    agentDtoMapper.toDto(agentService.create(agentDtoMapper.toEntity(agentDTO))),
-                    HttpStatus.CREATED);
-        } catch (ParseException e) {
-            throw new InvalidTokenException("Activation token cannot be generated. Please try again.",
-                    HttpStatus.BAD_REQUEST);
-        }
+        return new ResponseEntity<>(agentDtoMapper.toDto(agentService.create(agentDtoMapper.toEntity(agentDTO))),
+                HttpStatus.CREATED);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)

@@ -2,6 +2,7 @@ package jvn.Users.serviceImpl;
 
 import jvn.Users.common.RandomPasswordGenerator;
 import jvn.Users.enumeration.AdminStatus;
+import jvn.Users.enumeration.ClientStatus;
 import jvn.Users.exceptionHandler.InvalidAdminDataException;
 import jvn.Users.exceptionHandler.InvalidClientDataException;
 import jvn.Users.model.Admin;
@@ -10,12 +11,14 @@ import jvn.Users.repository.AdminRepository;
 import jvn.Users.service.AdminService;
 import jvn.Users.service.EmailNotificationService;
 import jvn.Users.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@Service
 public class AdminServiceImpl implements AdminService {
 
     private AdminRepository adminRepository;
@@ -41,7 +44,6 @@ public class AdminServiceImpl implements AdminService {
         admin.setRole(role);
         admin.setStatus(AdminStatus.INACTIVE);
 
-
         RandomPasswordGenerator randomPasswordGenerator = new RandomPasswordGenerator();
         String generatedPassword = randomPasswordGenerator.generatePassword();
         admin.setPassword(passwordEncoder.encode(generatedPassword));
@@ -60,12 +62,12 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<Admin> getAll(String status) {
-        List<Admin> admins = null;
-        if (status.equals("inactive")) {
-            admins = adminRepository.findAllByStatus(AdminStatus.INACTIVE);
-        } else {
-            admins = adminRepository.findAllByStatus(AdminStatus.ACTIVE);
+    public List<Admin> getAll(String status,Long id) {
+        List<Admin> admins;
+        if(status.equals("all")){
+            admins = adminRepository.findAllByIdNot(id);
+        }else {
+            admins = adminRepository.findByStatusAndIdNot(getAdminStatus(status),id);
         }
         return admins;
     }
@@ -82,7 +84,6 @@ public class AdminServiceImpl implements AdminService {
         Admin dbAdmin = get(admin.getId());
         dbAdmin.setName(admin.getName());
         return adminRepository.save(dbAdmin);
-
     }
 
     private void composeAndSendEmailToChangePassword(String recipientEmail, String generatedPassword) {
@@ -106,10 +107,19 @@ public class AdminServiceImpl implements AdminService {
 
         emailNotificationService.sendEmail(recipientEmail, subject, text);
     }
+
     private String getLocalhostURL() {
         return environment.getProperty("LOCALHOST_URL");
     }
 
+    private AdminStatus getAdminStatus(String status) {
+        try {
+            return AdminStatus.valueOf(status.toUpperCase());
+        } catch (Exception e) {
+            throw new InvalidAdminDataException("Please choose valid admin's status", HttpStatus.NOT_FOUND);
+        }
+    }
+    @Autowired
     public AdminServiceImpl(AdminRepository adminRepository, UserService userService, PasswordEncoder passwordEncoder, EmailNotificationService emailNotificationService, Environment environment) {
         this.adminRepository = adminRepository;
         this.userService = userService;

@@ -10,6 +10,7 @@ import { HttpClient } from '@angular/common/http';
 export class AdminService {
   url = environment.baseUrl + environment.admin;
   createSuccessEmitter = new Subject<Admin>();
+  deleteSuccessEmitter = new Subject<Admin>();
 
   constructor(private httpClient: HttpClient) { }
 
@@ -21,8 +22,8 @@ export class AdminService {
     return this.httpClient.put(this.url + '/' + admin.id, admin);
   }
 
-  public getAdmins() {
-    return this.httpClient.get(this.url);
+  public getAll(status: string) {
+    return this.httpClient.get(this.url + '/all/' + status);
   }
 
   public delete(id: number): any {

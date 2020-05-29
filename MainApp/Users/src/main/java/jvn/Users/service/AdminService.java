@@ -12,7 +12,7 @@ public interface AdminService {
 
     Admin get(Long id);
 
-    List<Admin> getAll(String status);
+    List<Admin> getAll(String status,Long id);
 
     void delete(Long id);
 

@@ -1,16 +1,19 @@
 package jvn.Users.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Users.dto.both.ClientDTO;
+import jvn.Users.dto.response.UserDTO;
 import jvn.Users.exceptionHandler.InvalidTokenException;
 import jvn.Users.mapper.ClientDtoMapper;
 import jvn.Users.service.ClientService;
+import jvn.Users.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
@@ -27,6 +30,8 @@ public class ClientController {
 
     private ClientDtoMapper clientDtoMapper;
 
+    private UserService userService;
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ClientDTO> create(@Valid @RequestBody ClientDTO clientDTO) {
         try {
@@ -38,8 +43,8 @@ public class ClientController {
 
     @GetMapping("/all/{status}")
     public ResponseEntity<List<ClientDTO>> getAll(
-            @PathVariable(value = "status", required = false) @Pattern(regexp = "(?i)(all|awaiting|approved|active|blocked)$", message = "Status is not valid.") String status) {
-        List<ClientDTO> list = clientService.get(status).stream().map(clientDtoMapper::toDto).
+            @PathVariable(value = "status") @Pattern(regexp = "(?i)(all|awaiting|approved|active|blocked)$", message = "Status is not valid.") String status) {
+        List<ClientDTO> list = clientService.get(status,userService.getLoginUser().getId()).stream().map(clientDtoMapper::toDto).
                 collect(Collectors.toList());
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
@@ -98,9 +103,11 @@ public class ClientController {
         return new ResponseEntity<>(clientDtoMapper.toDto(clientService.createComments(id,status)), HttpStatus.OK);
     }
 
+
     @Autowired
-    public ClientController(ClientService clientService, ClientDtoMapper clientDtoMapper) {
+    public ClientController(ClientService clientService, ClientDtoMapper clientDtoMapper,UserService userService) {
         this.clientService = clientService;
         this.clientDtoMapper = clientDtoMapper;
+        this.userService = userService;
     }
 }

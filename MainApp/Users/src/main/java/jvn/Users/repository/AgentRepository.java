@@ -9,7 +9,12 @@ import java.util.List;
 
 @Repository
 public interface AgentRepository extends JpaRepository<Agent, Long> {
+
     Agent findByPhoneNumber(String phoneNumber);
-    Agent findOneById(Long id);
-    List<Agent> findAllByStatus(AgentStatus agentStatus);
+
+    Agent findOneByIdAndStatusNot(Long id,AgentStatus agentStatus);
+
+    List<Agent> findByStatusNotAndIdNot(AgentStatus agentStatus,Long id);
+
+    List<Agent> findByStatusAndIdNot(AgentStatus agentStatus,Long id);
 }

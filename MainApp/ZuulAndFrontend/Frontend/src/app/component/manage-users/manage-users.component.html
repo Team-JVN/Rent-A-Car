@@ -107,11 +107,10 @@
             <div class="status-filter">
               <span class="filter-span">Filter by status:</span>
               <mat-form-field>
-                <mat-select [(ngModel)]="status" (selectionChange)="fetchAllClients(status)">
+                <mat-select [(ngModel)]="agentStatus" (selectionChange)="fetchAllAgents(agentStatus)">
                   <mat-option value="all" selected>- All -</mat-option>
                   <mat-option value="inactive">Inactive</mat-option>
                   <mat-option value="active">Active</mat-option>
-                  <mat-option value="blocked">Blocked</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
@@ -122,31 +121,30 @@
             </div>
             <br /><br />
             <div>
-              <!-- TODO: add [dataSource]="dataSource" -->
-              <table mat-table class="mat-elevation-z8">
+              <table mat-table class="mat-elevation-z8" [dataSource]="agentsDataSource">
                 <ng-container matColumnDef="name">
                   <th mat-header-cell *matHeaderCellDef>Name</th>
-                  <td mat-cell *matCellDef="let element">DATA</td>
+                  <td mat-cell *matCellDef="let element">{{element.name}}</td>
                 </ng-container>
 
                 <ng-container matColumnDef="email">
                   <th mat-header-cell *matHeaderCellDef>Email</th>
-                  <td mat-cell *matCellDef="let element">DATA</td>
+                  <td mat-cell *matCellDef="let element">{{element.email}}</td>
                 </ng-container>
 
                 <ng-container matColumnDef="address">
                   <th mat-header-cell *matHeaderCellDef>Address</th>
-                  <td mat-cell *matCellDef="let element">DATA</td>
+                  <td mat-cell *matCellDef="let element">{{element.address}}</td>
                 </ng-container>
 
                 <ng-container matColumnDef="number">
                   <th mat-header-cell *matHeaderCellDef>Phone number</th>
-                  <td mat-cell *matCellDef="let element">DATA</td>
+                  <td mat-cell *matCellDef="let element">{{element.phoneNumber}}</td>
                 </ng-container>
 
                 <ng-container matColumnDef="taxIdNumber">
                   <th mat-header-cell *matHeaderCellDef>TAX ID number</th>
-                  <td mat-cell *matCellDef="let element">DATA</td>
+                  <td mat-cell *matCellDef="let element">{{element.taxId}}</td>
                 </ng-container>
 
                 <ng-container matColumnDef="buttons">
@@ -157,12 +155,6 @@
                     </button>
                   </td>
                 </ng-container>
-                <!-- 
-                <ng-container matColumnDef="symbol">
-                  <th mat-header-cell *matHeaderCellDef>Address</th>
-                  <td mat-cell *matCellDef="let element">DATA</td>
-                </ng-container> -->
-
                 <tr mat-header-row *matHeaderRowDef="displayedColumnsAgent"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumnsAgent"></tr>
               </table>
@@ -175,31 +167,27 @@
             <div class="status-filter">
               <span class="filter-span">Filter by status:</span>
               <mat-form-field>
-                <mat-select [(ngModel)]="status" (selectionChange)="fetchAllClients(status)">
+                <mat-select [(ngModel)]="adminStatus" (selectionChange)="fetchAllAdmins(adminStatus)">
                   <mat-option value="all" selected>- All -</mat-option>
                   <mat-option value="inactive">Inactive</mat-option>
                   <mat-option value="active">Active</mat-option>
-                  <mat-option value="blocked">Blocked</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
             <div align="end">
-              <button mat-raised-button color="primary" (click)="newAdminDialog()">
-                Create New
-              </button>
+              <button mat-raised-button color="primary" (click)="newAdminDialog()"> Create New </button>
             </div>
             <br /><br />
             <div>
-              <!-- TODO: add [dataSource]="dataSource" -->
-              <table mat-table class="mat-elevation-z8">
+              <table mat-table class="mat-elevation-z8" [dataSource]="adminsDataSource">
                 <ng-container matColumnDef="name">
                   <th mat-header-cell *matHeaderCellDef>Name</th>
-                  <td mat-cell *matCellDef="let element">DATA</td>
+                  <td mat-cell *matCellDef="let element">{{element.name}}</td>
                 </ng-container>
 
                 <ng-container matColumnDef="email">
                   <th mat-header-cell *matHeaderCellDef>Email</th>
-                  <td mat-cell *matCellDef="let element">DATA</td>
+                  <td mat-cell *matCellDef="let element">{{element.email}}</td>
                 </ng-container>
 
                 <ng-container matColumnDef="buttons">
@@ -210,13 +198,6 @@
                     </button>
                   </td>
                 </ng-container>
-
-                <!-- 
-                <ng-container matColumnDef="symbol">
-                  <th mat-header-cell *matHeaderCellDef>Address</th>
-                  <td mat-cell *matCellDef="let element">DATA</td>
-                </ng-container> -->
-
                 <tr mat-header-row *matHeaderRowDef="displayedColumnsAdmin"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumnsAdmin"></tr>
               </table>

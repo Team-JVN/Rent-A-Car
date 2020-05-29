@@ -81,6 +81,8 @@ import { ViewPermissionsComponent } from './component/view/view-permissions/view
 import { ReplacePipe } from './util/replace.pipe';
 import { RejectRequestToRegisterComponent } from './component/reject-request-to-register/reject-request-to-register.component';
 import { ConfirmDeleteClientComponent } from './component/confirm-dialog/confirm-delete-client/confirm-delete-client.component';
+import { ConfirmDialogDeleteAgentComponent } from './component/confirm-dialog/confirm-dialog-delete-agent/confirm-dialog-delete-agent.component';
+import { ConfirmDialogDeleteAdminComponent } from './component/confirm-dialog/confirm-dialog-delete-admin/confirm-dialog-delete-admin.component';
 
 @NgModule({
   declarations: [
@@ -151,6 +153,8 @@ import { ConfirmDeleteClientComponent } from './component/confirm-dialog/confirm
     ViewPermissionsComponent,
     RejectRequestToRegisterComponent,
     ConfirmDeleteClientComponent,
+    ConfirmDialogDeleteAgentComponent,
+    ConfirmDialogDeleteAdminComponent,
   ],
   imports: [
     BrowserModule,
@@ -205,6 +209,8 @@ import { ConfirmDeleteClientComponent } from './component/confirm-dialog/confirm
     AddModelComponent,
     ConfirmDeleteClientComponent,
     RejectRequestToRegisterComponent,
+    ConfirmDialogDeleteAgentComponent,
+    ConfirmDialogDeleteAdminComponent,
   ],
   providers: [
     {

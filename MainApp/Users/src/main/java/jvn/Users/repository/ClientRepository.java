@@ -17,9 +17,9 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
 
     List<Client> findAll();
 
-    List<Client> findByStatusNot(ClientStatus clientStatus);
+    List<Client> findByStatusNotAndIdNot(ClientStatus clientStatus,Long id);
 
-    List<Client> findByStatus(ClientStatus clientStatus);
+    List<Client> findByStatusAndIdNot(ClientStatus clientStatus,Long id);
 
     Client findOneByIdAndStatusNot(Long id,ClientStatus clientStatus);
 

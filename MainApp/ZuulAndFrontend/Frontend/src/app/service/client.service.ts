@@ -27,6 +27,7 @@ export class ClientService {
   public approve(id: number) {
     return this.httpClient.put(this.url + '/' + id + '/approve', null);
   }
+
   public getClients() {
     return this.httpClient.get(this.url);
   }

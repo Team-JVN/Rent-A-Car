@@ -11,5 +11,8 @@ import java.util.List;
 public interface AdminRepository extends JpaRepository<Admin, Long> {
 
     Admin findOneById(Long id);
-    List<Admin> findAllByStatus(AdminStatus adminStatus);
+
+    List<Admin> findAllByIdNot(Long id);
+
+    List<Admin> findByStatusAndIdNot(AdminStatus adminStatus,Long id);
 }

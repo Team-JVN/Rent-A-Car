@@ -12,7 +12,7 @@ public interface AgentService {
 
     Agent get(Long id);
 
-    List<Agent> getAll(String status);
+    List<Agent> getAll(String status,Long id);
 
     void delete(Long id);
 

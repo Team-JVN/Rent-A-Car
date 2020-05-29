@@ -32,7 +32,6 @@ export class AddAgentComponent implements OnInit {
       this.toastr.error("Please enter valid data", 'Registrate Agent/Company');
       return;
     }
-
     const agent = new Agent(this.addForm.value.name, this.addForm.value.email, this.addForm.value.address,
       this.addForm.value.phoneNumber, this.addForm.value.taxIdNumber)
     this.agentService.add(agent).subscribe(

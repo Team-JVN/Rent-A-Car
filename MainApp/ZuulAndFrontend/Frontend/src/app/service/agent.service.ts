@@ -10,6 +10,7 @@ import { HttpClient } from '@angular/common/http';
 export class AgentService {
   url = environment.baseUrl + environment.agent;
   createSuccessEmitter = new Subject<Agent>();
+  deleteSuccessEmitter = new Subject<Agent>();
 
   constructor(private httpClient: HttpClient) { }
 
@@ -21,12 +22,11 @@ export class AgentService {
     return this.httpClient.put(this.url + '/' + agent.id, agent);
   }
 
-  public getAgents() {
-    return this.httpClient.get(this.url);
-  }
-
   public delete(id: number): any {
     return this.httpClient.delete(this.url + '/' + id);
   }
 
+  public getAll(status: string) {
+    return this.httpClient.get(this.url + '/all/' + status);
+  }
 }

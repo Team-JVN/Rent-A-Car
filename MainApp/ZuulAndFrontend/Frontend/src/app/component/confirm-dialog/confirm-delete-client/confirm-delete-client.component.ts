@@ -2,7 +2,6 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { ClientService } from 'src/app/service/client.service';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-confirm-delete-client',
@@ -22,8 +21,8 @@ export class ConfirmDeleteClientComponent implements OnInit {
     this.clientService.delete(this.data.client.id).subscribe(
       () => {
         this.dialogRef.close();
-        this.toastr.success('Success. ', 'Delete client');
-        this.clientService.rejectSuccessEmitter.next(this.data.client);
+        this.toastr.success('Success.', 'Delete client');
+        this.clientService.deleteSuccessEmitter.next(this.data.client);
       },
       () => {
         this.toastr.error('Something goes wrong. Please try again.', 'Delete client');

@@ -14,7 +14,7 @@ public class AgentDtoMapper implements MapperInterface<Agent, AgentDTO>{
     public ModelMapper modelMapper;
 
     @Override
-    public Agent toEntity(AgentDTO dto) throws ParseException {
+    public Agent toEntity(AgentDTO dto) {
         Agent agent = modelMapper.map(dto, Agent.class);
         return agent;
     }

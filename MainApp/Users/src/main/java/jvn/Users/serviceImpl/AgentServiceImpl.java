@@ -1,11 +1,10 @@
 package jvn.Users.serviceImpl;
 
 import jvn.Users.common.RandomPasswordGenerator;
+import jvn.Users.enumeration.ClientStatus;
 import jvn.Users.exceptionHandler.InvalidAgentDataException;
 import org.springframework.core.env.Environment;
-import jvn.Users.dto.both.AgentDTO;
 import jvn.Users.enumeration.AgentStatus;
-import jvn.Users.exceptionHandler.InvalidClientDataException;
 import jvn.Users.model.Agent;
 import jvn.Users.model.Role;
 import jvn.Users.repository.AgentRepository;
@@ -15,9 +14,11 @@ import jvn.Users.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class AgentServiceImpl implements AgentService {
 
     private AgentRepository agentRepository;
@@ -37,14 +38,13 @@ public class AgentServiceImpl implements AgentService {
                     HttpStatus.BAD_REQUEST);
         }
         if (userService.findByEmail(agent.getEmail()) != null) {
-            throw new InvalidAgentDataException("User with same email address already exists.",
+            throw new InvalidAgentDataException("Agent with same email address already exists.",
                     HttpStatus.BAD_REQUEST);
         }
 
         Role role = userService.findRoleByName("ROLE_AGENT");
         agent.setRole(role);
         agent.setStatus(AgentStatus.INACTIVE);
-
 
         RandomPasswordGenerator randomPasswordGenerator = new RandomPasswordGenerator();
         String generatedPassword = randomPasswordGenerator.generatePassword();
@@ -57,7 +57,7 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     public Agent get(Long id) {
-        Agent agent = agentRepository.findOneById(id);
+        Agent agent = agentRepository.findOneByIdAndStatusNot(id,AgentStatus.DELETED);
         if (agent == null) {
             throw new InvalidAgentDataException("Requested agent does not exist.", HttpStatus.NOT_FOUND);
         }
@@ -65,24 +65,24 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
-    public List<Agent> getAll(String status) {
-        List<Agent> agents = null;
-        if (status.equals("inactive")) {
-            agents = agentRepository.findAllByStatus(AgentStatus.INACTIVE);
-        } else {
-            agents = agentRepository.findAllByStatus(AgentStatus.ACTIVE);
+    public List<Agent> getAll(String status,Long id) {
+        List<Agent> agents;
+        if(status.equals("all")){
+            agents = agentRepository.findByStatusNotAndIdNot(AgentStatus.DELETED,id);
+        }else {
+            agents = agentRepository.findByStatusAndIdNot(getAgentStatus(status),id);
         }
         return agents;
     }
 
     @Override
     public void delete(Long id) {
-        Agent agent = get(id);
-        if (agent.getStatus() == AgentStatus.INACTIVE) {
-            throw new InvalidAgentDataException("This agent is in use and therefore can not be deleted.", HttpStatus.BAD_REQUEST);
+        Agent agent = agentRepository.findOneByIdAndStatusNot(id,AgentStatus.DELETED);
+        if (agent == null) {
+            throw new InvalidAgentDataException("This agent is already deleted.", HttpStatus.NOT_FOUND);
         }
-        agent.setStatus(AgentStatus.INACTIVE);
-        agentRepository.save(admin);
+        agent.setStatus(AgentStatus.DELETED);
+        agentRepository.save(agent);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class AgentServiceImpl implements AgentService {
         dbAgent.setName(agent.getName());
         dbAgent.setAddress(agent.getAddress());
         dbAgent.setPhoneNumber(agent.getPhoneNumber());
-        dbAgent.setTaxId(agent.getTaxId());
+        dbAgent.setTaxIdNumber(agent.getTaxIdNumber());
         return agentRepository.save(dbAgent);
     }
 
@@ -120,6 +120,13 @@ public class AgentServiceImpl implements AgentService {
         return environment.getProperty("LOCALHOST_URL");
     }
 
+    private AgentStatus getAgentStatus(String status) {
+        try {
+            return AgentStatus.valueOf(status.toUpperCase());
+        } catch (Exception e) {
+            throw new InvalidAgentDataException("Please choose valid agent's status", HttpStatus.NOT_FOUND);
+        }
+    }
     @Autowired
     public AgentServiceImpl(AgentRepository agentRepository, UserService userService,PasswordEncoder passwordEncoder,
                             EmailNotificationService emailNotificationService, Environment environment) {
