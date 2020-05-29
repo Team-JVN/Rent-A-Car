@@ -87,7 +87,7 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     public Agent edit(Long id, Agent agent) {
-        Agent dbAgent = get(agent.getId());
+        Agent dbAgent = get(id);
         dbAgent.setName(agent.getName());
         dbAgent.setAddress(agent.getAddress());
         dbAgent.setPhoneNumber(agent.getPhoneNumber());

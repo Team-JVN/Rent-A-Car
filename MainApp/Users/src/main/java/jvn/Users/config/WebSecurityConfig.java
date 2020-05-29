@@ -59,15 +59,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/client/{id}/reject")
                 .hasAuthority("MANAGE_CLIENTS")
 
-                .antMatchers(HttpMethod.PUT, "/api/client")
-                .hasAuthority("CLIENT_EDIT_PROFILE")
-
-                .antMatchers("/api/agent", "/api/agent/{status}", "/api/agent/{id}")
-                .hasAuthority("MANAGE_AGENTS")
-
-                .antMatchers(HttpMethod.PUT, "/api/agent")
-                .hasAuthority("AGENT_EDIT_PROFILE")
-
                 .anyRequest().authenticated().and()
 
                 .cors().and()

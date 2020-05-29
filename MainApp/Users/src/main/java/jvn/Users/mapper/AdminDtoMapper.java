@@ -13,7 +13,7 @@ public class AdminDtoMapper implements MapperInterface<Admin, AdminDTO>{
     public ModelMapper modelMapper;
 
     @Override
-    public Admin toEntity(AdminDTO dto) throws ParseException {
+    public Admin toEntity(AdminDTO dto) {
        Admin admin = modelMapper.map(dto, Admin.class);
        return admin;
     }

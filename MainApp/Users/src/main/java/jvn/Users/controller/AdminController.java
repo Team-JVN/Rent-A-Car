@@ -3,8 +3,14 @@ package jvn.Users.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Users.dto.both.AdminDTO;
+import jvn.Users.dto.both.AgentDTO;
+import jvn.Users.dto.both.ClientDTO;
 import jvn.Users.dto.response.UserDTO;
+import jvn.Users.exceptionHandler.InvalidAdminDataException;
 import jvn.Users.mapper.AdminDtoMapper;
+import jvn.Users.model.Admin;
+import jvn.Users.model.Client;
+import jvn.Users.model.User;
 import jvn.Users.service.AdminService;
 import jvn.Users.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +43,12 @@ public class AdminController {
         return new ResponseEntity<>(adminDtoMapper.toDto(adminService.create(adminDtoMapper.toEntity(adminDTO))), HttpStatus.CREATED);
     }
 
+    @GetMapping(value="/{id}")
+    public ResponseEntity<AdminDTO>get(@PathVariable("id") @Positive(message="Id must be positive.") Long id){
+        return new ResponseEntity<>(adminDtoMapper.toDto(adminService.get(id)), HttpStatus.CREATED);
+    }
     @GetMapping(value="/all/{status}")
-    public ResponseEntity<List<AdminDTO>>getAll(@PathVariable(value = "status") String status){
+    public ResponseEntity<List<AdminDTO>>getAll(@PathVariable(value = "status") @Pattern(regexp = "(?i)(all|active|inactive)$", message = "Status is not valid.")  String status){
         List<AdminDTO> list = adminService.getAll(status,userService.getLoginUser().getId()).stream().map(adminDtoMapper::toDto).
                 collect(Collectors.toList());
         return new ResponseEntity<>(list, HttpStatus.OK);
@@ -50,9 +60,22 @@ public class AdminController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping(value="/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AdminDTO> edit(@PathVariable @Positive(message = "Id must be positive.") Long id, @Valid @RequestBody AdminDTO adminDTO) throws ParseException {
-        return new ResponseEntity<>(adminDtoMapper.toDto(adminService.edit(id, adminDtoMapper.toEntity(adminDTO))), HttpStatus.OK);
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AdminDTO> edit(@Valid @RequestBody AdminDTO adminDTO) {
+        User user = userService.getLoginUser();
+        if(user instanceof Admin){
+            return new ResponseEntity<>(adminDtoMapper.toDto(adminService.edit(userService.getLoginUser().getId(), adminDtoMapper.toEntity(adminDTO))), HttpStatus.OK);
+        }
+        throw new InvalidAdminDataException("As a non-authorized user, you are not allowed to enter this page.", HttpStatus.FORBIDDEN);
+    }
+
+    @GetMapping(value="/logged-in-user")
+    public ResponseEntity<AdminDTO>get(){
+        User user = userService.getLoginUser();
+        if(user instanceof Admin){
+            return new ResponseEntity<>(adminDtoMapper.toDto((Admin)user), HttpStatus.OK);
+        }
+        throw new InvalidAdminDataException("As a non-authorized user, you are not allowed to enter this page.", HttpStatus.FORBIDDEN);
     }
 
     @Autowired

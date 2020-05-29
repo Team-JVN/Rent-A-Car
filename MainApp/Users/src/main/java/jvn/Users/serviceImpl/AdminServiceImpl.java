@@ -81,7 +81,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Admin edit(Long id, Admin admin) {
-        Admin dbAdmin = get(admin.getId());
+        Admin dbAdmin = get(id);
         dbAdmin.setName(admin.getName());
         return adminRepository.save(dbAdmin);
     }

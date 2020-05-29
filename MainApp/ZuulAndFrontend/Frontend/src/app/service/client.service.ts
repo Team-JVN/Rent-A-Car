@@ -21,7 +21,7 @@ export class ClientService {
   }
 
   public edit(client: Client): any {
-    return this.httpClient.put(this.url + '/' + client.id, client);
+    return this.httpClient.put(this.url, client);
   }
 
   public approve(id: number) {
@@ -32,6 +32,9 @@ export class ClientService {
     return this.httpClient.get(this.url);
   }
 
+  public getLoggedInUser() {
+    return this.httpClient.get(this.url + '/logged-in-user');
+  }
   public getAll(status: string) {
     return this.httpClient.get(this.url + '/all/' + status);
   }

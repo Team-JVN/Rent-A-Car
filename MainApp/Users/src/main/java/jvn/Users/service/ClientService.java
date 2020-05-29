@@ -14,8 +14,8 @@ public interface ClientService {
 
     List<Client> get(String status,Long id);
 
-//    Client edit(Long id, Client client);
-//
+    Client edit(Long id, Client client);
+
     void delete(Long id);
 
     Client activateAccount(String token) throws NoSuchAlgorithmException;

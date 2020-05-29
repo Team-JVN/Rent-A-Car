@@ -16,5 +16,5 @@ public interface AdminService {
 
     void delete(Long id);
 
-    Admin edit(Long id, Admin admin);
+    Admin edit(Long loggedInUserId,Admin admin);
 }

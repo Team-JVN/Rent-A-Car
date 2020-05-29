@@ -2,10 +2,15 @@ package jvn.Users.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jvn.Users.dto.both.AdminDTO;
 import jvn.Users.dto.both.ClientDTO;
 import jvn.Users.dto.response.UserDTO;
+import jvn.Users.enumeration.ClientStatus;
+import jvn.Users.exceptionHandler.InvalidClientDataException;
 import jvn.Users.exceptionHandler.InvalidTokenException;
 import jvn.Users.mapper.ClientDtoMapper;
+import jvn.Users.model.Client;
+import jvn.Users.model.User;
 import jvn.Users.service.ClientService;
 import jvn.Users.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +44,11 @@ public class ClientController {
         } catch (NoSuchAlgorithmException e) {
             throw new InvalidTokenException("Activation token cannot be generated. Please try again.", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping(value="/{id}")
+    public ResponseEntity<ClientDTO>get(@PathVariable("id") @Positive(message="Id must be positive.") Long id){
+        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.get(id, ClientStatus.ACTIVE)), HttpStatus.CREATED);
     }
 
     @GetMapping("/all/{status}")
@@ -103,6 +113,23 @@ public class ClientController {
         return new ResponseEntity<>(clientDtoMapper.toDto(clientService.createComments(id,status)), HttpStatus.OK);
     }
 
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ClientDTO> edit(@Valid @RequestBody ClientDTO clientDTO) {
+        User user = userService.getLoginUser();
+        if (user instanceof Client) {
+            return new ResponseEntity<>(clientDtoMapper.toDto(clientService.edit(userService.getLoginUser().getId(), clientDtoMapper.toEntity(clientDTO))), HttpStatus.OK);
+        }
+        throw new InvalidClientDataException("As a non-authorized user, you are not allowed to enter this page.", HttpStatus.FORBIDDEN);
+    }
+
+    @GetMapping(value="/logged-in-user")
+    public ResponseEntity<ClientDTO>get(){
+        User user = userService.getLoginUser();
+        if (user instanceof Client) {
+            return new ResponseEntity<>(clientDtoMapper.toDto((Client) userService.getLoginUser()), HttpStatus.OK);
+        }
+        throw new InvalidClientDataException("As a non-authorized user, you are not allowed to enter this page.", HttpStatus.FORBIDDEN);
+    }
 
     @Autowired
     public ClientController(ClientService clientService, ClientDtoMapper clientDtoMapper,UserService userService) {

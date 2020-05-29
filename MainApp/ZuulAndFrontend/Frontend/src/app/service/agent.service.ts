@@ -19,11 +19,15 @@ export class AgentService {
   }
 
   public edit(agent: Agent): any {
-    return this.httpClient.put(this.url + '/' + agent.id, agent);
+    return this.httpClient.put(this.url, agent);
   }
 
   public delete(id: number): any {
     return this.httpClient.delete(this.url + '/' + id);
+  }
+
+  public getLoggedInUser() {
+    return this.httpClient.get(this.url + '/logged-in-user');
   }
 
   public getAll(status: string) {
