@@ -79,6 +79,8 @@ import { ErrorInterceptor } from './interceptor/error.interceptor';
 import { EditRoleComponent } from './component/edit/edit-role/edit-role.component';
 import { ViewPermissionsComponent } from './component/view/view-permissions/view-permissions.component';
 import { ReplacePipe } from './util/replace.pipe';
+import { RejectRequestToRegisterComponent } from './component/reject-request-to-register/reject-request-to-register.component';
+import { ConfirmDeleteClientComponent } from './component/confirm-dialog/confirm-delete-client/confirm-delete-client.component';
 
 @NgModule({
   declarations: [
@@ -147,6 +149,8 @@ import { ReplacePipe } from './util/replace.pipe';
     ResetPasswordEnterNewPassComponent,
     EditRoleComponent,
     ViewPermissionsComponent,
+    RejectRequestToRegisterComponent,
+    ConfirmDeleteClientComponent,
   ],
   imports: [
     BrowserModule,
@@ -198,7 +202,9 @@ import { ReplacePipe } from './util/replace.pipe';
     LeaveFeedbackComponent,
     EditClientInfoComponent,
     EditAdminComponent,
-    AddModelComponent
+    AddModelComponent,
+    ConfirmDeleteClientComponent,
+    RejectRequestToRegisterComponent,
   ],
   providers: [
     {

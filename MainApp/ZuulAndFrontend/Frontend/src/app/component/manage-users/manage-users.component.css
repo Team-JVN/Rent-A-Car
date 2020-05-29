@@ -99,5 +99,9 @@ tr.element-row:not(.expanded-row):active {
 }
 
 .buttons-width {
-  width: 145px;
+  width: 210px;
+}
+
+.btn-enable{
+  color: #3f51b5;
 }

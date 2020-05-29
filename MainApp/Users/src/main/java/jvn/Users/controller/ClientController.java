@@ -44,16 +44,11 @@ public class ClientController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-//    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<ClientDTO> edit(@PathVariable @Positive(message = "Id must be positive.") Long id, @Valid @RequestBody ClientDTO clientDTO) {
-//        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.edit(id, clientDtoMapper.toEntity(clientDTO))), HttpStatus.OK);
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Void> delete(@PathVariable("id") @Positive(message = "Id must be positive.") Long id) {
-//        clientService.delete(id);
-//        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable("id") @Positive(message = "Id must be positive.") Long id) {
+        clientService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 
     @PutMapping(value = "/activate")
     public ResponseEntity<ClientDTO> activateAccount(
@@ -73,6 +68,34 @@ public class ClientController {
         } catch (NoSuchAlgorithmException e) {
             throw new InvalidTokenException("Activation token cannot be checked. Please try again.", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PutMapping(value = "/{id}/reject")
+    public ResponseEntity<ClientDTO> rejectRequestToRegister(@PathVariable @Positive(message = "Id must be positive.") Long id,
+                                                             @RequestBody @Pattern(regexp = "^[\\p{N}\\p{L}\\p{Sc}@ !()-,.:;/'\"&*=+%]+$", message = "Comment is not valid.") String reason) {
+        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.rejectRequestToRegister(id,reason)), HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/{id}/block")
+    public ResponseEntity<ClientDTO> block(@PathVariable @Positive(message = "Id must be positive.") Long id) {
+        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.block(id)), HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/{id}/unblock")
+    public ResponseEntity<ClientDTO> unblock(@PathVariable @Positive(message = "Id must be positive.") Long id) {
+        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.unblock(id)), HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/{id}/create-rent-requests/{status}")
+    public ResponseEntity<ClientDTO> createRentRequests(@PathVariable("id") @Positive(message = "Id must be positive.") Long id,
+                                                        @PathVariable("status") @Pattern(regexp = "(?i)(disable|enable)$", message = "Status is not valid.") String status) {
+        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.createRentRequests(id,status)), HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/{id}/create-comments/{status}")
+    public ResponseEntity<ClientDTO> createComments(@PathVariable("id") @Positive(message = "Id must be positive.") Long id,
+                                                        @PathVariable("status") @Pattern(regexp = "(?i)(disable|enable)$", message = "Status is not valid.") String status) {
+        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.createComments(id,status)), HttpStatus.OK);
     }
 
     @Autowired

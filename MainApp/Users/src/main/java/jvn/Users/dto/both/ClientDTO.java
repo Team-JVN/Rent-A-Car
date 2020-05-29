@@ -39,5 +39,9 @@ public class ClientDTO {
     private Integer canceledReservationCounter;
 
     private Integer rejectedCommentsCounter;
+
+    private Boolean canCreateRentRequests;
+
+    private Boolean canCreateComments;
 }
 

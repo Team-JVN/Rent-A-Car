@@ -53,12 +53,13 @@ public class ClientServiceImpl implements ClientService {
         client.setRole(role);
         client.setCanceledReservationCounter(0);
         client.setRejectedCommentsCounter(0);
+        client.setCanCreateRentRequests(true);
+        client.setCanCreateComments(true);
         if (client.getPassword() == null) {
             RandomPasswordGenerator randomPasswordGenerator = new RandomPasswordGenerator();
             String generatedPassword = randomPasswordGenerator.generatePassword();
             client.setPassword(passwordEncoder.encode(generatedPassword));
             client.setStatus(ClientStatus.NEVER_LOGGED_IN);
-
             composeAndSendEmailToChangePassword(client.getEmail(), generatedPassword);
             return clientRepository.save(client);
         } else {
@@ -70,8 +71,8 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Client get(Long id) {
-        Client client = clientRepository.findOneById(id);
+    public Client get(Long id,ClientStatus status) {
+        Client client = clientRepository.findOneByIdAndStatus(id,status);
         if (client == null) {
             throw new InvalidClientDataException("This client doesn't exist.", HttpStatus.NOT_FOUND);
         }
@@ -80,7 +81,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public List<Client> get(String status) {
-        List<Client> clients = null;
+        List<Client> clients;
         if(status.equals("all")){
             clients = clientRepository.findByStatusNot(ClientStatus.DELETED);
         }else {
@@ -102,16 +103,15 @@ public class ClientServiceImpl implements ClientService {
 //        return clientRepository.save(dbClient);
 //    }
 //
-//    @Override
-//    public void delete(Long id) {
-//        Client dbClient = get(id);
-//        if (!dbClient.getClientRentRequests().isEmpty()) {
-//            throw new InvalidClientDataException(
-//                    "This client has at least one request so you can not delete this client.", HttpStatus.BAD_REQUEST);
-//        }
-//        dbClient.setRole(null);
-//        clientRepository.deleteById(id);
-//    }
+    @Override
+    public void delete(Long id) {
+        Client client = clientRepository.findOneByIdAndStatusNot(id,ClientStatus.DELETED);
+        if (client == null) {
+            throw new InvalidClientDataException("This client is already deleted.", HttpStatus.NOT_FOUND);
+        }
+        client.setStatus(ClientStatus.DELETED);
+        clientRepository.save(client);
+    }
 
     @Override
     public Client activateAccount(String token) throws NoSuchAlgorithmException {
@@ -120,7 +120,7 @@ public class ClientServiceImpl implements ClientService {
         if (verificationToken == null) {
             throw new InvalidTokenException("This activation link is invalid or expired.", HttpStatus.BAD_REQUEST);
         }
-        Client client = get(verificationToken.getClient().getId());
+        Client client = get(verificationToken.getClient().getId(),ClientStatus.APPROVED);
         client.setStatus(ClientStatus.ACTIVE);
         verificationTokenRepository.deleteById(verificationToken.getId());
 
@@ -129,7 +129,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Client approveRequestToRegister(Long id) throws NoSuchAlgorithmException {
-        Client client = get(id);
+        Client client = get(id,ClientStatus.AWAITING);
         if(client.getStatus().equals(ClientStatus.AWAITING)){
             client.setStatus(ClientStatus.APPROVED);
             client = clientRepository.save(client);
@@ -148,6 +148,142 @@ public class ClientServiceImpl implements ClientService {
             return client;
         }
         throw new InvalidClientDataException("This client is already approved or rejected.", HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    public Client rejectRequestToRegister(Long id, String reason) {
+        Client client = get(id,ClientStatus.AWAITING);
+
+        client.setRole(null);
+        clientRepository.deleteById(id);
+        composeAndSendRejectionEmail(client.getEmail(), reason);
+
+        return client;
+    }
+
+    @Override
+    public Client block(Long id) {
+        Client dbClient = get(id,ClientStatus.ACTIVE);
+        dbClient.setStatus(ClientStatus.BLOCKED);
+        Client client = clientRepository.save(dbClient);
+        composeAndSendBlockEmail(client.getEmail());
+        return client;
+    }
+
+    @Override
+    public Client unblock(Long id) {
+        Client dbClient = get(id,ClientStatus.BLOCKED);
+        dbClient.setStatus(ClientStatus.ACTIVE);
+        Client client = clientRepository.save(dbClient);
+        composeAndSendUnblockEmail(client.getEmail());
+        return client;
+    }
+
+    @Override
+    public Client createRentRequests(Long id, String status) {
+        Client dbClient = get(id,ClientStatus.ACTIVE);
+        if(status.equals("disable")){
+            dbClient.setCanCreateRentRequests(false);
+            dbClient.setCanceledReservationCounter(0);
+            composeAndSendDisableCreatingRentRequests(dbClient.getEmail());
+        }else if(status.equals("enable")){
+            dbClient.setCanCreateRentRequests(true);
+            composeAndSendEnableCreatingRentRequests(dbClient.getEmail());
+        }else {
+            throw new InvalidTokenException("Status is not valid.Please try again.", HttpStatus.BAD_REQUEST);
+        }
+        return clientRepository.save(dbClient);
+    }
+
+    @Override
+    public Client createComments(Long id, String status) {
+        Client dbClient = get(id,ClientStatus.ACTIVE);
+        if(status.equals("disable")){
+            dbClient.setCanCreateComments(false);
+            dbClient.setRejectedCommentsCounter(0);
+            composeAndSendDisableCreatingComments(dbClient.getEmail());
+        }else if(status.equals("enable")){
+            dbClient.setCanCreateComments(true);
+            composeAndSendEnableCreatingComments(dbClient.getEmail());
+        }else {
+            throw new InvalidTokenException("Status is not valid. Please try again.", HttpStatus.BAD_REQUEST);
+        }
+        return clientRepository.save(dbClient);
+    }
+
+    private void composeAndSendDisableCreatingRentRequests(String recipientEmail ) {
+        String subject = "Forbidden creating rent requests";
+        StringBuilder sb = new StringBuilder();
+        sb.append("From now on, you are not allowed to create rent requests because you canceled your reservations many times.");
+        sb.append(System.lineSeparator());
+        sb.append(System.lineSeparator());
+        sb.append("You will receive an email when an administrator returns you that permission.");
+        sb.append(System.lineSeparator());
+        String text = sb.toString();
+        emailNotificationService.sendEmail(recipientEmail, subject, text);
+    }
+
+    private void composeAndSendEnableCreatingRentRequests(String recipientEmail ) {
+        String subject = "Allowed creating rent requests";
+        StringBuilder sb = new StringBuilder();
+        sb.append("From now on, you are allowed to create rent requests again.");
+        sb.append(System.lineSeparator());
+        String text = sb.toString();
+        emailNotificationService.sendEmail(recipientEmail, subject, text);
+    }
+
+    private void composeAndSendDisableCreatingComments(String recipientEmail ) {
+        String subject = "Forbidden creating comments";
+        StringBuilder sb = new StringBuilder();
+        sb.append("From now on, you are not allowed to create comments because your comments were rejected many times by an administrator.");
+        sb.append(System.lineSeparator());
+        sb.append(System.lineSeparator());
+        sb.append("You will receive an email when an administrator returns you that permission.");
+        sb.append(System.lineSeparator());
+        String text = sb.toString();
+        emailNotificationService.sendEmail(recipientEmail, subject, text);
+    }
+
+    private void composeAndSendEnableCreatingComments(String recipientEmail ) {
+        String subject = "Allowed creating comments";
+        StringBuilder sb = new StringBuilder();
+        sb.append("From now on, you are allowed to create comments again.");
+        sb.append(System.lineSeparator());
+        String text = sb.toString();
+        emailNotificationService.sendEmail(recipientEmail, subject, text);
+    }
+    private void composeAndSendRejectionEmail(String recipientEmail, String reason) {
+        String subject = "Request to register rejected";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Your request to register as a client is rejected by a rent a car administrator.");
+        sb.append(System.lineSeparator());
+        sb.append(System.lineSeparator());
+        sb.append("Explanation:");
+        sb.append(System.lineSeparator());
+        sb.append(reason);
+        String text = sb.toString();
+        emailNotificationService.sendEmail(recipientEmail, subject, text);
+    }
+
+    private void composeAndSendBlockEmail(String recipientEmail) {
+        String subject = "Blocked account";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Your account is blocked by a rent a car administrator.");
+        sb.append(System.lineSeparator());
+        sb.append(System.lineSeparator());
+        sb.append("Administrator will send you email when unblock you.");
+        sb.append(System.lineSeparator());
+        String text = sb.toString();
+        emailNotificationService.sendEmail(recipientEmail, subject, text);
+    }
+
+    private void composeAndSendUnblockEmail(String recipientEmail) {
+        String subject = "Unblocked account";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Your account is unblocked by a rent a car administrator.");
+        sb.append(System.lineSeparator());
+        String text = sb.toString();
+        emailNotificationService.sendEmail(recipientEmail, subject, text);
     }
 
     private ClientStatus getClientStatus(String status) {

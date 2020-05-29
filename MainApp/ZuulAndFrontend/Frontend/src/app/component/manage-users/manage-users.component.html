@@ -52,16 +52,45 @@
                 <ng-container matColumnDef="buttons">
                   <th mat-header-cell *matHeaderCellDef class="buttons-width">&nbsp;</th>
                   <td mat-cell *matCellDef="let element">
-                    <button mat-icon-button aria-label="Edit" *ngIf="element.status === 'AWAITING'" color="primary"
-                      (click)="approve(element)">
+                    <button mat-icon-button aria-label="Approve" matTooltip="Approve"
+                      *ngIf="element.status === 'AWAITING'" color="primary" (click)="approve(element)">
                       <mat-icon>check</mat-icon>
                     </button>
-                    <button mat-icon-button aria-label="Edit" color="primary" *ngIf="element.status === 'AWAITING'"
-                      (click)="reject(element)">
+                    <button mat-icon-button aria-label="Reject" matTooltip="Reject" color="primary"
+                      *ngIf="element.status === 'AWAITING'" (click)="reject(element)">
                       <mat-icon>cancel</mat-icon>
                     </button>
-                    <button mat-icon-button aria-label="Delete" color="warn" (click)="delete(element)">
+                    <button mat-icon-button aria-label="Delete" color="warn" matTooltip="Delete"
+                      (click)="delete(element)">
                       <mat-icon>delete</mat-icon>
+                    </button>
+                    <button mat-icon-button aria-label="Block" *ngIf="element.status === 'ACTIVE'" color="warn"
+                      matTooltip="Block" (click)="block(element)">
+                      <mat-icon>enhanced_encryption</mat-icon>
+                    </button>
+                    <button mat-icon-button aria-label="Unblock" *ngIf="element.status === 'BLOCKED'" color="warn"
+                      matTooltip="Unblock" (click)="unblock(element)">
+                      <mat-icon>no_encryption</mat-icon>
+                    </button>
+                    <button mat-icon-button aria-label="Disable creating rent requests"
+                      *ngIf="element.canCreateRentRequests && element.status === 'ACTIVE'" class="btn-enable"
+                      matTooltip="Disable creating rent requests" (click)="disableCreatingRentRequests(element)">
+                      <mat-icon>layers</mat-icon>
+                    </button>
+                    <button mat-icon-button aria-label="Enable creating rent requests"
+                      *ngIf="!element.canCreateRentRequests && element.status === 'ACTIVE'" color="warn"
+                      matTooltip="Enable creating rent requests" (click)="enableCreatingRentRequests(element)">
+                      <mat-icon>layers_clear</mat-icon>
+                    </button>
+                    <button mat-icon-button aria-label="Disable creating comments"
+                      *ngIf="element.canCreateComments && element.status === 'ACTIVE'" class="btn-enable"
+                      matTooltip="Disable creating comments" (click)="disableCreatingComments(element)">
+                      <mat-icon>speaker_notes</mat-icon>
+                    </button>
+                    <button mat-icon-button aria-label="Enable creating comments"
+                      *ngIf="!element.canCreateComments && element.status === 'ACTIVE'" color="warn"
+                      matTooltip="Enable creating comments" (click)="enableCreatingComments(element)">
+                      <mat-icon>speaker_notes_off</mat-icon>
                     </button>
                   </td>
                 </ng-container>

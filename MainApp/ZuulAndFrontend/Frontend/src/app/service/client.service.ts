@@ -11,6 +11,8 @@ export class ClientService {
   url = environment.baseUrl + environment.client;
   updateSuccessEmitter = new Subject<Client>();
   createSuccessEmitter = new Subject<Client>();
+  rejectSuccessEmitter = new Subject<Client>();
+  deleteSuccessEmitter = new Subject<Client>();
 
   constructor(private httpClient: HttpClient) { }
 
@@ -37,10 +39,30 @@ export class ClientService {
     return this.httpClient.delete(this.url + '/' + id);
   }
 
-  activateAccount(token: string) {
+  public block(id: number): any {
+    return this.httpClient.put(this.url + '/' + id + '/block', null);
+  }
+
+  public unblock(id: number): any {
+    return this.httpClient.put(this.url + '/' + id + '/unblock', null);
+  }
+
+  public activateAccount(token: string) {
     let params = new HttpParams();
     params = params.append('t', token);
     return this.httpClient.put(this.url + '/activate', {}, { params: params });
+  }
+
+  public reject(id: number, reason: String) {
+    return this.httpClient.put(this.url + '/' + id + '/reject', reason);
+  }
+
+  public creatingRentRequests(id: number, status: string) {
+    return this.httpClient.put(this.url + '/' + id + '/create-rent-requests/' + status, null);
+  }
+
+  public creatingComments(id: number, status: string) {
+    return this.httpClient.put(this.url + '/' + id + '/create-comments/' + status, null);
   }
 
 }
