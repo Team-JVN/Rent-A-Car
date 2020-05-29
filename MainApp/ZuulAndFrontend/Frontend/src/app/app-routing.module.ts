@@ -158,6 +158,10 @@ const routes: Routes = [
     path: "advertisements",
     component: ListAdvertisementsComponent,
   },
+  {
+    path: '**',
+    component: SearchAdvertisementsComponent
+  },
 ];
 
 @NgModule({

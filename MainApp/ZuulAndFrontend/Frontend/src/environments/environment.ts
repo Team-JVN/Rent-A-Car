@@ -23,6 +23,7 @@ export const environment = {
   rentReport: "/renting/api/rent-report",
   role: "/users/api/role",
   permission: "/users/api/permission",
+  searchAdvertisements: "/search/api/advertisement"
 };
 
 /*

@@ -1,3 +1,5 @@
+import { SearchParams } from './../../../model/searchParams';
+import { SearchService } from './../../../service/search.service';
 import { MakeService } from './../../../service/make.service';
 import { BodyStyleService } from './../../../service/bodyStyle.service';
 import { GearboxTypeService } from './../../../service/gearboxType.service';
@@ -20,6 +22,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { StarRatingComponent } from 'ng-starrating';
+import { formatDate } from '@angular/common';
 
 const DateValidator: ValidatorFn = (fg: FormGroup) => {
   const from = fg.get('dateFrom').value;
@@ -46,13 +49,14 @@ export class SearchAdvertisementsComponent implements OnInit {
   makes: Make[] = [];
   models: Model[] = [];
   status: string = 'all';
-  minRating: Number = 0.0;
+  minRating: number = 0.0;
 
   constructor(
     public router: Router,
     public dialog: MatDialog,
     private formBuilder: FormBuilder,
     private advertisementService: AdvertisementService,
+    private searchService: SearchService,
     private carService: CarService,
     private toastr: ToastrService,
     private fuelTypeService: FuelTypeService,
@@ -89,6 +93,62 @@ export class SearchAdvertisementsComponent implements OnInit {
     this.fetchFuelTypes();
     this.fetchGearboxTypes();
     this.fetchBodyStyles();
+  }
+
+  rent(element: AdvertisementWithPictures) {
+    this.dialog.open(AddRentRequestComponent, { data: element });
+  }
+
+  viewDetails(element: AdvertisementWithPictures) {
+    this.router.navigate(['/advertisement/' + element.id]);
+  }
+
+  onRate($event: { oldValue: number, newValue: number, starRating: StarRatingComponent }) {
+    this.minRating = $event.newValue;
+  }
+
+  clearSearch() {
+    this.searchForm.reset();
+    this.minRating = 0.0;
+  }
+
+  search() {
+    if (this.searchForm.invalid) {
+      this.toastr.error("Please enter valid dates and times", 'Search Advertisements');
+      return;
+    }
+
+    const dateFrom = formatDate(this.searchForm.value.dateFrom, 'yyyy-MM-dd', 'en-US')
+    const dateTimeFrom = dateFrom + ' ' + this.searchForm.value.timeFrom;
+    const dateTo = formatDate(this.searchForm.value.dateTo, 'yyyy-MM-dd', 'en-US')
+    const dateTimeTo = dateTo + ' ' + this.searchForm.value.timeTo;
+
+    const searchParams = new SearchParams(dateTimeFrom, dateTimeTo, this.searchForm.value.pickUpPoint, this.searchForm.value.make,
+      this.searchForm.value.model, this.searchForm.value.fuelType, this.searchForm.value.gearBoxType, this.searchForm.value.bodyStyle,
+      this.minRating, this.searchForm.value.minPricePerDay, this.searchForm.value.maxPricePerDay, this.searchForm.value.kidsSeats,
+      this.searchForm.value.mileageInKm, this.searchForm.value.kilometresLimit, this.searchForm.value.cdw);
+
+    this.searchService.searchAdvertisements(searchParams).subscribe(
+      (data: AdvertisementWithPictures[]) => {
+        // data.forEach(adWithPicturesDTO => {
+        //   this.getPicture(adWithPicturesDTO);
+        // });
+        this.advertisementsDataSource = new MatTableDataSource(data);
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Search Advertisements');
+      }
+    );
+  }
+
+  checkIfCanRentAdvertisement(element: AdvertisementWithPictures): boolean {
+    if (!element.dateTo) {
+      return true;
+    }
+    if (new Date(element.dateTo) > new Date()) {
+      return true;
+    }
+    return false;
   }
 
   fetchAll(status: string) {
@@ -190,34 +250,4 @@ export class SearchAdvertisementsComponent implements OnInit {
     }
   }
 
-  rent(element: AdvertisementWithPictures) {
-    this.dialog.open(AddRentRequestComponent, { data: element });
-  }
-
-  viewDetails(element: AdvertisementWithPictures) {
-    this.router.navigate(['/advertisement/' + element.id]);
-  }
-
-  onRate($event: { oldValue: number, newValue: number, starRating: StarRatingComponent }) {
-    this.minRating = $event.newValue;
-  }
-
-  clearSearch() {
-    this.searchForm.reset();
-    this.minRating = 0.0;
-  }
-
-  search() {
-
-  }
-
-  checkIfCanRentAdvertisement(element: AdvertisementWithPictures): boolean {
-    if (!element.dateTo) {
-      return true;
-    }
-    if (new Date(element.dateTo) > new Date()) {
-      return true;
-    }
-    return false;
-  }
 }
