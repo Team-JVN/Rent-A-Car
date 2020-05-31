@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "cars")
 public interface CarClient {
 
-    @GetMapping("/api/car/verify/{carId}")
-    CarWithAllInformationDTO verify(@PathVariable("carId") Long carId);
+    @GetMapping("/api/car/verify/{userId}/{carId}")
+    CarWithAllInformationDTO verify(@PathVariable("userId")Long userId, @PathVariable("carId") Long carId);
 }

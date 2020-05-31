@@ -23,4 +23,12 @@ public interface AdvertisementRepository extends JpaRepository<Advertisement, Lo
             LogicalStatus logicalStatus, LocalDate dateFrom, LocalDate dateTo, Integer minKilometresLimit, String pickUpPoint, String make, String model, String fuelType, String gearBoxType, String bodyStyle, Integer maxMileageInKm, Integer minKidsSeats, Double minRating, Double minPricePerDay, Double maxPricePerDay
     );
 
+    List<Advertisement> findAllByLogicalStatusNotAndOwner(LogicalStatus logicalStatus,Long owner);
+
+    List<Advertisement> findAllByLogicalStatusAndOwner(LogicalStatus logicalStatus,Long owner);
+
+    List<Advertisement> findAllByLogicalStatusNotAndOwnerAndDateToEqualsOrLogicalStatusNotAndOwnerAndDateToGreaterThan(LogicalStatus logicalStatus,Long id, LocalDate localDate,
+                                                                                                                       LogicalStatus logicalStatus1, Long owner, LocalDate localDateToNow);
+
+    List<Advertisement> findAllByLogicalStatusNotAndOwnerAndDateToLessThanEqual(LogicalStatus logicalStatus,Long id, LocalDate localDateToNow);
 }

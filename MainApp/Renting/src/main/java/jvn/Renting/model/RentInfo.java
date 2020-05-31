@@ -24,7 +24,7 @@ public class RentInfo {
     @Column(nullable = false)
     private LocalDateTime dateTimeTo;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Column(nullable = false)
     private Long advertisement;
 
     @Column

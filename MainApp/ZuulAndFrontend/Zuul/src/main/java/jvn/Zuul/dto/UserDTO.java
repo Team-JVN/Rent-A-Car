@@ -23,4 +23,6 @@ public class UserDTO {
     @Email(message = "Email is not valid.")
     private String email;
 
+    @NotBlank(message = "Role is empty.")
+    private String role;
 }

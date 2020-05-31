@@ -19,7 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Service
 public class AdvertisementServiceImpl implements AdvertisementService {
@@ -41,10 +40,9 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     public Advertisement create(Advertisement createAdvertisementDTO, UserDTO userDTO) {
 
         checkDate(createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
-        CarWithAllInformationDTO carDTO = carClient.verify(createAdvertisementDTO.getCar());
-        //TODO: Treba  car servisu da dodas metodu koja ce proveriti da li car postoji i da li je ulogovani korisnik vlasnik tog car-a
-        //        checkOwner(createAdvertisementDTO.getCar());
+        CarWithAllInformationDTO carDTO = carClient.verify(userDTO.getId(),createAdvertisementDTO.getCar());
         checkIfCarIsAvailable(createAdvertisementDTO.getCar(), createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
+        createAdvertisementDTO.setOwner(userDTO.getId());
         createAdvertisementDTO.setPriceList(priceListService.get(createAdvertisementDTO.getPriceList().getId(),userDTO));
         PriceList priceList = createAdvertisementDTO.getPriceList();
         if (priceList.getPricePerKm() != null && createAdvertisementDTO.getKilometresLimit() == null) {
@@ -53,10 +51,21 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         if (priceList.getPricePerKm() == null) {
             createAdvertisementDTO.setKilometresLimit(null);
         }
+
         if (priceList.getPriceForCDW() != null) {
             createAdvertisementDTO.setCDW(true);
         } else {
             createAdvertisementDTO.setCDW(false);
+        }
+
+        if(userDTO.getRole().equals("ROLE_CLIENT")){
+            createAdvertisementDTO.setDiscount(null);
+            if(createAdvertisementDTO.getDateTo() == null){
+                throw new InvalidAdvertisementDataException("You have to set date to.", HttpStatus.BAD_REQUEST);
+            }
+            checkIfClientCanCreateAdvertisement(createAdvertisementDTO);
+        }else{
+            createAdvertisementDTO.setDateTo(null);
         }
 
         Advertisement savedAdvertisement = advertisementRepository.save(createAdvertisementDTO);
@@ -66,19 +75,6 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         return savedAdvertisement;
     }
 
-    public List<Advertisement> getAll(String status) {
-//        List<Advertisement> ads = null;
-//        if (status.equals("all")) {
-//            ads = advertisementRepository.findAllByLogicalStatusNot(LogicalStatus.DELETED);
-//        } else if (status.equals("active")) {
-//            ads = advertisementRepository.findAllByLogicalStatusNotAndDateToEqualsOrLogicalStatusNotAndDateToGreaterThan(LogicalStatus.DELETED, null, LogicalStatus.DELETED,
-//                    LocalDate.now());
-//        } else {
-//            ads = advertisementRepository.findAllByLogicalStatusNotAndDateToLessThanEqual(LogicalStatus.DELETED, LocalDate.now());
-//        }
-//        return ads;
-        return null;
-    }
 
     private void checkIfCarIsAvailable(Long carId, LocalDate advertisementDateFrom, LocalDate advertisementDateTo) {
         if (!advertisementRepository.findByCarAndLogicalStatusNotAndDateToEquals(carId, LogicalStatus.DELETED, null).isEmpty()) {
@@ -105,6 +101,11 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         }
     }
 
+    private void checkIfClientCanCreateAdvertisement(Advertisement advertisement){
+        if(advertisementRepository.findByOwnerAndDateToGreaterThanEqualAndLogicalStatus(advertisement.getOwner(),LocalDate.now(),LogicalStatus.EXISTING).size() >= 3){
+            throw new InvalidAdvertisementDataException("You already have 3 active advertisements, therefore you cannot create a new one.", HttpStatus.BAD_REQUEST);
+        }
+    }
     @Autowired
     public AdvertisementServiceImpl(PriceListService priceListService, CarClient carClient, AdvertisementRepository advertisementRepository,
                                     AdvertisementDtoMapper advertisementMapper, AdvertisementMessageDtoMapper advertisementMessageMapper,

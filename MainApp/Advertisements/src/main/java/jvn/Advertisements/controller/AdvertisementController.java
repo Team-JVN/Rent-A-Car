@@ -49,14 +49,6 @@ public class AdvertisementController {
         }
     }
 
-//    @GetMapping("/all/{status}")
-//    public ResponseEntity<List<AdvertisementWithPicturesDTO>> getAll(
-//            @PathVariable(value = "status", required = false) @Pattern(regexp = "(?i)(all|active|inactive)$", message = "Status is not valid.") String status) {
-//        List<AdvertisementWithPicturesDTO> list = advertisementService.getAll(status).stream().map(adWithPicturesDtoMapper::toDto).
-//                collect(Collectors.toList());
-//        return new ResponseEntity<>(list, HttpStatus.OK);
-//    }
-
     private UserDTO stringToObject(String user) {
         try {
             return objectMapper.readValue(user, UserDTO.class);

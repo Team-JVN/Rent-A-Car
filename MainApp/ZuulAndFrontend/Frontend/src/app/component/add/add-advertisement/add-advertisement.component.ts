@@ -1,3 +1,4 @@
+import { AuthentificationService } from 'src/app/service/authentification.service';
 import { AdvertisementWithPictures } from 'src/app/model/advertisementWithPictures';
 import { Advertisement } from './../../../model/advertisement';
 import { AddPriceListComponent } from './../add-price-list/add-price-list.component';
@@ -10,11 +11,19 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { CarService } from './../../../service/car.service';
 import { ToastrService } from 'ngx-toastr';
-import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, Validators, ValidatorFn } from '@angular/forms';
 import { AddCarComponent } from '../add-car/add-car.component';
 import { AdvertisementService } from 'src/app/service/advertisement.service';
 import { formatDate, DatePipe } from '@angular/common';
 import { CreateAdvertisement } from 'src/app/model/createAdvertisement';
+const DateValidator: ValidatorFn = (fg: FormGroup) => {
+  const from = fg.get('validFrom').value;
+  const to = fg.get('validTo').value;
+  if (!from || !to) {
+    return null;
+  }
+  return from !== null && to !== null && from < to ? null : { validError: true };
+};
 
 @Component({
   selector: 'app-add-advertisement',
@@ -31,11 +40,16 @@ export class AddAdvertisementComponent implements OnInit {
   priceLists: PriceList[] = [];
   successCreatedCar: Subscription;
   successCreatedList: Subscription;
+  isClient: boolean = false;
 
   constructor(private toastr: ToastrService, private carService: CarService, private priceListService: PriceListService, private advertisementService: AdvertisementService,
-    private dialogRef: MatDialogRef<AddAdvertisementComponent>, private formBuilder: FormBuilder, public dialog: MatDialog) { }
+    private dialogRef: MatDialogRef<AddAdvertisementComponent>, private formBuilder: FormBuilder, public dialog: MatDialog, private authentificationService: AuthentificationService) { }
 
   ngOnInit() {
+    if (this.authentificationService.isClient()) {
+      this.isClient = true;
+    }
+
     this.carForm = this.formBuilder.group({
       car: new FormControl(null, Validators.required),
     })
@@ -47,8 +61,11 @@ export class AddAdvertisementComponent implements OnInit {
     this.dateForm = this.formBuilder.group({
       pickUpPoint: new FormControl(null, Validators.required),
       validFrom: new FormControl(null, Validators.required),
+      validTo: new FormControl(null),
       discount: new FormControl(null, [Validators.min(0), Validators.max(99)]),
       kilometresLimit: new FormControl(null, Validators.min(1))
+    }, {
+      validator: [DateValidator]
     })
 
     this.successCreatedCar = this.carService.createSuccessEmitter.subscribe(
@@ -111,18 +128,32 @@ export class AddAdvertisementComponent implements OnInit {
   }
 
   create() {
+    if (this.isClient && !this.dateForm.value.validTo) {
+      this.toastr.error("You have to choose date to.", 'Create Advertisement');
+      return;
+    }
+
     if (this.getSelectedPriceList().pricePerKm && !this.dateForm.value.kilometresLimit) {
       this.toastr.error("Please enter Kilometres limit", 'Create Advertisement');
       return;
     }
+
     const validFrom = formatDate(this.dateForm.value.validFrom, 'yyyy-MM-dd', 'en-US')
     var cdw = true;
     if (!this.priceListForm.value.priceList.priceForCDW) {
       cdw = false;
     }
+    var validTo: string = null;
+    if (this.dateForm.value.validTo) {
+      validTo = formatDate(this.dateForm.value.validFrom, 'yyyy-MM-dd', 'en-US');
+    }
+    var discount = this.dateForm.value.discount
+    if (this.isClient) {
+      discount = null;
+    }
 
     const advertisement = new CreateAdvertisement(this.carForm.value.car.id, this.priceListForm.value.priceList,
-      this.dateForm.value.discount, this.dateForm.value.kilometresLimit, cdw, this.dateForm.value.pickUpPoint, validFrom);
+      discount, this.dateForm.value.kilometresLimit, cdw, this.dateForm.value.pickUpPoint, validFrom, validTo);
 
     this.advertisementService.create(advertisement).subscribe(
       (data: Advertisement) => {

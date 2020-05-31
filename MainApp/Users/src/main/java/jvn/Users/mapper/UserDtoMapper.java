@@ -19,6 +19,7 @@ public class UserDtoMapper implements MapperInterface<User, UserDTO> {
     @Override
     public UserDTO toDto(User entity) {
         UserDTO dto = modelMapper.map(entity, UserDTO.class);
+        dto.setRole(entity.getRole().getName());
         return dto;
     }
 

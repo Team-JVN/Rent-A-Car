@@ -22,7 +22,7 @@ public class RentRequest {
     @Enumerated(EnumType.STRING)
     private RentRequestStatus rentRequestStatus;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Column(nullable = false)
     private Long client;
 
     @Column(nullable = false)
@@ -34,6 +34,6 @@ public class RentRequest {
     @OneToMany(mappedBy = "rentRequest", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Message> messages = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Column(nullable = false)
     private Long createdBy;
 }

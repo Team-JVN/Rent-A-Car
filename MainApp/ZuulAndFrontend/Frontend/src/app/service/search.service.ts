@@ -18,4 +18,8 @@ export class SearchService {
     public searchAdvertisements(searchParams: SearchParams) {
         return this.httpClient.post(this.url + "/search", searchParams);
     }
+
+    public getAllMy(status: string) {
+        return this.httpClient.get(this.url + '/all/' + status);
+    }
 }

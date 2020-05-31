@@ -79,10 +79,10 @@ public class CarController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @GetMapping("/verify/{carId}")
-    public ResponseEntity<CarWithAllInformationDTO> verify(@PathVariable("carId") @Positive(message = "Id must be positive.") Long carId) {
-        UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(carWithAllInformationDtoMapper.toDto(carService.get(carId,userDTO)), HttpStatus.OK);
+    @GetMapping("/verify/{userId}/{carId}")
+    public ResponseEntity<CarWithAllInformationDTO> verify(@PathVariable("userId") @Positive(message = "Id must be positive.") Long userId,
+            @PathVariable("carId") @Positive(message = "Id must be positive.") Long carId) {
+        return new ResponseEntity<>(carWithAllInformationDtoMapper.toDto(carService.get(carId,userId)), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}/picture", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})

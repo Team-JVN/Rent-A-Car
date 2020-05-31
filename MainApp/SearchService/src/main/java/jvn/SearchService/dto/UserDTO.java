@@ -1,6 +1,5 @@
-package jvn.Cars.dto.request;
+package jvn.SearchService.dto;
 
-import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,7 +14,6 @@ import javax.validation.constraints.Positive;
 @NoArgsConstructor
 public class UserDTO {
 
-    @NotNull
     @Positive(message = "Id must be positive.")
     private Long id;
 
@@ -29,5 +27,4 @@ public class UserDTO {
 
     @NotBlank(message = "Role is empty.")
     private String role;
-
 }

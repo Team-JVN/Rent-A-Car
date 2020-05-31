@@ -20,7 +20,7 @@ public class Comment {
     @Column(nullable = false)
     private String text;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Column(nullable = false)
     private Long sender;
 
     @Column(nullable = false)
