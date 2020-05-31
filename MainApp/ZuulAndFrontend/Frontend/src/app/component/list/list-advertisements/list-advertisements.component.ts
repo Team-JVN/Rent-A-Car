@@ -70,11 +70,11 @@ export class ListAdvertisementsComponent implements OnInit {
     );
   }
 
-  getPicture(adWithPicturesDTO: AdvertisementFromSearch) {
-    this.carService.getPicture(adWithPicturesDTO.car.pictures[0], adWithPicturesDTO.car.id).subscribe(
+  getPicture(advertisement: AdvertisementFromSearch) {
+    this.carService.getPicture(advertisement.car.pictures[0], advertisement.car.id).subscribe(
       (data) => {
-        this.createImageFromBlob(data, adWithPicturesDTO);
-        adWithPicturesDTO.car.isImageLoading = false;
+        this.createImageFromBlob(data, advertisement);
+        advertisement.car.isImageLoading = false;
       },
       (httpErrorResponse: HttpErrorResponse) => {
         this.toastr.error(httpErrorResponse.error.message, 'Get picture');

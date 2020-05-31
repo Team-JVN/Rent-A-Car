@@ -11,6 +11,10 @@ export class SearchService {
 
     constructor(private httpClient: HttpClient) { }
 
+    public get(id: number) {
+        return this.httpClient.get(this.url + "/" + id);
+    }
+
     public getAll() {
         return this.httpClient.get(this.url);
     }

@@ -11,10 +11,12 @@ export class AdvertisementFromSearch {
     pickUpPoint: string;
     dateFrom: string;
     dateTo: string;
+    owner: number;
+    ownerName: string;
     logicalStatus: string;
 
-    constructor(car: CarFromSearch, priceList: PriceList, discount: number, kilometresLimit: number,
-        cdw: boolean, pickUpPoint: string, dateFrom: string, logicalStatus: string, dateTo?: string, id?: number
+    constructor(car: CarFromSearch, priceList: PriceList, discount: number, kilometresLimit: number, cdw: boolean, pickUpPoint: string,
+        dateFrom: string, owner: number, ownerName: string, logicalStatus: string, dateTo?: string, id?: number
     ) {
         this.id = id;
         this.car = car;
@@ -25,6 +27,8 @@ export class AdvertisementFromSearch {
         this.dateFrom = dateFrom;
         this.pickUpPoint = pickUpPoint;
         this.dateTo = dateTo;
+        this.owner = owner;
+        this.ownerName = ownerName;
         this.logicalStatus = logicalStatus;
     }
 }

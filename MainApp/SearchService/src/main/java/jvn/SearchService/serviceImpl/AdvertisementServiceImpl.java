@@ -2,6 +2,7 @@ package jvn.SearchService.serviceImpl;
 
 import jvn.SearchService.dto.SearchParamsDTO;
 import jvn.SearchService.enumeration.LogicalStatus;
+import jvn.SearchService.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.SearchService.exceptionHandler.InvalidSearchDataException;
 import jvn.SearchService.model.Advertisement;
 import jvn.SearchService.repository.AdvertisementRepository;
@@ -21,6 +22,15 @@ import java.util.stream.Collectors;
 public class AdvertisementServiceImpl implements AdvertisementService {
 
     private AdvertisementRepository advertisementRepository;
+
+    @Override
+    public Advertisement get(Long id) {
+        Advertisement advertisement = advertisementRepository.findByIdAndLogicalStatus(id, LogicalStatus.EXISTING);
+        if (advertisement == null) {
+            throw new InvalidAdvertisementDataException("Requested advertisement does not exist.", HttpStatus.NOT_FOUND);
+        }
+        return advertisement;
+    }
 
     @Override
     public List<Advertisement> getAll() {

@@ -2,8 +2,8 @@ package jvn.Advertisements.serviceImpl;
 
 import jvn.Advertisements.client.CarClient;
 import jvn.Advertisements.dto.message.AdvertisementMessageDTO;
-import jvn.Advertisements.dto.response.CarWithAllInformationDTO;
 import jvn.Advertisements.dto.request.UserDTO;
+import jvn.Advertisements.dto.response.CarWithAllInformationDTO;
 import jvn.Advertisements.enumeration.LogicalStatus;
 import jvn.Advertisements.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.Advertisements.mapper.AdvertisementDtoMapper;
@@ -35,15 +35,14 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     private CarClient carClient;
 
-
     @Override
     public Advertisement create(Advertisement createAdvertisementDTO, UserDTO userDTO) {
 
         checkDate(createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
-        CarWithAllInformationDTO carDTO = carClient.verify(userDTO.getId(),createAdvertisementDTO.getCar());
+        CarWithAllInformationDTO carDTO = carClient.verify(userDTO.getId(), createAdvertisementDTO.getCar());
         checkIfCarIsAvailable(createAdvertisementDTO.getCar(), createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
         createAdvertisementDTO.setOwner(userDTO.getId());
-        createAdvertisementDTO.setPriceList(priceListService.get(createAdvertisementDTO.getPriceList().getId(),userDTO));
+        createAdvertisementDTO.setPriceList(priceListService.get(createAdvertisementDTO.getPriceList().getId(), userDTO));
         PriceList priceList = createAdvertisementDTO.getPriceList();
         if (priceList.getPricePerKm() != null && createAdvertisementDTO.getKilometresLimit() == null) {
             throw new InvalidAdvertisementDataException("You have to set kilometres limit.", HttpStatus.BAD_REQUEST);
@@ -58,19 +57,20 @@ public class AdvertisementServiceImpl implements AdvertisementService {
             createAdvertisementDTO.setCDW(false);
         }
 
-        if(userDTO.getRole().equals("ROLE_CLIENT")){
+        if (userDTO.getRole().equals("ROLE_CLIENT")) {
             createAdvertisementDTO.setDiscount(null);
-            if(createAdvertisementDTO.getDateTo() == null){
+            if (createAdvertisementDTO.getDateTo() == null) {
                 throw new InvalidAdvertisementDataException("You have to set date to.", HttpStatus.BAD_REQUEST);
             }
             checkIfClientCanCreateAdvertisement(createAdvertisementDTO);
-        }else{
+        } else {
             createAdvertisementDTO.setDateTo(null);
         }
 
         Advertisement savedAdvertisement = advertisementRepository.save(createAdvertisementDTO);
         AdvertisementMessageDTO advertisementMessageDTO = advertisementMessageMapper.toDto(savedAdvertisement);
         advertisementMessageDTO.setCar(carDTO);
+        advertisementMessageDTO.setOwnerName(userDTO.getName());
         advertisementProducer.send(advertisementMessageDTO);
         return savedAdvertisement;
     }
@@ -101,11 +101,12 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         }
     }
 
-    private void checkIfClientCanCreateAdvertisement(Advertisement advertisement){
-        if(advertisementRepository.findByOwnerAndDateToGreaterThanEqualAndLogicalStatus(advertisement.getOwner(),LocalDate.now(),LogicalStatus.EXISTING).size() >= 3){
+    private void checkIfClientCanCreateAdvertisement(Advertisement advertisement) {
+        if (advertisementRepository.findByOwnerAndDateToGreaterThanEqualAndLogicalStatus(advertisement.getOwner(), LocalDate.now(), LogicalStatus.EXISTING).size() >= 3) {
             throw new InvalidAdvertisementDataException("You already have 3 active advertisements, therefore you cannot create a new one.", HttpStatus.BAD_REQUEST);
         }
     }
+
     @Autowired
     public AdvertisementServiceImpl(PriceListService priceListService, CarClient carClient, AdvertisementRepository advertisementRepository,
                                     AdvertisementDtoMapper advertisementMapper, AdvertisementMessageDtoMapper advertisementMessageMapper,

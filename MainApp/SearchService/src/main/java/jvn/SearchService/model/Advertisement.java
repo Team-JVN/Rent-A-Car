@@ -44,6 +44,9 @@ public class Advertisement {
     @Column
     private String pickUpPoint;
 
-    @Column
+    @Column(nullable = false)
     private Long owner;
+
+    @Column(nullable = false)
+    private String ownerName;
 }
