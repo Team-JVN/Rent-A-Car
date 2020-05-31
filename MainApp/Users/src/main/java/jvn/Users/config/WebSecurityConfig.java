@@ -47,18 +47,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .authorizeRequests().antMatchers("/api/auth/**").permitAll()
 
-                .antMatchers("/api/admin", "/api/admin/{status}",
-                        "/api/admin/{id}")
-                .hasAuthority("MANAGE_ADMINS")
-
-                .antMatchers(HttpMethod.PUT, "/api/admin")
-                .hasAuthority("ADMIN_EDIT_PROFILE")
-
-                .antMatchers("/api/client", "/api/client/{status}",
-                        "/api/client/{id}", "/api/client/{id}/block","/api/client/{id}/approve",
-                        "/api/client/{id}/reject")
-                .hasAuthority("MANAGE_CLIENTS")
-
                 .anyRequest().authenticated().and()
 
                 .cors().and()
@@ -66,7 +54,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(new TokenAuthenticationFilter(jwtUserDetailsService.tokenUtils,
                         jwtUserDetailsService), BasicAuthenticationFilter.class);
 //                                .headers().contentSecurityPolicy(
-//                                                "default-src 'self' https://localhost:8090/;img-src 'self' blob: data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-eval'; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;");
+//                                                "default-src 'self' https://localhost:8080/;img-src 'self' blob: data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-eval'; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;");
         //  http.addFilterAfter(new CsrfTokenResponseHeaderBindingFilter(), CsrfFilter.class);
         // http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
         http.csrf().disable();

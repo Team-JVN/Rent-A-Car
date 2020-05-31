@@ -3,26 +3,40 @@
     [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="(isHandset$ | async) === false">
     <mat-toolbar>Menu</mat-toolbar>
     <mat-nav-list>
+      <mat-nav-list *ngIf="!isLoggedIn()">
+        <a mat-list-item routerLink="/client/registration">Registration</a>
+        <a mat-list-item routerLink="/login">Login</a>
+        <a mat-list-item routerLink="/change-password">Change Password</a>
+      </mat-nav-list>
+      <mat-nav-list *ngIf="isLoggedIn()">
+        <a mat-list-item routerLink="/client/renting-cart">Renting Cart</a>
+        <a mat-list-item routerLink="/advertisements">Advertisements</a>
+        <a mat-list-item routerLink="/client-rent-requests">Clients' Rent Requests</a>
+        <a mat-list-item routerLink="/cars">Cars</a>
+        <a mat-list-item routerLink="/statistics">Statistics</a>
+        <a mat-list-item routerLink="/price-lists">Price Lists</a>
+        <a mat-list-item routerLink="/clients">Clients</a>
+        <a mat-list-item routerLink="/body-styles">Body Styles</a>
+        <a mat-list-item routerLink="/gearbox-types">Gearbox Types</a>
+        <a mat-list-item routerLink="/fuel-types">Fuel Types</a>
+        <a mat-list-item routerLink="/makes">Makes</a>
+        <a mat-list-item routerLink="/manage-users">Manage Users</a>
+        <a mat-list-item routerLink="/role">Manage permissions</a>
+      </mat-nav-list>
       <a mat-list-item routerLink="/search-advertisements">Search Advertisements</a>
-      <a mat-list-item routerLink="/client/renting-cart">Renting Cart</a>
-      <a mat-list-item routerLink="/client/registration">Registration</a>
-      <a mat-list-item routerLink="/login">Login</a>
-      <a mat-list-item routerLink="/change-password">Change Password</a>
-      <a mat-list-item routerLink="/advertisements">Advertisements</a>
-      <a mat-list-item routerLink="/client-rent-requests">Clients' Rent Requests</a>
-      <a mat-list-item routerLink="/cars">Cars</a>
-      <a mat-list-item routerLink="/statistics">Statistics</a>
-      <a mat-list-item routerLink="/price-lists">Price Lists</a>
-      <a mat-list-item routerLink="/clients">Clients</a>
-      <a mat-list-item routerLink="/body-styles">Body Styles</a>
-      <a mat-list-item routerLink="/gearbox-types">Gearbox Types</a>
-      <a mat-list-item routerLink="/fuel-types">Fuel Types</a>
-      <a mat-list-item routerLink="/makes">Makes</a>
-      <a mat-list-item routerLink="/manage-users">Manage Users</a>
-      <a mat-list-item routerLink="/edit-client-info">Edit Profile Client</a>
-      <a mat-list-item routerLink="/edit-agent-info">Edit Profile Agent</a>
-      <a mat-list-item routerLink="/edit-admin-info">Edit Profile Admin</a>
-      <a mat-list-item routerLink="/role">Manage permissions</a>
+
+      <mat-nav-list *ngIf="isLoggedIn() && this.authentificationService.isAgent()">
+        <a mat-list-item routerLink="/edit-agent-info">Edit Profile Agent</a>
+      </mat-nav-list>
+      <mat-nav-list *ngIf="isLoggedIn() && this.authentificationService.isAdmin()">
+        <a mat-list-item routerLink="/edit-admin-info">Edit Profile Admin</a>
+      </mat-nav-list>
+      <mat-nav-list *ngIf="isLoggedIn() && this.authentificationService.isClient()">
+        <a mat-list-item routerLink="/edit-client-info">Edit Profile Client</a>
+      </mat-nav-list>
+      <mat-nav-list *ngIf="isLoggedIn()">
+        <a mat-list-item (click)="onLogout()">Log out</a>
+      </mat-nav-list>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>

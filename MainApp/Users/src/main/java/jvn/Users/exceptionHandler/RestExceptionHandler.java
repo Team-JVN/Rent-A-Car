@@ -60,7 +60,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(InvalidAdminDataException.class)
     protected ResponseEntity<Object> handleInvalidAdminDataException(InvalidAdminDataException ex) {
-        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+        ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
         return buildResponseEntity(error);
     }
 

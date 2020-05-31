@@ -28,7 +28,7 @@
       </mat-form-field>
 
       <mat-form-field class="form-full-width mt-3">
-        <input matInput placeholder="Phone number" type="password" formControlName="phoneNumber" />
+        <input matInput placeholder="Phone number" formControlName="phoneNumber" />
         <mat-error *ngIf="
             editForm.get('phoneNumber').errors &&
             editForm.get('phoneNumber').errors['required']
