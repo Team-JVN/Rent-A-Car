@@ -30,4 +30,10 @@ public class Client extends User {
 
     @Column
     private Integer rejectedCommentsCounter;
+
+    @Column
+    private Boolean canCreateRentRequests;
+
+    @Column
+    private Boolean canCreateComments;
 }

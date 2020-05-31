@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
+import { AuthentificationService } from 'src/app/service/authentification.service';
 
 @Component({
   selector: 'app-header',
@@ -13,7 +14,8 @@ export class HeaderComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private breakpointObserver: BreakpointObserver
+    private breakpointObserver: BreakpointObserver,
+    private authentificationService: AuthentificationService
   ) { }
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
@@ -26,4 +28,12 @@ export class HeaderComponent implements OnInit {
 
   }
 
+  isLoggedIn() {
+    return this.authentificationService.isLoggedIn();
+  }
+
+  onLogout() {
+    this.authentificationService.logout();
+    this.router.navigate(['/login']);
+  }
 }

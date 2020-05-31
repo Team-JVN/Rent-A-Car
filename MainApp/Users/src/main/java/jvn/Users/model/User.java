@@ -44,7 +44,6 @@ public abstract class User implements UserDetails {
     @Column
     private boolean enabled;
 
-
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Role role;
 

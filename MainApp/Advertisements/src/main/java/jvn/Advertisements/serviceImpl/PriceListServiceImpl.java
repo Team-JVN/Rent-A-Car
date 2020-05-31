@@ -1,5 +1,6 @@
 package jvn.Advertisements.serviceImpl;
 
+import jvn.Advertisements.dto.request.UserDTO;
 import jvn.Advertisements.enumeration.LogicalStatus;
 import jvn.Advertisements.exceptionHandler.InvalidPriceListDataException;
 import jvn.Advertisements.model.PriceList;
@@ -22,8 +23,8 @@ public class PriceListServiceImpl implements PriceListService {
     }
 
     @Override
-    public PriceList get(Long id) {
-        PriceList priceList = priceListRepository.findOneByIdAndStatusNot(id, LogicalStatus.DELETED);
+    public PriceList get(Long id, UserDTO userDTO) {
+        PriceList priceList = priceListRepository.findOneByIdAndStatusNotAndOwnerId(id, LogicalStatus.DELETED,userDTO.getId());
         if (priceList == null) {
             throw new InvalidPriceListDataException("Requested price list does not exist.", HttpStatus.NOT_FOUND);
         }
@@ -31,18 +32,19 @@ public class PriceListServiceImpl implements PriceListService {
     }
 
     @Override
-    public List<PriceList> getAll() {
-        return priceListRepository.findByStatus(LogicalStatus.EXISTING);
+    public List<PriceList> getAll( UserDTO userDTO) {
+        return priceListRepository.findByStatusAndOwnerId(LogicalStatus.EXISTING,userDTO.getId());
     }
 
     @Override
-    public PriceList create(PriceList priceList) {
+    public PriceList create(PriceList priceList, UserDTO userDTO) {
+        priceList.setOwnerId(userDTO.getId());
         return priceListRepository.save(priceList);
     }
 
     @Override
-    public PriceList edit(Long id, PriceList priceList) {
-        PriceList dbPriceList = get(id);
+    public PriceList edit(Long id, PriceList priceList,UserDTO userDTO) {
+        PriceList dbPriceList = get(id,userDTO);
         dbPriceList.setPriceForCDW(priceList.getPriceForCDW());
         dbPriceList.setPricePerDay(priceList.getPricePerDay());
         dbPriceList.setPricePerKm(priceList.getPricePerKm());
@@ -50,8 +52,8 @@ public class PriceListServiceImpl implements PriceListService {
     }
 
     @Override
-    public void delete(Long id) {
-        PriceList priceList = get(id);
+    public void delete(Long id,UserDTO userDTO) {
+        PriceList priceList = get(id,userDTO);
 
         if (priceListRepository.findByIdAndStatusNotAndAdvertisementsLogicalStatusNot(id, LogicalStatus.DELETED, LogicalStatus.DELETED) != null) {
             throw new InvalidPriceListDataException("Price list is used in advertisements, so it can't be deleted.", HttpStatus.BAD_REQUEST);

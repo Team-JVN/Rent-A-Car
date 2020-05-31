@@ -27,12 +27,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(error);
     }
 
-    @ExceptionHandler(InvalidAdminDataException.class)
-    protected ResponseEntity<Object> handleInvalidAdminDataException(InvalidTokenException ex) {
-        ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
-        return buildResponseEntity(error);
-    }
-
     @ExceptionHandler(InvalidRoleDataException.class)
     protected ResponseEntity<Object> handleInvalidRoleDataException(InvalidRoleDataException ex) {
         ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
@@ -52,9 +46,21 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(error);
     }
 
+    @ExceptionHandler(InvalidAgentDataException.class)
+    protected ResponseEntity<Object> handleInvalidAgentDataException(InvalidAgentDataException ex) {
+        ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
+        return buildResponseEntity(error);
+    }
+
     @ExceptionHandler(UsernameNotFoundException.class)
     protected ResponseEntity<Object> handleUsernameNotFoundException(UsernameNotFoundException ex) {
         ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+        return buildResponseEntity(error);
+    }
+
+    @ExceptionHandler(InvalidAdminDataException.class)
+    protected ResponseEntity<Object> handleInvalidAdminDataException(InvalidAdminDataException ex) {
+        ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
         return buildResponseEntity(error);
     }
 

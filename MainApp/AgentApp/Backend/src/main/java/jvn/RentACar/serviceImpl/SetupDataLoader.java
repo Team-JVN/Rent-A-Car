@@ -55,7 +55,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
         Permission createRentRequest = createPermissionIfNotFound("CREATE_RENT_REQUEST");
         Permission getMyRentRequests = createPermissionIfNotFound("GET_MY_RENT_REQUESTS");
-        Permission getReceivedRentRequest = createPermissionIfNotFound("GET_RECEIVED_RENT_REQUEST");
+        Permission getReceivedRentRequest = createPermissionIfNotFound("GET_RECEIVED_RENT_REQUESTS");
         Permission deleteRentRequest = createPermissionIfNotFound("DELETE_RENT_REQUEST");
         Permission changeRentRequestStatus = createPermissionIfNotFound("CHANGE_RENT_REQUEST_STATUS");
 

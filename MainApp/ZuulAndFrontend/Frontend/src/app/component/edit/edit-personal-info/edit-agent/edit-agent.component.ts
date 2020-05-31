@@ -1,3 +1,7 @@
+import { HttpErrorResponse } from '@angular/common/http';
+import { ToastrService } from 'ngx-toastr';
+import { AgentService } from 'src/app/service/agent.service';
+import { Agent } from './../../../../model/agent';
 import { Component, OnInit } from "@angular/core";
 import {
   FormGroup,
@@ -13,13 +17,13 @@ import {
 })
 export class EditAgentComponent implements OnInit {
   editForm: FormGroup;
+  loggedInAgent: Agent = new Agent("", "", "", "", 0);
 
-  constructor(private formBuilder: FormBuilder) {}
+  constructor(private formBuilder: FormBuilder, private agentService: AgentService, private toastr: ToastrService) { }
 
   ngOnInit() {
     this.editForm = this.formBuilder.group({
-      firstName: new FormControl(null, Validators.required),
-      lastName: new FormControl(null, Validators.required),
+      name: new FormControl(null, Validators.required),
       address: new FormControl(null, Validators.required),
       phoneNumber: new FormControl(null, [
         Validators.required,
@@ -27,7 +31,37 @@ export class EditAgentComponent implements OnInit {
         Validators.maxLength(10),
         Validators.pattern("0[0-9]+"),
       ]),
+      taxIdNumber: new FormControl(null, [Validators.required, Validators.pattern("[1-9][0-9]+"), Validators.maxLength(9), Validators.minLength(9)])
     });
+
+    this.agentService.getLoggedInUser().subscribe(
+      (responseData: Agent) => {
+        this.loggedInAgent = responseData;
+
+        this.editForm.patchValue(
+          {
+            'name': this.loggedInAgent.name,
+            'address': this.loggedInAgent.address,
+            'phoneNumber': this.loggedInAgent.phoneNumber,
+            'taxIdNumber': this.loggedInAgent.taxIdNumber
+          }
+        );
+      },
+      () => {
+        this.toastr.error('Something goes wrong. Please try again.', 'Show clients');
+      }
+    );
   }
-  editAgent() {}
+
+  editAgent() {
+    this.agentService.edit(new Agent(this.editForm.value.name, this.loggedInAgent.email, this.editForm.value.address, this.editForm.value.phoneNumber,
+      this.editForm.value.taxIdNumber)).subscribe(
+        () => {
+          this.toastr.success("Success.", "Edit personal info");
+        },
+        (httpErrorResponse: HttpErrorResponse) => {
+          this.toastr.error(httpErrorResponse.error.message, "Edit personal info");
+        }
+      );
+  }
 }

@@ -3,6 +3,7 @@ package jvn.Advertisements.serviceImpl;
 import jvn.Advertisements.client.CarClient;
 import jvn.Advertisements.dto.message.AdvertisementMessageDTO;
 import jvn.Advertisements.dto.response.CarWithAllInformationDTO;
+import jvn.Advertisements.dto.request.UserDTO;
 import jvn.Advertisements.enumeration.LogicalStatus;
 import jvn.Advertisements.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.Advertisements.mapper.AdvertisementDtoMapper;
@@ -35,15 +36,16 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     private CarClient carClient;
 
+
     @Override
-    public Advertisement create(Advertisement createAdvertisementDTO) {
+    public Advertisement create(Advertisement createAdvertisementDTO, UserDTO userDTO) {
 
         checkDate(createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
         CarWithAllInformationDTO carDTO = carClient.verify(createAdvertisementDTO.getCar());
         //TODO: Treba  car servisu da dodas metodu koja ce proveriti da li car postoji i da li je ulogovani korisnik vlasnik tog car-a
         //        checkOwner(createAdvertisementDTO.getCar());
         checkIfCarIsAvailable(createAdvertisementDTO.getCar(), createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
-        createAdvertisementDTO.setPriceList(priceListService.get(createAdvertisementDTO.getPriceList().getId()));
+        createAdvertisementDTO.setPriceList(priceListService.get(createAdvertisementDTO.getPriceList().getId(),userDTO));
         PriceList priceList = createAdvertisementDTO.getPriceList();
         if (priceList.getPricePerKm() != null && createAdvertisementDTO.getKilometresLimit() == null) {
             throw new InvalidAdvertisementDataException("You have to set kilometres limit.", HttpStatus.BAD_REQUEST);
