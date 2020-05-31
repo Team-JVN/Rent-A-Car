@@ -49,9 +49,14 @@ export class SearchAdvertisementsComponent implements OnInit {
   bodyStyles: BodyStyle[] = [];
   makes: Make[] = [];
   models: Model[] = [];
-  status: string = 'all';
+
   minRating: number = 0.0;
   minDate: Date;
+  allMakes: Make;
+  allModels: Model;
+  allFuelTypes: FuelType;
+  allGearboxTypes: GearBoxType;
+  allBodyStyles: BodyStyle;
 
   constructor(
     public router: Router,
@@ -71,6 +76,12 @@ export class SearchAdvertisementsComponent implements OnInit {
   ngOnInit() {
     this.minDate = new Date();
     this.minDate.setDate(this.minDate.getDate() + 2);
+
+    this.allMakes = new Make("- All -");
+    this.allModels = new Model("- All -");
+    this.allFuelTypes = new FuelType("- All -");
+    this.allGearboxTypes = new GearBoxType("- All -");
+    this.allBodyStyles = new BodyStyle("- All -");
 
     this.searchForm = this.formBuilder.group({
       dateFrom: new FormControl(null, Validators.required),
@@ -92,7 +103,6 @@ export class SearchAdvertisementsComponent implements OnInit {
     }, {
       validator: [DateValidator]
     })
-    this.fetchAll();
 
     this.fetchMakes();
     this.fetchFuelTypes();
@@ -130,10 +140,15 @@ export class SearchAdvertisementsComponent implements OnInit {
     const dateTo = formatDate(this.searchForm.value.dateTo, 'yyyy-MM-dd', 'en-US')
     const dateTimeTo = dateTo + ' ' + this.searchForm.value.timeTo;
 
-    const searchParams = new SearchParams(dateTimeFrom, dateTimeTo, this.searchForm.value.pickUpPoint, this.searchForm.value.make.name,
-      this.searchForm.value.model.name, this.searchForm.value.fuelType.name, this.searchForm.value.gearBoxType.name,
-      this.searchForm.value.bodyStyle.name, this.minRating, this.searchForm.value.minPricePerDay, this.searchForm.value.maxPricePerDay,
-      this.searchForm.value.kidsSeats, this.searchForm.value.mileageInKm, this.searchForm.value.kilometresLimit, this.searchForm.value.cdw);
+    const make = this.searchForm.value.make && this.searchForm.value.make !== this.allMakes ? this.searchForm.value.make.name : null;
+    const model = this.searchForm.value.model && this.searchForm.value.model !== this.allModels ? this.searchForm.value.model.name : null;
+    const fuelType = this.searchForm.value.fuelType && this.searchForm.value.fuelType !== this.allFuelTypes ? this.searchForm.value.fuelType.name : null;
+    const gearBoxType = this.searchForm.value.gearBoxType && this.searchForm.value.gearBoxType !== this.allGearboxTypes ? this.searchForm.value.gearBoxType.name : null;
+    const bodyStyle = this.searchForm.value.bodyStyle && this.searchForm.value.bodyStyle !== this.allBodyStyles ? this.searchForm.value.bodyStyle.name : null;
+
+    const searchParams = new SearchParams(dateTimeFrom, dateTimeTo, this.searchForm.value.pickUpPoint, make, model, fuelType, gearBoxType, bodyStyle,
+      this.minRating, this.searchForm.value.minPricePerDay, this.searchForm.value.maxPricePerDay, this.searchForm.value.kidsSeats,
+      this.searchForm.value.mileageInKm, this.searchForm.value.kilometresLimit, this.searchForm.value.cdw);
 
     this.searchService.searchAdvertisements(searchParams).subscribe(
       (data: AdvertisementFromSearch[]) => {
@@ -142,8 +157,8 @@ export class SearchAdvertisementsComponent implements OnInit {
         });
         this.advertisementsDataSource = new MatTableDataSource(data);
       },
-      (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Search Advertisements');
+      () => {
+        this.toastr.error("Search did not succeed. Please try again.", 'Search Advertisements');
       }
     );
   }
@@ -157,22 +172,6 @@ export class SearchAdvertisementsComponent implements OnInit {
       return true;
     }
     return false;
-  }
-
-  fetchAll() {
-    this.searchService.getAll().subscribe(
-      (data: AdvertisementFromSearch[]) => {
-        data.forEach(adFromSearch => {
-          this.getPicture(adFromSearch);
-        });
-        this.advertisementsDataSource = new MatTableDataSource(data);
-      },
-      (httpErrorResponse: HttpErrorResponse) => {
-        const data: AdvertisementFromSearch[] = []
-        this.advertisementsDataSource = new MatTableDataSource(data)
-        this.toastr.error(httpErrorResponse.error.message, 'Show Advertisements');
-      }
-    );
   }
 
   fetchBodyStyles() {
