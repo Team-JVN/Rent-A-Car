@@ -13,7 +13,6 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AddAdvertisementComponent } from '../../add/add-advertisement/add-advertisement.component';
 import { MatTableDataSource } from '@angular/material/table';
-import { EditAdvertisementComponent } from '../../edit/edit-advertisement/edit-advertisement.component';
 import { AdvertisementFromSearch } from 'src/app/model/advertisementFromSearch';
 import { SearchService } from 'src/app/service/search.service';
 
@@ -29,15 +28,8 @@ export class ListAdvertisementsComponent implements OnInit {
   createSuccess: Subscription;
   status: string = 'all';
 
-  constructor(
-    public router: Router,
-    public dialog: MatDialog,
-    private advertisementService: AdvertisementService,
-    private carService: CarService,
-    private toastr: ToastrService,
-    private rentRequestService: RentRequestService,
-    private searchService: SearchService
-  ) { }
+  constructor(public router: Router, public dialog: MatDialog, private advertisementService: AdvertisementService, private carService: CarService,
+    private toastr: ToastrService, private rentRequestService: RentRequestService, private searchService: SearchService) { }
 
   ngOnInit() {
     this.fetchAll('all');

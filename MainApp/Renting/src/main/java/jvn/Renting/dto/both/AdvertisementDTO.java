@@ -1,6 +1,6 @@
-package jvn.Advertisements.dto.response;
+package jvn.Renting.dto.both;
 
-import jvn.Advertisements.dto.both.PriceListDTO;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
