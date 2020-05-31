@@ -97,3 +97,11 @@ tr.element-row:not(.expanded-row):active {
 .filter-span {
   margin-right: 20px;
 }
+
+.buttons-width {
+  width: 210px;
+}
+
+.btn-enable{
+  color: #3f51b5;
+}

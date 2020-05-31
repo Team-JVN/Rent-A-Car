@@ -18,10 +18,7 @@ RUN ["mvn", "package", "-DskipTests"]
 
 
 FROM openjdk:8-jdk-alpine
-EXPOSE 8080
 WORKDIR /app
-
 COPY --from=appServer /usr/src/agentapp/target/Rent-A-Car-0.0.1-SNAPSHOT.jar  ./
-
 
 CMD ["java", "-jar", "Rent-A-Car-0.0.1-SNAPSHOT.jar"]

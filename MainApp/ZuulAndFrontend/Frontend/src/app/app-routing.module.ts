@@ -27,11 +27,19 @@ import { ManageUsersComponent } from "./component/manage-users/manage-users.comp
 import { EditClientInfoComponent } from "./component/edit/edit-personal-info/edit-client/edit-client-info.component";
 import { EditAgentComponent } from "./component/edit/edit-personal-info/edit-agent/edit-agent.component";
 import { EditAdminComponent } from "./component/edit/edit-personal-info/edit-admin/edit-admin.component";
+import { ResetPasswordEnterNewPassComponent } from './component/authentification/reset-password-enter-new-pass/reset-password-enter-new-pass.component';
+import { ResetPasswordEnterEmailComponent } from './component/authentification/reset-password-enter-email/reset-password-enter-email.component';
+import { EditRoleComponent } from './component/edit/edit-role/edit-role.component';
+import { ActivateAccountComponent } from './component/authentification/activate-account/activate-account.component';
 
 const routes: Routes = [
   {
     path: "advertisement/:id",
     component: AdvertisementDetailsComponent,
+  },
+  {
+    path: "activate-account",
+    component: ActivateAccountComponent,
   },
   {
     path: "body-styles",
@@ -76,6 +84,14 @@ const routes: Routes = [
   {
     path: 'client-rent-request/:id',
     component: ClientRentRequestDetailsComponent
+  },
+  {
+    path: "reset-password",
+    component: ResetPasswordEnterNewPassComponent,
+  },
+  {
+    path: "forgot-password",
+    component: ResetPasswordEnterEmailComponent,
   },
   {
     path: "login",
@@ -129,6 +145,11 @@ const routes: Routes = [
     path: "models/:id",
     component: ListModelsComponent,
   },
+  /** MANAGE ROLES */
+  {
+    path: "role",
+    component: EditRoleComponent,
+  },
   //******************* ERROR PAGES ************************
   {
     path: "error/non-authenticated",
@@ -139,7 +160,7 @@ const routes: Routes = [
     component: NonAuthorizedErrorPageComponent,
   },
   {
-    path: "",
+    path: "advertisements",
     component: ListAdvertisementsComponent,
   },
 ];

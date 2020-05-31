@@ -13,6 +13,7 @@ import { AuthentificationService } from 'src/app/service/authentification.servic
 })
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
+  hide = true;
 
   constructor(private toastr: ToastrService, private authentificationService: AuthentificationService,
     private formBuilder: FormBuilder, private router: Router) { }
@@ -20,7 +21,7 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
     this.loginForm = this.formBuilder.group({
       email: new FormControl(null, [Validators.required, Validators.email]),
-      password: new FormControl(null, [Validators.required, Validators.minLength(8), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$')])
+      password: new FormControl(null, [Validators.required, Validators.minLength(8), Validators.maxLength(64), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,64}$')])
     })
   }
 
@@ -32,19 +33,23 @@ export class LoginComponent implements OnInit {
         this.redirectToHomePage();
       },
       (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Login');
+        if (httpErrorResponse.status == 406) {
+          this.toastr.info("You have to change received generic password on first attempt to login.", 'Login');
+          this.router.navigate(['/change-password']);
+        } else {
+          this.toastr.error(httpErrorResponse.error.message, 'Login');
+        }
       }
     );
   }
 
   redirectToHomePage() {
     if (this.authentificationService.isAgent()) {
-      console.log("AGENT HAJ")
-      this.router.navigate(['']);
+      this.router.navigate(['/advertisements']);
     } else if (this.authentificationService.isClient()) {
       this.router.navigate(['/search-advertisements']);
     } else if (this.authentificationService.isAdmin()) {
-      this.router.navigate(['']);
+      this.router.navigate(['/advertisements']);
     } else {
       this.authentificationService.logout();
     }
