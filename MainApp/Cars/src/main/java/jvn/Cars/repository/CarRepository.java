@@ -9,9 +9,9 @@ import java.util.List;
 
 @Repository
 public interface CarRepository extends JpaRepository<Car, Long> {
-    List<Car> findAllByLogicalStatusNot(LogicalStatus logicalStatus);
+    List<Car> findAllByLogicalStatusNotAndOwner(LogicalStatus logicalStatus,Long owner);
 
-    Car findOneByIdAndLogicalStatusNot(Long id, LogicalStatus logicalStatus);
+    Car findOneByIdAndLogicalStatusNotAndOwner(Long id, LogicalStatus logicalStatus,Long owner);
 
 //    Car findByIdAndAdvertisementsLogicalStatusAndAdvertisementsDateToEquals(Long id, LogicalStatus logicalStatus, LocalDate date);
 

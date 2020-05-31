@@ -1,9 +1,11 @@
 package jvn.Cars.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Cars.dto.both.CarDTO;
 import jvn.Cars.dto.request.CarEditDTO;
 import jvn.Cars.dto.request.CreateCarDTO;
+import jvn.Cars.dto.request.UserDTO;
 import jvn.Cars.dto.response.CarWithAllInformationDTO;
 import jvn.Cars.dto.response.CarWithPicturesDTO;
 import jvn.Cars.exceptionHandler.InvalidCarDataException;
@@ -21,6 +23,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -47,6 +50,10 @@ public class CarController {
 
     private CarWithAllInformationDtoMapper carWithAllInformationDtoMapper;
 
+    private HttpServletRequest request;
+
+    private ObjectMapper objectMapper;
+
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CarDTO> create(@RequestParam("carData") String jsonString, @RequestParam("files") List<MultipartFile> multipartFiles) {
 
@@ -58,21 +65,24 @@ public class CarController {
         } catch (IOException e) {
             throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
-        CarDTO carDTO = carMapper.toDto(carService.create(createCarDtoMapper.toEntity(createCarDTO), multipartFiles));
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        CarDTO carDTO = carMapper.toDto(carService.create(createCarDtoMapper.toEntity(createCarDTO), multipartFiles,userDTO));
         return new ResponseEntity<>(carDTO, HttpStatus.CREATED);
     }
 
 
     @GetMapping
     public ResponseEntity<List<CarWithPicturesDTO>> get() {
-        List<CarWithPicturesDTO> list = carService.get().stream().map(carWithPicturesDtoMapper::toDto).
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        List<CarWithPicturesDTO> list = carService.get(userDTO).stream().map(carWithPicturesDtoMapper::toDto).
                 collect(Collectors.toList());
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @GetMapping("/verify/{carId}")
-    public ResponseEntity<CarWithAllInformationDTO> verify(@PathVariable("carId") @Positive(message = "Id must be positive.") Long carId) {
-        return new ResponseEntity<>(carWithAllInformationDtoMapper.toDto(carService.get(carId)), HttpStatus.OK);
+    @GetMapping("/verify/{userId}/{carId}")
+    public ResponseEntity<CarWithAllInformationDTO> verify(@PathVariable("userId") @Positive(message = "Id must be positive.") Long userId,
+            @PathVariable("carId") @Positive(message = "Id must be positive.") Long carId) {
+        return new ResponseEntity<>(carWithAllInformationDtoMapper.toDto(carService.get(carId,userId)), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}/picture", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
@@ -151,13 +161,25 @@ public class CarController {
         }
     }
 
+    private UserDTO stringToObject(String user) {
+        try {
+            return objectMapper.readValue(user, UserDTO.class);
+        } catch (JsonProcessingException e) {
+            //TODO: Add to log and delete return null;
+            return null;
+        }
+    }
+
     @Autowired
-    public CarController(CarService carService, CarDtoMapper carMapper, CreateCarDtoMapper createCarDtoMapper,
-                         CarWithPicturesDtoMapper carWithPicturesDtoMapper,CarWithAllInformationDtoMapper carWithAllInformationDtoMapper) {
+    public CarController(CarService carService, CarDtoMapper carMapper, CreateCarDtoMapper createCarDtoMapper,HttpServletRequest request,
+                         CarWithPicturesDtoMapper carWithPicturesDtoMapper,CarWithAllInformationDtoMapper carWithAllInformationDtoMapper,
+                         ObjectMapper objectMapper) {
         this.carService = carService;
         this.carMapper = carMapper;
         this.createCarDtoMapper = createCarDtoMapper;
         this.carWithPicturesDtoMapper = carWithPicturesDtoMapper;
         this.carWithAllInformationDtoMapper = carWithAllInformationDtoMapper;
+        this.request=request;
+        this.objectMapper = objectMapper;
     }
 }

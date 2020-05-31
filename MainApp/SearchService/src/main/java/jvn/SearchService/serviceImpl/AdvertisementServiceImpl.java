@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -24,6 +25,27 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     @Override
     public List<Advertisement> getAll() {
         return advertisementRepository.findByLogicalStatus(LogicalStatus.EXISTING);
+    }
+
+    @Override
+    public List<Advertisement> getAllMy(String status, Long id) {
+        List<Advertisement> ads;
+        switch (status) {
+            case "all":
+                ads = advertisementRepository.findAllByLogicalStatusNotAndOwner(LogicalStatus.DELETED, id);
+                break;
+            case "active":
+                ads = advertisementRepository.findAllByLogicalStatusNotAndOwnerAndDateToEqualsOrLogicalStatusNotAndOwnerAndDateToGreaterThan(LogicalStatus.DELETED, id, null,
+                        LogicalStatus.DELETED, id, LocalDate.now());
+                break;
+            case "operation_pending":
+                ads = advertisementRepository.findAllByLogicalStatusAndOwner(LogicalStatus.OPERATION_PENDING, id);
+                break;
+            default:
+                ads = advertisementRepository.findAllByLogicalStatusNotAndOwnerAndDateToLessThanEqual(LogicalStatus.DELETED, id, LocalDate.now());
+                break;
+        }
+        return ads;
     }
 
     public List<Advertisement> searchAdvertisements(SearchParamsDTO searchParamsDTO) {

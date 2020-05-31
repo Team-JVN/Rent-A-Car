@@ -12,6 +12,7 @@ import org.springframework.web.context.request.RequestContextListener;
 
 @SpringBootApplication
 @EnableEurekaClient
+@EnableAsync
 public class UsersApplication {
 
 	public static void main(String[] args) {

@@ -1,5 +1,6 @@
 package jvn.Cars.serviceImpl;
 
+import jvn.Cars.dto.request.UserDTO;
 import jvn.Cars.enumeration.LogicalStatus;
 import jvn.Cars.exceptionHandler.InvalidCarDataException;
 import jvn.Cars.mapper.CarDtoMapper;
@@ -43,7 +44,7 @@ public class CarServiceImpl implements CarService {
 
     @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-    public Car create(Car car, List<MultipartFile> multipartFiles) {
+    public Car create(Car car, List<MultipartFile> multipartFiles, UserDTO userDTO) {
         if (multipartFiles.size() > 5) {
             throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
         }
@@ -53,7 +54,7 @@ public class CarServiceImpl implements CarService {
             }
         }
 
-        car.setOwner(1000L);
+        car.setOwner(userDTO.getId());
 //        car.setOwner(userService.getLoginUser());
 
         car.setMake(makeService.get(car.getMake().getId()));
@@ -73,8 +74,8 @@ public class CarServiceImpl implements CarService {
         return pictureService.loadFileAsResource(fileName, UPLOADED_PICTURES_PATH);
     }
     @Override
-    public List<Car> get() {
-        return carRepository.findAllByLogicalStatusNot(LogicalStatus.DELETED);
+    public List<Car> get(UserDTO userDTO) {
+        return carRepository.findAllByLogicalStatusNotAndOwner(LogicalStatus.DELETED,userDTO.getId());
     }
     /*
         @Override
@@ -155,8 +156,8 @@ public class CarServiceImpl implements CarService {
     */
 
     @Override
-    public Car get(Long id) {
-        Car car = carRepository.findOneByIdAndLogicalStatusNot(id, LogicalStatus.DELETED);
+    public Car get(Long id,Long loggedInUser) {
+        Car car = carRepository.findOneByIdAndLogicalStatusNotAndOwner(id, LogicalStatus.DELETED,loggedInUser);
         if (car == null) {
             throw new InvalidCarDataException("This car doesn't exist.", HttpStatus.NOT_FOUND);
         }

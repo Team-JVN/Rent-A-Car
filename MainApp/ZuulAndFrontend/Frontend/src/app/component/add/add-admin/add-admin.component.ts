@@ -31,11 +31,11 @@ export class AddAdminComponent implements OnInit {
       this.toastr.error("Please enter valid data", 'Registrate Admin');
       return;
     }
-    const name = this.addForm.value.firstName + '|' + this.addForm.value.lastName;
-    const agent = new Admin(name, this.addForm.value.email)
+    const name = this.addForm.value.firstName + ' ' + this.addForm.value.lastName;
+    const admin = new Admin(name, this.addForm.value.email)
 
-    this.adminService.add(agent).subscribe(
-      (data: Agent) => {
+    this.adminService.add(admin).subscribe(
+      (data: Admin) => {
         this.addForm.reset();
         this.dialogRef.close();
         this.toastr.success('Success!', 'Registrate Admin');

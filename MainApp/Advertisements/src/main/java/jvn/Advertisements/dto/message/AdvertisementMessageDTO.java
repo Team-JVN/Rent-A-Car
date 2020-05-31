@@ -29,4 +29,6 @@ public class AdvertisementMessageDTO {
     private String dateTo;
 
     private String pickUpPoint;
+
+    private Long owner;
 }

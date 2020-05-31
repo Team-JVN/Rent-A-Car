@@ -65,7 +65,7 @@ export class HeaderComponent implements OnInit {
   }
 
   hasPermissionGetReceivedRentRequests() {
-    return this.authentificationService.hasPermission("GET_RECEIVED_RENT_REQUEST");
+    return this.authentificationService.hasPermission("GET_RECEIVED_RENT_REQUESTS");
   }
 
   hasPermissionDeleteRentRequest() {

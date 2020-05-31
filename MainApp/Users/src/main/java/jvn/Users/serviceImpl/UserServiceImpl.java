@@ -81,7 +81,6 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     @Override
     public Agent getLoginAgent() {
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
-
         return (Agent) userRepository.findByEmail(currentUser.getName());
     }
 
@@ -136,6 +135,12 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         } else {
             throw new InvalidUserDataException("Token can not be refreshed", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @Override
+    public User verify() {
+        Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
+        return userRepository.findByEmail(currentUser.getName());
     }
 
     private String getClientIP() {

@@ -66,19 +66,19 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         RandomPasswordGenerator randomPasswordGenerator = new RandomPasswordGenerator();
         String generatedPassword = randomPasswordGenerator.generatePassword();
 
-        Admin admin = new Admin("Rent-a-Car Admin","rentacaradmin@maildrop.cc",passwordEncoder.encode(generatedPassword),this.roleRepository.findByName("ROLE_ADMIN"));
-        userRepository.save(admin);
-        composeAndSendEmailToChangePassword(admin.getEmail(), generatedPassword);
-
-         generatedPassword = randomPasswordGenerator.generatePassword();
-        Agent agent = new Agent("Rent-a-Car Agency", "rentacar@maildrop.cc",
-                passwordEncoder.encode(generatedPassword), this.roleRepository.findByName("ROLE_AGENT"), "Beograd","0627564136", "00000001");
-        if (userRepository.findByEmail(agent.getEmail()) != null) {
-            return;
+        Admin admin = new Admin("Rent-a-Car Admin", "rentacaradmin@maildrop.cc", passwordEncoder.encode(generatedPassword), this.roleRepository.findByName("ROLE_ADMIN"));
+        if (userRepository.findByEmail(admin.getEmail()) == null) {
+            userRepository.save(admin);
+            composeAndSendEmailToChangePassword(admin.getEmail(), generatedPassword);
         }
 
-        userRepository.save(agent);
-        composeAndSendEmailToChangePassword(agent.getEmail(), generatedPassword);
+         generatedPassword = randomPasswordGenerator.generatePassword();
+        Agent agent = new Agent("Rent a Car Agency", "rentacar@maildrop.cc",
+                passwordEncoder.encode(generatedPassword), this.roleRepository.findByName("ROLE_AGENT"), "Beograd","0627564136", "50000001");
+        if (userRepository.findByEmail(agent.getEmail()) == null) {
+            userRepository.save(agent);
+            composeAndSendEmailToChangePassword(agent.getEmail(), generatedPassword);
+        }
 
         alreadySetup = true;
     }

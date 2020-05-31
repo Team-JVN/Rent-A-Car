@@ -30,11 +30,16 @@ import { EditAdminComponent } from "./component/edit/edit-personal-info/edit-adm
 import { ResetPasswordEnterNewPassComponent } from './component/authentification/reset-password-enter-new-pass/reset-password-enter-new-pass.component';
 import { ResetPasswordEnterEmailComponent } from './component/authentification/reset-password-enter-email/reset-password-enter-email.component';
 import { EditRoleComponent } from './component/edit/edit-role/edit-role.component';
+import { ActivateAccountComponent } from './component/authentification/activate-account/activate-account.component';
 
 const routes: Routes = [
   {
     path: "advertisement/:id",
     component: AdvertisementDetailsComponent,
+  },
+  {
+    path: "activate-account",
+    component: ActivateAccountComponent,
   },
   {
     path: "body-styles",
