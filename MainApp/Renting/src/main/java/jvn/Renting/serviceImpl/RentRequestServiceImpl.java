@@ -41,7 +41,7 @@ public class RentRequestServiceImpl implements RentRequestService {
 
         // Uncomment this !!!
         // checkIfClientExist(rentRequest.getClient());
-        
+
         if (ownerId.equals(loggedInUserId)) {
             if (rentRequest.getClient().equals(loggedInUserId)) {
                 throw new InvalidRentRequestDataException("Please choose client for which you create rent request.", HttpStatus.BAD_REQUEST);
