@@ -62,25 +62,10 @@ export class AdvertisementDetailsComponent implements OnInit {
     });
   }
 
-  rent(element: AdvertisementFromSearch) {
-    this.dialog.open(AddRentRequestComponent, { data: element });
-
-  }
-
   fetchPictures() {
     this.selectedAdvertisement.car.pictures.forEach(pictureName => {
       let imgUrl = this.url + '/' + this.selectedAdvertisement.car.id + '/picture?fileName=' + pictureName;
       this.galleryImages.push({ small: imgUrl, medium: imgUrl });
     });
-  }
-
-  checkIfCanRentAdvertisement(element: AdvertisementFromSearch): boolean {
-    if (!element.dateTo) {
-      return true;
-    }
-    if (new Date(element.dateTo) > new Date()) {
-      return true;
-    }
-    return false;
   }
 }

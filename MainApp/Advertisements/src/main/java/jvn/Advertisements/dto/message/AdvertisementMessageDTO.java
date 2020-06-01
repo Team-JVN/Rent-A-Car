@@ -28,7 +28,5 @@ public class AdvertisementMessageDTO {
 
     private String pickUpPoint;
 
-    private Long owner;
-
-    private String ownerName;
+    private OwnerMessageDTO owner;
 }

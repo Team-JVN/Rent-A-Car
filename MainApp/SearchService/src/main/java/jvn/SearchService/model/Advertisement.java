@@ -41,12 +41,9 @@ public class Advertisement {
     @Column
     private Boolean CDW;
 
-    @Column
+    @Column(nullable = false)
     private String pickUpPoint;
 
-    @Column(nullable = false)
-    private Long owner;
-
-    @Column(nullable = false)
-    private String ownerName;
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Owner owner;
 }

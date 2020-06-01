@@ -2,6 +2,7 @@ package jvn.Advertisements.serviceImpl;
 
 import jvn.Advertisements.client.CarClient;
 import jvn.Advertisements.dto.message.AdvertisementMessageDTO;
+import jvn.Advertisements.dto.message.OwnerMessageDTO;
 import jvn.Advertisements.dto.request.UserDTO;
 import jvn.Advertisements.dto.response.CarWithAllInformationDTO;
 import jvn.Advertisements.enumeration.LogicalStatus;
@@ -71,7 +72,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         Advertisement savedAdvertisement = advertisementRepository.save(createAdvertisementDTO);
         AdvertisementMessageDTO advertisementMessageDTO = advertisementMessageMapper.toDto(savedAdvertisement);
         advertisementMessageDTO.setCar(carDTO);
-        advertisementMessageDTO.setOwnerName(userDTO.getName());
+        advertisementMessageDTO.setOwner(new OwnerMessageDTO(userDTO.getId(), userDTO.getName(), userDTO.getEmail()));
         advertisementProducer.send(advertisementMessageDTO);
         return savedAdvertisement;
     }
