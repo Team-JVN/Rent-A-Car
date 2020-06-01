@@ -142,7 +142,7 @@ export class RentingCartComponent implements OnInit {
     if (element.optedForCDW) {
       calculatedPrice += element.advertisement.priceList.priceForCDW * daysBetween;
     }
-    if (daysBetween > 30) {
+    if (element.advertisement.discount && daysBetween > 30) {
       const reducedPricePerDay = element.advertisement.priceList.pricePerDay * (1.0 - (element.advertisement.discount / 100.0));
       calculatedPrice += reducedPricePerDay * daysBetween;
     } else {

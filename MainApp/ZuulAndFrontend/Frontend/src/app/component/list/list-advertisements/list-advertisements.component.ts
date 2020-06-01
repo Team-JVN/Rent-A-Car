@@ -125,8 +125,7 @@ export class ListAdvertisementsComponent implements OnInit {
   }
 
   rent(element: AdvertisementFromSearch) {
-    // this.dialog.open(AddRentRequestComponent, { data: element });
-
+    this.dialog.open(AddRentRequestComponent, { data: element });
   }
 
   viewDetails(element: AdvertisementFromSearch) {

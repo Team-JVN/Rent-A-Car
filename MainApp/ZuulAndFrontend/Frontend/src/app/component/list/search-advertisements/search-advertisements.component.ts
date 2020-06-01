@@ -108,8 +108,7 @@ export class SearchAdvertisementsComponent implements OnInit {
     this.fetchBodyStyles();
   }
 
-  //TODO: change from AdvertisementWithPictures to AdvertisementFromSearch
-  rent(element: AdvertisementWithPictures) {
+  rent(element: AdvertisementFromSearch) {
     this.dialog.open(AddRentRequestComponent, { data: element });
   }
 

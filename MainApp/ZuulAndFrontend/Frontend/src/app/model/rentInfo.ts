@@ -1,3 +1,4 @@
+import { AdvertisementFromSearch } from './advertisementFromSearch';
 import { AdvertisementWithPictures } from 'src/app/model/advertisementWithPictures';
 
 export class RentInfo {
@@ -5,11 +6,11 @@ export class RentInfo {
     dateTimeFrom: string;
     dateTimeTo: string;
     optedForCDW: boolean;
-    advertisement: AdvertisementWithPictures;
+    advertisement: AdvertisementFromSearch;
     index: number;
     inBundle: boolean;
 
-    constructor(dateTimeFrom: string, dateTimeTo: string, optedForCDW: boolean, advertisement: AdvertisementWithPictures, id?: number) {
+    constructor(dateTimeFrom: string, dateTimeTo: string, optedForCDW: boolean, advertisement: AdvertisementFromSearch, id?: number) {
         this.dateTimeFrom = dateTimeFrom;
         this.dateTimeTo = dateTimeTo;
         this.optedForCDW = optedForCDW;

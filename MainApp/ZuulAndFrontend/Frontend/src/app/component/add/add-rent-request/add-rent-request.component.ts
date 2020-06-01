@@ -1,3 +1,4 @@
+import { AdvertisementFromSearch } from './../../../model/advertisementFromSearch';
 import { AdvertisementWithPictures } from './../../../model/advertisementWithPictures';
 import { AuthentificationService } from './../../../service/authentification.service';
 import { RentInfo } from './../../../model/rentInfo';
@@ -44,7 +45,7 @@ export class AddRentRequestComponent implements OnInit {
     private dialogRef: MatDialogRef<AddRentRequestComponent>,
     private formBuilder: FormBuilder,
     public dialog: MatDialog,
-    @Inject(MAT_DIALOG_DATA) public selectedItem: AdvertisementWithPictures) { }
+    @Inject(MAT_DIALOG_DATA) public selectedItem: AdvertisementFromSearch) { }
 
   ngOnInit() {
     if (this.minDate < new Date(this.selectedItem.dateFrom)) {
