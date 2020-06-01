@@ -40,6 +40,10 @@ export class RentRequestService {
     return this.httpClient.get(this.url + '/' + status + '/mine');
   }
 
+  public getAdvertisementsRentRequests(advertisementId: number, status: string) {
+    return this.httpClient.get(this.url + '/' + status + '/advertisement/' + advertisementId);
+  }
+
   public get(id: number) {
     return this.httpClient.get(this.url + "/" + id);
   }

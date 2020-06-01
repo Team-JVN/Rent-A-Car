@@ -10,7 +10,6 @@ import { ClientRegistrationComponent } from './component/authentification/client
 import { ChangePasswordComponent } from './component/authentification/change-password/change-password.component';
 import { LoginComponent } from './component/authentification/login/login.component';
 import { ListRentRequestsComponent } from './component/list/list-rent-requests/list-rent-requests.component';
-import { ListClientsComponent } from './component/list/list-clients/list-clients.component';
 import { AdvertisementDetailsComponent } from './component/advertisement-details/advertisement-details.component';
 import { ListCarsComponent } from './component/list/list-cars/list-cars.component';
 import { ListGearBoxTypesComponent } from './component/list/list-gear-box-types/list-gear-box-types.component';
@@ -64,10 +63,6 @@ const routes: Routes = [
   {
     path: 'price-lists',
     component: ListPriceListsComponent
-  },
-  {
-    path: "clients",
-    component: ListClientsComponent,
   },
   {
     path: 'rent-requests/:id',
@@ -162,6 +157,10 @@ const routes: Routes = [
   {
     path: "advertisements",
     component: ListAdvertisementsComponent,
+  },
+  {
+    path: '**',
+    component: SearchAdvertisementsComponent
   },
 ];
 

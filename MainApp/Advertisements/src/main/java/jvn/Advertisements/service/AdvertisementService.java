@@ -8,6 +8,6 @@ import java.util.List;
 public interface AdvertisementService {
     Advertisement create(Advertisement createAdvertisementDTO, UserDTO userDTO);
 
-    List<Advertisement> getAll(String status);
+    List<Advertisement> get(List<Long> advertisements);
 }
 

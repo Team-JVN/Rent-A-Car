@@ -10,7 +10,7 @@ import java.util.List;
 public interface CarService {
     Car create(Car car, List<MultipartFile> multipartFiles, UserDTO userDTO);
 
-    Car get(Long id,UserDTO userDTO);
+    Car get(Long id,Long loggedInUser);
 
     Resource get(String fileName);
 

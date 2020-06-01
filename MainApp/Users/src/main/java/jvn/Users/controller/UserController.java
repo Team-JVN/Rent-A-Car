@@ -147,11 +147,6 @@ public class UserController {
         return new ResponseEntity<>(userService.refreshAuthenticationToken(request), HttpStatus.OK);
     }
 
-//    @GetMapping("/verify/{jwt-token}")
-//    public ResponseEntity<UserDTO> verify(@PathVariable("jwt-token") String jwtToken) {
-//        return new ResponseEntity<>(userDtoMapper.toDto(this.userService.verify(jwtToken)), HttpStatus.OK);
-//    }
-
     @Autowired
     public UserController(UserService userService, ClientService clientService, ClientDtoMapper clientDtoMapper,
                           AuthentificationService authentificationService,UserDtoMapper userDtoMapper,

@@ -1,5 +1,5 @@
-import { RentInfo } from './rentInfo';
 import { Client } from './client';
+import { RentInfo } from './rentInfo';
 
 export class RentRequest {
     id: number;

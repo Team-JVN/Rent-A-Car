@@ -73,9 +73,10 @@ public class CarServiceImpl implements CarService {
     public Resource get(String fileName) {
         return pictureService.loadFileAsResource(fileName, UPLOADED_PICTURES_PATH);
     }
+
     @Override
     public List<Car> get(UserDTO userDTO) {
-        return carRepository.findAllByLogicalStatusNotAndOwner(LogicalStatus.DELETED,userDTO.getId());
+        return carRepository.findAllByLogicalStatusNotAndOwner(LogicalStatus.DELETED, userDTO.getId());
     }
     /*
         @Override
@@ -156,8 +157,8 @@ public class CarServiceImpl implements CarService {
     */
 
     @Override
-    public Car get(Long id,UserDTO userDTO) {
-        Car car = carRepository.findOneByIdAndLogicalStatusNotAndOwner(id, LogicalStatus.DELETED,userDTO.getId());
+    public Car get(Long id, Long loggedInUser) {
+        Car car = carRepository.findOneByIdAndLogicalStatusNotAndOwner(id, LogicalStatus.DELETED, loggedInUser);
         if (car == null) {
             throw new InvalidCarDataException("This car doesn't exist.", HttpStatus.NOT_FOUND);
         }

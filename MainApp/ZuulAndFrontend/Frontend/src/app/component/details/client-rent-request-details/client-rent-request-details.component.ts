@@ -21,13 +21,8 @@ import { ActivatedRoute, Router, Params } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Location } from '@angular/common';
-import { FuelType } from 'src/app/model/fuelType';
-import { GearBoxType } from 'src/app/model/gearboxType';
-import { Client } from 'src/app/model/client';
-import { PriceList } from 'src/app/model/priceList';
-import { MatTableDataSource } from '@angular/material/table';
-import { User } from 'src/app/model/user';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
+import { Client } from 'src/app/model/client';
 
 @Component({
   selector: 'app-client-rent-request-details',
@@ -38,7 +33,7 @@ export class ClientRentRequestDetailsComponent implements OnInit {
 
   messageForm: FormGroup;
   rentRequestId: number;
-  rentRequest: RentRequest;
+  rentRequest: RentRequest = new RentRequest(new Client("", "", "", ""), null, 0, "");
   loggedInUserEmail: string;
   messages: Message[];
 

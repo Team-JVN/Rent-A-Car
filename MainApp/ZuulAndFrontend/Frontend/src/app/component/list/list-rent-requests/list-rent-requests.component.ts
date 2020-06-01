@@ -36,7 +36,6 @@ export class ListRentRequestsComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     public router: Router,
     public dialog: MatDialog,
-    private advertisementService: AdvertisementService,
     private rentRequestService: RentRequestService,
     private toastr: ToastrService
   ) { }
@@ -55,7 +54,7 @@ export class ListRentRequestsComponent implements OnInit {
   }
 
   fetchRentRequests(status: string) {
-    this.advertisementService.getRentRequests(this.advertisementId, status).subscribe(
+    this.rentRequestService.getAdvertisementsRentRequests(this.advertisementId, status).subscribe(
       (data: RentRequest[]) => {
         this.rentRequestsDataSource = new MatTableDataSource(data);
       },

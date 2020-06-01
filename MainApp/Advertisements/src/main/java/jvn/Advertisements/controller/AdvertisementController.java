@@ -23,7 +23,7 @@ import javax.validation.constraints.Positive;
 import java.text.ParseException;
 import java.util.List;
 import java.util.stream.Collectors;
-@CrossOrigin
+
 @Validated
 @RestController
 @RequestMapping(value = "/api/advertisement", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -42,20 +42,19 @@ public class AdvertisementController {
     public ResponseEntity<AdvertisementDTO> create(@Valid @RequestBody CreateAdvertisementDTO createAdvertisementDTO) {
         try {
             UserDTO userDTO = stringToObject(request.getHeader("user"));
-            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.create(createAdvertisementDtoMapper.toEntity(createAdvertisementDTO),userDTO)),
+            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.create(createAdvertisementDtoMapper.toEntity(createAdvertisementDTO), userDTO)),
                     HttpStatus.CREATED);
         } catch (ParseException e) {
             throw new InvalidAdvertisementDataException("Please choose valid date.", HttpStatus.BAD_REQUEST);
         }
     }
 
-//    @GetMapping("/all/{status}")
-//    public ResponseEntity<List<AdvertisementWithPicturesDTO>> getAll(
-//            @PathVariable(value = "status", required = false) @Pattern(regexp = "(?i)(all|active|inactive)$", message = "Status is not valid.") String status) {
-//        List<AdvertisementWithPicturesDTO> list = advertisementService.getAll(status).stream().map(adWithPicturesDtoMapper::toDto).
-//                collect(Collectors.toList());
-//        return new ResponseEntity<>(list, HttpStatus.OK);
-//    }
+    @GetMapping("/{advId}")
+    public ResponseEntity<List<AdvertisementDTO>> getAllMy(@PathVariable("advId") List<Long> advertisements) {
+        List<AdvertisementDTO> list = advertisementService.get(advertisements).stream().map(advertisementDtoMapper::toDto).
+                collect(Collectors.toList());
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
 
     private UserDTO stringToObject(String user) {
         try {
@@ -66,9 +65,10 @@ public class AdvertisementController {
         }
     }
 
+
     @Autowired
     public AdvertisementController(AdvertisementService advertisementService, CreateAdvertisementDtoMapper createAdvertisementDtoMapper,
-                                   AdvertisementDtoMapper advertisementDtoMapper, ObjectMapper objectMapper,HttpServletRequest request) {
+                                   AdvertisementDtoMapper advertisementDtoMapper, ObjectMapper objectMapper, HttpServletRequest request) {
         this.advertisementService = advertisementService;
         this.createAdvertisementDtoMapper = createAdvertisementDtoMapper;
         this.advertisementDtoMapper = advertisementDtoMapper;

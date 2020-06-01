@@ -92,6 +92,7 @@
                             <mat-form-field class="form-full-width-90">
                                 <mat-label>Make</mat-label>
                                 <mat-select formControlName="make" (selectionChange)="fetchModels()">
+                                    <mat-option [value]="allMakes">- All -</mat-option>
                                     <mat-option *ngFor="let make of makes" [value]="make">
                                         {{make.name}}
                                     </mat-option>
@@ -102,6 +103,7 @@
                             <mat-form-field class="form-full-width-90">
                                 <mat-label>Model</mat-label>
                                 <mat-select formControlName="model">
+                                    <mat-option [value]="allModels">- All -</mat-option>
                                     <mat-option *ngFor="let model of models" [value]="model">
                                         {{model.name}}
                                     </mat-option>
@@ -127,6 +129,7 @@
                             <mat-form-field class="form-full-width-90">
                                 <mat-label>Fuel Type</mat-label>
                                 <mat-select formControlName="fuelType">
+                                    <mat-option [value]="allFuelTypes">- All -</mat-option>
                                     <mat-option *ngFor="let fuelType of fuelTypes" [value]="fuelType">
                                         {{fuelType.name}}
                                     </mat-option>
@@ -137,6 +140,7 @@
                             <mat-form-field class="form-full-width-90">
                                 <mat-label>Gearbox Type</mat-label>
                                 <mat-select formControlName="gearBoxType">
+                                    <mat-option [value]="allGearboxTypes">- All -</mat-option>
                                     <mat-option *ngFor="let gearBoxType of gearBoxTypes" [value]="gearBoxType">
                                         {{gearBoxType.name}}
                                     </mat-option>
@@ -147,6 +151,7 @@
                             <mat-form-field class="form-full-width-90">
                                 <mat-label>Body Style</mat-label>
                                 <mat-select formControlName="bodyStyle">
+                                    <mat-option [value]="allBodyStyles">- All -</mat-option>
                                     <mat-option *ngFor="let bodyStyle of bodyStyles" [value]="bodyStyle">
                                         {{bodyStyle.name}}
                                     </mat-option>
@@ -233,7 +238,9 @@
             </div>
         </form>
         <hr />
-        <table mat-table [dataSource]="advertisementsDataSource" class="advertisement-list-table">
+        <table mat-table *ngIf="this.advertisementsDataSource && this.advertisementsDataSource.data.length != 0"
+            [dataSource]="advertisementsDataSource" class="advertisement-list-table">
+
             <ng-container matColumnDef="advertisement">
                 <td mat-cell *matCellDef="let element">
                     <mat-card class="item-card" (click)="viewDetails(element)">
@@ -243,13 +250,14 @@
                         </div>
                         <div class="advertisement-div">
                             <mat-card-header class="advertisement-card-header">
-                                <mat-card-title class="advertisement-card-title">{{element.car.make.name}}
-                                    {{element.car.model.name}}
+                                <mat-card-title class="advertisement-card-title">{{element.car.make}}
+                                    {{element.car.model}}
                                 </mat-card-title>
                                 <div class="rating">
                                     <star-rating class="rating-style" totalstars="5" checkedcolor="#87C7F3"
                                         uncheckedcolor="black" size="30px" [(value)]="element.car.avgRating"
-                                        readonly="true">
+                                        readonly="true" matTooltip="{{element.car.avgRating}}"
+                                        matTooltipPosition="right">
                                     </star-rating>
                                 </div>
                             </mat-card-header>
@@ -310,7 +318,7 @@
                                     {{element.priceList.pricePerDay | number: '1.2-2'}} €</td>
                             </tr>
                             <tr><button mat-raised-button color="primary" class="rent-btn"
-                                    *ngIf="checkIfCanRentAdvertisement(element)"
+                                    *ngIf="this.authService.isLoggedIn() && checkIfCanRentAdvertisement(element)"
                                     (click)="rent(element);$event.stopPropagation()">Rent
                                     me!</button></tr>
                         </table>
@@ -320,6 +328,10 @@
 
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
+
+        <div *ngIf="!this.advertisementsDataSource || this.advertisementsDataSource.data.length == 0" class="no-ads">
+            No advertisements to show.
+        </div>
 
     </mat-card-content>
 </mat-card>

@@ -15,6 +15,7 @@
                     <mat-option value="all" selected>- All -</mat-option>
                     <mat-option value="active">Active</mat-option>
                     <mat-option value="inactive">Inactive</mat-option>
+                    <mat-option value="operation_pending">Operation pending</mat-option>
                 </mat-select>
             </mat-form-field>
         </div>
@@ -29,19 +30,22 @@
                         </div>
                         <div class="advertisement-div">
                             <mat-card-header class="advertisement-card-header">
-                                <mat-card-title class="advertisement-card-title">{{element.car.make.name}}
-                                    {{element.car.model.name}}
+                                <mat-card-title class="advertisement-card-title">{{element.car.make}}
+                                    {{element.car.model}}
                                 </mat-card-title>
                                 <div class="advertisement-card-buttons">
                                     <button mat-icon-button aria-label="View rent requests"
-                                        matTooltip="View Rent Requests" (click)="viewRentRequests(element)">
+                                        *ngIf="element.logicalStatus === 'EXISTING'" matTooltip="View Rent Requests"
+                                        (click)="viewRentRequests(element)">
                                         <mat-icon>assignment</mat-icon>
                                     </button>
                                     <button mat-icon-button aria-label="Edit" color="primary"
+                                        *ngIf="element.logicalStatus === 'EXISTING'"
                                         (click)="edit(element);$event.stopPropagation()">
                                         <mat-icon>edit</mat-icon>
                                     </button>
                                     <button mat-icon-button aria-label="Delete" color="warn"
+                                        *ngIf="element.logicalStatus === 'EXISTING'"
                                         (click)="delete(element);$event.stopPropagation()">
                                         <mat-icon>delete</mat-icon>
                                     </button>

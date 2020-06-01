@@ -13,6 +13,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Location } from '@angular/common';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { ReviewFeedbackComponent } from '../../review-feedback/review-feedback.component';
+import { Client } from 'src/app/model/client';
 
 @Component({
   selector: 'app-rent-request-details',
@@ -23,7 +24,7 @@ export class RentRequestDetailsComponent implements OnInit {
   messageForm: FormGroup;
 
   rentRequestId: number;
-  rentRequest: RentRequest;
+  rentRequest: RentRequest = new RentRequest(new Client("", "", "", ""), null, 0, "");
   loggedInUserEmail: string;
 
   messages: Message[];
@@ -114,4 +115,5 @@ export class RentRequestDetailsComponent implements OnInit {
       }
     );
   }
+
 }

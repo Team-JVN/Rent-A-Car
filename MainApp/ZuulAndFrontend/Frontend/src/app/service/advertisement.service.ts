@@ -1,11 +1,11 @@
 import { AdvertisementEdit } from './../model/advertisementEdit';
-import { AdvertisementWithPictures } from 'src/app/model/advertisementWithPictures';
 import { Advertisement } from './../model/advertisement';
 import { environment } from './../../environments/environment';
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { CreateAdvertisement } from '../model/createAdvertisement';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -43,7 +43,9 @@ export class AdvertisementService {
   public getRentRequests(advertisementId: number, status: string) {
     return this.httpClient.get(this.url + "/" + advertisementId + "/rent-requests/" + status);
   }
+
   public delete(id: number): any {
     return this.httpClient.delete(this.url + '/' + id);
   }
+
 }

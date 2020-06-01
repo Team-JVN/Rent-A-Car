@@ -1,9 +1,10 @@
+import { AuthentificationService } from './../../service/authentification.service';
+import { SearchService } from 'src/app/service/search.service';
+import { AdvertisementFromSearch } from './../../model/advertisementFromSearch';
 import { NgxGalleryOptions, NgxGalleryImage, NgxGalleryAnimation } from 'ngx-gallery';
 import { environment } from './../../../environments/environment';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
-import { AdvertisementWithPictures } from './../../model/advertisementWithPictures';
-import { AdvertisementService } from './../../service/advertisement.service';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
@@ -17,7 +18,7 @@ import { AddRentRequestComponent } from '../add/add-rent-request/add-rent-reques
 export class AdvertisementDetailsComponent implements OnInit {
 
   advertisementId: number;
-  selectedAdWithPictures: AdvertisementWithPictures;
+  selectedAdvertisement: AdvertisementFromSearch;
 
   url = environment.baseUrl + environment.car;
   galleryOptions: NgxGalleryOptions[] = [];
@@ -27,7 +28,8 @@ export class AdvertisementDetailsComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private toastr: ToastrService,
-    private advertisementService: AdvertisementService,
+    private searchService: SearchService,
+    private authService: AuthentificationService,
     public dialog: MatDialog,
   ) { }
 
@@ -47,9 +49,9 @@ export class AdvertisementDetailsComponent implements OnInit {
 
     this.activatedRoute.params.subscribe((params: Params) => {
       this.advertisementId = params['id'];
-      this.advertisementService.get(this.advertisementId).subscribe(
-        (data: AdvertisementWithPictures) => {
-          this.selectedAdWithPictures = data;
+      this.searchService.get(this.advertisementId).subscribe(
+        (data: AdvertisementFromSearch) => {
+          this.selectedAdvertisement = data;
           this.fetchPictures();
         },
         (httpErrorResponse: HttpErrorResponse) => {
@@ -60,25 +62,10 @@ export class AdvertisementDetailsComponent implements OnInit {
     });
   }
 
-  rent(element: AdvertisementWithPictures) {
-    this.dialog.open(AddRentRequestComponent, { data: element });
-
-  }
-
   fetchPictures() {
-    this.selectedAdWithPictures.car.pictures.forEach(element => {
-      let imgUrl = this.url + '/' + this.selectedAdWithPictures.car.id + '/picture?fileName=' + element.data;
+    this.selectedAdvertisement.car.pictures.forEach(pictureName => {
+      let imgUrl = this.url + '/' + this.selectedAdvertisement.car.id + '/picture?fileName=' + pictureName;
       this.galleryImages.push({ small: imgUrl, medium: imgUrl });
     });
-  }
-
-  checkIfCanRentAdvertisement(element: AdvertisementWithPictures): boolean {
-    if (!element.dateTo) {
-      return true;
-    }
-    if (new Date(element.dateTo) > new Date()) {
-      return true;
-    }
-    return false;
   }
 }

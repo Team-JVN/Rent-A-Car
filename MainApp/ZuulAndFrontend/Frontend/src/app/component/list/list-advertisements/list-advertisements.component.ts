@@ -13,8 +13,9 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AddAdvertisementComponent } from '../../add/add-advertisement/add-advertisement.component';
 import { MatTableDataSource } from '@angular/material/table';
-import { AdvertisementWithPictures } from 'src/app/model/advertisementWithPictures';
-import { EditAdvertisementComponent } from '../../edit/edit-advertisement/edit-advertisement.component';
+import { AdvertisementFromSearch } from 'src/app/model/advertisementFromSearch';
+import { SearchService } from 'src/app/service/search.service';
+import { delay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-list-advertisements',
@@ -24,28 +25,16 @@ import { EditAdvertisementComponent } from '../../edit/edit-advertisement/edit-a
 export class ListAdvertisementsComponent implements OnInit {
 
   displayedColumns: string[] = ['advertisement'];
-  advertisementsDataSource: MatTableDataSource<AdvertisementWithPictures>;
+  advertisementsDataSource: MatTableDataSource<AdvertisementFromSearch>;
   createSuccess: Subscription;
   status: string = 'all';
 
-  constructor(
-    public router: Router,
-    public dialog: MatDialog,
-    private advertisementService: AdvertisementService,
-    private carService: CarService,
-    private toastr: ToastrService,
-    private rentRequestService: RentRequestService
-  ) { }
+  constructor(public router: Router, public dialog: MatDialog, private advertisementService: AdvertisementService, private carService: CarService,
+    private toastr: ToastrService, private rentRequestService: RentRequestService, private searchService: SearchService) { }
 
   ngOnInit() {
     this.fetchAll('all');
     this.createSuccess = this.advertisementService.createSuccessEmitter.subscribe(
-      () => {
-        this.fetchAll(this.status)
-      }
-    );
-
-    this.createSuccess = this.rentRequestService.createSuccessEmitter.subscribe(
       () => {
         this.fetchAll(this.status);
       }
@@ -53,26 +42,26 @@ export class ListAdvertisementsComponent implements OnInit {
   }
 
   fetchAll(status: string) {
-    this.advertisementService.getAll(status).subscribe(
-      (data: AdvertisementWithPictures[]) => {
-        data.forEach(adWithPicturesDTO => {
-          this.getPicture(adWithPicturesDTO);
+    this.searchService.getAllMy(status).subscribe(
+      (data: AdvertisementFromSearch[]) => {
+        data.forEach(advertisement => {
+          this.getPicture(advertisement);
         });
         this.advertisementsDataSource = new MatTableDataSource(data);
       },
       (httpErrorResponse: HttpErrorResponse) => {
-        const data: AdvertisementWithPictures[] = []
+        const data: AdvertisementFromSearch[] = []
         this.advertisementsDataSource = new MatTableDataSource(data)
         this.toastr.error(httpErrorResponse.error.message, 'Show Advertisements');
       }
     );
   }
 
-  getPicture(adWithPicturesDTO: AdvertisementWithPictures) {
-    this.carService.getPicture(adWithPicturesDTO.car.pictures[0].data, adWithPicturesDTO.car.id).subscribe(
+  getPicture(advertisement: AdvertisementFromSearch) {
+    this.carService.getPicture(advertisement.car.pictures[0], advertisement.car.id).subscribe(
       (data) => {
-        this.createImageFromBlob(data, adWithPicturesDTO);
-        adWithPicturesDTO.car.isImageLoading = false;
+        this.createImageFromBlob(data, advertisement);
+        advertisement.car.isImageLoading = false;
       },
       (httpErrorResponse: HttpErrorResponse) => {
         this.toastr.error(httpErrorResponse.error.message, 'Get picture');
@@ -80,10 +69,10 @@ export class ListAdvertisementsComponent implements OnInit {
     );
   }
 
-  createImageFromBlob(image: Blob, adWithPicturesDTO: AdvertisementWithPictures) {
+  createImageFromBlob(image: Blob, advertisement: AdvertisementFromSearch) {
     let reader = new FileReader();
     reader.addEventListener("load", () => {
-      adWithPicturesDTO.car.image = reader.result;
+      advertisement.car.image = reader.result;
     }, false);
 
     if (image) {
@@ -95,43 +84,42 @@ export class ListAdvertisementsComponent implements OnInit {
     this.dialog.open(AddAdvertisementComponent);
   }
 
-  edit(element: AdvertisementWithPictures) {
-    this.advertisementService.getEditType(element.id).subscribe(
-      (data: string) => {
-        if (data === "ALL") {
-          this.dialog.open(EditAdvertisementComponent, { data: element });
-        } else {
-          this.dialog.open(EditAdvertisementPartialComponent, { data: element });
-        }
-      },
-      (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Get edit type');
-      }
-    );
+  edit(element: AdvertisementFromSearch) {
+    // this.advertisementService.getEditType(element.id).subscribe(
+    //   (data: string) => {
+    //     if (data === "ALL") {
+    //       this.dialog.open(EditAdvertisementComponent, { data: element });
+    //     } else {
+    //       this.dialog.open(EditAdvertisementPartialComponent, { data: element });
+    //     }
+    //   },
+    //   (httpErrorResponse: HttpErrorResponse) => {
+    //     this.toastr.error(httpErrorResponse.error.message, 'Get edit type');
+    //   }
+    // );
   }
 
-  delete(element: AdvertisementWithPictures) {
-    this.advertisementService.delete(element.id).subscribe(
-      () => {
-        this.fetchAll(this.status);
-        this.toastr.success('Successfully deleted Advertisement!', 'Delete Advertisement');
-      },
-      (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Delete Advertisement');
-      }
-    );
+  delete(element: AdvertisementFromSearch) {
+    // this.advertisementService.delete(element.id).subscribe(
+    //   () => {
+    //     this.fetchAll(this.status);
+    //     this.toastr.success('Successfully deleted Advertisement!', 'Delete Advertisement');
+    //   },
+    //   (httpErrorResponse: HttpErrorResponse) => {
+    //     this.toastr.error(httpErrorResponse.error.message, 'Delete Advertisement');
+    //   }
+    // );
   }
 
-  rent(element: AdvertisementWithPictures) {
+  rent(element: AdvertisementFromSearch) {
     this.dialog.open(AddRentRequestComponent, { data: element });
-
   }
 
-  viewDetails(element: AdvertisementWithPictures) {
+  viewDetails(element: AdvertisementFromSearch) {
     this.router.navigate(['/advertisement/' + element.id]);
   }
 
-  checkIfCanRentAdvertisement(element: AdvertisementWithPictures): boolean {
+  checkIfCanRentAdvertisement(element: AdvertisementFromSearch): boolean {
     if (!element.dateTo) {
       return true;
     }
@@ -141,7 +129,7 @@ export class ListAdvertisementsComponent implements OnInit {
     return false;
   }
 
-  viewRentRequests(element: AdvertisementWithPictures) {
+  viewRentRequests(element: AdvertisementFromSearch) {
     this.router.navigate(['/rent-requests/' + element.id]);
   }
 }

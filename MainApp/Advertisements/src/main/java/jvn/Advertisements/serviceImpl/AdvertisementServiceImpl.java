@@ -1,11 +1,17 @@
 package jvn.Advertisements.serviceImpl;
+
 import jvn.Advertisements.client.CarClient;
+import jvn.Advertisements.dto.message.AdvertisementMessageDTO;
+import jvn.Advertisements.dto.message.OwnerMessageDTO;
 import jvn.Advertisements.dto.request.UserDTO;
+import jvn.Advertisements.dto.response.CarWithAllInformationDTO;
 import jvn.Advertisements.enumeration.LogicalStatus;
 import jvn.Advertisements.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.Advertisements.mapper.AdvertisementDtoMapper;
+import jvn.Advertisements.mapper.AdvertisementMessageDtoMapper;
 import jvn.Advertisements.model.Advertisement;
 import jvn.Advertisements.model.PriceList;
+import jvn.Advertisements.producer.AdvertisementProducer;
 import jvn.Advertisements.repository.AdvertisementRepository;
 import jvn.Advertisements.service.AdvertisementService;
 import jvn.Advertisements.service.PriceListService;
@@ -14,7 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -26,18 +31,20 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     private AdvertisementDtoMapper advertisementMapper;
 
-    private CarClient carClient;
+    private AdvertisementMessageDtoMapper advertisementMessageMapper;
 
+    private AdvertisementProducer advertisementProducer;
+
+    private CarClient carClient;
 
     @Override
     public Advertisement create(Advertisement createAdvertisementDTO, UserDTO userDTO) {
 
         checkDate(createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
-        carClient.verify(createAdvertisementDTO.getCar());
-        //TODO: Treba  car servisu da dodas metodu koja ce proveriti da li car postoji i da li je ulogovani korisnik vlasnik tog car-a
-        //        checkOwner(createAdvertisementDTO.getCar());
+        CarWithAllInformationDTO carDTO = carClient.verify(userDTO.getId(), createAdvertisementDTO.getCar());
         checkIfCarIsAvailable(createAdvertisementDTO.getCar(), createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
-        createAdvertisementDTO.setPriceList(priceListService.get(createAdvertisementDTO.getPriceList().getId(),userDTO));
+        createAdvertisementDTO.setOwner(userDTO.getId());
+        createAdvertisementDTO.setPriceList(priceListService.get(createAdvertisementDTO.getPriceList().getId(), userDTO));
         PriceList priceList = createAdvertisementDTO.getPriceList();
         if (priceList.getPricePerKm() != null && createAdvertisementDTO.getKilometresLimit() == null) {
             throw new InvalidAdvertisementDataException("You have to set kilometres limit.", HttpStatus.BAD_REQUEST);
@@ -45,27 +52,36 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         if (priceList.getPricePerKm() == null) {
             createAdvertisementDTO.setKilometresLimit(null);
         }
+
         if (priceList.getPriceForCDW() != null) {
             createAdvertisementDTO.setCDW(true);
         } else {
             createAdvertisementDTO.setCDW(false);
         }
-        return advertisementRepository.save(createAdvertisementDTO);
+
+        if (userDTO.getRole().equals("ROLE_CLIENT")) {
+            createAdvertisementDTO.setDiscount(null);
+            if (createAdvertisementDTO.getDateTo() == null) {
+                throw new InvalidAdvertisementDataException("You have to set date to.", HttpStatus.BAD_REQUEST);
+            }
+            checkIfClientCanCreateAdvertisement(createAdvertisementDTO);
+        } else {
+            createAdvertisementDTO.setDateTo(null);
+        }
+
+        Advertisement savedAdvertisement = advertisementRepository.save(createAdvertisementDTO);
+        AdvertisementMessageDTO advertisementMessageDTO = advertisementMessageMapper.toDto(savedAdvertisement);
+        advertisementMessageDTO.setCar(carDTO);
+        advertisementMessageDTO.setOwner(new OwnerMessageDTO(userDTO.getId(), userDTO.getName(), userDTO.getEmail()));
+        advertisementProducer.send(advertisementMessageDTO);
+        return savedAdvertisement;
     }
 
-    public List<Advertisement> getAll(String status) {
-//        List<Advertisement> ads = null;
-//        if (status.equals("all")) {
-//            ads = advertisementRepository.findAllByLogicalStatusNot(LogicalStatus.DELETED);
-//        } else if (status.equals("active")) {
-//            ads = advertisementRepository.findAllByLogicalStatusNotAndDateToEqualsOrLogicalStatusNotAndDateToGreaterThan(LogicalStatus.DELETED, null, LogicalStatus.DELETED,
-//                    LocalDate.now());
-//        } else {
-//            ads = advertisementRepository.findAllByLogicalStatusNotAndDateToLessThanEqual(LogicalStatus.DELETED, LocalDate.now());
-//        }
-//        return ads;
-        return null;
+    @Override
+    public List<Advertisement> get(List<Long> advertisements) {
+        return advertisementRepository.findByIdInAndLogicalStatus(advertisements, LogicalStatus.EXISTING);
     }
+
 
     private void checkIfCarIsAvailable(Long carId, LocalDate advertisementDateFrom, LocalDate advertisementDateTo) {
         if (!advertisementRepository.findByCarAndLogicalStatusNotAndDateToEquals(carId, LogicalStatus.DELETED, null).isEmpty()) {
@@ -92,12 +108,21 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         }
     }
 
+    private void checkIfClientCanCreateAdvertisement(Advertisement advertisement) {
+        if (advertisementRepository.findByOwnerAndDateToGreaterThanEqualAndLogicalStatus(advertisement.getOwner(), LocalDate.now(), LogicalStatus.EXISTING).size() >= 3) {
+            throw new InvalidAdvertisementDataException("You already have 3 active advertisements, therefore you cannot create a new one.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @Autowired
-    public AdvertisementServiceImpl(PriceListService priceListService,CarClient carClient,
-                                    AdvertisementRepository advertisementRepository, AdvertisementDtoMapper advertisementMapper) {
+    public AdvertisementServiceImpl(PriceListService priceListService, CarClient carClient, AdvertisementRepository advertisementRepository,
+                                    AdvertisementDtoMapper advertisementMapper, AdvertisementMessageDtoMapper advertisementMessageMapper,
+                                    AdvertisementProducer advertisementProducer) {
         this.priceListService = priceListService;
-        this.carClient=carClient;
+        this.carClient = carClient;
         this.advertisementRepository = advertisementRepository;
         this.advertisementMapper = advertisementMapper;
+        this.advertisementMessageMapper = advertisementMessageMapper;
+        this.advertisementProducer = advertisementProducer;
     }
 }

@@ -36,7 +36,6 @@ import { AddPriceListComponent } from './component/add/add-price-list/add-price-
 import { EditPriceListComponent } from './component/edit/edit-price-list/edit-price-list.component';
 import { ViewPicturesComponent } from './component/view-pictures/view-pictures.component';
 import { EditAdvertisementComponent } from './component/edit/edit-advertisement/edit-advertisement.component';
-import { ListClientsComponent } from './component/list/list-clients/list-clients.component';
 import { AddClientComponent } from './component/add/add-client/add-client.component';
 import { EditClientComponent } from './component/edit/edit-client/edit-client.component';
 import { AdvertisementDetailsComponent } from './component/advertisement-details/advertisement-details.component';
@@ -110,7 +109,6 @@ import { ConfirmDialogDeleteAdminComponent } from './component/confirm-dialog/co
     EditPriceListComponent,
     ViewPicturesComponent,
     EditAdvertisementComponent,
-    ListClientsComponent,
     AddClientComponent,
     EditClientComponent,
     AddRentRequestComponent,

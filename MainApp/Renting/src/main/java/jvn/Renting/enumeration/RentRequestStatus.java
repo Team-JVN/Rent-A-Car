@@ -4,5 +4,6 @@ public enum RentRequestStatus {
     PENDING,
     RESERVED,
     PAID,
-    CANCELED
+    CANCELED,
+    OPERATION_PENDING
 }
