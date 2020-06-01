@@ -39,15 +39,15 @@ export class ListClientRentRequestsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    /*   this.fetchRentRequests('all');
-       this.createSuccess = this.rentRequestService.createSuccessEmitter.subscribe(
-         () => {
-           this.fetchRentRequests(this.status)
-         }
-       );*/
+    this.fetchRentRequests('all');
+    this.createSuccess = this.rentRequestService.createSuccessEmitter.subscribe(
+      () => {
+        this.fetchRentRequests(this.status)
+      }
+    );
   }
 
-  /*fetchRentRequests(status: string) {
+  fetchRentRequests(status: string) {
     this.rentRequestService.getClientRentRequests(status).subscribe(
       (data: RentRequest[]) => {
         this.rentRequestsDataSource = new MatTableDataSource(data);
@@ -102,5 +102,5 @@ export class ListClientRentRequestsComponent implements OnInit {
 
   leaveFeedback(rentInfo, element) {
     this.dialog.open(LeaveFeedbackComponent, { data: { rentInfo: rentInfo, rentRequest: element } });
-  }*/
+  }
 }

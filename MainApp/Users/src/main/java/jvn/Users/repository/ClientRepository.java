@@ -29,4 +29,6 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     Client findOneByIdAndStatus(Long id, ClientStatus clientStatus);
 
     Client findOneByIdAndStatusIn(Long id, Collection<ClientStatus> clientStatus);
+
+    List<Client> findByIdIn(Collection<Long> id);
 }

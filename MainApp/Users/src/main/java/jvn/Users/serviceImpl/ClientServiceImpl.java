@@ -235,6 +235,11 @@ public class ClientServiceImpl implements ClientService {
         return clientRepository.save(dbClient);
     }
 
+    @Override
+    public List<Client> getClientsById(List<Long> clients) {
+        return clientRepository.findByIdIn(clients);
+    }
+
     private void composeAndSendDisableCreatingRentRequests(String recipientEmail) {
         String subject = "Forbidden creating rent requests";
         StringBuilder sb = new StringBuilder();

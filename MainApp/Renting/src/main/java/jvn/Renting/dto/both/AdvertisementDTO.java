@@ -1,14 +1,13 @@
 package jvn.Renting.dto.both;
 
 
+import jvn.Renting.enumeration.LogicalStatus;
 import jvn.Renting.model.CarDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
 import javax.validation.constraints.*;
-import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -40,7 +39,7 @@ public class AdvertisementDTO {
     private Integer discount;
 
     //    @NotNull(message = "CDW is null.")
-    private Boolean cdw;
+    private Boolean CDW;
 
     @NotBlank(message = "Pick-up point  is empty.")
     @Pattern(regexp = "^([#.0-9a-zA-ZÀ-ƒ,-/]+[ ]?){1,10}$", message = "Pick up point is not valid.")
@@ -48,4 +47,6 @@ public class AdvertisementDTO {
 
     //    @NotNull(message = "Owner is null.")
     private OwnerDTO owner;
+
+    private LogicalStatus logicalStatus;
 }

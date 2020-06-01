@@ -36,84 +36,83 @@ export class ListRentRequestsComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     public router: Router,
     public dialog: MatDialog,
-    private advertisementService: AdvertisementService,
     private rentRequestService: RentRequestService,
     private toastr: ToastrService
   ) { }
 
   ngOnInit() {
-    /* this.activatedRoute.params.subscribe((params: Params) => {
-       this.advertisementId = params['id'];
-       this.fetchRentRequests('all');
-     });
-     this.fetchRentRequests('all');
-     this.createSuccess = this.rentRequestService.createSuccessEmitter.subscribe(
-       () => {
-         this.fetchRentRequests(this.status)
-       }
-     );*/
+    this.activatedRoute.params.subscribe((params: Params) => {
+      this.advertisementId = params['id'];
+      this.fetchRentRequests('all');
+    });
+    this.fetchRentRequests('all');
+    this.createSuccess = this.rentRequestService.createSuccessEmitter.subscribe(
+      () => {
+        this.fetchRentRequests(this.status)
+      }
+    );
   }
-  /*
-    fetchRentRequests(status: string) {
-      this.advertisementService.getRentRequests(this.advertisementId, status).subscribe(
-        (data: RentRequest[]) => {
-          this.rentRequestsDataSource = new MatTableDataSource(data);
-        },
-        (httpErrorResponse: HttpErrorResponse) => {
-          const data: RentRequest[] = []
-          this.rentRequestsDataSource = new MatTableDataSource(data)
-          this.toastr.error(httpErrorResponse.error.message, 'Show Rent Requests');
-  
-        }
-      );
-    }
-  
-  
-    delete(element: RentRequest) {
-      this.rentRequestService.delete(element.id).subscribe(
-        () => {
-          this.fetchRentRequests(this.status);
-          this.toastr.success('Successfully deleted Rent Request!', 'Delete Rent Request');
-        },
-        (httpErrorResponse: HttpErrorResponse) => {
-          this.toastr.error(httpErrorResponse.error.message, 'Delete Rent Request');
-        }
-      );
-    }
-  
-    createRentReport(rentRequest: RentRequest, rentInfo: RentInfo) {
-      // this.dialog.open(AddRentRequestComponent, { data: element.advertisement });
-    }
-  
-    advertisementDetails(rentInfo: RentInfo) {
-      this.router.navigate(['/advertisement/' + rentInfo.advertisement.id]);
-    }
-  
-    viewDetails(element: RentRequest) {
-      this.router.navigate(['/rent-request/' + element.id]);
-    }
-  
-    accept(element: RentRequest) {
-      this.rentRequestService.accept(element).subscribe(
-        () => {
-          this.fetchRentRequests(this.status);
-          this.toastr.success('Successfully accepted Rent Request!', 'Accept Rent Request');
-        },
-        (httpErrorResponse: HttpErrorResponse) => {
-          this.toastr.error(httpErrorResponse.error.message, 'Accept Rent Request');
-        }
-      );
-    }
-  
-    reject(element: RentRequest) {
-      this.rentRequestService.reject(element).subscribe(
-        () => {
-          this.fetchRentRequests(this.status);
-          this.toastr.success('Successfully canceled Rent Request!', 'Cancel Rent Request');
-        },
-        (httpErrorResponse: HttpErrorResponse) => {
-          this.toastr.error(httpErrorResponse.error.message, 'Cancel Rent Request');
-        }
-      );
-    }*/
+
+  fetchRentRequests(status: string) {
+    this.rentRequestService.getAdvertisementsRentRequests(this.advertisementId, status).subscribe(
+      (data: RentRequest[]) => {
+        this.rentRequestsDataSource = new MatTableDataSource(data);
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        const data: RentRequest[] = []
+        this.rentRequestsDataSource = new MatTableDataSource(data)
+        this.toastr.error(httpErrorResponse.error.message, 'Show Rent Requests');
+
+      }
+    );
+  }
+
+
+  delete(element: RentRequest) {
+    this.rentRequestService.delete(element.id).subscribe(
+      () => {
+        this.fetchRentRequests(this.status);
+        this.toastr.success('Successfully deleted Rent Request!', 'Delete Rent Request');
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Delete Rent Request');
+      }
+    );
+  }
+
+  createRentReport(rentRequest: RentRequest, rentInfo: RentInfo) {
+    // this.dialog.open(AddRentRequestComponent, { data: element.advertisement });
+  }
+
+  advertisementDetails(rentInfo: RentInfo) {
+    this.router.navigate(['/advertisement/' + rentInfo.advertisement.id]);
+  }
+
+  viewDetails(element: RentRequest) {
+    this.router.navigate(['/rent-request/' + element.id]);
+  }
+
+  accept(element: RentRequest) {
+    this.rentRequestService.accept(element).subscribe(
+      () => {
+        this.fetchRentRequests(this.status);
+        this.toastr.success('Successfully accepted Rent Request!', 'Accept Rent Request');
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Accept Rent Request');
+      }
+    );
+  }
+
+  reject(element: RentRequest) {
+    this.rentRequestService.reject(element).subscribe(
+      () => {
+        this.fetchRentRequests(this.status);
+        this.toastr.success('Successfully canceled Rent Request!', 'Cancel Rent Request');
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Cancel Rent Request');
+      }
+    );
+  }
 }

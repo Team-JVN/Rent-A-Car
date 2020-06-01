@@ -57,5 +57,5 @@ public class SearchParamsDTO {
     @PositiveOrZero(message = "Kilometres limit must be a positive number.")
     private Integer kilometresLimit;
 
-    private Boolean cdw;
+    private Boolean CDW;
 }

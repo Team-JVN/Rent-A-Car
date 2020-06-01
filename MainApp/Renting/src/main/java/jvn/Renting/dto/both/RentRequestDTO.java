@@ -17,7 +17,6 @@ public class RentRequestDTO {
     @Positive(message = "Id must be positive.")
     private Long id;
 
-    @NotNull
     private ClientDTO client;
 
     @NotEmpty(message = "Set of rent infos is empty.")

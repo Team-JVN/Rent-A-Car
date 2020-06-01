@@ -47,14 +47,26 @@ public class RentRequestController {
         }
     }
 
-//    @GetMapping("/{status}/advertisement/{advertisementId}")
-//    public ResponseEntity<List<RentRequestDTO>> getRentRequests(@PathVariable(value = "advertisementId", required = false) @Positive(message = "Id must be positive.") Long advertisementId,
-//                                                                @PathVariable(value = "status", required = false) @Pattern(regexp = "(?i)(all|pending|reserved|paid|canceled)$", message = "Status is not valid.")
-//                                                                        String status) {
-//        List<RentRequestDTO> list = rentRequestService.get(advertisementId, status).stream().map(rentRequestDtoMapper::toDto).
-//                collect(Collectors.toList());
-//        return new ResponseEntity<>(list, HttpStatus.OK);
-//    }
+    @GetMapping("/{status}/advertisement/{advertisementId}")
+    public ResponseEntity<List<RentRequestDTO>> getRentRequests(@PathVariable(value = "advertisementId", required = false) @Positive(message = "Id must be positive.") Long advertisementId,
+                                                                @PathVariable(value = "status", required = false) @Pattern(regexp = "(?i)(all|pending|reserved|paid|canceled)$", message = "Status is not valid.")
+                                                                        String status) {
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        return new ResponseEntity<>(rentRequestService.get(advertisementId, status, userDTO.getId()), HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<RentRequestDTO> get(@PathVariable @Positive(message = "Id must be positive.") Long id) {
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        return new ResponseEntity<>(rentRequestService.get(id, userDTO.getId()), HttpStatus.OK);
+    }
+
+    @GetMapping("/{status}/mine")
+    public ResponseEntity<List<RentRequestDTO>> getMine(@PathVariable(value = "status") @Pattern(regexp = "(?i)(all|pending|reserved|paid|canceled)$", message = "Status is not valid.") String status) {
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        return new ResponseEntity<>(rentRequestService.getMine(status, userDTO.getId()), HttpStatus.OK);
+    }
+
 
     private UserDTO stringToObject(String user) {
         try {
