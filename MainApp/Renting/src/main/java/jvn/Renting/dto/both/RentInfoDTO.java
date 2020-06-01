@@ -25,8 +25,7 @@ public class RentInfoDTO {
     private Boolean optedForCDW;
 
     @NotNull(message = "Advertisement is null.")
-    @Positive(message = "Id must be positive.")
-    private Long advertisement;
+    private AdvertisementDTO advertisement;
 
     private Boolean inBundle;
 }

@@ -4,16 +4,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserDTO {
-
+public class OwnerDTO {
+    @NotNull(message = "Id is null.")
     @Positive(message = "Id must be positive.")
     private Long id;
 
@@ -24,11 +21,4 @@ public class UserDTO {
     @NotBlank(message = "Email is empty.")
     @Email(message = "Email is not valid.")
     private String email;
-
-    @NotBlank(message = "Role is empty.")
-    private String role;
-
-    private Boolean canCreateRentRequests;
-
-    private Boolean canCreateComments;
 }

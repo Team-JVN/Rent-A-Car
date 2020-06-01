@@ -1,5 +1,4 @@
-package jvn.Zuul.dto;
-
+package jvn.Renting.dto.both;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +9,7 @@ import javax.validation.constraints.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserDTO {
+public class ClientDTO {
 
     @Positive(message = "Id must be positive.")
     private Long id;
@@ -23,10 +22,12 @@ public class UserDTO {
     @Email(message = "Email is not valid.")
     private String email;
 
-    @NotBlank(message = "Role is empty.")
-    private String role;
+    @NotBlank(message = "Address is empty.")
+    @Pattern(regexp = "^([#.0-9a-zA-ZÀ-ƒ,-\\/]+[ ]?){1,10}$", message = "Address is not valid.")
+    private String address;
 
-    private Boolean canCreateRentRequests;
-
-    private Boolean canCreateComments;
+    @NotBlank(message = "PhoneNumber is empty.")
+    @Size(min = 9, max = 10, message = "Phone number can contain between 9 and 10 digits.")
+    @Pattern(regexp = "0[0-9]+", message = " Phone number must begin with 0 and can contain digits only.")
+    private String phoneNumber;
 }

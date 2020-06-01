@@ -16,7 +16,7 @@ export class AdvertisementFromSearch {
     logicalStatus: string;
 
     constructor(car: CarFromSearch, priceList: PriceList, discount: number, kilometresLimit: number, cdw: boolean, pickUpPoint: string,
-        dateFrom: string, owner: Owner, logicalStatus: string, dateTo?: string, id?: number
+        dateFrom: string, owner: Owner, logicalStatus?: string, dateTo?: string, id?: number
     ) {
         this.id = id;
         this.car = car;
