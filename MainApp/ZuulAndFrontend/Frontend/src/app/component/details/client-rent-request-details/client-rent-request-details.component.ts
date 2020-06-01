@@ -55,55 +55,55 @@ export class ClientRentRequestDetailsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.messageForm = this.formBuilder.group({
-      text: new FormControl(null, Validators.required)
-    })
-    this.activatedRoute.params.subscribe((params: Params) => {
-      this.rentRequestId = params['id'];
-      this.rentRequestService.get(this.rentRequestId).subscribe(
-        (data: RentRequest) => {
-          this.rentRequest = data;
-        },
-        (httpErrorResponse: HttpErrorResponse) => {
-          this.toastr.error(httpErrorResponse.error.message, 'Rent Request Details');
-          this.location.back();
-        }
-      )
-    });
-    this.loggedInUserEmail = this.authentificationService.getLoggedInUserEmail();
-    this.getMessages();
-
-    //Delete this
-    this.messages = [new Message("Cao sta radi,kako si, da li si dorbo.Kako su tvoji. sta radis", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 1), new Message("Kako si", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 2),
-    new Message("Dobro", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 1), new Message("To?", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 2)];
-    this.rentRequestId = 2;
+    /*  this.messageForm = this.formBuilder.group({
+        text: new FormControl(null, Validators.required)
+      })
+      this.activatedRoute.params.subscribe((params: Params) => {
+        this.rentRequestId = params['id'];
+        this.rentRequestService.get(this.rentRequestId).subscribe(
+          (data: RentRequest) => {
+            this.rentRequest = data;
+          },
+          (httpErrorResponse: HttpErrorResponse) => {
+            this.toastr.error(httpErrorResponse.error.message, 'Rent Request Details');
+            this.location.back();
+          }
+        )
+      });
+      this.loggedInUserEmail = this.authentificationService.getLoggedInUserEmail();
+      this.getMessages();
+  
+      //Delete this
+      this.messages = [new Message("Cao sta radi,kako si, da li si dorbo.Kako su tvoji. sta radis", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 1), new Message("Kako si", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 2),
+      new Message("Dobro", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 1), new Message("To?", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 2)];
+      this.rentRequestId = 2;*/
   }
 
-  advertisementDetails(rentInfo: RentInfo) {
-    this.router.navigate(['/advertisement/' + rentInfo.advertisement.id]);
-  }
-
-  getMessages() {
-    this.messageService.getMessages(this.rentRequest.client).subscribe(
-      (data: Message[]) => {
-        this.toastr.success('Success!', 'Fetch messages');
-        this.messages = data;
-      },
-      (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Fetch messages');
-      }
-    );
-  }
-
-  checkIfCanLeaveFeedback(rentInfo: RentInfo, rentRequest: RentRequest) {
-    const dateTimeTo = new Date(rentInfo.dateTimeTo.substring(0, 10));
-    if (rentRequest.rentRequestStatus == 'PAID' && dateTimeTo < new Date()) {
-      return true;
-    }
-    return false;
-  }
-
-  leaveFeedback(rentInfo: RentInfo) {
-    this.dialog.open(LeaveFeedbackComponent, { data: { rentInfo: rentInfo, rentRequest: this.rentRequest } });
-  }
+  /* advertisementDetails(rentInfo: RentInfo) {
+     this.router.navigate(['/advertisement/' + rentInfo.advertisement.id]);
+   }
+ 
+   getMessages() {
+     this.messageService.getMessages(this.rentRequest.client).subscribe(
+       (data: Message[]) => {
+         this.toastr.success('Success!', 'Fetch messages');
+         this.messages = data;
+       },
+       (httpErrorResponse: HttpErrorResponse) => {
+         this.toastr.error(httpErrorResponse.error.message, 'Fetch messages');
+       }
+     );
+   }
+ 
+   checkIfCanLeaveFeedback(rentInfo: RentInfo, rentRequest: RentRequest) {
+     const dateTimeTo = new Date(rentInfo.dateTimeTo.substring(0, 10));
+     if (rentRequest.rentRequestStatus == 'PAID' && dateTimeTo < new Date()) {
+       return true;
+     }
+     return false;
+   }
+ 
+   leaveFeedback(rentInfo: RentInfo) {
+     this.dialog.open(LeaveFeedbackComponent, { data: { rentInfo: rentInfo, rentRequest: this.rentRequest } });
+   }*/
 }

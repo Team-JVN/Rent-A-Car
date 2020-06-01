@@ -1,13 +1,14 @@
 package jvn.Renting.dto.both;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.*;
 
 @Getter
 @Setter
-@NotEmpty
+@NoArgsConstructor
 public class RentInfoDTO {
 
     @Positive(message = "Id must be positive.")
@@ -26,4 +27,6 @@ public class RentInfoDTO {
     @NotNull(message = "Advertisement is null.")
     @Positive(message = "Id must be positive.")
     private Long advertisement;
+
+    private Boolean inBundle;
 }

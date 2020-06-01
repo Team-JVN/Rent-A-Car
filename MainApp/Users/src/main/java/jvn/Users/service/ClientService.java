@@ -12,7 +12,11 @@ public interface ClientService {
 
     Client get(Long id, ClientStatus status);
 
-    List<Client> get(String status,Long id);
+    boolean verify(Long id);
+
+    List<Client> get(String status, Long id);
+
+    List<Client> getForRentRequest();
 
     Client edit(Long id, Client client);
 
@@ -22,7 +26,7 @@ public interface ClientService {
 
     Client approveRequestToRegister(Long id) throws NoSuchAlgorithmException;
 
-    Client rejectRequestToRegister(Long id,String reason);
+    Client rejectRequestToRegister(Long id, String reason);
 
     Client block(Long id);
 

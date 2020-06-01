@@ -35,7 +35,10 @@ export class ListAdvertisementsComponent implements OnInit {
     this.fetchAll('all');
     this.createSuccess = this.advertisementService.createSuccessEmitter.subscribe(
       () => {
-        this.fetchAll(this.status)
+        setTimeout(function () {
+          this.fetchAll(this.status);
+        }, 3000);
+
       }
     );
 
@@ -117,7 +120,7 @@ export class ListAdvertisementsComponent implements OnInit {
   }
 
   rent(element: AdvertisementFromSearch) {
-    // this.dialog.open(AddRentRequestComponent, { data: element });
+    this.dialog.open(AddRentRequestComponent, { data: element });
 
   }
 

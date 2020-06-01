@@ -41,77 +41,78 @@ export class RentRequestDetailsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.messageForm = this.formBuilder.group({
-      text: new FormControl(null, Validators.required)
-    })
-    this.activatedRoute.params.subscribe((params: Params) => {
-      this.rentRequestId = params['id'];
-      this.rentRequestService.get(this.rentRequestId).subscribe(
-        (data: RentRequest) => {
-          this.rentRequest = data;
+    /*  this.messageForm = this.formBuilder.group({
+        text: new FormControl(null, Validators.required)
+      })
+      this.activatedRoute.params.subscribe((params: Params) => {
+        this.rentRequestId = params['id'];
+        this.rentRequestService.get(this.rentRequestId).subscribe(
+          (data: RentRequest) => {
+            this.rentRequest = data;
+          },
+          (httpErrorResponse: HttpErrorResponse) => {
+            this.toastr.error(httpErrorResponse.error.message, 'Rent Request Details');
+            this.location.back();
+          }
+        )
+      });
+      this.loggedInUserEmail = this.authentificationService.getLoggedInUserEmail();
+      this.getMessages();
+  
+      //Delete this
+      this.messages = [new Message("Cao sta radi,kako si, da li si dorbo.Kako su tvoji. sta radis", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 1), new Message("Kako si", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 2),
+      new Message("Dobro", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 1), new Message("To?", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 2)];
+      this.rentRequestId = 2;*/
+  }
+  /*
+    advertisementDetails(rentInfo: RentInfo) {
+      this.router.navigate(['/advertisement/' + rentInfo.advertisement.id]);
+    }
+  
+    createRentReport() {
+  
+    }
+  
+    reviewFeedback(rentInfo: RentInfo) {
+      // this.rentRequestService.getRentInfoFeedback(this.rentInfo.id).subscribe(
+      //   (feedback: Feedback) => {
+      //     if (feedback.rating) {
+      //       this.dialog.open(ReviewFeedbackComponent, { data: { feedback: feedback, rentInfoId: rentInfo.id, rentRequestId: this.rentRequestId }});
+      //     }
+      //   },
+      //   (httpErrorResponse: HttpErrorResponse) => {
+      //     this.toastr.error(httpErrorResponse.error.message, 'Review feedback');
+      //   }
+      // );
+  
+      this.dialog.open(ReviewFeedbackComponent, { data: { feedback: null, rentInfoId: rentInfo.id, rentRequestId: this.rentRequestId } });
+    }
+  
+    checkIfCanCreateComment(rentInfo: RentInfo) {
+      const dateTimeTo = new Date(rentInfo.dateTimeTo.substring(0, 10));
+      if (this.rentRequest.rentRequestStatus == 'PAID' && dateTimeTo < new Date()) {
+        return true;
+      }
+      return false;
+    }
+  
+    checkIfCanCreateReport(rentInfo: RentInfo) {
+      const dateTimeTo = new Date(rentInfo.dateTimeTo.substring(0, 10));
+      if (this.rentRequest.rentRequestStatus == 'PAID' && dateTimeTo < new Date()) {
+        return true;
+      }
+      return false;
+    }
+    getMessages() {
+      this.messageService.getMessages(this.rentRequest.client).subscribe(
+        (data: Message[]) => {
+          this.toastr.success('Success!', 'Fetch messages');
+          this.messages = data;
         },
         (httpErrorResponse: HttpErrorResponse) => {
-          this.toastr.error(httpErrorResponse.error.message, 'Rent Request Details');
-          this.location.back();
+          this.toastr.error(httpErrorResponse.error.message, 'Fetch messages');
         }
-      )
-    });
-    this.loggedInUserEmail = this.authentificationService.getLoggedInUserEmail();
-    this.getMessages();
-
-    //Delete this
-    this.messages = [new Message("Cao sta radi,kako si, da li si dorbo.Kako su tvoji. sta radis", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 1), new Message("Kako si", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 2),
-    new Message("Dobro", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 1), new Message("To?", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 2)];
-    this.rentRequestId = 2;
-  }
-
-  advertisementDetails(rentInfo: RentInfo) {
-    this.router.navigate(['/advertisement/' + rentInfo.advertisement.id]);
-  }
-
-  createRentReport() {
-
-  }
-
-  reviewFeedback(rentInfo: RentInfo) {
-    // this.rentRequestService.getRentInfoFeedback(this.rentInfo.id).subscribe(
-    //   (feedback: Feedback) => {
-    //     if (feedback.rating) {
-    //       this.dialog.open(ReviewFeedbackComponent, { data: { feedback: feedback, rentInfoId: rentInfo.id, rentRequestId: this.rentRequestId }});
-    //     }
-    //   },
-    //   (httpErrorResponse: HttpErrorResponse) => {
-    //     this.toastr.error(httpErrorResponse.error.message, 'Review feedback');
-    //   }
-    // );
-
-    this.dialog.open(ReviewFeedbackComponent, { data: { feedback: null, rentInfoId: rentInfo.id, rentRequestId: this.rentRequestId } });
-  }
-
-  checkIfCanCreateComment(rentInfo: RentInfo) {
-    const dateTimeTo = new Date(rentInfo.dateTimeTo.substring(0, 10));
-    if (this.rentRequest.rentRequestStatus == 'PAID' && dateTimeTo < new Date()) {
-      return true;
+      );
     }
-    return false;
-  }
-
-  checkIfCanCreateReport(rentInfo: RentInfo) {
-    const dateTimeTo = new Date(rentInfo.dateTimeTo.substring(0, 10));
-    if (this.rentRequest.rentRequestStatus == 'PAID' && dateTimeTo < new Date()) {
-      return true;
-    }
-    return false;
-  }
-  getMessages() {
-    this.messageService.getMessages(this.rentRequest.client).subscribe(
-      (data: Message[]) => {
-        this.toastr.success('Success!', 'Fetch messages');
-        this.messages = data;
-      },
-      (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Fetch messages');
-      }
-    );
-  }
+    */
 }

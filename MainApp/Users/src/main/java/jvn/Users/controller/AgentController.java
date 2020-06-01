@@ -26,6 +26,7 @@ import javax.validation.constraints.Positive;
 import java.text.ParseException;
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Validated
 @RestController
 @RequestMapping(value = "/api/agent", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -38,24 +39,24 @@ public class AgentController {
     private UserService userService;
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AgentDTO>create(@Valid @RequestBody AgentDTO agentDTO){
+    public ResponseEntity<AgentDTO> create(@Valid @RequestBody AgentDTO agentDTO) {
         return new ResponseEntity<>(agentDtoMapper.toDto(agentService.create(agentDtoMapper.toEntity(agentDTO))), HttpStatus.CREATED);
     }
 
-    @GetMapping(value="/{id}")
-    public ResponseEntity<AgentDTO>get(@PathVariable("id") @Positive(message="Id must be positive.") Long id){
-        return new ResponseEntity<>(agentDtoMapper.toDto(agentService.get(id)), HttpStatus.CREATED);
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<AgentDTO> get(@PathVariable("id") @Positive(message = "Id must be positive.") Long id) {
+        return new ResponseEntity<>(agentDtoMapper.toDto(agentService.get(id)), HttpStatus.OK);
     }
 
-    @GetMapping(value="/all/{status}")
-    public ResponseEntity<List<AgentDTO>>getAll(@PathVariable(value = "status") @Pattern(regexp = "(?i)(all|active|inactive)$", message = "Status is not valid.") String status){
-        List<AgentDTO> list = agentService.getAll(status,userService.getLoginUser().getId()).stream().map(agentDtoMapper::toDto).
+    @GetMapping(value = "/all/{status}")
+    public ResponseEntity<List<AgentDTO>> getAll(@PathVariable(value = "status") @Pattern(regexp = "(?i)(all|active|inactive)$", message = "Status is not valid.") String status) {
+        List<AgentDTO> list = agentService.getAll(status, userService.getLoginUser().getId()).stream().map(agentDtoMapper::toDto).
                 collect(Collectors.toList());
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @DeleteMapping(value="/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") @Positive(message="Id must be positive.") Long id){
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> delete(@PathVariable("id") @Positive(message = "Id must be positive.") Long id) {
         agentService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -63,20 +64,21 @@ public class AgentController {
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AgentDTO> edit(@Valid @RequestBody AgentDTO agentDTO) {
         User user = userService.getLoginUser();
-        if(user instanceof Agent){
+        if (user instanceof Agent) {
             return new ResponseEntity<>(agentDtoMapper.toDto(agentService.edit(userService.getLoginUser().getId(), agentDtoMapper.toEntity(agentDTO))), HttpStatus.OK);
         }
         throw new InvalidAgentDataException("As a non-authorized user, you are not allowed to enter this page.", HttpStatus.FORBIDDEN);
     }
 
-    @GetMapping(value="/logged-in-user")
-    public ResponseEntity<AgentDTO>get(){
+    @GetMapping(value = "/logged-in-user")
+    public ResponseEntity<AgentDTO> get() {
         User user = userService.getLoginUser();
-        if(user instanceof Agent){
+        if (user instanceof Agent) {
             return new ResponseEntity<>(agentDtoMapper.toDto((Agent) userService.getLoginUser()), HttpStatus.OK);
         }
         throw new InvalidAgentDataException("As a non-authorized user, you are not allowed to enter this page.", HttpStatus.FORBIDDEN);
     }
+
     @Autowired
     public AgentController(AgentService agentService, AgentDtoMapper agentDtoMapper,
                            UserService userService) {

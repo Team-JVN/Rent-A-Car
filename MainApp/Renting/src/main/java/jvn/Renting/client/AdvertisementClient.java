@@ -10,6 +10,6 @@ import java.util.List;
 @FeignClient(name = "advertisements")
 public interface AdvertisementClient {
 
-    @GetMapping("/{advId}")
+    @GetMapping("/api/advertisement/{advId}")
     List<AdvertisementDTO> get(@PathVariable("advId") List<Long> advertisements);
 }

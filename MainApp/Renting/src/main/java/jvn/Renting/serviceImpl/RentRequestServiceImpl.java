@@ -1,6 +1,7 @@
 package jvn.Renting.serviceImpl;
 
 import jvn.Renting.client.AdvertisementClient;
+import jvn.Renting.client.UserClient;
 import jvn.Renting.dto.both.AdvertisementDTO;
 import jvn.Renting.dto.both.PriceListDTO;
 import jvn.Renting.enumeration.RentRequestStatus;
@@ -32,23 +33,23 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     private AdvertisementClient advertisementClient;
 
+    private UserClient userClient;
+
     @Override
-    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public RentRequest create(RentRequest rentRequest, Long loggedInUserId) throws ParseException {
         List<RentInfo> rentInfos = new ArrayList<>(rentRequest.getRentInfos());
         List<AdvertisementDTO> advertisementDTOS = getAdvertisements(rentInfos);
         Long ownerId = advertisementOwnerId(advertisementDTOS);
 
-        // Uncomment this !!!
-        // checkIfClientExist(rentRequest.getClient());
-
         if (ownerId.equals(loggedInUserId)) {
             if (rentRequest.getClient().equals(loggedInUserId)) {
                 throw new InvalidRentRequestDataException("Please choose client for which you create rent request.", HttpStatus.BAD_REQUEST);
             }
+            userClient.verify(rentRequest.getClient());
             rentRequest.setRentRequestStatus(RentRequestStatus.PAID);
-            //TODO: ODBI SVE OSTALE ZAHETEVE!!
         } else {
+            rentRequest.setClient(loggedInUserId);
             rentRequest.setRentRequestStatus(RentRequestStatus.PENDING);
         }
         rentRequest.setCreatedBy(loggedInUserId);
@@ -59,10 +60,10 @@ public class RentRequestServiceImpl implements RentRequestService {
         savedRequest = rentRequestRepository.save(setRentInfosData(savedRequest, rentInfos, advertisementDTOS));
         if (savedRequest.getRentRequestStatus().equals(RentRequestStatus.PAID)) {
             //TODO: REJECT OTHER REQUESTS!!!!
+            rejectOtherRequests(savedRequest);
         }
 
-        // Change this !!!
-        return null;
+        return savedRequest;
     }
 
     private RentRequest setRentInfosData(RentRequest rentRequest, List<RentInfo> rentInfos, List<AdvertisementDTO> advertisementDTOS) throws ParseException {
@@ -98,8 +99,9 @@ public class RentRequestServiceImpl implements RentRequestService {
         if (rentInfoDateFrom.isBefore(advertisementDateFrom) || rentInfoDateTo.isBefore(advertisementDateFrom)) {
             throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.", HttpStatus.BAD_REQUEST);
         }
-        LocalDate advertisementDateTo = getDateConverted(advertisement.getDateTo());
-        if (advertisementDateTo != null) {
+
+        if (advertisement.getDateTo() != null && !advertisement.getDateTo().isEmpty()) {
+            LocalDate advertisementDateTo = getDateConverted(advertisement.getDateTo());
             if (rentInfoDateFrom.isAfter(advertisementDateTo) || rentInfoDateTo.isAfter(advertisementDateTo)) {
                 throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.", HttpStatus.BAD_REQUEST);
             }
@@ -155,16 +157,29 @@ public class RentRequestServiceImpl implements RentRequestService {
     private Long advertisementOwnerId(List<AdvertisementDTO> advertisementDTOS) {
         Long ownerId = advertisementDTOS.get(0).getOwner();
         for (AdvertisementDTO advertisementDTO : advertisementDTOS) {
-            if (advertisementDTO.getOwner() != ownerId) {
+            if (!advertisementDTO.getOwner().equals(ownerId)) {
                 throw new InvalidRentRequestDataException("All advertisements of a rent request must have the same owner.", HttpStatus.BAD_REQUEST);
             }
         }
         return ownerId;
     }
 
+    private void rejectOtherRequests(RentRequest rentRequest) {
+        for (RentInfo rentInfo : rentRequest.getRentInfos()) {
+            List<RentRequest> rentRequests = rentRequestRepository.findByRentRequestStatusNotAndRentInfosAdvertisement(RentRequestStatus.PAID, rentInfo.getAdvertisement());
+            for (RentRequest rentRequest1 : rentRequests) {
+                rentRequest1.setRentRequestStatus(RentRequestStatus.CANCELED);
+            }
+            if (!rentRequests.isEmpty()) {
+                rentRequestRepository.saveAll(rentRequests);
+            }
+        }
+    }
+
     @Autowired
-    public RentRequestServiceImpl(RentRequestRepository rentRequestRepository, AdvertisementClient advertisementClient) {
+    public RentRequestServiceImpl(RentRequestRepository rentRequestRepository, AdvertisementClient advertisementClient, UserClient userClient) {
         this.rentRequestRepository = rentRequestRepository;
         this.advertisementClient = advertisementClient;
+        this.userClient = userClient;
     }
 }

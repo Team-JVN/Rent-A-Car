@@ -1,13 +1,12 @@
 import { RentInfo } from './rentInfo';
-import { Client } from './client';
 
 export class RentRequest {
     id: number;
-    client: Client;
+    client: number;
     rentInfos: RentInfo[];
     totalPrice: number;
     rentRequestStatus: string;
-    constructor(client: Client, rentInfos: RentInfo[], totalPrice?: number, rentRequestStatus?: string, id?: number) {
+    constructor(client: number, rentInfos: RentInfo[], totalPrice?: number, rentRequestStatus?: string, id?: number) {
         this.client = client;
         this.rentInfos = rentInfos;
         this.totalPrice = totalPrice;

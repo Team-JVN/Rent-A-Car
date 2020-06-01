@@ -74,7 +74,7 @@ export class AddRentRequestComponent implements OnInit {
   }
 
   fetchClients() {
-    this.clientService.getClients().subscribe(
+    this.clientService.getClientsForRentRequest().subscribe(
       (data: Client[]) => {
         this.clients = data;
       },
@@ -105,34 +105,49 @@ export class AddRentRequestComponent implements OnInit {
     if (!this.selectedItem.cdw) {
       cdw = null;
     }
-    const newRentInfo = new RentInfo(dateTimeFrom, dateTimeTo, cdw, this.selectedItem);
+    const newRentInfo = new RentInfo(dateTimeFrom, dateTimeTo, cdw, this.selectedItem.id);
+    var rentInfos = [];
+    rentInfos.push(newRentInfo);
+    const rentRequest = new RentRequest(this.clientForm.value.client.id, rentInfos, null, null);
+    console.log(rentRequest);
+    this.rentRequestService.create(rentRequest).subscribe(
+      (data: RentRequest) => {
+        this.clientForm.reset();
+        this.informationForm.reset();
+        this.dialogRef.close();
+        this.toastr.success('Success.', 'Create Rent Request');
+        this.rentRequestService.createSuccessEmitter.next(data);
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Create Rent Request');
+      }
+    );
+    // if (this.authService.isAgent()) {
+    //   var rentInfos = [];
+    //   rentInfos.push(newRentInfo);
+    //   const rentRequest = new RentRequest(this.clientForm.value.client, rentInfos);
 
-    if (this.authService.isAgent()) {
-      var rentInfos = [];
-      rentInfos.push(newRentInfo);
-      const rentRequest = new RentRequest(this.clientForm.value.client, rentInfos);
-
-      this.rentRequestService.create(rentRequest).subscribe(
-        (data: RentRequest) => {
-          this.clientForm.reset();
-          this.informationForm.reset();
-          this.dialogRef.close();
-          this.toastr.success('Success.', 'Create Rent Request');
-          this.rentRequestService.createSuccessEmitter.next(data);
-        },
-        (httpErrorResponse: HttpErrorResponse) => {
-          this.toastr.error(httpErrorResponse.error.message, 'Create Rent Request');
-        }
-      );
-    } else if (this.authService.isClient()) {
-      let rentInfos: RentInfo[] = JSON.parse(localStorage.getItem("rentInfos") || "[]");
-      rentInfos.push(newRentInfo);
-      localStorage.setItem("rentInfos", JSON.stringify(rentInfos));
-      this.clientForm.reset();
-      this.informationForm.reset();
-      this.dialogRef.close();
-      this.toastr.success('Successfully added to cart!', 'Create Rent Request');
-    }
+    //   this.rentRequestService.create(rentRequest).subscribe(
+    //     (data: RentRequest) => {
+    //       this.clientForm.reset();
+    //       this.informationForm.reset();
+    //       this.dialogRef.close();
+    //       this.toastr.success('Success.', 'Create Rent Request');
+    //       this.rentRequestService.createSuccessEmitter.next(data);
+    //     },
+    //     (httpErrorResponse: HttpErrorResponse) => {
+    //       this.toastr.error(httpErrorResponse.error.message, 'Create Rent Request');
+    //     }
+    //   );
+    // } else if (this.authService.isClient()) {
+    //   let rentInfos: RentInfo[] = JSON.parse(localStorage.getItem("rentInfos") || "[]");
+    //   rentInfos.push(newRentInfo);
+    //   localStorage.setItem("rentInfos", JSON.stringify(rentInfos));
+    //   this.clientForm.reset();
+    //   this.informationForm.reset();
+    //   this.dialogRef.close();
+    //   this.toastr.success('Successfully added to cart!', 'Create Rent Request');
+    // }
   }
 
   openAddClient() {

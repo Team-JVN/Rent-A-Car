@@ -1,15 +1,13 @@
-import { AdvertisementWithPictures } from 'src/app/model/advertisementWithPictures';
-
 export class RentInfo {
     id: number;
     dateTimeFrom: string;
     dateTimeTo: string;
     optedForCDW: boolean;
-    advertisement: AdvertisementWithPictures;
+    advertisement: number;
     index: number;
     inBundle: boolean;
 
-    constructor(dateTimeFrom: string, dateTimeTo: string, optedForCDW: boolean, advertisement: AdvertisementWithPictures, id?: number) {
+    constructor(dateTimeFrom: string, dateTimeTo: string, optedForCDW: boolean, advertisement: number, id?: number) {
         this.dateTimeFrom = dateTimeFrom;
         this.dateTimeTo = dateTimeTo;
         this.optedForCDW = optedForCDW;

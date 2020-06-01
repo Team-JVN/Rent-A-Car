@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
@@ -46,15 +47,27 @@ public class ClientController {
         }
     }
 
-    @GetMapping(value="/{id}")
-    public ResponseEntity<ClientDTO>get(@PathVariable("id") @Positive(message="Id must be positive.") Long id){
-        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.get(id, ClientStatus.ACTIVE)), HttpStatus.CREATED);
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<ClientDTO> get(@PathVariable("id") @Positive(message = "Id must be positive.") Long id) {
+        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.get(id, ClientStatus.ACTIVE)), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/for-rent-request")
+    public ResponseEntity<List<ClientDTO>> getForRentRequest() {
+        List<ClientDTO> list = clientService.getForRentRequest().stream().map(clientDtoMapper::toDto).
+                collect(Collectors.toList());
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/verify/{clientId}")
+    public ResponseEntity<?> verify(@PathVariable("clientId") @Positive(message = "Id must be positive.") Long clientId) {
+        return new ResponseEntity<>(clientService.verify(clientId), HttpStatus.OK);
     }
 
     @GetMapping("/all/{status}")
     public ResponseEntity<List<ClientDTO>> getAll(
             @PathVariable(value = "status") @Pattern(regexp = "(?i)(all|awaiting|approved|active|blocked)$", message = "Status is not valid.") String status) {
-        List<ClientDTO> list = clientService.get(status,userService.getLoginUser().getId()).stream().map(clientDtoMapper::toDto).
+        List<ClientDTO> list = clientService.get(status, userService.getLoginUser().getId()).stream().map(clientDtoMapper::toDto).
                 collect(Collectors.toList());
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
@@ -88,7 +101,7 @@ public class ClientController {
     @PutMapping(value = "/{id}/reject")
     public ResponseEntity<ClientDTO> rejectRequestToRegister(@PathVariable @Positive(message = "Id must be positive.") Long id,
                                                              @RequestBody @Pattern(regexp = "^[\\p{N}\\p{L}\\p{Sc}@ !()-,.:;/'\"&*=+%]+$", message = "Comment is not valid.") String reason) {
-        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.rejectRequestToRegister(id,reason)), HttpStatus.OK);
+        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.rejectRequestToRegister(id, reason)), HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}/block")
@@ -104,13 +117,13 @@ public class ClientController {
     @PutMapping(value = "/{id}/create-rent-requests/{status}")
     public ResponseEntity<ClientDTO> createRentRequests(@PathVariable("id") @Positive(message = "Id must be positive.") Long id,
                                                         @PathVariable("status") @Pattern(regexp = "(?i)(disable|enable)$", message = "Status is not valid.") String status) {
-        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.createRentRequests(id,status)), HttpStatus.OK);
+        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.createRentRequests(id, status)), HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}/create-comments/{status}")
     public ResponseEntity<ClientDTO> createComments(@PathVariable("id") @Positive(message = "Id must be positive.") Long id,
-                                                        @PathVariable("status") @Pattern(regexp = "(?i)(disable|enable)$", message = "Status is not valid.") String status) {
-        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.createComments(id,status)), HttpStatus.OK);
+                                                    @PathVariable("status") @Pattern(regexp = "(?i)(disable|enable)$", message = "Status is not valid.") String status) {
+        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.createComments(id, status)), HttpStatus.OK);
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -122,8 +135,8 @@ public class ClientController {
         throw new InvalidClientDataException("As a non-authorized user, you are not allowed to enter this page.", HttpStatus.FORBIDDEN);
     }
 
-    @GetMapping(value="/logged-in-user")
-    public ResponseEntity<ClientDTO>get(){
+    @GetMapping(value = "/logged-in-user")
+    public ResponseEntity<ClientDTO> get() {
         User user = userService.getLoginUser();
         if (user instanceof Client) {
             return new ResponseEntity<>(clientDtoMapper.toDto((Client) userService.getLoginUser()), HttpStatus.OK);
@@ -132,7 +145,7 @@ public class ClientController {
     }
 
     @Autowired
-    public ClientController(ClientService clientService, ClientDtoMapper clientDtoMapper,UserService userService) {
+    public ClientController(ClientService clientService, ClientDtoMapper clientDtoMapper, UserService userService) {
         this.clientService = clientService;
         this.clientDtoMapper = clientDtoMapper;
         this.userService = userService;

@@ -22,6 +22,8 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -71,8 +73,8 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Client get(Long id,ClientStatus status) {
-        Client client = clientRepository.findOneByIdAndStatus(id,status);
+    public Client get(Long id, ClientStatus status) {
+        Client client = clientRepository.findOneByIdAndStatus(id, status);
         if (client == null) {
             throw new InvalidClientDataException("This client doesn't exist.", HttpStatus.NOT_FOUND);
         }
@@ -80,19 +82,41 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public List<Client> get(String status,Long id) {
+    public boolean verify(Long id) {
+        Collection<ClientStatus> statuses = new ArrayList<>();
+        statuses.add(ClientStatus.NEVER_LOGGED_IN);
+        statuses.add(ClientStatus.ACTIVE);
+        statuses.add(ClientStatus.APPROVED);
+        Client client = clientRepository.findOneByIdAndStatusIn(id, statuses);
+        if (client == null) {
+            throw new InvalidClientDataException("This client doesn't exist.", HttpStatus.NOT_FOUND);
+        }
+        return true;
+    }
+
+    @Override
+    public List<Client> get(String status, Long id) {
         List<Client> clients;
-        if(status.equals("all")){
-            clients = clientRepository.findByStatusNotAndIdNot(ClientStatus.DELETED,id);
-        }else {
-            clients = clientRepository.findByStatusAndIdNot(getClientStatus(status),id);
+        if (status.equals("all")) {
+            clients = clientRepository.findByStatusNotAndIdNot(ClientStatus.DELETED, id);
+        } else {
+            clients = clientRepository.findByStatusAndIdNot(getClientStatus(status), id);
         }
         return clients;
     }
 
     @Override
+    public List<Client> getForRentRequest() {
+        Collection<ClientStatus> statuses = new ArrayList<>();
+        statuses.add(ClientStatus.NEVER_LOGGED_IN);
+        statuses.add(ClientStatus.ACTIVE);
+        statuses.add(ClientStatus.APPROVED);
+        return clientRepository.findByStatusIn(statuses);
+    }
+
+    @Override
     public Client edit(Long id, Client client) {
-        Client dbClient = get(id,ClientStatus.ACTIVE);
+        Client dbClient = get(id, ClientStatus.ACTIVE);
         if (clientRepository.findByPhoneNumberAndIdNot(client.getPhoneNumber(), id) != null) {
             throw new InvalidClientDataException("Client with same phone number already exists.",
                     HttpStatus.BAD_REQUEST);
@@ -105,7 +129,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public void delete(Long id) {
-        Client client = clientRepository.findOneByIdAndStatusNot(id,ClientStatus.DELETED);
+        Client client = clientRepository.findOneByIdAndStatusNot(id, ClientStatus.DELETED);
         if (client == null) {
             throw new InvalidClientDataException("This client is already deleted.", HttpStatus.NOT_FOUND);
         }
@@ -120,7 +144,7 @@ public class ClientServiceImpl implements ClientService {
         if (verificationToken == null) {
             throw new InvalidTokenException("This activation link is invalid or expired.", HttpStatus.BAD_REQUEST);
         }
-        Client client = get(verificationToken.getClient().getId(),ClientStatus.APPROVED);
+        Client client = get(verificationToken.getClient().getId(), ClientStatus.APPROVED);
         client.setStatus(ClientStatus.ACTIVE);
         verificationTokenRepository.deleteById(verificationToken.getId());
 
@@ -129,8 +153,8 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Client approveRequestToRegister(Long id) throws NoSuchAlgorithmException {
-        Client client = get(id,ClientStatus.AWAITING);
-        if(client.getStatus().equals(ClientStatus.AWAITING)){
+        Client client = get(id, ClientStatus.AWAITING);
+        if (client.getStatus().equals(ClientStatus.AWAITING)) {
             client.setStatus(ClientStatus.APPROVED);
             client = clientRepository.save(client);
             VerificationToken verificationToken = new VerificationToken(client);
@@ -152,7 +176,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Client rejectRequestToRegister(Long id, String reason) {
-        Client client = get(id,ClientStatus.AWAITING);
+        Client client = get(id, ClientStatus.AWAITING);
 
         client.setRole(null);
         clientRepository.deleteById(id);
@@ -163,7 +187,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Client block(Long id) {
-        Client dbClient = get(id,ClientStatus.ACTIVE);
+        Client dbClient = get(id, ClientStatus.ACTIVE);
         dbClient.setStatus(ClientStatus.BLOCKED);
         Client client = clientRepository.save(dbClient);
         composeAndSendBlockEmail(client.getEmail());
@@ -172,7 +196,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Client unblock(Long id) {
-        Client dbClient = get(id,ClientStatus.BLOCKED);
+        Client dbClient = get(id, ClientStatus.BLOCKED);
         dbClient.setStatus(ClientStatus.ACTIVE);
         Client client = clientRepository.save(dbClient);
         composeAndSendUnblockEmail(client.getEmail());
@@ -181,15 +205,15 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Client createRentRequests(Long id, String status) {
-        Client dbClient = get(id,ClientStatus.ACTIVE);
-        if(status.equals("disable")){
+        Client dbClient = get(id, ClientStatus.ACTIVE);
+        if (status.equals("disable")) {
             dbClient.setCanCreateRentRequests(false);
             dbClient.setCanceledReservationCounter(0);
             composeAndSendDisableCreatingRentRequests(dbClient.getEmail());
-        }else if(status.equals("enable")){
+        } else if (status.equals("enable")) {
             dbClient.setCanCreateRentRequests(true);
             composeAndSendEnableCreatingRentRequests(dbClient.getEmail());
-        }else {
+        } else {
             throw new InvalidTokenException("Status is not valid.Please try again.", HttpStatus.BAD_REQUEST);
         }
         return clientRepository.save(dbClient);
@@ -197,21 +221,21 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Client createComments(Long id, String status) {
-        Client dbClient = get(id,ClientStatus.ACTIVE);
-        if(status.equals("disable")){
+        Client dbClient = get(id, ClientStatus.ACTIVE);
+        if (status.equals("disable")) {
             dbClient.setCanCreateComments(false);
             dbClient.setRejectedCommentsCounter(0);
             composeAndSendDisableCreatingComments(dbClient.getEmail());
-        }else if(status.equals("enable")){
+        } else if (status.equals("enable")) {
             dbClient.setCanCreateComments(true);
             composeAndSendEnableCreatingComments(dbClient.getEmail());
-        }else {
+        } else {
             throw new InvalidTokenException("Status is not valid. Please try again.", HttpStatus.BAD_REQUEST);
         }
         return clientRepository.save(dbClient);
     }
 
-    private void composeAndSendDisableCreatingRentRequests(String recipientEmail ) {
+    private void composeAndSendDisableCreatingRentRequests(String recipientEmail) {
         String subject = "Forbidden creating rent requests";
         StringBuilder sb = new StringBuilder();
         sb.append("From now on, you are not allowed to create rent requests because you canceled your reservations many times.");
@@ -223,7 +247,7 @@ public class ClientServiceImpl implements ClientService {
         emailNotificationService.sendEmail(recipientEmail, subject, text);
     }
 
-    private void composeAndSendEnableCreatingRentRequests(String recipientEmail ) {
+    private void composeAndSendEnableCreatingRentRequests(String recipientEmail) {
         String subject = "Allowed creating rent requests";
         StringBuilder sb = new StringBuilder();
         sb.append("From now on, you are allowed to create rent requests again.");
@@ -232,7 +256,7 @@ public class ClientServiceImpl implements ClientService {
         emailNotificationService.sendEmail(recipientEmail, subject, text);
     }
 
-    private void composeAndSendDisableCreatingComments(String recipientEmail ) {
+    private void composeAndSendDisableCreatingComments(String recipientEmail) {
         String subject = "Forbidden creating comments";
         StringBuilder sb = new StringBuilder();
         sb.append("From now on, you are not allowed to create comments because your comments were rejected many times by an administrator.");
@@ -244,7 +268,7 @@ public class ClientServiceImpl implements ClientService {
         emailNotificationService.sendEmail(recipientEmail, subject, text);
     }
 
-    private void composeAndSendEnableCreatingComments(String recipientEmail ) {
+    private void composeAndSendEnableCreatingComments(String recipientEmail) {
         String subject = "Allowed creating comments";
         StringBuilder sb = new StringBuilder();
         sb.append("From now on, you are allowed to create comments again.");
@@ -252,6 +276,7 @@ public class ClientServiceImpl implements ClientService {
         String text = sb.toString();
         emailNotificationService.sendEmail(recipientEmail, subject, text);
     }
+
     private void composeAndSendRejectionEmail(String recipientEmail, String reason) {
         String subject = "Request to register rejected";
         StringBuilder sb = new StringBuilder();
@@ -293,6 +318,7 @@ public class ClientServiceImpl implements ClientService {
             throw new InvalidClientDataException("Please choose valid client's status", HttpStatus.NOT_FOUND);
         }
     }
+
     private String getTokenHash(String token) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-512");
         digest.reset();

@@ -25,45 +25,45 @@ export class ListClientsComponent implements OnInit {
     private toastr: ToastrService) { }
 
   ngOnInit() {
-    this.fetchClients();
-    this.successCreated = this.clientService.createSuccessEmitter.subscribe(
-      () => {
-        this.fetchClients()
-      }
-    );
+    /* this.fetchClients();
+     this.successCreated = this.clientService.createSuccessEmitter.subscribe(
+       () => {
+         this.fetchClients()
+       }
+     );*/
   }
-
-  fetchClients() {
-    this.clientService.getClients().subscribe(
-      (data: Client[]) => {
-        this.clientsDataSource = new MatTableDataSource(data);
-      },
-      (httpErrorResponse: HttpErrorResponse) => {
-        const data: Client[] = []
-        this.clientsDataSource = new MatTableDataSource(data)
-        this.toastr.error(httpErrorResponse.error.message, 'Show Clients');
-      }
-    );
-  }
-
-  edit(element: Client) {
-    this.dialog.open(EditClientComponent, { data: element });
-  }
-
-  openDialog() {
-    this.dialog.open(AddClientComponent);
-  }
-
-  delete(element: Client) {
-    this.clientService.delete(element.id).subscribe(
-      () => {
-        this.fetchClients();
-        this.toastr.success('Successfully deleted Client!', 'Delete Client');
-      },
-      (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Delete Client');
-      }
-    );
-  }
-
+  /*
+    fetchClients() {
+      this.clientService.getClients().subscribe(
+        (data: Client[]) => {
+          this.clientsDataSource = new MatTableDataSource(data);
+        },
+        (httpErrorResponse: HttpErrorResponse) => {
+          const data: Client[] = []
+          this.clientsDataSource = new MatTableDataSource(data)
+          this.toastr.error(httpErrorResponse.error.message, 'Show Clients');
+        }
+      );
+    }
+  
+    edit(element: Client) {
+      this.dialog.open(EditClientComponent, { data: element });
+    }
+  
+    openDialog() {
+      this.dialog.open(AddClientComponent);
+    }
+  
+    delete(element: Client) {
+      this.clientService.delete(element.id).subscribe(
+        () => {
+          this.fetchClients();
+          this.toastr.success('Successfully deleted Client!', 'Delete Client');
+        },
+        (httpErrorResponse: HttpErrorResponse) => {
+          this.toastr.error(httpErrorResponse.error.message, 'Delete Client');
+        }
+      );
+    }
+  */
 }
