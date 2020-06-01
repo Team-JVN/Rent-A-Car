@@ -318,7 +318,7 @@
                                     {{element.priceList.pricePerDay | number: '1.2-2'}} €</td>
                             </tr>
                             <tr><button mat-raised-button color="primary" class="rent-btn"
-                                    *ngIf="checkIfCanRentAdvertisement(element)"
+                                    *ngIf="this.authService.isLoggedIn() && checkIfCanRentAdvertisement(element)"
                                     (click)="rent(element);$event.stopPropagation()">Rent
                                     me!</button></tr>
                         </table>

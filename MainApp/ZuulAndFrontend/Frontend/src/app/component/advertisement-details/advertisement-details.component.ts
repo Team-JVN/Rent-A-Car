@@ -1,3 +1,4 @@
+import { AuthentificationService } from './../../service/authentification.service';
 import { SearchService } from 'src/app/service/search.service';
 import { AdvertisementFromSearch } from './../../model/advertisementFromSearch';
 import { NgxGalleryOptions, NgxGalleryImage, NgxGalleryAnimation } from 'ngx-gallery';
@@ -28,6 +29,7 @@ export class AdvertisementDetailsComponent implements OnInit {
     private router: Router,
     private toastr: ToastrService,
     private searchService: SearchService,
+    private authService: AuthentificationService,
     public dialog: MatDialog,
   ) { }
 

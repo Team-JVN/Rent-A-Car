@@ -135,8 +135,11 @@
                         <td class="price-text">
                             {{selectedAdvertisement.priceList.pricePerDay | number: '1.2-2'}} €</td>
                     </tr>
-                    <tr><button *ngIf="checkIfCanRentAdvertisement(selectedAdvertisement)" mat-raised-button
-                            color="primary" class="rent-btn" (click)="rent(selectedAdvertisement)">Rent me!</button>
+                    <tr><button
+                            *ngIf="this.authService.isLoggedIn() && checkIfCanRentAdvertisement(selectedAdvertisement)"
+                            mat-raised-button color="primary" class="rent-btn" (click)="rent(selectedAdvertisement)">
+                            Rent me!
+                        </button>
                         <button *ngIf="!checkIfCanRentAdvertisement(selectedAdvertisement)" mat-flat-button color="warn"
                             class="rented-out-btn">RENTED OUT</button></tr>
                 </table>
