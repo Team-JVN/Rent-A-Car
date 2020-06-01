@@ -1,5 +1,4 @@
 import { AdvertisementFromSearch } from './../../../model/advertisementFromSearch';
-import { AdvertisementWithPictures } from './../../../model/advertisementWithPictures';
 import { AuthentificationService } from './../../../service/authentification.service';
 import { RentInfo } from './../../../model/rentInfo';
 import { RentRequest } from './../../../model/rentRequest';
@@ -107,48 +106,31 @@ export class AddRentRequestComponent implements OnInit {
       cdw = null;
     }
     const newRentInfo = new RentInfo(dateTimeFrom, dateTimeTo, cdw, this.selectedItem.id);
-    var rentInfos = [];
-    rentInfos.push(newRentInfo);
-    const rentRequest = new RentRequest(this.clientForm.value.client.id, rentInfos, null, null);
-    console.log(rentRequest);
-    this.rentRequestService.create(rentRequest).subscribe(
-      (data: RentRequest) => {
-        this.clientForm.reset();
-        this.informationForm.reset();
-        this.dialogRef.close();
-        this.toastr.success('Success.', 'Create Rent Request');
-        this.rentRequestService.createSuccessEmitter.next(data);
-      },
-      (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Create Rent Request');
-      }
-    );
-    // if (this.authService.isAgent()) {
-    //   var rentInfos = [];
-    //   rentInfos.push(newRentInfo);
-    //   const rentRequest = new RentRequest(this.clientForm.value.client, rentInfos);
 
-    //   this.rentRequestService.create(rentRequest).subscribe(
-    //     (data: RentRequest) => {
-    //       this.clientForm.reset();
-    //       this.informationForm.reset();
-    //       this.dialogRef.close();
-    //       this.toastr.success('Success.', 'Create Rent Request');
-    //       this.rentRequestService.createSuccessEmitter.next(data);
-    //     },
-    //     (httpErrorResponse: HttpErrorResponse) => {
-    //       this.toastr.error(httpErrorResponse.error.message, 'Create Rent Request');
-    //     }
-    //   );
-    // } else if (this.authService.isClient()) {
-    //   let rentInfos: RentInfo[] = JSON.parse(localStorage.getItem("rentInfos") || "[]");
-    //   rentInfos.push(newRentInfo);
-    //   localStorage.setItem("rentInfos", JSON.stringify(rentInfos));
-    //   this.clientForm.reset();
-    //   this.informationForm.reset();
-    //   this.dialogRef.close();
-    //   this.toastr.success('Successfully added to cart!', 'Create Rent Request');
-    // }
+    if (this.selectedItem.owner.email === this.authService.getLoggedInUserEmail()) {
+      var rentInfos = [];
+      rentInfos.push(newRentInfo);
+      const rentRequest = new RentRequest(this.clientForm.value.client.id, rentInfos);
+      this.rentRequestService.create(rentRequest).subscribe(
+        (data: RentRequest) => {
+          this.clientForm.reset();
+          this.informationForm.reset();
+          this.dialogRef.close();
+          this.toastr.success('Success.', 'Create Rent Request');
+          this.rentRequestService.createSuccessEmitter.next(data);
+        },
+        (httpErrorResponse: HttpErrorResponse) => {
+          this.toastr.error(httpErrorResponse.error.message, 'Create Rent Request');
+        }
+      );
+    } else {
+      let rentInfos: RentInfo[] = JSON.parse(localStorage.getItem("rentInfos") || "[]");
+      rentInfos.push(newRentInfo);
+      localStorage.setItem("rentInfos", JSON.stringify(rentInfos));
+      this.informationForm.reset();
+      this.dialogRef.close();
+      this.toastr.success('Successfully added to cart!', 'Create Rent Request');
+    }
   }
 
   openAddClient() {

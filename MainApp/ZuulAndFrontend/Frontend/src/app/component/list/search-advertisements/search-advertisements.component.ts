@@ -1,3 +1,4 @@
+import { AddToCartComponent } from './../../add/add-to-cart/add-to-cart.component';
 import { AuthentificationService } from './../../../service/authentification.service';
 import { AdvertisementFromSearch } from './../../../model/advertisementFromSearch';
 import { SearchParams } from './../../../model/searchParams';
@@ -12,8 +13,6 @@ import { BodyStyle } from '../../../model/bodyStyle';
 import { GearBoxType } from './../../../model/gearboxType';
 import { FuelType } from './../../../model/fuelType';
 import { FormGroup, ValidatorFn, FormControl, FormBuilder, Validators } from '@angular/forms';
-import { AdvertisementWithPictures } from './../../../model/advertisementWithPictures';
-import { AddRentRequestComponent } from './../../add/add-rent-request/add-rent-request.component';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CarService } from './../../../service/car.service';
@@ -23,6 +22,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { StarRatingComponent } from 'ng-starrating';
 import { formatDate } from '@angular/common';
+import { SearchParamsForRentInfo } from 'src/app/model/searchParamsForRentInfo';
 
 const DateValidator: ValidatorFn = (fg: FormGroup) => {
   const from = fg.get('dateFrom').value;
@@ -49,6 +49,9 @@ export class SearchAdvertisementsComponent implements OnInit {
   makes: Make[] = [];
   models: Model[] = [];
 
+  dateTimeFrom: string;
+  dateTimeTo: string;
+  pickUpPoint: string;
   minRating: number = 0.0;
   minDate: Date;
   allMakes: Make;
@@ -109,7 +112,15 @@ export class SearchAdvertisementsComponent implements OnInit {
   }
 
   rent(element: AdvertisementFromSearch) {
-    this.dialog.open(AddRentRequestComponent, { data: element });
+    const searchParams = new SearchParamsForRentInfo(this.dateTimeFrom, this.dateTimeTo, this.pickUpPoint, element);
+
+    if (element.cdw) {
+      this.dialog.open(AddToCartComponent, { data: searchParams });
+    } else {
+      console.log("Nema CDW!");
+      console.log(searchParams);
+    }
+
   }
 
   viewDetails(element: AdvertisementFromSearch) {
@@ -132,9 +143,11 @@ export class SearchAdvertisementsComponent implements OnInit {
     }
 
     const dateFrom = formatDate(this.searchForm.value.dateFrom, 'yyyy-MM-dd', 'en-US')
-    const dateTimeFrom = dateFrom + ' ' + this.searchForm.value.timeFrom;
+    this.dateTimeFrom = dateFrom + ' ' + this.searchForm.value.timeFrom;
     const dateTo = formatDate(this.searchForm.value.dateTo, 'yyyy-MM-dd', 'en-US')
-    const dateTimeTo = dateTo + ' ' + this.searchForm.value.timeTo;
+    this.dateTimeTo = dateTo + ' ' + this.searchForm.value.timeTo;
+
+    this.pickUpPoint = this.searchForm.value.pickUpPoint;
 
     const make = this.searchForm.value.make && this.searchForm.value.make !== this.allMakes ? this.searchForm.value.make.name : null;
     const model = this.searchForm.value.model && this.searchForm.value.model !== this.allModels ? this.searchForm.value.model.name : null;
@@ -142,7 +155,7 @@ export class SearchAdvertisementsComponent implements OnInit {
     const gearBoxType = this.searchForm.value.gearBoxType && this.searchForm.value.gearBoxType !== this.allGearboxTypes ? this.searchForm.value.gearBoxType.name : null;
     const bodyStyle = this.searchForm.value.bodyStyle && this.searchForm.value.bodyStyle !== this.allBodyStyles ? this.searchForm.value.bodyStyle.name : null;
 
-    const searchParams = new SearchParams(dateTimeFrom, dateTimeTo, this.searchForm.value.pickUpPoint, make, model, fuelType, gearBoxType, bodyStyle,
+    const searchParams = new SearchParams(this.dateTimeFrom, this.dateTimeTo, this.pickUpPoint, make, model, fuelType, gearBoxType, bodyStyle,
       this.minRating, this.searchForm.value.minPricePerDay, this.searchForm.value.maxPricePerDay, this.searchForm.value.kidsSeats,
       this.searchForm.value.mileageInKm, this.searchForm.value.kilometresLimit, this.searchForm.value.cdw);
 

@@ -1,0 +1,13 @@
+<h1 mat-dialog-title>Add to Cart</h1>
+<mat-dialog-content class="dialog-class">
+    <form [formGroup]="informationForm">
+        <div>
+            <mat-checkbox formControlName="optedForCDW" class="form-full-width">
+                Include Collision Damage Waiver
+            </mat-checkbox>
+        </div>
+        <div align="end" class="mt-3">
+            <button mat-raised-button color="primary" (click)="create()">Confirm</button>
+        </div>
+    </form>
+</mat-dialog-content>
