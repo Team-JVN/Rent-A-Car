@@ -1,3 +1,4 @@
+import { AuthentificationService } from './../../../service/authentification.service';
 import { AdvertisementFromSearch } from './../../../model/advertisementFromSearch';
 import { SearchParams } from './../../../model/searchParams';
 import { SearchService } from './../../../service/search.service';
@@ -12,12 +13,10 @@ import { GearBoxType } from './../../../model/gearboxType';
 import { FuelType } from './../../../model/fuelType';
 import { FormGroup, ValidatorFn, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { AdvertisementWithPictures } from './../../../model/advertisementWithPictures';
-import { RentRequestService } from './../../../service/rent-request.service';
 import { AddRentRequestComponent } from './../../add/add-rent-request/add-rent-request.component';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CarService } from './../../../service/car.service';
-import { AdvertisementService } from './../../../service/advertisement.service';
 import { ToastrService } from 'ngx-toastr';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -62,15 +61,14 @@ export class SearchAdvertisementsComponent implements OnInit {
     public router: Router,
     public dialog: MatDialog,
     private formBuilder: FormBuilder,
-    private advertisementService: AdvertisementService,
     private searchService: SearchService,
+    private authService: AuthentificationService,
     private carService: CarService,
     private toastr: ToastrService,
     private fuelTypeService: FuelTypeService,
     private gearboxTypeService: GearboxTypeService,
     private bodyStyleService: BodyStyleService,
     private makeService: MakeService,
-    private rentRequestService: RentRequestService
   ) { }
 
   ngOnInit() {
@@ -110,13 +108,11 @@ export class SearchAdvertisementsComponent implements OnInit {
     this.fetchBodyStyles();
   }
 
-  //TODO: change from AdvertisementWithPictures to AdvertisementFromSearch
-  rent(element: AdvertisementWithPictures) {
+  rent(element: AdvertisementFromSearch) {
     this.dialog.open(AddRentRequestComponent, { data: element });
   }
 
-  //TODO: change from AdvertisementWithPictures to AdvertisementFromSearch
-  viewDetails(element: AdvertisementWithPictures) {
+  viewDetails(element: AdvertisementFromSearch) {
     this.router.navigate(['/advertisement/' + element.id]);
   }
 
@@ -163,8 +159,7 @@ export class SearchAdvertisementsComponent implements OnInit {
     );
   }
 
-  //TODO: change from AdvertisementWithPictures to AdvertisementFromSearch
-  checkIfCanRentAdvertisement(element: AdvertisementWithPictures): boolean {
+  checkIfCanRentAdvertisement(element: AdvertisementFromSearch): boolean {
     if (!element.dateTo) {
       return true;
     }

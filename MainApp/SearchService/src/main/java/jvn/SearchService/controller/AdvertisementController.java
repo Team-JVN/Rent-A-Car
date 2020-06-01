@@ -10,13 +10,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping(value = "/api/advertisement", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AdvertisementController {
@@ -27,16 +30,21 @@ public class AdvertisementController {
 
     private HttpServletRequest request;
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Advertisement> get(@PathVariable @Positive(message = "Id must be positive.") Long id) {
+        return new ResponseEntity<>(advertisementService.get(id), HttpStatus.OK);
+    }
+
     @GetMapping
     public ResponseEntity<List<Advertisement>> getAll() {
         return new ResponseEntity<>(advertisementService.getAll(), HttpStatus.OK);
     }
 
     @GetMapping("/all/{status}")
-    public ResponseEntity<List<Advertisement>> getAllMy(
+    public ResponseEntity<List<Advertisement>> getAllMine(
             @PathVariable(value = "status", required = false) @Pattern(regexp = "(?i)(all|active|inactive|operation_pending)$", message = "Status is not valid.") String status) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(advertisementService.getAllMy(status,userDTO.getId()), HttpStatus.OK);
+        return new ResponseEntity<>(advertisementService.getAllMy(status, userDTO.getId()), HttpStatus.OK);
     }
 
     @PostMapping("/search")
@@ -55,7 +63,7 @@ public class AdvertisementController {
     }
 
     @Autowired
-    public AdvertisementController(AdvertisementService advertisementService, ObjectMapper objectMapper,HttpServletRequest request) {
+    public AdvertisementController(AdvertisementService advertisementService, ObjectMapper objectMapper, HttpServletRequest request) {
         this.advertisementService = advertisementService;
         this.objectMapper = objectMapper;
         this.request = request;

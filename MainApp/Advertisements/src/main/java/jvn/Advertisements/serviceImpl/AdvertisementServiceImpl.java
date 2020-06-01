@@ -2,8 +2,8 @@ package jvn.Advertisements.serviceImpl;
 
 import jvn.Advertisements.client.CarClient;
 import jvn.Advertisements.dto.message.AdvertisementMessageDTO;
-import jvn.Advertisements.dto.response.CarWithAllInformationDTO;
 import jvn.Advertisements.dto.request.UserDTO;
+import jvn.Advertisements.dto.response.CarWithAllInformationDTO;
 import jvn.Advertisements.enumeration.LogicalStatus;
 import jvn.Advertisements.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.Advertisements.mapper.AdvertisementDtoMapper;
@@ -35,7 +35,6 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     private AdvertisementProducer advertisementProducer;
 
     private CarClient carClient;
-
 
     @Override
     public Advertisement create(Advertisement createAdvertisementDTO, UserDTO userDTO) {
@@ -72,6 +71,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         Advertisement savedAdvertisement = advertisementRepository.save(createAdvertisementDTO);
         AdvertisementMessageDTO advertisementMessageDTO = advertisementMessageMapper.toDto(savedAdvertisement);
         advertisementMessageDTO.setCar(carDTO);
+        advertisementMessageDTO.setOwnerName(userDTO.getName());
         advertisementProducer.send(advertisementMessageDTO);
         return savedAdvertisement;
     }

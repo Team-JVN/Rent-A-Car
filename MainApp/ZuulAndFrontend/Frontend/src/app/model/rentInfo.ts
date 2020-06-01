@@ -1,3 +1,6 @@
+import { AdvertisementFromSearch } from './advertisementFromSearch';
+import { AdvertisementWithPictures } from 'src/app/model/advertisementWithPictures';
+
 export class RentInfo {
     id: number;
     dateTimeFrom: string;
