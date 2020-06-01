@@ -39,7 +39,7 @@ public class RentRequestController {
     public ResponseEntity<RentRequestDTO> create(@Valid @RequestBody RentRequestDTO rentRequestDTO) {
         try {
             UserDTO userDTO = stringToObject(request.getHeader("user"));
-            return new ResponseEntity<>(rentRequestDtoMapper.toDto(rentRequestService.create(rentRequestDtoMapper.toEntity(rentRequestDTO), userDTO.getId())),
+            return new ResponseEntity<>(rentRequestDtoMapper.toDto(rentRequestService.create(rentRequestDtoMapper.toEntity(rentRequestDTO), userDTO)),
                     HttpStatus.CREATED);
         } catch (DateTimeParseException | ParseException e) {
             throw new InvalidRentRequestDataException("Please choose valid date and time.", HttpStatus.BAD_REQUEST);

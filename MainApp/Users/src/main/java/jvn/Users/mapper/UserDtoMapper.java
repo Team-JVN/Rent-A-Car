@@ -1,6 +1,7 @@
 package jvn.Users.mapper;
 
 import jvn.Users.dto.response.UserDTO;
+import jvn.Users.model.Client;
 import jvn.Users.model.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,11 @@ public class UserDtoMapper implements MapperInterface<User, UserDTO> {
     public UserDTO toDto(User entity) {
         UserDTO dto = modelMapper.map(entity, UserDTO.class);
         dto.setRole(entity.getRole().getName());
+        if (entity instanceof Client) {
+            Client client = (Client) entity;
+            dto.setCanCreateComments(client.getCanCreateComments());
+            dto.setCanCreateRentRequests(client.getCanCreateRentRequests());
+        }
         return dto;
     }
 

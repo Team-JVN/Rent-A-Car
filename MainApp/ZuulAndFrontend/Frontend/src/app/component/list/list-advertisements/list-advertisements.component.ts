@@ -15,6 +15,7 @@ import { AddAdvertisementComponent } from '../../add/add-advertisement/add-adver
 import { MatTableDataSource } from '@angular/material/table';
 import { AdvertisementFromSearch } from 'src/app/model/advertisementFromSearch';
 import { SearchService } from 'src/app/service/search.service';
+import { delay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-list-advertisements',
@@ -34,15 +35,6 @@ export class ListAdvertisementsComponent implements OnInit {
   ngOnInit() {
     this.fetchAll('all');
     this.createSuccess = this.advertisementService.createSuccessEmitter.subscribe(
-      () => {
-        setTimeout(function () {
-          this.fetchAll(this.status);
-        }, 3000);
-
-      }
-    );
-
-    this.createSuccess = this.rentRequestService.createSuccessEmitter.subscribe(
       () => {
         this.fetchAll(this.status);
       }

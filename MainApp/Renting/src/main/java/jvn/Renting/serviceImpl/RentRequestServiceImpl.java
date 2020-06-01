@@ -4,6 +4,7 @@ import jvn.Renting.client.AdvertisementClient;
 import jvn.Renting.client.UserClient;
 import jvn.Renting.dto.both.AdvertisementDTO;
 import jvn.Renting.dto.both.PriceListDTO;
+import jvn.Renting.dto.both.UserDTO;
 import jvn.Renting.enumeration.RentRequestStatus;
 import jvn.Renting.exceptionHandler.InvalidRentRequestDataException;
 import jvn.Renting.model.RentInfo;
@@ -37,7 +38,8 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public RentRequest create(RentRequest rentRequest, Long loggedInUserId) throws ParseException {
+    public RentRequest create(RentRequest rentRequest, UserDTO loggedInUser) throws ParseException {
+        Long loggedInUserId = loggedInUser.getId();
         List<RentInfo> rentInfos = new ArrayList<>(rentRequest.getRentInfos());
         List<AdvertisementDTO> advertisementDTOS = getAdvertisements(rentInfos);
         Long ownerId = advertisementOwnerId(advertisementDTOS);
@@ -49,9 +51,13 @@ public class RentRequestServiceImpl implements RentRequestService {
             userClient.verify(rentRequest.getClient());
             rentRequest.setRentRequestStatus(RentRequestStatus.PAID);
         } else {
+            if (!loggedInUser.getCanCreateRentRequests()) {
+                throw new InvalidRentRequestDataException("You are not allowed to create rent requests because you canceled your reservations many times. ", HttpStatus.BAD_REQUEST);
+            }
             rentRequest.setClient(loggedInUserId);
             rentRequest.setRentRequestStatus(RentRequestStatus.PENDING);
         }
+
         rentRequest.setCreatedBy(loggedInUserId);
         rentRequest.setTotalPrice(0.0);
         rentRequest.setRentInfos(new HashSet<>());
@@ -166,7 +172,11 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     private void rejectOtherRequests(RentRequest rentRequest) {
         for (RentInfo rentInfo : rentRequest.getRentInfos()) {
-            List<RentRequest> rentRequests = rentRequestRepository.findByRentRequestStatusNotAndRentInfosAdvertisement(RentRequestStatus.PAID, rentInfo.getAdvertisement());
+            LocalDateTime rentInfoDateTimeFrom = rentInfo.getDateTimeFrom();
+            LocalDateTime rentInfoDateTimeTo = rentInfo.getDateTimeTo();
+            List<RentRequest> rentRequests = rentRequestRepository.findByRentRequestStatusNotAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualOrRentRequestStatusNotAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualOrRentRequestStatusNotAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanEqual(
+                    RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeFrom, RentRequestStatus.PAID, rentInfoDateTimeTo, rentInfoDateTimeTo,
+                    RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeTo);
             for (RentRequest rentRequest1 : rentRequests) {
                 rentRequest1.setRentRequestStatus(RentRequestStatus.CANCELED);
             }

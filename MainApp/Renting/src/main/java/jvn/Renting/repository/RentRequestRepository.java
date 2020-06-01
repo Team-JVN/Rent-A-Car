@@ -16,4 +16,8 @@ public interface RentRequestRepository extends JpaRepository<RentRequest, Long> 
     List<RentRequest> findByRentRequestStatusAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanEqual(RentRequestStatus status, LocalDateTime localDateFrom, LocalDateTime localDateTo);
 
     List<RentRequest> findByRentRequestStatusNotAndRentInfosAdvertisement(RentRequestStatus rentRequestStatus, Long id);
+
+    List<RentRequest> findByRentRequestStatusNotAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualOrRentRequestStatusNotAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualOrRentRequestStatusNotAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanEqual(
+            RentRequestStatus status, LocalDateTime localDateFrom, LocalDateTime localDateFrom1, RentRequestStatus status1, LocalDateTime localDateTo, LocalDateTime localDateTo1, RentRequestStatus status2, LocalDateTime localDateFrom2, LocalDateTime localDateTo2
+    );
 }

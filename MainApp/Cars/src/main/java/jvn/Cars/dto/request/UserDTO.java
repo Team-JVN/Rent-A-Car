@@ -30,4 +30,8 @@ public class UserDTO {
     @NotBlank(message = "Role is empty.")
     private String role;
 
+    private Boolean canCreateRentRequests;
+
+    private Boolean canCreateComments;
+
 }
