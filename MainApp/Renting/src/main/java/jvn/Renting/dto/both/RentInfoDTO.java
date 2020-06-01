@@ -25,7 +25,7 @@ public class RentInfoDTO {
     private Boolean optedForCDW;
 
     @NotNull(message = "Advertisement is null.")
-    private Long advertisement;
+    private AdvertisementDTO advertisement;
 
     private Boolean inBundle;
 }

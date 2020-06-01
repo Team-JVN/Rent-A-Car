@@ -2,8 +2,10 @@ package jvn.SearchService.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jvn.SearchService.dto.AdvertisementDTO;
 import jvn.SearchService.dto.SearchParamsDTO;
 import jvn.SearchService.dto.UserDTO;
+import jvn.SearchService.mapper.AdvertisementDtoMapper;
 import jvn.SearchService.model.Advertisement;
 import jvn.SearchService.service.AdvertisementService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Validated
 @RestController
@@ -26,30 +29,34 @@ public class AdvertisementController {
 
     private AdvertisementService advertisementService;
 
+    private AdvertisementDtoMapper advertisementDtoMapper;
+
     private ObjectMapper objectMapper;
 
     private HttpServletRequest request;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Advertisement> get(@PathVariable @Positive(message = "Id must be positive.") Long id) {
-        return new ResponseEntity<>(advertisementService.get(id), HttpStatus.OK);
+    public ResponseEntity<AdvertisementDTO> get(@PathVariable @Positive(message = "Id must be positive.") Long id) {
+        return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.get(id)), HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<List<Advertisement>> getAll() {
-        return new ResponseEntity<>(advertisementService.getAll(), HttpStatus.OK);
+    public ResponseEntity<List<AdvertisementDTO>> getAll() {
+        List<AdvertisementDTO> list = advertisementService.getAll().stream().map(advertisementDtoMapper::toDto).collect(Collectors.toList());
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @GetMapping("/all/{status}")
-    public ResponseEntity<List<Advertisement>> getAllMine(
+    public ResponseEntity<List<AdvertisementDTO>> getAllMine(
             @PathVariable(value = "status", required = false) @Pattern(regexp = "(?i)(all|active|inactive|operation_pending)$", message = "Status is not valid.") String status) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(advertisementService.getAllMy(status, userDTO.getId()), HttpStatus.OK);
+        List<AdvertisementDTO> list = advertisementService.getAllMy(status, userDTO.getId()).stream().map(advertisementDtoMapper::toDto).collect(Collectors.toList());
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @PostMapping("/search")
-    public ResponseEntity<List<Advertisement>> searchAdvertisements(@Valid @RequestBody SearchParamsDTO searchParamsDTO) {
-        List<Advertisement> list = advertisementService.searchAdvertisements(searchParamsDTO);
+    public ResponseEntity<List<AdvertisementDTO>> searchAdvertisements(@Valid @RequestBody SearchParamsDTO searchParamsDTO) {
+        List<AdvertisementDTO> list = advertisementService.searchAdvertisements(searchParamsDTO).stream().map(advertisementDtoMapper::toDto).collect(Collectors.toList());
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
@@ -63,9 +70,11 @@ public class AdvertisementController {
     }
 
     @Autowired
-    public AdvertisementController(AdvertisementService advertisementService, ObjectMapper objectMapper, HttpServletRequest request) {
+    public AdvertisementController(AdvertisementService advertisementService, ObjectMapper objectMapper, HttpServletRequest request,
+                                   AdvertisementDtoMapper advertisementDtoMapper) {
         this.advertisementService = advertisementService;
         this.objectMapper = objectMapper;
         this.request = request;
+        this.advertisementDtoMapper = advertisementDtoMapper;
     }
 }

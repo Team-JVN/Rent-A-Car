@@ -109,7 +109,7 @@ export class AddRentRequestComponent implements OnInit {
     const newRentInfo = new RentInfo(dateTimeFrom, dateTimeTo, cdw, this.selectedItem);
     var rentInfos = [];
     rentInfos.push(newRentInfo);
-    const rentRequest = new RentRequest(this.clientForm.value.client, rentInfos, null, null);
+    const rentRequest = new RentRequest(this.clientForm.value.client, rentInfos);
     console.log(rentRequest);
     this.rentRequestService.create(rentRequest).subscribe(
       (data: RentRequest) => {

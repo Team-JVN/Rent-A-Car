@@ -47,14 +47,14 @@ public class RentRequestController {
         }
     }
 
-    @GetMapping("/{status}/advertisement/{advertisementId}")
-    public ResponseEntity<List<RentRequestDTO>> getRentRequests(@PathVariable(value = "advertisementId", required = false) @Positive(message = "Id must be positive.") Long advertisementId,
-                                                                @PathVariable(value = "status", required = false) @Pattern(regexp = "(?i)(all|pending|reserved|paid|canceled)$", message = "Status is not valid.")
-                                                                        String status) {
-        List<RentRequestDTO> list = rentRequestService.get(advertisementId, status).stream().map(rentRequestDtoMapper::toDto).
-                collect(Collectors.toList());
-        return new ResponseEntity<>(list, HttpStatus.OK);
-    }
+//    @GetMapping("/{status}/advertisement/{advertisementId}")
+//    public ResponseEntity<List<RentRequestDTO>> getRentRequests(@PathVariable(value = "advertisementId", required = false) @Positive(message = "Id must be positive.") Long advertisementId,
+//                                                                @PathVariable(value = "status", required = false) @Pattern(regexp = "(?i)(all|pending|reserved|paid|canceled)$", message = "Status is not valid.")
+//                                                                        String status) {
+//        List<RentRequestDTO> list = rentRequestService.get(advertisementId, status).stream().map(rentRequestDtoMapper::toDto).
+//                collect(Collectors.toList());
+//        return new ResponseEntity<>(list, HttpStatus.OK);
+//    }
 
     private UserDTO stringToObject(String user) {
         try {

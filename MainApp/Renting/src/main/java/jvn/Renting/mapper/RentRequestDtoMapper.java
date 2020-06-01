@@ -14,6 +14,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Component
@@ -22,20 +23,22 @@ public class RentRequestDtoMapper implements MapperInterface<RentRequest, RentRe
 
     @Override
     public RentRequest toEntity(RentRequestDTO dto) {
-        RentRequest entity = modelMapper.map(dto, RentRequest.class);
-        List<RentInfo> entityRentInfos = new ArrayList<>(entity.getRentInfos().size());
-        entityRentInfos.addAll(entity.getRentInfos());
+        RentRequest entity = new RentRequest();
+        entity.setClient(dto.getClient().getId());
+        entity.setTotalPrice(dto.getTotalPrice());
+        entity.setId(dto.getId());
 
-        List<RentInfoDTO> rentInfos = new ArrayList<>(dto.getRentInfos().size());
-        rentInfos.addAll(dto.getRentInfos());
-
-        for (int i = 0; i < entityRentInfos.size(); i++) {
-            RentInfoDTO rentInfoDTO = rentInfos.get(i);
-            RentInfo rentInfo = entityRentInfos.get(i);
+        List<RentInfo> entityRentInfos = new ArrayList<>(dto.getRentInfos().size());
+        for (RentInfoDTO rentInfoDTO : dto.getRentInfos()) {
+            RentInfo rentInfo = new RentInfo();
             rentInfo.setDateTimeFrom(getLocalDateTime(rentInfoDTO.getDateTimeFrom()));
             rentInfo.setDateTimeTo(getLocalDateTime(rentInfoDTO.getDateTimeTo()));
+            rentInfo.setAdvertisement(rentInfoDTO.getAdvertisement().getId());
+            rentInfo.setOptedForCDW(rentInfoDTO.getOptedForCDW());
+            rentInfo.setId(rentInfoDTO.getId());
+            entityRentInfos.add(rentInfo);
         }
-
+        entity.setRentInfos(new HashSet<>(entityRentInfos));
         return entity;
     }
 

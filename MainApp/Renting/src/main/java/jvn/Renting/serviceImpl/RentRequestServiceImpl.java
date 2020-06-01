@@ -3,6 +3,7 @@ package jvn.Renting.serviceImpl;
 import jvn.Renting.client.AdvertisementClient;
 import jvn.Renting.client.UserClient;
 import jvn.Renting.dto.both.AdvertisementDTO;
+import jvn.Renting.dto.both.AdvertisementWithIdsDTO;
 import jvn.Renting.dto.both.PriceListDTO;
 import jvn.Renting.dto.both.UserDTO;
 import jvn.Renting.enumeration.RentRequestStatus;
@@ -41,7 +42,7 @@ public class RentRequestServiceImpl implements RentRequestService {
     public RentRequest create(RentRequest rentRequest, UserDTO loggedInUser) throws ParseException {
         Long loggedInUserId = loggedInUser.getId();
         List<RentInfo> rentInfos = new ArrayList<>(rentRequest.getRentInfos());
-        List<AdvertisementDTO> advertisementDTOS = getAdvertisements(rentInfos);
+        List<AdvertisementWithIdsDTO> advertisementDTOS = getAdvertisements(rentInfos);
         Long ownerId = advertisementOwnerId(advertisementDTOS);
 
         if (ownerId.equals(loggedInUserId)) {
@@ -72,12 +73,12 @@ public class RentRequestServiceImpl implements RentRequestService {
         return savedRequest;
     }
 
-    private RentRequest setRentInfosData(RentRequest rentRequest, List<RentInfo> rentInfos, List<AdvertisementDTO> advertisementDTOS) throws ParseException {
+    private RentRequest setRentInfosData(RentRequest rentRequest, List<RentInfo> rentInfos, List<AdvertisementWithIdsDTO> advertisementDTOS) throws ParseException {
         double totalPrice = 0;
         int i = 0;
         for (RentInfo rentInfo : rentInfos) {
             rentInfo.setRentRequest(rentRequest);
-            AdvertisementDTO advertisementDTO = advertisementDTOS.get(i);
+            AdvertisementWithIdsDTO advertisementDTO = advertisementDTOS.get(i);
             checkDate(advertisementDTO, rentInfo.getDateTimeFrom().toLocalDate(), rentInfo.getDateTimeTo().toLocalDate());
             if (!advertisementDTO.getCDW()) {
                 rentInfo.setOptedForCDW(null);
@@ -94,7 +95,7 @@ public class RentRequestServiceImpl implements RentRequestService {
     }
 
 
-    private void checkDate(AdvertisementDTO advertisement, LocalDate rentInfoDateFrom, LocalDate rentInfoDateTo) throws ParseException {
+    private void checkDate(AdvertisementWithIdsDTO advertisement, LocalDate rentInfoDateFrom, LocalDate rentInfoDateTo) throws ParseException {
         LocalDate advertisementDateFrom = getDateConverted(advertisement.getDateFrom());
         if (rentInfoDateFrom.isBefore(LocalDate.now()) || rentInfoDateTo.isBefore(LocalDate.now())) {
             throw new InvalidRentRequestDataException("Invalid date from/to.", HttpStatus.NOT_FOUND);
@@ -129,7 +130,7 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     }
 
-    private double countPrice(RentInfo rentInfo, AdvertisementDTO advertisementDTO) {
+    private double countPrice(RentInfo rentInfo, AdvertisementWithIdsDTO advertisementDTO) {
         double price = 0;
         PriceListDTO priceList = advertisementDTO.getPriceList();
         long numberOfHours = ChronoUnit.HOURS.between(rentInfo.getDateTimeFrom(), rentInfo.getDateTimeTo());
@@ -152,7 +153,7 @@ public class RentRequestServiceImpl implements RentRequestService {
         return LocalDate.parse(date, formatter);
     }
 
-    private List<AdvertisementDTO> getAdvertisements(List<RentInfo> rentInfos) {
+    private List<AdvertisementWithIdsDTO> getAdvertisements(List<RentInfo> rentInfos) {
         List<Long> advertisements = new ArrayList<>();
         for (RentInfo rentInfo : rentInfos) {
             advertisements.add(rentInfo.getAdvertisement());
@@ -160,9 +161,9 @@ public class RentRequestServiceImpl implements RentRequestService {
         return advertisementClient.get(advertisements);
     }
 
-    private Long advertisementOwnerId(List<AdvertisementDTO> advertisementDTOS) {
+    private Long advertisementOwnerId(List<AdvertisementWithIdsDTO> advertisementDTOS) {
         Long ownerId = advertisementDTOS.get(0).getOwner();
-        for (AdvertisementDTO advertisementDTO : advertisementDTOS) {
+        for (AdvertisementWithIdsDTO advertisementDTO : advertisementDTOS) {
             if (!advertisementDTO.getOwner().equals(ownerId)) {
                 throw new InvalidRentRequestDataException("All advertisements of a rent request must have the same owner.", HttpStatus.BAD_REQUEST);
             }
