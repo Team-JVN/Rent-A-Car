@@ -48,7 +48,7 @@ th.mat-header-cell{
 
 .rent-info-table th, .table td {
     font-size: 15px;
-    vertical-align: bottom;
+    vertical-align: middle;
     padding: 0.6rem;
 }
 
