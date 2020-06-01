@@ -1,4 +1,5 @@
 package jvn.Users.config;
+
 import jvn.Users.security.RestAuthenticationEntryPoint;
 import jvn.Users.security.TokenAuthenticationFilter;
 import jvn.Users.serviceImpl.UserServiceImpl;
@@ -71,6 +72,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers(HttpMethod.PUT, "/api/client/activate**");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/advertisement/{id}");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/car/{id}/picture");
+        web.ignoring().antMatchers(HttpMethod.GET, "/api/client/verify/{clientId}");
     }
 
 }
