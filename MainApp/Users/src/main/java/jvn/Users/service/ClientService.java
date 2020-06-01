@@ -16,7 +16,7 @@ public interface ClientService {
 
     List<Client> get(String status, Long id);
 
-    List<Client> getForRentRequest();
+    List<Client> getForRentRequest(Long loggedInClientId);
 
     Client edit(Long id, Client client);
 

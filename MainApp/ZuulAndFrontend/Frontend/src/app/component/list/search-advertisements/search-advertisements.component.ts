@@ -1,3 +1,4 @@
+import { RentInfo } from './../../../model/rentInfo';
 import { AddToCartComponent } from './../../add/add-to-cart/add-to-cart.component';
 import { AuthentificationService } from './../../../service/authentification.service';
 import { AdvertisementFromSearch } from './../../../model/advertisementFromSearch';
@@ -117,10 +118,13 @@ export class SearchAdvertisementsComponent implements OnInit {
     if (element.cdw) {
       this.dialog.open(AddToCartComponent, { data: searchParams });
     } else {
-      console.log("Nema CDW!");
-      console.log(searchParams);
-    }
+      const newRentInfo = new RentInfo(searchParams.dateTimeFrom, searchParams.dateTimeTo, searchParams.optedForCDW, searchParams.advertisement);
 
+      let rentInfos: RentInfo[] = JSON.parse(localStorage.getItem("rentInfos") || "[]");
+      rentInfos.push(newRentInfo);
+      localStorage.setItem("rentInfos", JSON.stringify(rentInfos));
+      this.toastr.success('Success!', 'Add to Cart');
+    }
   }
 
   viewDetails(element: AdvertisementFromSearch) {

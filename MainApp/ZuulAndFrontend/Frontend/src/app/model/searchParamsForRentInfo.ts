@@ -4,7 +4,7 @@ export class SearchParamsForRentInfo {
     dateTimeFrom: string;
     dateTimeTo: string;
     pickUpPoint: string;
-    advrertisement: AdvertisementFromSearch;
+    advertisement: AdvertisementFromSearch;
     optedForCDW: boolean;
 
     constructor(dateTimeFrom: string, dateTimeTo: string, pickUpPoint: string, advertisement: AdvertisementFromSearch, optedForCDW?: boolean) {
@@ -12,6 +12,6 @@ export class SearchParamsForRentInfo {
         this.dateTimeTo = dateTimeTo;
         this.pickUpPoint = pickUpPoint;
         this.optedForCDW = optedForCDW;
-        this.advrertisement = advertisement;
+        this.advertisement = advertisement;
     }
 }

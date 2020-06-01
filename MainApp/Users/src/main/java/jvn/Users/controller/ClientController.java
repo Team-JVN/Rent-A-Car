@@ -1,10 +1,6 @@
 package jvn.Users.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jvn.Users.dto.both.AdminDTO;
 import jvn.Users.dto.both.ClientDTO;
-import jvn.Users.dto.response.UserDTO;
 import jvn.Users.enumeration.ClientStatus;
 import jvn.Users.exceptionHandler.InvalidClientDataException;
 import jvn.Users.exceptionHandler.InvalidTokenException;
@@ -54,7 +50,8 @@ public class ClientController {
 
     @GetMapping(value = "/for-rent-request")
     public ResponseEntity<List<ClientDTO>> getForRentRequest() {
-        List<ClientDTO> list = clientService.getForRentRequest().stream().map(clientDtoMapper::toDto).
+        User user = userService.getLoginUser();
+        List<ClientDTO> list = clientService.getForRentRequest(user.getId()).stream().map(clientDtoMapper::toDto).
                 collect(Collectors.toList());
         return new ResponseEntity<>(list, HttpStatus.OK);
     }

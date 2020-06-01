@@ -101,36 +101,29 @@ export class AddRentRequestComponent implements OnInit {
     const dateTo = formatDate(this.informationForm.value.dateTo, 'yyyy-MM-dd', 'en-US')
     const dateTimeTo = dateTo + ' ' + this.informationForm.value.timeTo;
 
-    var cdw = this.informationForm.value.optedForCDW;
-    if (!this.selectedItem.cdw) {
-      cdw = null;
+    let optedForCDW = null;
+    if (this.selectedItem.cdw) {
+      optedForCDW = this.informationForm.value.optedForCDW;
     }
-    const newRentInfo = new RentInfo(dateTimeFrom, dateTimeTo, cdw, this.selectedItem.id);
 
-    if (this.selectedItem.owner.email === this.authService.getLoggedInUserEmail()) {
-      var rentInfos = [];
-      rentInfos.push(newRentInfo);
-      const rentRequest = new RentRequest(this.clientForm.value.client.id, rentInfos);
-      this.rentRequestService.create(rentRequest).subscribe(
-        (data: RentRequest) => {
-          this.clientForm.reset();
-          this.informationForm.reset();
-          this.dialogRef.close();
-          this.toastr.success('Success.', 'Create Rent Request');
-          this.rentRequestService.createSuccessEmitter.next(data);
-        },
-        (httpErrorResponse: HttpErrorResponse) => {
-          this.toastr.error(httpErrorResponse.error.message, 'Create Rent Request');
-        }
-      );
-    } else {
-      let rentInfos: RentInfo[] = JSON.parse(localStorage.getItem("rentInfos") || "[]");
-      rentInfos.push(newRentInfo);
-      localStorage.setItem("rentInfos", JSON.stringify(rentInfos));
-      this.informationForm.reset();
-      this.dialogRef.close();
-      this.toastr.success('Successfully added to cart!', 'Create Rent Request');
-    }
+    const newRentInfo = new RentInfo(dateTimeFrom, dateTimeTo, optedForCDW, this.selectedItem);
+    let rentInfos = [];
+    rentInfos.push(newRentInfo);
+
+    const rentRequest = new RentRequest(this.clientForm.value.client, rentInfos);
+
+    this.rentRequestService.create(rentRequest).subscribe(
+      (data: RentRequest) => {
+        this.clientForm.reset();
+        this.informationForm.reset();
+        this.dialogRef.close();
+        this.toastr.success('Success.', 'Create Rent Request');
+        this.rentRequestService.createSuccessEmitter.next(data);
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Create Rent Request');
+      }
+    );
   }
 
   openAddClient() {

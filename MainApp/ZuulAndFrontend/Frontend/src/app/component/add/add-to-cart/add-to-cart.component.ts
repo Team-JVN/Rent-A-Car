@@ -34,38 +34,16 @@ export class AddToCartComponent implements OnInit {
     });
   }
 
-  create() {
+  addToCart() {
     this.searchParams.optedForCDW = this.informationForm.value.optedForCDW;
+    const newRentInfo = new RentInfo(this.searchParams.dateTimeFrom, this.searchParams.dateTimeTo, this.searchParams.optedForCDW, this.searchParams.advertisement);
 
-    console.log("Ima CDW!");
-    console.log(this.searchParams);
-
-    //   const newRentInfo = new RentInfo(dateTimeFrom, dateTimeTo, cdw, this.selectedItem.id);
-
-    //   if (this.selectedItem.owner.email === this.authService.getLoggedInUserEmail()) {
-    //     var rentInfos = [];
-    //     rentInfos.push(newRentInfo);
-    //     const rentRequest = new RentRequest(this.clientForm.value.client.id, rentInfos);
-    //     this.rentRequestService.create(rentRequest).subscribe(
-    //       (data: RentRequest) => {
-    //         this.clientForm.reset();
-    //         this.informationForm.reset();
-    //         this.dialogRef.close();
-    //         this.toastr.success('Success.', 'Create Rent Request');
-    //         this.rentRequestService.createSuccessEmitter.next(data);
-    //       },
-    //       (httpErrorResponse: HttpErrorResponse) => {
-    //         this.toastr.error(httpErrorResponse.error.message, 'Create Rent Request');
-    //       }
-    //     );
-    //   } else {
-    //     let rentInfos: RentInfo[] = JSON.parse(localStorage.getItem("rentInfos") || "[]");
-    //     rentInfos.push(newRentInfo);
-    //     localStorage.setItem("rentInfos", JSON.stringify(rentInfos));
-    //     this.informationForm.reset();
-    //     this.dialogRef.close();
-    //     this.toastr.success('Successfully added to cart!', 'Create Rent Request');
-    //   }
+    let rentInfos: RentInfo[] = JSON.parse(localStorage.getItem("rentInfos") || "[]");
+    rentInfos.push(newRentInfo);
+    localStorage.setItem("rentInfos", JSON.stringify(rentInfos));
+    this.informationForm.reset();
+    this.dialogRef.close();
+    this.toastr.success('Success!', 'Add to Cart');
   }
 
 }
