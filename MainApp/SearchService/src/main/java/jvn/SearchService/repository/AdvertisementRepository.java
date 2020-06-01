@@ -27,12 +27,12 @@ public interface AdvertisementRepository extends JpaRepository<Advertisement, Lo
             LogicalStatus logicalStatus2, LocalDate dateFrom2, String pickUpPoint2, String make2, String model2, String fuelType2, String gearBoxType2, String bodyStyle2, Integer maxMileageInKm2, Integer minKidsSeats2, Double minRating2, Double minPricePerDay2, Double maxPricePerDay2
     );
 
-    List<Advertisement> findAllByLogicalStatusNotAndOwner(LogicalStatus logicalStatus, Long owner);
+    List<Advertisement> findAllByLogicalStatusNotAndOwnerId(LogicalStatus logicalStatus, Long owner);
 
-    List<Advertisement> findAllByLogicalStatusAndOwner(LogicalStatus logicalStatus, Long owner);
+    List<Advertisement> findAllByLogicalStatusAndOwnerId(LogicalStatus logicalStatus, Long owner);
 
-    List<Advertisement> findAllByLogicalStatusNotAndOwnerAndDateToEqualsOrLogicalStatusNotAndOwnerAndDateToGreaterThan(LogicalStatus logicalStatus, Long id, LocalDate localDate,
-                                                                                                                       LogicalStatus logicalStatus1, Long owner, LocalDate localDateToNow);
+    List<Advertisement> findAllByLogicalStatusNotAndOwnerIdAndDateToEqualsOrLogicalStatusNotAndOwnerIdAndDateToGreaterThan(LogicalStatus logicalStatus, Long id, LocalDate localDate,
+                                                                                                                           LogicalStatus logicalStatus1, Long owner, LocalDate localDateToNow);
 
-    List<Advertisement> findAllByLogicalStatusNotAndOwnerAndDateToLessThanEqual(LogicalStatus logicalStatus, Long id, LocalDate localDateToNow);
+    List<Advertisement> findAllByLogicalStatusNotAndOwnerIdAndDateToLessThanEqual(LogicalStatus logicalStatus, Long id, LocalDate localDateToNow);
 }

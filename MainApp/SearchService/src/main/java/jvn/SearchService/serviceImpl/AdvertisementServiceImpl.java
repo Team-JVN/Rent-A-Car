@@ -42,17 +42,17 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         List<Advertisement> ads;
         switch (status) {
             case "all":
-                ads = advertisementRepository.findAllByLogicalStatusNotAndOwner(LogicalStatus.DELETED, id);
+                ads = advertisementRepository.findAllByLogicalStatusNotAndOwnerId(LogicalStatus.DELETED, id);
                 break;
             case "active":
-                ads = advertisementRepository.findAllByLogicalStatusNotAndOwnerAndDateToEqualsOrLogicalStatusNotAndOwnerAndDateToGreaterThan(LogicalStatus.DELETED, id, null,
+                ads = advertisementRepository.findAllByLogicalStatusNotAndOwnerIdAndDateToEqualsOrLogicalStatusNotAndOwnerIdAndDateToGreaterThan(LogicalStatus.DELETED, id, null,
                         LogicalStatus.DELETED, id, LocalDate.now());
                 break;
             case "operation_pending":
-                ads = advertisementRepository.findAllByLogicalStatusAndOwner(LogicalStatus.OPERATION_PENDING, id);
+                ads = advertisementRepository.findAllByLogicalStatusAndOwnerId(LogicalStatus.OPERATION_PENDING, id);
                 break;
             default:
-                ads = advertisementRepository.findAllByLogicalStatusNotAndOwnerAndDateToLessThanEqual(LogicalStatus.DELETED, id, LocalDate.now());
+                ads = advertisementRepository.findAllByLogicalStatusNotAndOwnerIdAndDateToLessThanEqual(LogicalStatus.DELETED, id, LocalDate.now());
                 break;
         }
         return ads;

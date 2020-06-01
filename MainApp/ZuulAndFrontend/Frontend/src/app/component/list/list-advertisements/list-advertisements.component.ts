@@ -44,8 +44,8 @@ export class ListAdvertisementsComponent implements OnInit {
   fetchAll(status: string) {
     this.searchService.getAllMy(status).subscribe(
       (data: AdvertisementFromSearch[]) => {
-        data.forEach(adWithPicturesDTO => {
-          this.getPicture(adWithPicturesDTO);
+        data.forEach(advertisement => {
+          this.getPicture(advertisement);
         });
         this.advertisementsDataSource = new MatTableDataSource(data);
       },
@@ -69,10 +69,10 @@ export class ListAdvertisementsComponent implements OnInit {
     );
   }
 
-  createImageFromBlob(image: Blob, adWithPicturesDTO: AdvertisementFromSearch) {
+  createImageFromBlob(image: Blob, advertisement: AdvertisementFromSearch) {
     let reader = new FileReader();
     reader.addEventListener("load", () => {
-      adWithPicturesDTO.car.image = reader.result;
+      advertisement.car.image = reader.result;
     }, false);
 
     if (image) {
