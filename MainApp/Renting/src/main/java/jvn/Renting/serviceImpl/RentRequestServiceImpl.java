@@ -4,8 +4,12 @@ import jvn.Renting.client.AdvertisementClient;
 import jvn.Renting.client.SearchClient;
 import jvn.Renting.client.UserClient;
 import jvn.Renting.dto.both.*;
+import jvn.Renting.enumeration.CommentStatus;
 import jvn.Renting.enumeration.RentRequestStatus;
 import jvn.Renting.exceptionHandler.InvalidRentRequestDataException;
+import jvn.Renting.mapper.CommentDtoMapper;
+import jvn.Renting.model.Comment;
+import jvn.Renting.model.Message;
 import jvn.Renting.model.RentInfo;
 import jvn.Renting.model.RentRequest;
 import jvn.Renting.repository.RentRequestRepository;
@@ -35,6 +39,8 @@ public class RentRequestServiceImpl implements RentRequestService {
     private UserClient userClient;
 
     private SearchClient searchClient;
+
+    private CommentDtoMapper commentDtoMapper;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -142,6 +148,74 @@ public class RentRequestServiceImpl implements RentRequestService {
         List<ClientDTO> clientDTOS = userClient.get(new ArrayList<>(clientIds));
         List<AdvertisementDTO> advertisementWithIdsDTOS = searchClient.get(new ArrayList<>(advertisements));
         return createListRentRequestDTOs(clientDTOS, advertisementWithIdsDTOS, rentRequests, loggedInUserId);
+    }
+
+    @Override
+    public Comment createComment(Comment comment, Long id, Long rentInfoId, Long userId) {
+        comment.setSender(userId);
+        comment.setStatus(CommentStatus.AWAITING);
+        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
+        for(RentInfo rentInfo: rentRequest.getRentInfos()){
+            if(rentInfo.getId() == rentInfoId){
+                rentInfo.getComments().add(comment);
+                rentRequestRepository.save(rentRequest);
+                break;
+            }
+        }
+        //TODO:save comment in comment repository and return comment
+        return comment;
+    }
+
+    @Override
+    public FeedbackDTO leaveFeedback(FeedbackDTO feedbackDTO, Long id, Long rentInfoId, Long userId){
+
+        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
+        for(RentInfo rentInfo: rentRequest.getRentInfos()){
+            if(rentInfo.getId() == rentInfoId){
+                Comment comment = commentDtoMapper.toEntity(feedbackDTO.getComment());
+                comment.setSender(userId);
+                comment.setStatus(CommentStatus.AWAITING);
+                rentInfo.getComments().add(comment);
+                Integer currRating = rentInfo.getRating();
+                rentInfo.setRating((currRating + feedbackDTO.getRating())/2);
+                rentRequestRepository.save(rentRequest);
+                break;
+            }
+        }
+        return feedbackDTO;
+    }
+
+    @Override
+    public FeedbackDTO getFeedback(Long id, Long rentInfoId, Long userId) {
+
+        FeedbackDTO feedbackDTO = new FeedbackDTO();
+        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
+        for(RentInfo rentInfo: rentRequest.getRentInfos()){
+            if(rentInfo.getId() == rentInfoId){
+                feedbackDTO.setRating(rentInfo.getRating());
+                for(Comment comment: rentInfo.getComments()){
+                    //TODO:find comment which is made by userId
+                    if(comment.getSender() == userId){
+                        feedbackDTO.setComment(commentDtoMapper.toDto(comment));
+                        break;
+                    }
+                }
+
+            }
+        }
+        return feedbackDTO;
+
+
+    }
+
+    @Override
+    public Message createMessage(Message message, Long id, Long rentInfoId, Long userId) {
+        return null;
+    }
+
+    @Override
+    public List<Message> getMessages(Long id, Long rentInfoId, Long userId) {
+        return null;
     }
 
     private List<RentRequestDTO> createListRentRequestDTOs(List<ClientDTO> clientDTOS, List<AdvertisementDTO> advertisementDTOS, List<RentRequest> rentRequests, Long loggedInUserId) {
@@ -304,10 +378,11 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     @Autowired
     public RentRequestServiceImpl(RentRequestRepository rentRequestRepository, AdvertisementClient advertisementClient, UserClient userClient,
-                                  SearchClient searchClient) {
+                                  SearchClient searchClient, CommentDtoMapper commentDtoMapper) {
         this.rentRequestRepository = rentRequestRepository;
         this.advertisementClient = advertisementClient;
         this.userClient = userClient;
         this.searchClient = searchClient;
+        this.commentDtoMapper = commentDtoMapper;
     }
 }

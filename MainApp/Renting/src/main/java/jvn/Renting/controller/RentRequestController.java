@@ -2,9 +2,10 @@ package jvn.Renting.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jvn.Renting.dto.both.RentRequestDTO;
-import jvn.Renting.dto.both.UserDTO;
+import jvn.Renting.dto.both.*;
 import jvn.Renting.exceptionHandler.InvalidRentRequestDataException;
+import jvn.Renting.mapper.CommentDtoMapper;
+import jvn.Renting.mapper.MessageDtoMapper;
 import jvn.Renting.mapper.RentRequestDtoMapper;
 import jvn.Renting.service.RentRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,10 @@ public class RentRequestController {
     private RentRequestService rentRequestService;
 
     private RentRequestDtoMapper rentRequestDtoMapper;
+
+    private CommentDtoMapper commentDtoMapper;
+
+    private MessageDtoMapper messageDtoMapper;
 
     private ObjectMapper objectMapper;
 
@@ -68,6 +73,41 @@ public class RentRequestController {
     }
 
 
+    @PostMapping(value="/{id}/rent-info/{rentInfoId}/comment")
+    public ResponseEntity<CommentDTO> createComment(@PathVariable Long id, @PathVariable Long rentInfoId, @Valid @RequestBody CommentDTO commentDTO){
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        return new ResponseEntity<>(commentDtoMapper.toDto(rentRequestService.createComment(commentDtoMapper.toEntity(commentDTO),id, rentInfoId, userDTO.getId())),
+                HttpStatus.CREATED);
+    }
+
+    @PostMapping(value="/{id}/rent-info/{rentInfoId}/feedback")
+    public ResponseEntity<FeedbackDTO> leaveFeedback(@PathVariable Long id, @PathVariable Long rentInfoId, @Valid @RequestBody FeedbackDTO feedbackDTO){
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        return new ResponseEntity<>(rentRequestService.leaveFeedback(feedbackDTO, id, rentInfoId, userDTO.getId()),
+                HttpStatus.CREATED);
+    }
+
+    @GetMapping(value="/{id}/rent-info/{rentInfoId}/feedback")
+    public ResponseEntity<FeedbackDTO> getFeedback(@PathVariable Long id, @PathVariable Long rentInfoId){
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        return new ResponseEntity<>(rentRequestService.getFeedback(id, rentInfoId, userDTO.getId()), HttpStatus.OK);
+    }
+
+    @PostMapping(value="/{id}/rent-info/{rentInfoId}/message")
+    public ResponseEntity<MessageDTO> createMessage(@PathVariable Long id, @PathVariable Long rentInfoId, @Valid @RequestBody MessageDTO messageDTO){
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        return new ResponseEntity<>(messageDtoMapper.toDto(rentRequestService.createMessage(messageDtoMapper.toEntity(messageDTO), id, rentInfoId, userDTO.getId())),
+                HttpStatus.CREATED);
+    }
+
+    @GetMapping(value="/{id}/rent-info/{rentInfoId}/message")
+    public ResponseEntity<List<MessageDTO>> getMessages(@PathVariable Long id, @PathVariable Long rentInfoId){
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        List<MessageDTO> list = rentRequestService.getMessages(id, rentInfoId, userDTO.getId()).stream().map(messageDtoMapper::toDto).
+                collect(Collectors.toList());
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
     private UserDTO stringToObject(String user) {
         try {
             return objectMapper.readValue(user, UserDTO.class);
@@ -79,10 +119,14 @@ public class RentRequestController {
 
     @Autowired
     public RentRequestController(RentRequestService rentRequestService, RentRequestDtoMapper rentRequestDtoMapper,
+                                 CommentDtoMapper commentDtoMapper, MessageDtoMapper messageDtoMapper,
                                  ObjectMapper objectMapper, HttpServletRequest request) {
         this.rentRequestService = rentRequestService;
         this.rentRequestDtoMapper = rentRequestDtoMapper;
+        this.commentDtoMapper = commentDtoMapper;
+        this.messageDtoMapper = messageDtoMapper;
         this.objectMapper = objectMapper;
         this.request = request;
     }
+
 }
