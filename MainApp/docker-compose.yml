@@ -28,116 +28,118 @@ services:
             - ./tls/certs/mainapp/keystore:/etc/keystore
         depends_on:
             - eureka-serviceregistry
-            # - advertisements
-            # - cars
-            # - renting
-            # - users
+            - advertisements
+            - cars
+            - renting
+            - users
             - rabbitmq-broker
+            # - search-service
             # - axon-server
 
-    # advertisements:
-    #     build: ./Advertisements
-    #     image: nikolabrodic/advertisements
-    #     container_name: advertisements
-    #     restart: on-failure
-    #     networks:
-    #         - main-app-tls
-    #     ports:
-    #         - 8081:8081
-    #     environment:
-    #         REGISTRY_HOST: eureka-serviceregistry
-    #         DATABASE_USERNAME: rentacar
-    #         DATABASE_PASSWORD: RentACarTeam29
-    #         DATABASE_DOMAIN: mainapp-mysql
-    #         DATABASE_SCHEMA: rentacardb
-    #     depends_on:
-    #         - mainapp-mysql
-    #         - eureka-serviceregistry
-    #         - rabbitmq-broker
-    #     #   - axon-server
-
-    # cars:
-    #     build: ./Cars
-    #     image: nikolabrodic/cars
-    #     container_name: cars
-    #     restart: on-failure
-    #     networks:
-    #         - main-app-tls
-    #     ports:
-    #         - 8082:8082
-    #     environment:
-    #         REGISTRY_HOST: eureka-serviceregistry
-    #         DATABASE_USERNAME: rentacar
-    #         DATABASE_PASSWORD: RentACarTeam29
-    #         DATABASE_DOMAIN: mainapp-mysql
-    #         DATABASE_SCHEMA: rentacardb
-    #     depends_on: 
-    #         - mainapp-mysql
-    #         - eureka-serviceregistry
-    #         - rabbitmq-broker
-    #     #   - axon-server
-
-    # renting:
-    #     build: ./Renting
-    #     image: nikolabrodic/renting
-    #     container_name: renting
-    #     restart: on-failure
-    #     networks:
-    #         - main-app-tls
-    #     ports:
-    #         - 8083:8083
-    #     environment:
-    #         REGISTRY_HOST: eureka-serviceregistry
-    #         DATABASE_USERNAME: rentacar
-    #         DATABASE_PASSWORD: RentACarTeam29
-    #         DATABASE_DOMAIN: mainapp-mysql
-    #         DATABASE_SCHEMA: rentacardb
-    #     depends_on:
-    #         - mainapp-mysql
-    #         - eureka-serviceregistry
-    #         - rabbitmq-broker
-    #     #   - axon-server
-
-    # users:
-    #     build: ./Users
-    #     image: nikolabrodic/users
-    #     container_name: users
-    #     restart: on-failure
-    #     networks:
-    #         - main-app-tls
-    #     ports:
-    #         - 8084:8084
-    #     environment:
-    #         REGISTRY_HOST: eureka-serviceregistry
-    #         DATABASE_USERNAME: rentacar
-    #         DATABASE_PASSWORD: RentACarTeam29
-    #         DATABASE_DOMAIN: mainapp-mysql
-    #         DATABASE_SCHEMA: rentacardb
-    #     depends_on:
-    #         - mainapp-mysql
-    #         - eureka-serviceregistry
-    #         - rabbitmq-broker
-    #     #   - axon-server
-
-    search-service:
-        build: ./SearchService
-        image: nikolabrodic/search-service
-        container_name: search-service
+    advertisements:
+        build: ./Advertisements
+        image: nikolabrodic/advertisements
+        container_name: advertisements
         restart: on-failure
         networks:
             - main-app-tls
         ports:
-            - 8085:8085
+            - 8081:8081
         environment:
             REGISTRY_HOST: eureka-serviceregistry
-            DATABASE_USERNAME: search
+            DATABASE_USERNAME: rentacar
             DATABASE_PASSWORD: RentACarTeam29
-            DATABASE_SCHEMA: searchservicedb
-        volumes:
-            - ./SearchService/src/main/resources/h2-db-data/:/etc/h2-db-data/
+            DATABASE_DOMAIN: mainapp-mysql
+            DATABASE_SCHEMA: rentacardb
         depends_on:
+            - mainapp-mysql
             - eureka-serviceregistry
             - rabbitmq-broker
+        #   - axon-server
+
+    cars:
+        build: ./Cars
+        image: nikolabrodic/cars
+        container_name: cars
+        restart: on-failure
+        networks:
+            - main-app-tls
+        ports:
+            - 8082:8082
+        environment:
+            REGISTRY_HOST: eureka-serviceregistry
+            DATABASE_USERNAME: rentacar
+            DATABASE_PASSWORD: RentACarTeam29
+            DATABASE_DOMAIN: mainapp-mysql
+            DATABASE_SCHEMA: rentacardb
+        depends_on: 
+            - mainapp-mysql
+            - eureka-serviceregistry
+            - rabbitmq-broker
+        #   - axon-server
+
+    renting:
+        build: ./Renting
+        image: nikolabrodic/renting
+        container_name: renting
+        restart: on-failure
+        networks:
+            - main-app-tls
+        ports:
+            - 8083:8083
+        environment:
+            REGISTRY_HOST: eureka-serviceregistry
+            DATABASE_USERNAME: rentacar
+            DATABASE_PASSWORD: RentACarTeam29
+            DATABASE_DOMAIN: mainapp-mysql
+            DATABASE_SCHEMA: rentacardb
+        depends_on:
+            - mainapp-mysql
+            - eureka-serviceregistry
+            - rabbitmq-broker
+        #   - axon-server
+
+    users:
+        build: ./Users
+        image: nikolabrodic/users
+        container_name: users
+        restart: on-failure
+        networks:
+            - main-app-tls
+        ports:
+            - 8084:8084
+        environment:
+            REGISTRY_HOST: eureka-serviceregistry
+            DATABASE_USERNAME: rentacar
+            DATABASE_PASSWORD: RentACarTeam29
+            DATABASE_DOMAIN: mainapp-mysql
+            DATABASE_SCHEMA: rentacardb
+        depends_on:
+            - mainapp-mysql
+            - eureka-serviceregistry
+            - rabbitmq-broker
+        #   - axon-server
+
+    # search-service:
+    #     build: ./SearchService
+    #     image: nikolabrodic/search-service
+    #     container_name: search-service
+    #     restart: on-failure
+    #     networks:
+    #         - main-app-tls
+    #     ports:
+    #         - 8085:8085
+    #     environment:
+    #         REGISTRY_HOST: eureka-serviceregistry
+    #         DATABASE_USERNAME: search
+    #         DATABASE_PASSWORD: RentACarTeam29
+    #         DATABASE_SCHEMA: searchservicedb
+    #         H2_DB_PATH: /etc/h2-db-data
+    #     volumes:
+    #         - ./SearchService/src/main/resources/h2-db-data/:/etc/h2-db-data/
+    #     depends_on:
+    #         - eureka-serviceregistry
+    #         - rabbitmq-broker
         #   - axon-server
 
     mainapp-mysql:
