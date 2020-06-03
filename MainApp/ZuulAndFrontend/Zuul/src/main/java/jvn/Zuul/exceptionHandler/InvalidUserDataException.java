@@ -1,4 +1,4 @@
-package jvn.Zuul.exceptions;
+package jvn.Zuul.exceptionHandler;
 
 import lombok.Getter;
 import lombok.Setter;

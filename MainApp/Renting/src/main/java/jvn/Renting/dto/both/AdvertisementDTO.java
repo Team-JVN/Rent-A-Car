@@ -1,6 +1,5 @@
 package jvn.Renting.dto.both;
 
-
 import jvn.Renting.enumeration.LogicalStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

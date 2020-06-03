@@ -17,6 +17,7 @@ import jvn.Advertisements.service.AdvertisementService;
 import jvn.Advertisements.service.PriceListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -38,10 +39,10 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     private CarClient carClient;
 
     @Override
-    public Advertisement create(Advertisement createAdvertisementDTO, UserDTO userDTO) {
+    public Advertisement create(Advertisement createAdvertisementDTO, UserDTO userDTO, String jwtToken, String user) {
 
         checkDate(createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
-        CarWithAllInformationDTO carDTO = carClient.verify(userDTO.getId(), createAdvertisementDTO.getCar());
+        CarWithAllInformationDTO carDTO = carClient.verify(jwtToken, user, userDTO.getId(), createAdvertisementDTO.getCar());
         checkIfCarIsAvailable(createAdvertisementDTO.getCar(), createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
         createAdvertisementDTO.setOwner(userDTO.getId());
         createAdvertisementDTO.setPriceList(priceListService.get(createAdvertisementDTO.getPriceList().getId(), userDTO));
@@ -70,10 +71,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         }
 
         Advertisement savedAdvertisement = advertisementRepository.save(createAdvertisementDTO);
-        AdvertisementMessageDTO advertisementMessageDTO = advertisementMessageMapper.toDto(savedAdvertisement);
-        advertisementMessageDTO.setCar(carDTO);
-        advertisementMessageDTO.setOwner(new OwnerMessageDTO(userDTO.getId(), userDTO.getName(), userDTO.getEmail()));
-        advertisementProducer.send(advertisementMessageDTO);
+        sendMessageToSearchService(savedAdvertisement, userDTO, carDTO);
         return savedAdvertisement;
     }
 
@@ -82,6 +80,13 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         return advertisementRepository.findByIdInAndLogicalStatus(advertisements, LogicalStatus.EXISTING);
     }
 
+    @Async
+    public void sendMessageToSearchService(Advertisement savedAdvertisement, UserDTO userDTO, CarWithAllInformationDTO carDTO) {
+        AdvertisementMessageDTO advertisementMessageDTO = advertisementMessageMapper.toDto(savedAdvertisement);
+        advertisementMessageDTO.setCar(carDTO);
+        advertisementMessageDTO.setOwner(new OwnerMessageDTO(userDTO.getId(), userDTO.getName(), userDTO.getEmail()));
+        advertisementProducer.send(advertisementMessageDTO);
+    }
 
     private void checkIfCarIsAvailable(Long carId, LocalDate advertisementDateFrom, LocalDate advertisementDateTo) {
         if (!advertisementRepository.findByCarAndLogicalStatusNotAndDateToEquals(carId, LogicalStatus.DELETED, null).isEmpty()) {

@@ -6,10 +6,9 @@ import com.netflix.zuul.context.RequestContext;
 import feign.FeignException;
 import jvn.Zuul.client.AuthClient;
 import jvn.Zuul.dto.UserDTO;
-import jvn.Zuul.exceptions.InvalidUserDataException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -34,13 +33,36 @@ public class AuthFilter extends ZuulFilter {
     public boolean shouldFilter() {
         RequestContext ctx = RequestContext.getCurrentContext();
         HttpServletRequest request = ctx.getRequest();
-        if(request.getRequestURL().toString().contains("users")){
+        if (request.getMethod().equals("OPTIONS")) {
             return false;
         }
-        if(request.getMethod().equals("OPTIONS")){
+        String url = request.getRequestURL().toString();
+        String method = request.getMethod();
+        if (url.contains("users")) {
             return false;
         }
-        return true;
+        if (new AntPathMatcher().match("**/api/car/{id}/picture", url) && method.equals("GET")) {
+            return false;
+        }
+        if (method.equals("GET") && url.contains("/api/body-style")) {
+            return false;
+        }
+        if (method.equals("GET") && url.contains("/api/fuel-type")) {
+            return false;
+        }
+        if (method.equals("GET") && url.contains("/api/gearbox-type")) {
+            return false;
+        }
+        if (method.equals("GET") && url.contains("/api/make")) {
+            return false;
+        }
+        if (method.equals("GET") && url.contains("/api/make/{makeId}/models")) {
+            return false;
+        }
+        if (new AntPathMatcher().match("**/api/advertisement/{id}", url) && method.equals("GET")) {
+            return false;
+        }
+        return !method.equals("POST") || !request.getRequestURL().toString().contains("/api/advertisement/search");
     }
 
     private void setFailedRequest(String body, int code) {
@@ -58,27 +80,27 @@ public class AuthFilter extends ZuulFilter {
         HttpServletRequest request = ctx.getRequest();
         String header = request.getHeader("Auth");
         if (header == null || header.isEmpty() || !header.startsWith("Bearer ")) {
-                ctx.setResponseStatusCode(401);
-                ctx.setSendZuulResponse(false);
-        }else {
+            ctx.setResponseStatusCode(401);
+            ctx.setSendZuulResponse(false);
+        } else {
             try {
                 System.out.println("Verifikacija");
-                UserDTO userDTO= authClient.verify(header);
-                ctx.addZuulRequestHeader("user",jsonToString(userDTO));
-            } catch (FeignException.NotFound | InvalidUserDataException e) {
-                setFailedRequest("Something is wrong. Please try againg.", 403);
+                UserDTO userDTO = authClient.verify(header);
+                ctx.addZuulRequestHeader("user", jsonToString(userDTO));
+                ctx.addZuulRequestHeader("Auth", header);
+            } catch (FeignException.NotFound e) {
+                setFailedRequest("Something goes wrong. Please try again.", 403);
             }
         }
         return null;
     }
 
-    private String jsonToString(UserDTO userDTO){
+    private String jsonToString(UserDTO userDTO) {
         ObjectMapper Obj = new ObjectMapper();
 
         try {
             return Obj.writeValueAsString(userDTO);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             setFailedRequest("Something is wrong. Please try again.", 403);
         }
         return null;

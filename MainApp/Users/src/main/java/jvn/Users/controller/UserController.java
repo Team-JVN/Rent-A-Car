@@ -49,11 +49,6 @@ public class UserController {
 
     private UserDtoMapper userDtoMapper;
 
-    @RequestMapping("/health")
-    public String health() {
-        return "Hello world";
-    }
-
     @PostMapping(value = "/login")
     public ResponseEntity<UserTokenState> login(@RequestBody JwtAuthenticationRequest authenticationRequest) {
         try {
@@ -105,6 +100,7 @@ public class UserController {
                     HttpStatus.BAD_REQUEST);
         }
     }
+
     @PostMapping(value = "/register-agent", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AgentDTO> registerAgent(@Valid @RequestBody AgentDTO agentDTO) {
         try {
@@ -149,7 +145,7 @@ public class UserController {
 
     @Autowired
     public UserController(UserService userService, ClientService clientService, ClientDtoMapper clientDtoMapper,
-                          AuthentificationService authentificationService,UserDtoMapper userDtoMapper,
+                          AuthentificationService authentificationService, UserDtoMapper userDtoMapper,
                           AgentDtoMapper agentDtoMapper, AgentService agentService) {
 
         this.userService = userService;

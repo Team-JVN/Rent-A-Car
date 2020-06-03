@@ -1,3 +1,13 @@
+import { MyRentRequestsGuard } from './guard/my.rent.requests.guard';
+import { ManagePriceListsGuard } from './guard/manage.pricelists.guard';
+import { ManageAdvertisementsGuard } from './guard/manage.advertisements.guard';
+import { ManageCodeBooksGuard } from './guard/manage.code.books.guard';
+import { ManageCarsGuard } from './guard/manage.cars.guard';
+import { ClientEditProfileGuard } from './guard/client.edit.profile.guard';
+import { AgentEditProfileGuard } from './guard/agent.edit.profile.guard';
+import { AdminEditProfileGuard } from './guard/admin.edit.profile.guard';
+import { ManageUsersGuard } from './guard/manage.users.guard';
+import { ManageRoleGuard } from './guard/manage.role.guard';
 
 import { TokenInterceptor } from './interceptor/token.interceptor';
 import { AddRentRequestComponent } from './component/add/add-rent-request/add-rent-request.component';
@@ -219,6 +229,16 @@ import { AddToCartComponent } from './component/add/add-to-cart/add-to-cart.comp
     },
     { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    ManageRoleGuard,
+    ManageUsersGuard,
+    AdminEditProfileGuard,
+    AgentEditProfileGuard,
+    ClientEditProfileGuard,
+    ManageCarsGuard,
+    ManageCodeBooksGuard,
+    ManageAdvertisementsGuard,
+    ManagePriceListsGuard,
+    MyRentRequestsGuard,
   ],
   bootstrap: [AppComponent]
 })

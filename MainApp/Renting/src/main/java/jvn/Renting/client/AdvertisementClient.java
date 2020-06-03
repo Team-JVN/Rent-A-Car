@@ -2,14 +2,17 @@ package jvn.Renting.client;
 
 import jvn.Renting.dto.both.AdvertisementWithIdsDTO;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
 
 @FeignClient(name = "advertisements")
 public interface AdvertisementClient {
 
-    @GetMapping("/api/advertisement/{advId}")
-    List<AdvertisementWithIdsDTO> get(@PathVariable("advId") List<Long> advertisements);
+    @RequestMapping(method = RequestMethod.GET, path = "/api/advertisement/by-ids/{advIds}")
+    List<AdvertisementWithIdsDTO> get(@RequestHeader("Auth") String token, @RequestHeader("user") String user,
+                                      @PathVariable("advIds") List<Long> advertisements);
 }

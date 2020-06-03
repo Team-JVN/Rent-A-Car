@@ -7,6 +7,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public class UserDtoMapper implements MapperInterface<User, UserDTO> {
     public ModelMapper modelMapper;
@@ -26,6 +29,11 @@ public class UserDtoMapper implements MapperInterface<User, UserDTO> {
             dto.setCanCreateComments(client.getCanCreateComments());
             dto.setCanCreateRentRequests(client.getCanCreateRentRequests());
         }
+        List<String> permissions = new ArrayList<>();
+        entity.getRole().getPermissions().forEach(p -> {
+            permissions.add(p.getName());
+        });
+        dto.setPermissions(permissions);
         return dto;
     }
 
