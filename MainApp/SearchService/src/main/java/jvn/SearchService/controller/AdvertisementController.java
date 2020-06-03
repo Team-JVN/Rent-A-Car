@@ -6,7 +6,6 @@ import jvn.SearchService.dto.AdvertisementDTO;
 import jvn.SearchService.dto.SearchParamsDTO;
 import jvn.SearchService.dto.UserDTO;
 import jvn.SearchService.mapper.AdvertisementDtoMapper;
-import jvn.SearchService.model.Advertisement;
 import jvn.SearchService.service.AdvertisementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,12 +37,6 @@ public class AdvertisementController {
     @GetMapping("/{id}")
     public ResponseEntity<AdvertisementDTO> get(@PathVariable @Positive(message = "Id must be positive.") Long id) {
         return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.get(id)), HttpStatus.OK);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<AdvertisementDTO>> getAll() {
-        List<AdvertisementDTO> list = advertisementService.getAll().stream().map(advertisementDtoMapper::toDto).collect(Collectors.toList());
-        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @GetMapping("/all/{status}")
