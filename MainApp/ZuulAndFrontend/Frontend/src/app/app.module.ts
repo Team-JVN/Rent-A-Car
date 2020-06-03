@@ -1,3 +1,10 @@
+import { ManageCodeBooksGuard } from './guard/manage.code.books.guard';
+import { ManageCarsGuard } from './guard/manage.cars.guard';
+import { ClientEditProfileGuard } from './guard/client.edit.profile.guard';
+import { AgentEditProfileGuard } from './guard/agent.edit.profile.guard';
+import { AdminEditProfileGuard } from './guard/admin.edit.profile.guard';
+import { ManageUsersGuard } from './guard/manage.users.guard';
+import { ManageRoleGuard } from './guard/manage.role.guard';
 
 import { TokenInterceptor } from './interceptor/token.interceptor';
 import { AddRentRequestComponent } from './component/add/add-rent-request/add-rent-request.component';
@@ -216,6 +223,13 @@ import { ConfirmDialogDeleteAdminComponent } from './component/confirm-dialog/co
     },
     { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    ManageRoleGuard,
+    ManageUsersGuard,
+    AdminEditProfileGuard,
+    AgentEditProfileGuard,
+    ClientEditProfileGuard,
+    ManageCarsGuard,
+    ManageCodeBooksGuard
   ],
   bootstrap: [AppComponent]
 })

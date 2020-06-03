@@ -1,13 +1,8 @@
 package jvn.Users.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jvn.Users.dto.both.AdminDTO;
 import jvn.Users.dto.both.AgentDTO;
-import jvn.Users.dto.response.UserDTO;
 import jvn.Users.exceptionHandler.InvalidAgentDataException;
 import jvn.Users.mapper.AgentDtoMapper;
-import jvn.Users.model.Admin;
 import jvn.Users.model.Agent;
 import jvn.Users.model.User;
 import jvn.Users.service.AgentService;
@@ -19,11 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
-import java.text.ParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,7 +63,7 @@ public class AgentController {
         throw new InvalidAgentDataException("As a non-authorized user, you are not allowed to enter this page.", HttpStatus.FORBIDDEN);
     }
 
-    @GetMapping(value = "/logged-in-user")
+    @GetMapping(value = "/profile")
     public ResponseEntity<AgentDTO> get() {
         User user = userService.getLoginUser();
         if (user instanceof Agent) {

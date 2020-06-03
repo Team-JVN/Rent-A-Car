@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.*;
+import java.util.List;
 
 @Getter
 @Setter
@@ -25,6 +26,9 @@ public class UserDTO {
 
     @NotBlank(message = "Role is empty.")
     private String role;
+
+    @NotEmpty
+    private List<String> permissions;
 
     private Boolean canCreateRentRequests;
 

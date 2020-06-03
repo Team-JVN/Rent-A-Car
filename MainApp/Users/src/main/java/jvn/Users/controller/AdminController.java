@@ -64,7 +64,7 @@ public class AdminController {
         throw new InvalidAdminDataException("As a non-authorized user, you are not allowed to enter this page.", HttpStatus.FORBIDDEN);
     }
 
-    @GetMapping(value = "/logged-in-user")
+    @GetMapping(value = "/profile")
     public ResponseEntity<AdminDTO> get() {
         User user = userService.getLoginUser();
         if (user instanceof Admin) {

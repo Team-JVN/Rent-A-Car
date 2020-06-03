@@ -64,6 +64,7 @@ public class AuthFilter extends ZuulFilter {
                 System.out.println("Verifikacija");
                 UserDTO userDTO = authClient.verify(header);
                 ctx.addZuulRequestHeader("user", jsonToString(userDTO));
+                ctx.addZuulRequestHeader("Auth",header);
             } catch (FeignException.NotFound e) {
                 setFailedRequest("Something goes wrong. Please try again.", 403);
             }

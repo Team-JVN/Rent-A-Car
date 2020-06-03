@@ -33,7 +33,7 @@ export class ClientService {
   }
 
   public getLoggedInUser() {
-    return this.httpClient.get(this.url + '/logged-in-user');
+    return this.httpClient.get(this.url + '/profile');
   }
   public getAll(status: string) {
     return this.httpClient.get(this.url + '/all/' + status);

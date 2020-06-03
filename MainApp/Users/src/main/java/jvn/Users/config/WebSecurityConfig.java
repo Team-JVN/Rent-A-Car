@@ -3,7 +3,6 @@ package jvn.Users.config;
 import jvn.Users.security.RestAuthenticationEntryPoint;
 import jvn.Users.security.TokenAuthenticationFilter;
 import jvn.Users.serviceImpl.UserServiceImpl;
-import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -58,17 +57,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .antMatchers(HttpMethod.PUT, "/api/admin")
                 .hasAuthority("ADMIN_EDIT_PROFILE")
-                .antMatchers(HttpMethod.GET, "/api/admin/logged-in-user")
+                .antMatchers(HttpMethod.GET, "/api/admin/profile")
                 .hasAuthority("ADMIN_EDIT_PROFILE")
 
                 .antMatchers(HttpMethod.PUT, "/api/agent")
                 .hasAuthority("AGENT_EDIT_PROFILE")
-                .antMatchers(HttpMethod.GET, "/api/agent/logged-in-user")
+                .antMatchers(HttpMethod.GET, "/api/agent/profile")
                 .hasAuthority("AGENT_EDIT_PROFILE")
 
                 .antMatchers(HttpMethod.PUT, "/api/client")
                 .hasAuthority("CLIENT_EDIT_PROFILE")
-                .antMatchers(HttpMethod.GET, "/api/client/logged-in-user")
+                .antMatchers(HttpMethod.GET, "/api/client/profile")
                 .hasAuthority("CLIENT_EDIT_PROFILE")
 
                 .antMatchers("/api/role").hasAuthority("MANAGE_ROLES")

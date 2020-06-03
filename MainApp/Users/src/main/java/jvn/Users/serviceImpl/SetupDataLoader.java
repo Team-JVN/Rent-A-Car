@@ -9,7 +9,6 @@ import jvn.Users.repository.PermissionRepository;
 import jvn.Users.repository.RoleRepository;
 import jvn.Users.repository.UserRepository;
 import jvn.Users.service.EmailNotificationService;
-import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -51,15 +50,16 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         Permission agentEditProfile = createPermissionIfNotFound("AGENT_EDIT_PROFILE");
         Permission clientEditProfile = createPermissionIfNotFound("CLIENT_EDIT_PROFILE");
         Permission manageRoles = createPermissionIfNotFound("MANAGE_ROLES");
+        Permission manageCodeBooks = createPermissionIfNotFound("MANAGE_CODE_BOOKS");
+        Permission manageCars = createPermissionIfNotFound("MANAGE_CARS");
 
-
-        Set<Permission> adminPermissions = new HashSet<>(Arrays.asList(manageUsers, adminEditProfile, manageRoles));
+        Set<Permission> adminPermissions = new HashSet<>(Arrays.asList(manageUsers, adminEditProfile, manageRoles, manageCodeBooks));
         createRoleIfNotFound("ROLE_ADMIN", adminPermissions);
 
-        Set<Permission> clientPermissions = new HashSet<>(Arrays.asList(clientEditProfile));
+        Set<Permission> clientPermissions = new HashSet<>(Arrays.asList(clientEditProfile, manageCars));
         createRoleIfNotFound("ROLE_CLIENT", clientPermissions);
 
-        Set<Permission> agentPermissions = new HashSet<>(Arrays.asList(agentEditProfile));
+        Set<Permission> agentPermissions = new HashSet<>(Arrays.asList(agentEditProfile, manageCars));
         createRoleIfNotFound("ROLE_AGENT", agentPermissions);
 
         RandomPasswordGenerator randomPasswordGenerator = new RandomPasswordGenerator();

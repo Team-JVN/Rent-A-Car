@@ -1,10 +1,6 @@
 package jvn.Users.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jvn.Users.dto.both.AdminDTO;
 import jvn.Users.dto.both.ClientDTO;
-import jvn.Users.dto.response.UserDTO;
 import jvn.Users.enumeration.ClientStatus;
 import jvn.Users.exceptionHandler.InvalidClientDataException;
 import jvn.Users.exceptionHandler.InvalidTokenException;
@@ -135,7 +131,7 @@ public class ClientController {
         throw new InvalidClientDataException("As a non-authorized user, you are not allowed to enter this page.", HttpStatus.FORBIDDEN);
     }
 
-    @GetMapping(value = "/logged-in-user")
+    @GetMapping(value = "/profile")
     public ResponseEntity<ClientDTO> get() {
         User user = userService.getLoginUser();
         if (user instanceof Client) {
