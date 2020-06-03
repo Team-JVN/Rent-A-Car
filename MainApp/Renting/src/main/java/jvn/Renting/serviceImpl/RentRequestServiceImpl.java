@@ -16,6 +16,7 @@ import jvn.Renting.repository.RentRequestRepository;
 import jvn.Renting.service.RentRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +42,8 @@ public class RentRequestServiceImpl implements RentRequestService {
     private SearchClient searchClient;
 
     private CommentDtoMapper commentDtoMapper;
+
+    private SimpMessagingTemplate simpMessagingTemplate;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -210,12 +213,33 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     @Override
     public Message createMessage(Message message, Long id, Long rentInfoId, Long userId) {
-        return null;
+
+        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
+        for(RentInfo rentInfo: rentRequest.getRentInfos()){
+            if(rentInfo.getId() == rentInfoId){
+                message.setRentRequest(rentRequest);
+                message.setSender(userId);
+                rentInfo.getMessages().add(message);
+//                this.simpMessagingTemplate.convertAndSend("/socket-publisher/" + rentRequest.getCreatedBy(), message);
+//                this.simpMessagingTemplate.convertAndSend("/socket-publisher/" + rentRequest.getClient(), message);
+                rentRequestRepository.save(rentRequest);
+                break;
+            }
+        }
+        return message;
     }
 
     @Override
     public List<Message> getMessages(Long id, Long rentInfoId, Long userId) {
-        return null;
+        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
+        List<Message> messages = new ArrayList<Message>();
+        for(Message message: rentRequest.getMessages()){
+            if(message.getSender() == userId || message.getSender() == rentRequest.getCreatedBy()){
+                messages.add(message);
+            }
+        }
+        return messages;
+
     }
 
     private List<RentRequestDTO> createListRentRequestDTOs(List<ClientDTO> clientDTOS, List<AdvertisementDTO> advertisementDTOS, List<RentRequest> rentRequests, Long loggedInUserId) {
@@ -378,11 +402,13 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     @Autowired
     public RentRequestServiceImpl(RentRequestRepository rentRequestRepository, AdvertisementClient advertisementClient, UserClient userClient,
-                                  SearchClient searchClient, CommentDtoMapper commentDtoMapper) {
+                                  SearchClient searchClient, CommentDtoMapper commentDtoMapper, SimpMessagingTemplate simpMessagingTemplate) {
         this.rentRequestRepository = rentRequestRepository;
         this.advertisementClient = advertisementClient;
         this.userClient = userClient;
         this.searchClient = searchClient;
         this.commentDtoMapper = commentDtoMapper;
+        this.simpMessagingTemplate = simpMessagingTemplate;
+
     }
 }

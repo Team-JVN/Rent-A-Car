@@ -25,7 +25,7 @@ public class MessageDTO {
     private Long sender;
 
     @Column(nullable = false)
-    private LocalDateTime dateAndTime;
+    private String dateAndTime;
 
     @NotNull(message = "Rent request is null.")
     private RentRequestDTO rentRequest;
