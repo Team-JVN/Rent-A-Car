@@ -35,4 +35,6 @@ public interface ClientService {
     Client createRentRequests(Long id, String status);
 
     Client createComments(Long id, String status);
+
+    List<Client> getClientsById(List<Long> clients);
 }

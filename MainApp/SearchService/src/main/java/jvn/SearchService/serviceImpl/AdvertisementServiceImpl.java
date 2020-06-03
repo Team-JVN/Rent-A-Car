@@ -58,6 +58,11 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         return ads;
     }
 
+    @Override
+    public List<Advertisement> get(List<Long> advertisements) {
+        return advertisementRepository.findByIdInAndLogicalStatus(advertisements, LogicalStatus.EXISTING);
+    }
+
     public List<Advertisement> searchAdvertisements(SearchParamsDTO searchParamsDTO) {
         LocalDateTime dateTimeFrom = getDateConverted(searchParamsDTO.getDateTimeFrom());
         LocalDateTime dateTimeTo = getDateConverted(searchParamsDTO.getDateTimeTo());
@@ -72,13 +77,13 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         SearchParamsDTO newSearchParamsDTO = replaceNullValues(searchParamsDTO);
 
         List<Advertisement> searchedAdsList;
-        if (newSearchParamsDTO.getCdw() != null && newSearchParamsDTO.getCdw()) {
+        if (newSearchParamsDTO.getCDW() != null && newSearchParamsDTO.getCDW()) {
             searchedAdsList = advertisementRepository.findByCDWAndLogicalStatusAndDateFromLessThanEqualAndDateToIsNotNullAndDateToGreaterThanEqualAndPickUpPointContainsIgnoringCaseAndCarMakeContainsAndCarModelContainsAndCarFuelTypeContainsAndCarGearBoxTypeContainsAndCarBodyStyleContainsAndCarMileageInKmLessThanEqualAndCarKidsSeatsGreaterThanEqualAndCarAvgRatingGreaterThanEqualAndPriceListPricePerDayBetweenOrCDWAndLogicalStatusAndDateFromLessThanEqualAndDateToIsNullAndPickUpPointContainsIgnoringCaseAndCarMakeContainsAndCarModelContainsAndCarFuelTypeContainsAndCarGearBoxTypeContainsAndCarBodyStyleContainsAndCarMileageInKmLessThanEqualAndCarKidsSeatsGreaterThanEqualAndCarAvgRatingGreaterThanEqualAndPriceListPricePerDayBetween(
-                    newSearchParamsDTO.getCdw(), LogicalStatus.EXISTING, dateTimeFrom.toLocalDate(), dateTimeTo.toLocalDate(), newSearchParamsDTO.getPickUpPoint(),
+                    newSearchParamsDTO.getCDW(), LogicalStatus.EXISTING, dateTimeFrom.toLocalDate(), dateTimeTo.toLocalDate(), newSearchParamsDTO.getPickUpPoint(),
                     newSearchParamsDTO.getMake(), newSearchParamsDTO.getModel(), newSearchParamsDTO.getFuelType(), newSearchParamsDTO.getGearBoxType(),
                     newSearchParamsDTO.getBodyStyle(), newSearchParamsDTO.getMileageInKm(), newSearchParamsDTO.getKidsSeats(), newSearchParamsDTO.getMinRating().doubleValue(),
                     newSearchParamsDTO.getMinPricePerDay(), newSearchParamsDTO.getMaxPricePerDay(),
-                    newSearchParamsDTO.getCdw(), LogicalStatus.EXISTING, dateTimeFrom.toLocalDate(), newSearchParamsDTO.getPickUpPoint(), newSearchParamsDTO.getMake(),
+                    newSearchParamsDTO.getCDW(), LogicalStatus.EXISTING, dateTimeFrom.toLocalDate(), newSearchParamsDTO.getPickUpPoint(), newSearchParamsDTO.getMake(),
                     newSearchParamsDTO.getModel(), newSearchParamsDTO.getFuelType(), newSearchParamsDTO.getGearBoxType(), newSearchParamsDTO.getBodyStyle(),
                     newSearchParamsDTO.getMileageInKm(), newSearchParamsDTO.getKidsSeats(), newSearchParamsDTO.getMinRating().doubleValue(),
                     newSearchParamsDTO.getMinPricePerDay(), newSearchParamsDTO.getMaxPricePerDay()

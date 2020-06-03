@@ -1,11 +1,9 @@
 package jvn.Renting.serviceImpl;
 
 import jvn.Renting.client.AdvertisementClient;
+import jvn.Renting.client.SearchClient;
 import jvn.Renting.client.UserClient;
-import jvn.Renting.dto.both.AdvertisementDTO;
-import jvn.Renting.dto.both.AdvertisementWithIdsDTO;
-import jvn.Renting.dto.both.PriceListDTO;
-import jvn.Renting.dto.both.UserDTO;
+import jvn.Renting.dto.both.*;
 import jvn.Renting.enumeration.RentRequestStatus;
 import jvn.Renting.exceptionHandler.InvalidRentRequestDataException;
 import jvn.Renting.model.RentInfo;
@@ -24,9 +22,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class RentRequestServiceImpl implements RentRequestService {
@@ -37,6 +34,8 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     private UserClient userClient;
 
+    private SearchClient searchClient;
+
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public RentRequest create(RentRequest rentRequest, UserDTO loggedInUser) throws ParseException {
@@ -46,7 +45,7 @@ public class RentRequestServiceImpl implements RentRequestService {
         Long ownerId = advertisementOwnerId(advertisementDTOS);
 
         if (ownerId.equals(loggedInUserId)) {
-            if (rentRequest.getClient().equals(loggedInUserId)) {
+            if (rentRequest.getClient() == null || rentRequest.getClient().equals(loggedInUserId)) {
                 throw new InvalidRentRequestDataException("Please choose client for which you create rent request.", HttpStatus.BAD_REQUEST);
             }
             userClient.verify(rentRequest.getClient());
@@ -71,6 +70,122 @@ public class RentRequestServiceImpl implements RentRequestService {
         }
 
         return savedRequest;
+    }
+
+    @Override
+    public RentRequestDTO get(Long id, Long loggedInUserId) {
+        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, loggedInUserId, id, loggedInUserId);
+        if (rentRequest == null) {
+            throw new InvalidRentRequestDataException("Requested rent request does not exist.", HttpStatus.NOT_FOUND);
+        }
+        Set<Long> clientIds = new HashSet<>();
+        clientIds.add(rentRequest.getClient());
+
+        Set<Long> advertisements = new HashSet<>();
+        for (RentInfo rentInfo : rentRequest.getRentInfos()) {
+            advertisements.add(rentInfo.getAdvertisement());
+        }
+        List<ClientDTO> clientDTOS = userClient.get(new ArrayList<>(clientIds));
+        List<AdvertisementDTO> advertisementDTOS = searchClient.get(new ArrayList<>(advertisements));
+
+        Map<Long, ClientDTO> clientsMap = clientDTOS.stream().collect(Collectors.toMap(ClientDTO::getId, client -> client));
+        Map<Long, AdvertisementDTO> advertisementsMap = advertisementDTOS.stream().collect(Collectors.toMap(AdvertisementDTO::getId, adv -> adv));
+
+        return createRentRequestDTO(rentRequest, clientsMap, advertisementsMap, loggedInUserId);
+    }
+
+    @Override
+    public List<RentRequestDTO> getMine(String status, Long loggedInUserId) {
+        List<RentRequest> rentRequests;
+        if (status.equals("all")) {
+            rentRequests = rentRequestRepository.findByClient(loggedInUserId);
+        } else {
+            rentRequests = rentRequestRepository.findByClientAndRentRequestStatus(loggedInUserId, getRentRequestStatus(status));
+        }
+
+        if (rentRequests.isEmpty()) {
+            return new ArrayList<>();
+        }
+        Set<Long> clientIds = new HashSet<>();
+        clientIds.add(loggedInUserId);
+        Set<Long> advertisements = new HashSet<>();
+        for (RentRequest rentRequest : rentRequests) {
+            for (RentInfo rentInfo : rentRequest.getRentInfos()) {
+                advertisements.add(rentInfo.getAdvertisement());
+            }
+        }
+        List<ClientDTO> clientDTOS = userClient.get(new ArrayList<>(clientIds));
+        List<AdvertisementDTO> advertisementWithIdsDTOS = searchClient.get(new ArrayList<>(advertisements));
+
+        return createListRentRequestDTOs(clientDTOS, advertisementWithIdsDTOS, rentRequests, loggedInUserId);
+    }
+
+    @Override
+    public List<RentRequestDTO> get(Long advertisementId, String status, Long loggedInUserId) {
+        List<RentRequest> rentRequests;
+        if (status.equals("all")) {
+            rentRequests = rentRequestRepository.findByRentInfosAdvertisement(advertisementId);
+        } else {
+            rentRequests = rentRequestRepository.findByRentInfosAdvertisementAndRentRequestStatus(advertisementId, getRentRequestStatus(status));
+        }
+        if (rentRequests.isEmpty()) {
+            return new ArrayList<>();
+        }
+        Set<Long> clientIds = new HashSet<>();
+        Set<Long> advertisements = new HashSet<>();
+        for (RentRequest rentRequest : rentRequests) {
+            clientIds.add(rentRequest.getClient());
+            for (RentInfo rentInfo : rentRequest.getRentInfos()) {
+                advertisements.add(rentInfo.getAdvertisement());
+            }
+        }
+        List<ClientDTO> clientDTOS = userClient.get(new ArrayList<>(clientIds));
+        List<AdvertisementDTO> advertisementWithIdsDTOS = searchClient.get(new ArrayList<>(advertisements));
+        return createListRentRequestDTOs(clientDTOS, advertisementWithIdsDTOS, rentRequests, loggedInUserId);
+    }
+
+    private List<RentRequestDTO> createListRentRequestDTOs(List<ClientDTO> clientDTOS, List<AdvertisementDTO> advertisementDTOS, List<RentRequest> rentRequests, Long loggedInUserId) {
+        Map<Long, ClientDTO> clientsMap = clientDTOS.stream().collect(Collectors.toMap(ClientDTO::getId, client -> client));
+        Map<Long, AdvertisementDTO> advertisementsMap = advertisementDTOS.stream().collect(Collectors.toMap(AdvertisementDTO::getId, adv -> adv));
+
+        List<RentRequestDTO> rentRequestDTOS = new ArrayList<>();
+        for (RentRequest rentRequest : rentRequests) {
+            rentRequestDTOS.add(createRentRequestDTO(rentRequest, clientsMap, advertisementsMap, loggedInUserId));
+        }
+        return rentRequestDTOS;
+    }
+
+    private RentRequestDTO createRentRequestDTO(RentRequest rentRequest, Map<Long, ClientDTO> clientsMap, Map<Long, AdvertisementDTO> advertisementsMap, Long loggedInUserId) {
+        RentRequestDTO rentRequestDTO = new RentRequestDTO();
+        rentRequestDTO.setId(rentRequest.getId());
+        rentRequestDTO.setClient(clientsMap.get(rentRequest.getClient()));
+        rentRequestDTO.setTotalPrice(rentRequest.getTotalPrice());
+        rentRequestDTO.setRentRequestStatus(rentRequest.getRentRequestStatus().toString());
+        Set<RentInfoDTO> rentInfoDTOS = new HashSet<>();
+        for (RentInfo rentInfo : rentRequest.getRentInfos()) {
+            RentInfoDTO rentInfoDTO = new RentInfoDTO();
+            rentInfoDTO.setId(rentInfo.getId());
+            rentInfoDTO.setDateTimeFrom(rentInfo.getDateTimeFrom().toString());
+            rentInfoDTO.setDateTimeTo(rentInfo.getDateTimeTo().toString());
+            rentInfoDTO.setOptedForCDW(rentInfo.getOptedForCDW());
+            rentInfoDTO.setAdvertisement(advertisementsMap.get(rentInfo.getAdvertisement()));
+            rentInfoDTOS.add(rentInfoDTO);
+            if (!rentInfoDTO.getAdvertisement().getOwner().getId().equals(loggedInUserId) && !rentRequest.getClient().equals(loggedInUserId)) {
+                throw new InvalidRentRequestDataException("You are not allowed to see rent requests of this advertisement.",
+                        HttpStatus.NOT_FOUND);
+            }
+        }
+        rentRequestDTO.setRentInfos(rentInfoDTOS);
+        return rentRequestDTO;
+    }
+
+    private RentRequestStatus getRentRequestStatus(String status) {
+        try {
+            return RentRequestStatus.valueOf(status.toUpperCase());
+        } catch (Exception e) {
+            throw new InvalidRentRequestDataException("Please choose some of existing rent request's status.",
+                    HttpStatus.NOT_FOUND);
+        }
     }
 
     private RentRequest setRentInfosData(RentRequest rentRequest, List<RentInfo> rentInfos, List<AdvertisementWithIdsDTO> advertisementDTOS) throws ParseException {
@@ -115,15 +230,15 @@ public class RentRequestServiceImpl implements RentRequestService {
         }
         LocalDateTime rentInfoDateTimeFrom = LocalDateTime.of(rentInfoDateFrom.minusDays(1), LocalTime.of(23, 59));
         LocalDateTime rentInfoDateTimeTo = LocalDateTime.of(rentInfoDateTo.plusDays(1), LocalTime.of(0, 0));
-        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqual(RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeFrom).isEmpty()) {
+        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualAndRentInfosAdvertisement(RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeFrom, advertisement.getId()).isEmpty()) {
             throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
                     HttpStatus.BAD_REQUEST);
         }
-        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqual(RentRequestStatus.PAID, rentInfoDateTimeTo, rentInfoDateTimeTo).isEmpty()) {
+        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualAndRentInfosAdvertisement(RentRequestStatus.PAID, rentInfoDateTimeTo, rentInfoDateTimeTo, advertisement.getId()).isEmpty()) {
             throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
                     HttpStatus.BAD_REQUEST);
         }
-        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanEqual(RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeTo).isEmpty()) {
+        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanEqualAndRentInfosAdvertisement(RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeTo, advertisement.getId()).isEmpty()) {
             throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
                     HttpStatus.BAD_REQUEST);
         }
@@ -175,9 +290,9 @@ public class RentRequestServiceImpl implements RentRequestService {
         for (RentInfo rentInfo : rentRequest.getRentInfos()) {
             LocalDateTime rentInfoDateTimeFrom = rentInfo.getDateTimeFrom();
             LocalDateTime rentInfoDateTimeTo = rentInfo.getDateTimeTo();
-            List<RentRequest> rentRequests = rentRequestRepository.findByRentRequestStatusNotAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualOrRentRequestStatusNotAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualOrRentRequestStatusNotAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanEqual(
-                    RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeFrom, RentRequestStatus.PAID, rentInfoDateTimeTo, rentInfoDateTimeTo,
-                    RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeTo);
+            List<RentRequest> rentRequests = rentRequestRepository.findByRentRequestStatusNotAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualAndRentInfosAdvertisementOrRentRequestStatusNotAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualAndRentInfosAdvertisementOrRentRequestStatusNotAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanEqualAndRentInfosAdvertisement(
+                    RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeFrom, rentInfo.getAdvertisement(), RentRequestStatus.PAID, rentInfoDateTimeTo, rentInfoDateTimeTo, rentInfo.getAdvertisement(),
+                    RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeTo, rentInfo.getAdvertisement());
             for (RentRequest rentRequest1 : rentRequests) {
                 rentRequest1.setRentRequestStatus(RentRequestStatus.CANCELED);
             }
@@ -188,9 +303,11 @@ public class RentRequestServiceImpl implements RentRequestService {
     }
 
     @Autowired
-    public RentRequestServiceImpl(RentRequestRepository rentRequestRepository, AdvertisementClient advertisementClient, UserClient userClient) {
+    public RentRequestServiceImpl(RentRequestRepository rentRequestRepository, AdvertisementClient advertisementClient, UserClient userClient,
+                                  SearchClient searchClient) {
         this.rentRequestRepository = rentRequestRepository;
         this.advertisementClient = advertisementClient;
         this.userClient = userClient;
+        this.searchClient = searchClient;
     }
 }

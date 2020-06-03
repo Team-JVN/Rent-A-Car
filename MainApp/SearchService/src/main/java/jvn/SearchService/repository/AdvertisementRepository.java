@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -35,4 +36,6 @@ public interface AdvertisementRepository extends JpaRepository<Advertisement, Lo
                                                                                                                            LogicalStatus logicalStatus1, Long owner, LocalDate localDateToNow);
 
     List<Advertisement> findAllByLogicalStatusNotAndOwnerIdAndDateToLessThanEqual(LogicalStatus logicalStatus, Long id, LocalDate localDateToNow);
+
+    List<Advertisement> findByIdInAndLogicalStatus(Collection<Long> id, LogicalStatus logicalStatus);
 }

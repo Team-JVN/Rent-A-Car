@@ -60,6 +60,13 @@ public class AdvertisementController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
+    @GetMapping("/for-rent-requests/{advId}")
+    public ResponseEntity<List<AdvertisementDTO>> getAll(@PathVariable("advId") List<Long> advertisements) {
+        List<AdvertisementDTO> list = advertisementService.get(advertisements).stream().map(advertisementDtoMapper::toDto).
+                collect(Collectors.toList());
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
     private UserDTO stringToObject(String user) {
         try {
             return objectMapper.readValue(user, UserDTO.class);

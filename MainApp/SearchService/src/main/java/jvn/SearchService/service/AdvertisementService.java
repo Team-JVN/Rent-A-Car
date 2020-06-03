@@ -14,5 +14,7 @@ public interface AdvertisementService {
     List<Advertisement> getAllMy(String status, Long id);
 
     List<Advertisement> searchAdvertisements(SearchParamsDTO searchParamsDTO);
+
+    List<Advertisement> get(List<Long> advertisements);
 }
 

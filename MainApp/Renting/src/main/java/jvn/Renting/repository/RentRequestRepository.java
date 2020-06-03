@@ -11,13 +11,21 @@ import java.util.List;
 @Repository
 public interface RentRequestRepository extends JpaRepository<RentRequest, Long> {
 
-    List<RentRequest> findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqual(RentRequestStatus status, LocalDateTime localDate, LocalDateTime localDate1);
+    List<RentRequest> findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualAndRentInfosAdvertisement(RentRequestStatus status, LocalDateTime localDate, LocalDateTime localDate1, Long advertisementId);
 
-    List<RentRequest> findByRentRequestStatusAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanEqual(RentRequestStatus status, LocalDateTime localDateFrom, LocalDateTime localDateTo);
+    List<RentRequest> findByRentRequestStatusAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanEqualAndRentInfosAdvertisement(RentRequestStatus status, LocalDateTime localDateFrom, LocalDateTime localDateTo, Long advertisementId);
 
-    List<RentRequest> findByRentRequestStatusNotAndRentInfosAdvertisement(RentRequestStatus rentRequestStatus, Long id);
-
-    List<RentRequest> findByRentRequestStatusNotAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualOrRentRequestStatusNotAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualOrRentRequestStatusNotAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanEqual(
-            RentRequestStatus status, LocalDateTime localDateFrom, LocalDateTime localDateFrom1, RentRequestStatus status1, LocalDateTime localDateTo, LocalDateTime localDateTo1, RentRequestStatus status2, LocalDateTime localDateFrom2, LocalDateTime localDateTo2
+    List<RentRequest> findByRentRequestStatusNotAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualAndRentInfosAdvertisementOrRentRequestStatusNotAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualAndRentInfosAdvertisementOrRentRequestStatusNotAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanEqualAndRentInfosAdvertisement(
+            RentRequestStatus status, LocalDateTime localDateFrom, LocalDateTime localDateFrom1, Long advertisement1, RentRequestStatus status1, LocalDateTime localDateTo, LocalDateTime localDateTo1, Long advertisement2, RentRequestStatus status2, LocalDateTime localDateFrom2, LocalDateTime localDateTo2, Long advertisementId3
     );
+
+    List<RentRequest> findByRentInfosAdvertisement(Long id);
+
+    List<RentRequest> findByRentInfosAdvertisementAndRentRequestStatus(Long id, RentRequestStatus rentRequestStatus);
+
+    RentRequest findOneByIdAndCreatedByOrIdAndClient(Long id, Long createdBy, Long id1, Long client);
+
+    List<RentRequest> findByClient(Long id);
+
+    List<RentRequest> findByClientAndRentRequestStatus(Long id, RentRequestStatus status);
 }
