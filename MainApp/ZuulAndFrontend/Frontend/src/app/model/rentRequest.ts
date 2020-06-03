@@ -7,6 +7,7 @@ export class RentRequest {
     rentInfos: RentInfo[];
     totalPrice: number;
     rentRequestStatus: string;
+
     constructor(client: Client, rentInfos: RentInfo[], totalPrice?: number, rentRequestStatus?: string, id?: number) {
         this.client = client;
         this.rentInfos = rentInfos;

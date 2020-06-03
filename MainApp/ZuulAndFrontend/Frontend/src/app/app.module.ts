@@ -82,6 +82,7 @@ import { RejectRequestToRegisterComponent } from './component/reject-request-to-
 import { ConfirmDeleteClientComponent } from './component/confirm-dialog/confirm-delete-client/confirm-delete-client.component';
 import { ConfirmDialogDeleteAgentComponent } from './component/confirm-dialog/confirm-dialog-delete-agent/confirm-dialog-delete-agent.component';
 import { ConfirmDialogDeleteAdminComponent } from './component/confirm-dialog/confirm-dialog-delete-admin/confirm-dialog-delete-admin.component';
+import { AddToCartComponent } from './component/add/add-to-cart/add-to-cart.component';
 
 @NgModule({
   declarations: [
@@ -153,6 +154,7 @@ import { ConfirmDialogDeleteAdminComponent } from './component/confirm-dialog/co
     ConfirmDeleteClientComponent,
     ConfirmDialogDeleteAgentComponent,
     ConfirmDialogDeleteAdminComponent,
+    AddToCartComponent,
   ],
   imports: [
     BrowserModule,
@@ -209,6 +211,7 @@ import { ConfirmDialogDeleteAdminComponent } from './component/confirm-dialog/co
     RejectRequestToRegisterComponent,
     ConfirmDialogDeleteAgentComponent,
     ConfirmDialogDeleteAdminComponent,
+    AddToCartComponent,
   ],
   providers: [
     {

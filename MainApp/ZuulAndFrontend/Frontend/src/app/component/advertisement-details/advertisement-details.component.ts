@@ -8,7 +8,6 @@ import { ToastrService } from 'ngx-toastr';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { AddRentRequestComponent } from '../add/add-rent-request/add-rent-request.component';
 
 @Component({
   selector: 'app-advertisement-details',
