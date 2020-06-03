@@ -5,7 +5,6 @@ import jvn.Advertisements.security.RestAuthenticationEntryPoint;
 import jvn.Advertisements.security.TokenAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -35,6 +34,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/advertisement")
                 .hasAuthority("MANAGE_ADVERTISEMENTS")
 
+                .antMatchers("/api/advertisement/{advId}")
+                .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
+
                 .anyRequest().authenticated().and()
 
                 .cors().and()
@@ -47,12 +49,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers(HttpMethod.GET, "/api/car/{id}/picture");
-        web.ignoring().antMatchers(HttpMethod.GET, "/api/body-style");
-        web.ignoring().antMatchers(HttpMethod.GET, "/api/fuel-type");
-        web.ignoring().antMatchers(HttpMethod.GET, "/api/gearbox-type");
-        web.ignoring().antMatchers(HttpMethod.GET, "/api/make");
-        web.ignoring().antMatchers(HttpMethod.GET, "/api/make/{makeId}/models");
+//        web.ignoring().antMatchers(HttpMethod.GET, "/api/advertisement/{advId}");
     }
 
 }

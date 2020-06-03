@@ -54,20 +54,23 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         Permission manageCars = createPermissionIfNotFound("MANAGE_CARS");
         Permission managePriceLists = createPermissionIfNotFound("MANAGE_PRICE_LISTS");
         Permission manageAdvertisements = createPermissionIfNotFound("MANAGE_ADVERTISEMENTS");
+        Permission myRentRequests = createPermissionIfNotFound("MY_RENT_REQUESTS");
 
         Set<Permission> adminPermissions = new HashSet<>(Arrays.asList(manageUsers, adminEditProfile, manageRoles, manageCodeBooks));
         createRoleIfNotFound("ROLE_ADMIN", adminPermissions);
 
-        Set<Permission> clientPermissions = new HashSet<>(Arrays.asList(clientEditProfile, manageCars, managePriceLists, manageAdvertisements));
+        Set<Permission> clientPermissions = new HashSet<>(Arrays.asList(clientEditProfile, manageCars, managePriceLists, manageAdvertisements,
+                myRentRequests));
         createRoleIfNotFound("ROLE_CLIENT", clientPermissions);
 
-        Set<Permission> agentPermissions = new HashSet<>(Arrays.asList(agentEditProfile, manageCars, managePriceLists, manageAdvertisements));
+        Set<Permission> agentPermissions = new HashSet<>(Arrays.asList(agentEditProfile, manageCars, managePriceLists,
+                manageAdvertisements));
         createRoleIfNotFound("ROLE_AGENT", agentPermissions);
 
         RandomPasswordGenerator randomPasswordGenerator = new RandomPasswordGenerator();
         String generatedPassword = randomPasswordGenerator.generatePassword();
 
-        Admin admin = new Admin("Rent-a-Car Admin", "rentacaradmin@maildrop.cc", passwordEncoder.encode(generatedPassword), this.roleRepository.findByName("ROLE_ADMIN"));
+        Admin admin = new Admin("Rent a Car Admin", "rentacaradmin@maildrop.cc", passwordEncoder.encode(generatedPassword), this.roleRepository.findByName("ROLE_ADMIN"));
         if (userRepository.findByEmail(admin.getEmail()) == null) {
             userRepository.save(admin);
             composeAndSendEmailToChangePassword(admin.getEmail(), generatedPassword);
@@ -75,7 +78,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
         generatedPassword = randomPasswordGenerator.generatePassword();
         Agent agent = new Agent("Rent a Car Agency", "rentacar@maildrop.cc",
-                passwordEncoder.encode(generatedPassword), this.roleRepository.findByName("ROLE_AGENT"), "Beograd", "0627564136", "50000001");
+                passwordEncoder.encode(generatedPassword), this.roleRepository.findByName("ROLE_AGENT"), "Beograd", "0627564136", "500000014");
         if (userRepository.findByEmail(agent.getEmail()) == null) {
             userRepository.save(agent);
             composeAndSendEmailToChangePassword(agent.getEmail(), generatedPassword);

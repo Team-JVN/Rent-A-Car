@@ -64,7 +64,7 @@ public class AgentController {
     }
 
     @GetMapping(value = "/profile")
-    public ResponseEntity<AgentDTO> get() {
+    public ResponseEntity<AgentDTO> getProfile() {
         User user = userService.getLoginUser();
         if (user instanceof Agent) {
             return new ResponseEntity<>(agentDtoMapper.toDto((Agent) userService.getLoginUser()), HttpStatus.OK);

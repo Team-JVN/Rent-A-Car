@@ -38,17 +38,17 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public RentRequest create(RentRequest rentRequest, UserDTO loggedInUser) throws ParseException {
+    public RentRequest create(RentRequest rentRequest, UserDTO loggedInUser, String jwt, String user) throws ParseException {
         Long loggedInUserId = loggedInUser.getId();
         List<RentInfo> rentInfos = new ArrayList<>(rentRequest.getRentInfos());
-        List<AdvertisementWithIdsDTO> advertisementDTOS = getAdvertisements(rentInfos);
+        List<AdvertisementWithIdsDTO> advertisementDTOS = getAdvertisements(jwt, user, rentInfos);
         Long ownerId = advertisementOwnerId(advertisementDTOS);
 
         if (ownerId.equals(loggedInUserId)) {
             if (rentRequest.getClient() == null || rentRequest.getClient().equals(loggedInUserId)) {
                 throw new InvalidRentRequestDataException("Please choose client for which you create rent request.", HttpStatus.BAD_REQUEST);
             }
-            userClient.verify(rentRequest.getClient());
+            userClient.verify(jwt, rentRequest.getClient());
             rentRequest.setRentRequestStatus(RentRequestStatus.PAID);
         } else {
             if (!loggedInUser.getCanCreateRentRequests()) {
@@ -73,7 +73,7 @@ public class RentRequestServiceImpl implements RentRequestService {
     }
 
     @Override
-    public RentRequestDTO get(Long id, Long loggedInUserId) {
+    public RentRequestDTO get(Long id, Long loggedInUserId, String jwt, String user) {
         RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, loggedInUserId, id, loggedInUserId);
         if (rentRequest == null) {
             throw new InvalidRentRequestDataException("Requested rent request does not exist.", HttpStatus.NOT_FOUND);
@@ -85,8 +85,8 @@ public class RentRequestServiceImpl implements RentRequestService {
         for (RentInfo rentInfo : rentRequest.getRentInfos()) {
             advertisements.add(rentInfo.getAdvertisement());
         }
-        List<ClientDTO> clientDTOS = userClient.get(new ArrayList<>(clientIds));
-        List<AdvertisementDTO> advertisementDTOS = searchClient.get(new ArrayList<>(advertisements));
+        List<ClientDTO> clientDTOS = userClient.get(jwt, new ArrayList<>(clientIds));
+        List<AdvertisementDTO> advertisementDTOS = searchClient.get(jwt, user, new ArrayList<>(advertisements));
 
         Map<Long, ClientDTO> clientsMap = clientDTOS.stream().collect(Collectors.toMap(ClientDTO::getId, client -> client));
         Map<Long, AdvertisementDTO> advertisementsMap = advertisementDTOS.stream().collect(Collectors.toMap(AdvertisementDTO::getId, adv -> adv));
@@ -95,7 +95,7 @@ public class RentRequestServiceImpl implements RentRequestService {
     }
 
     @Override
-    public List<RentRequestDTO> getMine(String status, Long loggedInUserId) {
+    public List<RentRequestDTO> getMine(String status, Long loggedInUserId, String jwt, String user) {
         List<RentRequest> rentRequests;
         if (status.equals("all")) {
             rentRequests = rentRequestRepository.findByClient(loggedInUserId);
@@ -114,14 +114,14 @@ public class RentRequestServiceImpl implements RentRequestService {
                 advertisements.add(rentInfo.getAdvertisement());
             }
         }
-        List<ClientDTO> clientDTOS = userClient.get(new ArrayList<>(clientIds));
-        List<AdvertisementDTO> advertisementWithIdsDTOS = searchClient.get(new ArrayList<>(advertisements));
+        List<ClientDTO> clientDTOS = userClient.get(jwt, new ArrayList<>(clientIds));
+        List<AdvertisementDTO> advertisementWithIdsDTOS = searchClient.get(jwt, user, new ArrayList<>(advertisements));
 
         return createListRentRequestDTOs(clientDTOS, advertisementWithIdsDTOS, rentRequests, loggedInUserId);
     }
 
     @Override
-    public List<RentRequestDTO> get(Long advertisementId, String status, Long loggedInUserId) {
+    public List<RentRequestDTO> get(Long advertisementId, String status, Long loggedInUserId, String jwt, String user) {
         List<RentRequest> rentRequests;
         if (status.equals("all")) {
             rentRequests = rentRequestRepository.findByRentInfosAdvertisement(advertisementId);
@@ -139,8 +139,8 @@ public class RentRequestServiceImpl implements RentRequestService {
                 advertisements.add(rentInfo.getAdvertisement());
             }
         }
-        List<ClientDTO> clientDTOS = userClient.get(new ArrayList<>(clientIds));
-        List<AdvertisementDTO> advertisementWithIdsDTOS = searchClient.get(new ArrayList<>(advertisements));
+        List<ClientDTO> clientDTOS = userClient.get(jwt, new ArrayList<>(clientIds));
+        List<AdvertisementDTO> advertisementWithIdsDTOS = searchClient.get(jwt, user, new ArrayList<>(advertisements));
         return createListRentRequestDTOs(clientDTOS, advertisementWithIdsDTOS, rentRequests, loggedInUserId);
     }
 
@@ -268,12 +268,12 @@ public class RentRequestServiceImpl implements RentRequestService {
         return LocalDate.parse(date, formatter);
     }
 
-    private List<AdvertisementWithIdsDTO> getAdvertisements(List<RentInfo> rentInfos) {
+    private List<AdvertisementWithIdsDTO> getAdvertisements(String jwt, String user, List<RentInfo> rentInfos) {
         List<Long> advertisements = new ArrayList<>();
         for (RentInfo rentInfo : rentInfos) {
             advertisements.add(rentInfo.getAdvertisement());
         }
-        return advertisementClient.get(advertisements);
+        return advertisementClient.get(jwt, user, advertisements);
     }
 
     private Long advertisementOwnerId(List<AdvertisementWithIdsDTO> advertisementDTOS) {

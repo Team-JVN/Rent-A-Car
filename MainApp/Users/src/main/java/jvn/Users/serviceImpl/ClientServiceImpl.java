@@ -13,10 +13,10 @@ import jvn.Users.service.ClientService;
 import jvn.Users.service.EmailNotificationService;
 import jvn.Users.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.core.env.Environment;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;

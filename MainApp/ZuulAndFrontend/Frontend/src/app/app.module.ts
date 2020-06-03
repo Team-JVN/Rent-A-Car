@@ -1,3 +1,6 @@
+import { MyRentRequestsGuard } from './guard/my.rent.requests.guard';
+import { ManagePriceListsGuard } from './guard/manage.pricelists.guard';
+import { ManageAdvertisementsGuard } from './guard/manage.advertisements.guard';
 import { ManageCodeBooksGuard } from './guard/manage.code.books.guard';
 import { ManageCarsGuard } from './guard/manage.cars.guard';
 import { ClientEditProfileGuard } from './guard/client.edit.profile.guard';
@@ -229,7 +232,10 @@ import { ConfirmDialogDeleteAdminComponent } from './component/confirm-dialog/co
     AgentEditProfileGuard,
     ClientEditProfileGuard,
     ManageCarsGuard,
-    ManageCodeBooksGuard
+    ManageCodeBooksGuard,
+    ManageAdvertisementsGuard,
+    ManagePriceListsGuard,
+    MyRentRequestsGuard,
   ],
   bootstrap: [AppComponent]
 })

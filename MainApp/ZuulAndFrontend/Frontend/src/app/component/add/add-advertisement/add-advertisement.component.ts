@@ -145,7 +145,7 @@ export class AddAdvertisementComponent implements OnInit {
     }
     var validTo: string = null;
     if (this.dateForm.value.validTo) {
-      validTo = formatDate(this.dateForm.value.validFrom, 'yyyy-MM-dd', 'en-US');
+      validTo = formatDate(this.dateForm.value.validTo, 'yyyy-MM-dd', 'en-US');
     }
     var discount = this.dateForm.value.discount
     if (this.isClient) {

@@ -3,8 +3,9 @@
     [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="(isHandset$ | async) === false">
     <mat-toolbar>Menu</mat-toolbar>
     <mat-nav-list>
+      <a mat-list-item routerLink="/search-advertisements">Search Advertisements</a>
+
       <span *ngIf="!isLoggedIn()">
-        <a mat-list-item routerLink="/search-advertisements">Search Advertisements</a>
         <a mat-list-item routerLink="/login">Login</a>
         <a mat-list-item routerLink="/client/registration">Registrate</a>
         <a mat-list-item routerLink="/change-password">Change Password</a>
@@ -28,11 +29,10 @@
         <a mat-list-item routerLink="/makes">Makes</a>
       </mat-nav-list>
 
-      <span *ngIf="isLoggedIn()">
+      <mat-nav-list *ngIf="isLoggedIn() && hasPermissionMyRentRequests()">
         <a mat-list-item routerLink="/client/renting-cart">Renting Cart</a>
         <a mat-list-item routerLink="/client-rent-requests">Clients' Rent Requests</a>
-        <!-- <a mat-list-item routerLink="/statistics">Statistics</a> -->
-      </span>
+      </mat-nav-list>
 
       <mat-nav-list *ngIf="isLoggedIn() && hasPermissionManageUsers()">
         <a mat-list-item routerLink="/manage-users">Manage Users</a>
@@ -44,7 +44,7 @@
       <span *ngIf="isLoggedIn() && hasPermissionAdminEditProfile()">
         <a mat-list-item routerLink="/edit-admin-info">Edit Profile Admin</a>
       </span>
-      <span *ngIf="isLoggedIn() && hasPermissionClientProfile()">
+      <span *ngIf="isLoggedIn() && hasPermissionClientEditProfile()">
         <a mat-list-item routerLink="/edit-client-info">Edit Profile Client</a>
       </span>
       <mat-nav-list *ngIf="isLoggedIn() && hasPermissionManageRoles()">

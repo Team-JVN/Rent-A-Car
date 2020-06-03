@@ -1,8 +1,7 @@
-package jvn.SearchService.config;
+package jvn.Renting.config;
 
-
-import jvn.SearchService.security.RestAuthenticationEntryPoint;
-import jvn.SearchService.security.TokenAuthenticationFilter;
+import jvn.Renting.security.RestAuthenticationEntryPoint;
+import jvn.Renting.security.TokenAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -29,27 +28,37 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
 
                 .authorizeRequests()
-                .antMatchers("/api/advertisement/all/{status}")
-                .hasAuthority("MANAGE_CARS")
+                .antMatchers(HttpMethod.POST, "/api/rent-request").hasAuthority("MY_RENT_REQUESTS")
+                .antMatchers(HttpMethod.GET, "/api/rent-request/{status}/mine",
+                        "/api/rent-request/{id}")
+                .hasAuthority("MY_RENT_REQUESTS")
 
-                .antMatchers("/api/advertisement/for-rent-requests/{advId}")
-                .hasAnyAuthority("MY_RENT_REQUESTS", "MANAGE_ADVERTISEMENTS")
-
+                .antMatchers(HttpMethod.GET,
+                        "/api/rent-request/{status}/advertisement/{advertisementId}")
+                .hasAuthority("MANAGE_ADVERTISEMENTS")
+                .antMatchers(HttpMethod.GET,
+                        "/api/rent-request/{id}")
+                .hasAuthority("MANAGE_ADVERTISEMENTS")
+                .antMatchers(HttpMethod.POST, "/api/rent-request").hasAuthority("MANAGE_ADVERTISEMENTS")
                 .anyRequest().authenticated().and()
 
                 .cors().and()
 
                 .addFilterBefore(new TokenAuthenticationFilter(), BasicAuthenticationFilter.class);
 
+        ///verify/{userId}/{carId}
         http.csrf().disable();
     }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers(HttpMethod.POST, "/api/advertisement/search");
-        web.ignoring().antMatchers(HttpMethod.GET, "/api/advertisement/{id}");
-
-//        web.ignoring().antMatchers(HttpMethod.GET, "/api/advertisement/for-rent-requests/{advId}");
+        web.ignoring().antMatchers(HttpMethod.GET, "/api/car/{id}/picture");
+        web.ignoring().antMatchers(HttpMethod.GET, "/api/body-style");
+        web.ignoring().antMatchers(HttpMethod.GET, "/api/fuel-type");
+        web.ignoring().antMatchers(HttpMethod.GET, "/api/gearbox-type");
+        web.ignoring().antMatchers(HttpMethod.GET, "/api/make");
+        web.ignoring().antMatchers(HttpMethod.GET, "/api/make/{makeId}/models");
+        web.ignoring().antMatchers(HttpMethod.GET, "/api/car/verify/{userId}/{carId}");
     }
 
 }

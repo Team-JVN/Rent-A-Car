@@ -49,7 +49,7 @@ export class LoginComponent implements OnInit {
     } else if (this.authentificationService.isClient()) {
       this.router.navigate(['/search-advertisements']);
     } else if (this.authentificationService.isAdmin()) {
-      this.router.navigate(['/advertisements']);
+      this.router.navigate(['/manage-users']);
     } else {
       this.authentificationService.logout();
     }

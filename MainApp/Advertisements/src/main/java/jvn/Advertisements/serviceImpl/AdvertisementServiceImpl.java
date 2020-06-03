@@ -39,10 +39,10 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     private CarClient carClient;
 
     @Override
-    public Advertisement create(Advertisement createAdvertisementDTO, UserDTO userDTO, String jwtToken) {
+    public Advertisement create(Advertisement createAdvertisementDTO, UserDTO userDTO, String jwtToken, String user) {
 
         checkDate(createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
-        CarWithAllInformationDTO carDTO = carClient.verify(userDTO.getId(), createAdvertisementDTO.getCar());
+        CarWithAllInformationDTO carDTO = carClient.verify(jwtToken, user, userDTO.getId(), createAdvertisementDTO.getCar());
         checkIfCarIsAvailable(createAdvertisementDTO.getCar(), createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
         createAdvertisementDTO.setOwner(userDTO.getId());
         createAdvertisementDTO.setPriceList(priceListService.get(createAdvertisementDTO.getPriceList().getId(), userDTO));

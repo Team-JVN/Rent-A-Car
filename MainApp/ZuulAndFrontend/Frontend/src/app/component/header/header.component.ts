@@ -61,7 +61,7 @@ export class HeaderComponent implements OnInit {
     return this.authentificationService.hasPermission("AGENT_EDIT_PROFILE");
   }
 
-  hasPermissionClientProfile() {
+  hasPermissionClientEditProfile() {
     return this.authentificationService.hasPermission("CLIENT_EDIT_PROFILE");
   }
 
@@ -71,5 +71,9 @@ export class HeaderComponent implements OnInit {
 
   hasPermissionManageAdvertisements() {
     return this.authentificationService.hasPermission("MANAGE_ADVERTISEMENTS");
+  }
+
+  hasPermissionMyRentRequests() {
+    return this.authentificationService.hasPermission("MY_RENT_REQUESTS");
   }
 }

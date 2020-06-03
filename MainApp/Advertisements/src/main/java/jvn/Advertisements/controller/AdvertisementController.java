@@ -41,7 +41,7 @@ public class AdvertisementController {
         try {
             UserDTO userDTO = stringToObject(request.getHeader("user"));
             String jwtToken = request.getHeader("Auth");
-            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.create(createAdvertisementDtoMapper.toEntity(createAdvertisementDTO), userDTO, jwtToken)),
+            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.create(createAdvertisementDtoMapper.toEntity(createAdvertisementDTO), userDTO, jwtToken, request.getHeader("user"))),
                     HttpStatus.CREATED);
         } catch (ParseException e) {
             throw new InvalidAdvertisementDataException("Please choose valid date.", HttpStatus.BAD_REQUEST);

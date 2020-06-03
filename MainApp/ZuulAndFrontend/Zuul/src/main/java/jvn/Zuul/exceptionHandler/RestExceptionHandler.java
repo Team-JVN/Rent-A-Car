@@ -36,4 +36,9 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(FeignException.Unauthorized.class)
+    public ResponseEntity<?> handleFeignUnauthorizedException(FeignException e,
+                                                              HttpServletResponse response) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
 }
