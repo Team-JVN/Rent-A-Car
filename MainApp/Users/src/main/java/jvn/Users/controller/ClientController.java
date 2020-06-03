@@ -55,7 +55,7 @@ public class ClientController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/verify/{clientId}")
+    @GetMapping(value = "/{clientId}/verify")
     public ResponseEntity<?> verify(@PathVariable("clientId") @Positive(message = "Id must be positive.") Long clientId) {
         return new ResponseEntity<>(clientService.verify(clientId), HttpStatus.OK);
     }
@@ -140,8 +140,8 @@ public class ClientController {
         throw new InvalidClientDataException("As a non-authorized user, you are not allowed to enter this page.", HttpStatus.FORBIDDEN);
     }
 
-    @GetMapping("/clients-by-id/{clientId}")
-    public ResponseEntity<List<ClientDTO>> getClientsById(@PathVariable("clientId") List<Long> clients) {
+    @GetMapping("/by-ids/{clientIds}")
+    public ResponseEntity<List<ClientDTO>> getClientsById(@PathVariable("clientIds") List<Long> clients) {
         List<ClientDTO> list = clientService.getClientsById(clients).stream().map(clientDtoMapper::toDto).
                 collect(Collectors.toList());
         return new ResponseEntity<>(list, HttpStatus.OK);

@@ -12,7 +12,7 @@ import java.util.List;
 @FeignClient(name = "advertisements")
 public interface AdvertisementClient {
 
-    @RequestMapping(method = RequestMethod.GET, path = "/api/advertisement/{advId}")
+    @RequestMapping(method = RequestMethod.GET, path = "/api/advertisement/by-ids/{advIds}")
     List<AdvertisementWithIdsDTO> get(@RequestHeader("Auth") String token, @RequestHeader("user") String user,
-                                      @PathVariable("advId") List<Long> advertisements);
+                                      @PathVariable("advIds") List<Long> advertisements);
 }

@@ -34,7 +34,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/advertisement")
                 .hasAuthority("MANAGE_ADVERTISEMENTS")
 
-                .antMatchers("/api/advertisement/{advId}")
+                .antMatchers("/api/advertisement/by-ids/{advIds}")
                 .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
 
                 .anyRequest().authenticated().and()
@@ -43,13 +43,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .addFilterBefore(new TokenAuthenticationFilter(), BasicAuthenticationFilter.class);
 
-        ///api/advertisement/{advId}
         http.csrf().disable();
     }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-//        web.ignoring().antMatchers(HttpMethod.GET, "/api/advertisement/{advId}");
+//        web.ignoring().antMatchers(HttpMethod.GET, "/api/advertisement/by-ids/{advIds}");
     }
 
 }

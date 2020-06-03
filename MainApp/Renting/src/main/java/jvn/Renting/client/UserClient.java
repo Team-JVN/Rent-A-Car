@@ -12,11 +12,12 @@ import java.util.List;
 @FeignClient(name = "users")
 public interface UserClient {
 
-    @RequestMapping(method = RequestMethod.GET, path = "/api/client/verify/{clientId}")
+    @RequestMapping(method = RequestMethod.GET, path = "/api/client/{clientId}/verify")
     Boolean verify(@RequestHeader("Auth") String token,
                    @PathVariable("clientId") Long clientId);
 
-    @RequestMapping(method = RequestMethod.GET, path = "/api/client/clients-by-id/{clientId}")
+
+    @RequestMapping(method = RequestMethod.GET, path = "/api/client/by-ids/{clientIds}")
     List<ClientDTO> get(@RequestHeader("Auth") String token,
-                        @PathVariable("clientId") List<Long> clients);
+                        @PathVariable("clientIds") List<Long> clients);
 }

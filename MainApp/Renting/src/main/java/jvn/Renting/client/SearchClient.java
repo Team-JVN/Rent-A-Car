@@ -12,8 +12,8 @@ import java.util.List;
 @FeignClient(name = "search-service")
 public interface SearchClient {
 
-    @RequestMapping(method = RequestMethod.GET, path = "/api/advertisement/for-rent-requests/{advId}")
+    @RequestMapping(method = RequestMethod.GET, path = "/api/advertisement/by-ids/{advIds}")
     List<AdvertisementDTO> get(@RequestHeader("Auth") String token, @RequestHeader("user") String user,
-                               @PathVariable("advId") List<Long> advertisements);
+                               @PathVariable("advIds") List<Long> advertisements);
 }
 

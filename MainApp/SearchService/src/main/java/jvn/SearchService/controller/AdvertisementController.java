@@ -53,8 +53,8 @@ public class AdvertisementController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @GetMapping("/for-rent-requests/{advId}")
-    public ResponseEntity<List<AdvertisementDTO>> getAll(@PathVariable("advId") List<Long> advertisements) {
+    @GetMapping("/by-ids/{advIds}")
+    public ResponseEntity<List<AdvertisementDTO>> getAll(@PathVariable("advIds") List<Long> advertisements) {
         List<AdvertisementDTO> list = advertisementService.get(advertisements).stream().map(advertisementDtoMapper::toDto).
                 collect(Collectors.toList());
         return new ResponseEntity<>(list, HttpStatus.OK);

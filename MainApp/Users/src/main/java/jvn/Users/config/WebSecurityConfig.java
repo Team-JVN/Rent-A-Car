@@ -78,7 +78,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/role").hasAuthority("MANAGE_ROLES")
                 .antMatchers(HttpMethod.GET, "/api/permission").hasAuthority("MANAGE_ROLES")
 
-                .antMatchers("/api/client/clients-by-id/{clientId}", "/api/client/verify/{clientId}")
+                .antMatchers("/api/client/by-ids/{clientIds}", "/api/client/{clientId}/verify")
                 .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
 
                 .anyRequest().authenticated().and()

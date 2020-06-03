@@ -1,5 +1,6 @@
 package jvn.Zuul.exceptionHandler;
 
+import com.netflix.zuul.exception.ZuulException;
 import feign.FeignException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -40,5 +41,11 @@ public class RestExceptionHandler {
     public ResponseEntity<?> handleFeignUnauthorizedException(FeignException e,
                                                               HttpServletResponse response) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(ZuulException.class)
+    public ResponseEntity<?> handleZuulException(ZuulException e,
+                                                 HttpServletResponse response) {
+        return new ResponseEntity<>("Something goes wrong.Please try again.", HttpStatus.UNAUTHORIZED);
     }
 }
