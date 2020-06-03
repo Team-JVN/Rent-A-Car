@@ -6,10 +6,12 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.modelmapper.ModelMapper;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
 @EnableEurekaClient
 @EnableFeignClients
+@EnableAsync
 public class AdvertisementsApplication {
 
     public static void main(String[] args) {

@@ -1,8 +1,6 @@
 package jvn.Renting.dto.both;
 
-
 import jvn.Renting.enumeration.LogicalStatus;
-import jvn.Renting.model.CarDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

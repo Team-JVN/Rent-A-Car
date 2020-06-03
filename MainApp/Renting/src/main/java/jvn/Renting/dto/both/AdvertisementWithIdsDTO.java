@@ -1,6 +1,5 @@
 package jvn.Renting.dto.both;
 
-import jvn.Renting.dto.both.PriceListDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

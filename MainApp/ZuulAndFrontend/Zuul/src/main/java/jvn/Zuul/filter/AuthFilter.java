@@ -6,9 +6,8 @@ import com.netflix.zuul.context.RequestContext;
 import feign.FeignException;
 import jvn.Zuul.client.AuthClient;
 import jvn.Zuul.dto.UserDTO;
-import jvn.Zuul.exceptions.InvalidUserDataException;
+import jvn.Zuul.exceptionHandler.InvalidUserDataException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,10 +33,10 @@ public class AuthFilter extends ZuulFilter {
     public boolean shouldFilter() {
         RequestContext ctx = RequestContext.getCurrentContext();
         HttpServletRequest request = ctx.getRequest();
-        if(request.getRequestURL().toString().contains("users")){
+        if (request.getRequestURL().toString().contains("users")) {
             return false;
         }
-        if(request.getMethod().equals("OPTIONS")){
+        if (request.getMethod().equals("OPTIONS")) {
             return false;
         }
         return true;
@@ -58,27 +57,26 @@ public class AuthFilter extends ZuulFilter {
         HttpServletRequest request = ctx.getRequest();
         String header = request.getHeader("Auth");
         if (header == null || header.isEmpty() || !header.startsWith("Bearer ")) {
-                ctx.setResponseStatusCode(401);
-                ctx.setSendZuulResponse(false);
-        }else {
+            ctx.setResponseStatusCode(401);
+            ctx.setSendZuulResponse(false);
+        } else {
             try {
                 System.out.println("Verifikacija");
-                UserDTO userDTO= authClient.verify(header);
-                ctx.addZuulRequestHeader("user",jsonToString(userDTO));
-            } catch (FeignException.NotFound | InvalidUserDataException e) {
-                setFailedRequest("Something is wrong. Please try againg.", 403);
+                UserDTO userDTO = authClient.verify(header);
+                ctx.addZuulRequestHeader("user", jsonToString(userDTO));
+            } catch (FeignException.NotFound e) {
+                setFailedRequest("Something goes wrong. Please try again.", 403);
             }
         }
         return null;
     }
 
-    private String jsonToString(UserDTO userDTO){
+    private String jsonToString(UserDTO userDTO) {
         ObjectMapper Obj = new ObjectMapper();
 
         try {
             return Obj.writeValueAsString(userDTO);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             setFailedRequest("Something is wrong. Please try again.", 403);
         }
         return null;

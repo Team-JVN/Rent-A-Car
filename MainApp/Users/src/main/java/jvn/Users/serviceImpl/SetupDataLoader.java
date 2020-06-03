@@ -1,4 +1,5 @@
 package jvn.Users.serviceImpl;
+
 import jvn.Users.common.RandomPasswordGenerator;
 import jvn.Users.model.Admin;
 import jvn.Users.model.Agent;
@@ -16,6 +17,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -44,17 +46,14 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
             return;
         }
 
-        Permission manageAdmins = createPermissionIfNotFound("MANAGE_ADMINS");
+        Permission manageUsers = createPermissionIfNotFound("MANAGE_USERS");
         Permission adminEditProfile = createPermissionIfNotFound("ADMIN_EDIT_PROFILE");
-        Permission manageClients = createPermissionIfNotFound("MANAGE_CLIENTS");
-        Permission clientEditProfile = createPermissionIfNotFound("CLIENT_EDIT_PROFILE");
-        Permission manageAgents = createPermissionIfNotFound("MANAGE_AGENTS");
         Permission agentEditProfile = createPermissionIfNotFound("AGENT_EDIT_PROFILE");
+        Permission clientEditProfile = createPermissionIfNotFound("CLIENT_EDIT_PROFILE");
         Permission manageRoles = createPermissionIfNotFound("MANAGE_ROLES");
 
 
-
-        Set<Permission> adminPermissions = new HashSet<>(Arrays.asList(manageAdmins, adminEditProfile, manageClients, manageAgents,manageRoles));
+        Set<Permission> adminPermissions = new HashSet<>(Arrays.asList(manageUsers, adminEditProfile, manageRoles));
         createRoleIfNotFound("ROLE_ADMIN", adminPermissions);
 
         Set<Permission> clientPermissions = new HashSet<>(Arrays.asList(clientEditProfile));
@@ -72,9 +71,9 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
             composeAndSendEmailToChangePassword(admin.getEmail(), generatedPassword);
         }
 
-         generatedPassword = randomPasswordGenerator.generatePassword();
+        generatedPassword = randomPasswordGenerator.generatePassword();
         Agent agent = new Agent("Rent a Car Agency", "rentacar@maildrop.cc",
-                passwordEncoder.encode(generatedPassword), this.roleRepository.findByName("ROLE_AGENT"), "Beograd","0627564136", "50000001");
+                passwordEncoder.encode(generatedPassword), this.roleRepository.findByName("ROLE_AGENT"), "Beograd", "0627564136", "50000001");
         if (userRepository.findByEmail(agent.getEmail()) == null) {
             userRepository.save(agent);
             composeAndSendEmailToChangePassword(agent.getEmail(), generatedPassword);
@@ -132,12 +131,12 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     @Autowired
     public SetupDataLoader(RoleRepository roleRepository, PermissionRepository permissionRepository, UserRepository userRepository,
-                           PasswordEncoder passwordEncoder, EmailNotificationService emailNotificationService,Environment environment) {
+                           PasswordEncoder passwordEncoder, EmailNotificationService emailNotificationService, Environment environment) {
         this.roleRepository = roleRepository;
         this.permissionRepository = permissionRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailNotificationService = emailNotificationService;
-        this.environment=environment;
+        this.environment = environment;
     }
 }
