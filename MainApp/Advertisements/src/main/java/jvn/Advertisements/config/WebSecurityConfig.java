@@ -1,7 +1,8 @@
-package jvn.Cars.config;
+package jvn.Advertisements.config;
 
-import jvn.Cars.security.RestAuthenticationEntryPoint;
-import jvn.Cars.security.TokenAuthenticationFilter;
+
+import jvn.Advertisements.security.RestAuthenticationEntryPoint;
+import jvn.Advertisements.security.TokenAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -28,22 +29,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
 
                 .authorizeRequests()
-                .antMatchers("/api/car", "/api/car/{id}", "/api/car/{id}/partial", "/api/car/{id}/edit")
-                .hasAuthority("MANAGE_CARS")
+                .antMatchers("/api/price-list", "/api/price-list/{id}")
+                .hasAuthority("MANAGE_PRICE_LISTS")
 
-                .antMatchers("/api/body-style/{id}", "/api/fuel-type/{id}", "/api/gearbox-type", "/api/gearbox-type/{id}",
-                        "/api/make/{id}", "/api/make/{makeId}/model/{modelId}")
-                .hasAuthority("MANAGE_CODE_BOOKS")
-                .antMatchers(HttpMethod.POST, "/api/body-style", "/api/fuel-type", "/api/gearbox-type",
-                        "/api/make/", "/api/make/{makeId}/model")
-                .hasAuthority("MANAGE_CODE_BOOKS")
+                .antMatchers("/api/advertisement")
+                .hasAuthority("MANAGE_ADVERTISEMENTS")
+
                 .anyRequest().authenticated().and()
 
                 .cors().and()
 
                 .addFilterBefore(new TokenAuthenticationFilter(), BasicAuthenticationFilter.class);
 
-        ///verify/{userId}/{carId}
+        ///api/advertisement/{advId}
         http.csrf().disable();
     }
 
@@ -55,7 +53,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers(HttpMethod.GET, "/api/gearbox-type");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/make");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/make/{makeId}/models");
-        web.ignoring().antMatchers(HttpMethod.GET, "/api/car/verify/{userId}/{carId}");
     }
 
 }

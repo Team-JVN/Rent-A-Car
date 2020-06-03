@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Positive;
 import java.text.ParseException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,7 +40,8 @@ public class AdvertisementController {
     public ResponseEntity<AdvertisementDTO> create(@Valid @RequestBody CreateAdvertisementDTO createAdvertisementDTO) {
         try {
             UserDTO userDTO = stringToObject(request.getHeader("user"));
-            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.create(createAdvertisementDtoMapper.toEntity(createAdvertisementDTO), userDTO)),
+            String jwtToken = request.getHeader("Auth");
+            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.create(createAdvertisementDtoMapper.toEntity(createAdvertisementDTO), userDTO, jwtToken)),
                     HttpStatus.CREATED);
         } catch (ParseException e) {
             throw new InvalidAdvertisementDataException("Please choose valid date.", HttpStatus.BAD_REQUEST);

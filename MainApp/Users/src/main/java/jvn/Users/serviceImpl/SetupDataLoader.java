@@ -52,14 +52,16 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         Permission manageRoles = createPermissionIfNotFound("MANAGE_ROLES");
         Permission manageCodeBooks = createPermissionIfNotFound("MANAGE_CODE_BOOKS");
         Permission manageCars = createPermissionIfNotFound("MANAGE_CARS");
+        Permission managePriceLists = createPermissionIfNotFound("MANAGE_PRICE_LISTS");
+        Permission manageAdvertisements = createPermissionIfNotFound("MANAGE_ADVERTISEMENTS");
 
         Set<Permission> adminPermissions = new HashSet<>(Arrays.asList(manageUsers, adminEditProfile, manageRoles, manageCodeBooks));
         createRoleIfNotFound("ROLE_ADMIN", adminPermissions);
 
-        Set<Permission> clientPermissions = new HashSet<>(Arrays.asList(clientEditProfile, manageCars));
+        Set<Permission> clientPermissions = new HashSet<>(Arrays.asList(clientEditProfile, manageCars, managePriceLists, manageAdvertisements));
         createRoleIfNotFound("ROLE_CLIENT", clientPermissions);
 
-        Set<Permission> agentPermissions = new HashSet<>(Arrays.asList(agentEditProfile, manageCars));
+        Set<Permission> agentPermissions = new HashSet<>(Arrays.asList(agentEditProfile, manageCars, managePriceLists, manageAdvertisements));
         createRoleIfNotFound("ROLE_AGENT", agentPermissions);
 
         RandomPasswordGenerator randomPasswordGenerator = new RandomPasswordGenerator();

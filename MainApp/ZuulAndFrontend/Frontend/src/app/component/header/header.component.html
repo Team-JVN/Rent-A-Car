@@ -9,8 +9,16 @@
         <a mat-list-item routerLink="/client/registration">Registrate</a>
         <a mat-list-item routerLink="/change-password">Change Password</a>
       </span>
+      <mat-nav-list *ngIf="isLoggedIn() && hasPermissionManageAdvertisements()">
+        <a mat-list-item routerLink="/advertisements">Advertisements</a>
+      </mat-nav-list>
+
       <mat-nav-list *ngIf="isLoggedIn() && hasPermissionManageCars()">
         <a mat-list-item routerLink="/cars">Cars</a>
+      </mat-nav-list>
+
+      <mat-nav-list *ngIf="isLoggedIn() && hasPermissionManagePricelists()">
+        <a mat-list-item routerLink="/price-lists">Price Lists</a>
       </mat-nav-list>
 
       <mat-nav-list *ngIf="isLoggedIn() && hasPermissionManageCodeBooks()">
@@ -22,10 +30,8 @@
 
       <span *ngIf="isLoggedIn()">
         <a mat-list-item routerLink="/client/renting-cart">Renting Cart</a>
-        <a mat-list-item routerLink="/advertisements">Advertisements</a>
         <a mat-list-item routerLink="/client-rent-requests">Clients' Rent Requests</a>
         <!-- <a mat-list-item routerLink="/statistics">Statistics</a> -->
-        <a mat-list-item routerLink="/price-lists">Price Lists</a>
       </span>
 
       <mat-nav-list *ngIf="isLoggedIn() && hasPermissionManageUsers()">
