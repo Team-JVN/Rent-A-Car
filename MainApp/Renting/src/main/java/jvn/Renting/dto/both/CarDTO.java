@@ -1,4 +1,4 @@
-package jvn.Renting.model;
+package jvn.Renting.dto.both;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
