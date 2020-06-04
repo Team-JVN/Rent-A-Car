@@ -50,8 +50,8 @@ public class ClientController {
 
     @GetMapping(value = "/for-rent-request")
     public ResponseEntity<List<ClientDTO>> getForRentRequest() {
-        User user = userService.getLoginUser();
-        List<ClientDTO> list = clientService.getForRentRequest(user.getId()).stream().map(clientDtoMapper::toDto).
+//        User user = userService.getLoginUser();
+        List<ClientDTO> list = clientService.getForRentRequest(1L).stream().map(clientDtoMapper::toDto).
                 collect(Collectors.toList());
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
