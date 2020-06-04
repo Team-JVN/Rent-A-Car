@@ -17,13 +17,10 @@ public class CommentDTO {
     @Positive(message = "Id must be positive.")
     private Long id;
 
-    @Column(nullable = false)
     private String text;
 
-    @Column(nullable = false)
     private Long sender;
 
-    @Column(nullable = false)
     private CommentStatus status;
 
     @NotNull(message = "Rent info is null.")

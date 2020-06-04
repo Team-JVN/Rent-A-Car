@@ -18,13 +18,10 @@ public class MessageDTO {
     @Positive(message = "Id must be positive.")
     private Long id;
 
-    @Column(nullable = false)
     private String text;
 
-    @Column(nullable = false)
     private Long sender;
 
-    @Column(nullable = false)
     private String dateAndTime;
 
     @NotNull(message = "Rent request is null.")
