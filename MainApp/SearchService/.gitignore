@@ -1,3 +1,6 @@
+# H2 Database
+*.mv.db
+
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar

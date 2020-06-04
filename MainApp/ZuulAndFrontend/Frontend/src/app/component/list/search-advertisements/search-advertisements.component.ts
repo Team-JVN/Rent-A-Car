@@ -236,6 +236,10 @@ export class SearchAdvertisementsComponent implements OnInit {
   }
 
   fetchModels() {
+    if (this.searchForm.value.make === this.allMakes) {
+      return;
+    }
+
     this.makeService.getModels(this.searchForm.value.make.id).subscribe(
       (data: Model[]) => {
         this.models = data;

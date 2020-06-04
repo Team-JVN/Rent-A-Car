@@ -9,8 +9,7 @@
       <mat-tab-group animationDuration="500ms">
         <mat-tab label="Clients">
           <div>
-            <br /><br />
-            <div class="status-filter">
+            <div class="status-filter mt-3 mb-2">
               <span class="filter-span">Filter by status:</span>
               <mat-form-field>
                 <mat-select [(ngModel)]="status" (selectionChange)="fetchAllClients(status)">
@@ -21,10 +20,9 @@
                   <mat-option value="blocked">Blocked</mat-option>
                 </mat-select>
               </mat-form-field>
-              <br /><br />
             </div>
             <div>
-              <table mat-table [dataSource]="clientsDataSource" class="mat-elevation-z8">
+              <table mat-table [dataSource]="clientsDataSource" class="user-table mat-elevation-z8">
                 <ng-container matColumnDef="name">
                   <th mat-header-cell *matHeaderCellDef>Name</th>
                   <td mat-cell *matCellDef="let element">{{element.name}}</td>
@@ -103,25 +101,25 @@
         </mat-tab>
         <mat-tab label="Agents">
           <div>
-            <br /><br />
-            <div class="status-filter">
-              <span class="filter-span">Filter by status:</span>
-              <mat-form-field>
-                <mat-select [(ngModel)]="agentStatus" (selectionChange)="fetchAllAgents(agentStatus)">
-                  <mat-option value="all" selected>- All -</mat-option>
-                  <mat-option value="inactive">Inactive</mat-option>
-                  <mat-option value="active">Active</mat-option>
-                </mat-select>
-              </mat-form-field>
+            <div class="row mt-3 mb-2">
+              <div class="col-9 status-filter">
+                <span class="filter-span">Filter by status:</span>
+                <mat-form-field>
+                  <mat-select [(ngModel)]="agentStatus" (selectionChange)="fetchAllAgents(agentStatus)">
+                    <mat-option value="all" selected>- All -</mat-option>
+                    <mat-option value="inactive">Inactive</mat-option>
+                    <mat-option value="active">Active</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-3 mt-2" align="end">
+                <button mat-raised-button color="primary" (click)="newAgentDialog()">
+                  Create New
+                </button>
+              </div>
             </div>
-            <div align="end">
-              <button mat-raised-button color="primary" (click)="newAgentDialog()">
-                Create New
-              </button>
-            </div>
-            <br /><br />
             <div>
-              <table mat-table class="mat-elevation-z8" [dataSource]="agentsDataSource">
+              <table mat-table class="user-table mat-elevation-z8" [dataSource]="agentsDataSource">
                 <ng-container matColumnDef="name">
                   <th mat-header-cell *matHeaderCellDef>Name</th>
                   <td mat-cell *matCellDef="let element">{{element.name}}</td>
@@ -144,17 +142,18 @@
 
                 <ng-container matColumnDef="taxIdNumber">
                   <th mat-header-cell *matHeaderCellDef>TAX ID number</th>
-                  <td mat-cell *matCellDef="let element">{{element.taxId}}</td>
+                  <td mat-cell *matCellDef="let element">{{element.taxIdNumber}}</td>
                 </ng-container>
 
                 <ng-container matColumnDef="buttons">
-                  <th mat-header-cell *matHeaderCellDef class="buttons-width">&nbsp;</th>
+                  <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
                   <td mat-cell *matCellDef="let element">
                     <button mat-icon-button aria-label="Delete" color="warn" (click)="deleteAgent(element)">
                       <mat-icon>delete</mat-icon>
                     </button>
                   </td>
                 </ng-container>
+
                 <tr mat-header-row *matHeaderRowDef="displayedColumnsAgent"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumnsAgent"></tr>
               </table>
@@ -163,23 +162,23 @@
         </mat-tab>
         <mat-tab label="Admins">
           <div>
-            <br /><br />
-            <div class="status-filter">
-              <span class="filter-span">Filter by status:</span>
-              <mat-form-field>
-                <mat-select [(ngModel)]="adminStatus" (selectionChange)="fetchAllAdmins(adminStatus)">
-                  <mat-option value="all" selected>- All -</mat-option>
-                  <mat-option value="inactive">Inactive</mat-option>
-                  <mat-option value="active">Active</mat-option>
-                </mat-select>
-              </mat-form-field>
+            <div class="row mt-3 mb-2">
+              <div class="col-9 status-filter">
+                <span class="filter-span">Filter by status:</span>
+                <mat-form-field>
+                  <mat-select [(ngModel)]="adminStatus" (selectionChange)="fetchAllAdmins(adminStatus)">
+                    <mat-option value="all" selected>- All -</mat-option>
+                    <mat-option value="inactive">Inactive</mat-option>
+                    <mat-option value="active">Active</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-3 mt-2" align="end">
+                <button mat-raised-button color="primary" (click)="newAdminDialog()"> Create New </button>
+              </div>
             </div>
-            <div align="end">
-              <button mat-raised-button color="primary" (click)="newAdminDialog()"> Create New </button>
-            </div>
-            <br /><br />
             <div>
-              <table mat-table class="mat-elevation-z8" [dataSource]="adminsDataSource">
+              <table mat-table class="user-table mat-elevation-z8" [dataSource]="adminsDataSource">
                 <ng-container matColumnDef="name">
                   <th mat-header-cell *matHeaderCellDef>Name</th>
                   <td mat-cell *matCellDef="let element">{{element.name}}</td>
