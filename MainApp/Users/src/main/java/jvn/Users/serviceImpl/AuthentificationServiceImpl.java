@@ -3,7 +3,6 @@ package jvn.Users.serviceImpl;
 import jvn.Users.dto.request.ChangePasswordDTO;
 import jvn.Users.dto.request.ResetPasswordDTO;
 import jvn.Users.dto.response.CheckPassDTO;
-import jvn.Users.dto.response.UserDTO;
 import jvn.Users.enumeration.AdminStatus;
 import jvn.Users.enumeration.AgentStatus;
 import jvn.Users.enumeration.ClientStatus;
@@ -16,6 +15,7 @@ import jvn.Users.repository.UserRepository;
 import jvn.Users.security.JwtAuthenticationRequest;
 import jvn.Users.security.TokenUtils;
 import jvn.Users.service.AuthentificationService;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
@@ -26,7 +26,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.joda.time.DateTime;
+
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -84,22 +84,22 @@ public class AuthentificationServiceImpl implements AuthentificationService {
         User user = userRepository.findByEmail(changePasswordDTO.getEmail());
 
         if (user instanceof Client) {
-            if(((Client) user).getStatus().equals(ClientStatus.NEVER_LOGGED_IN)) {
+            if (((Client) user).getStatus().equals(ClientStatus.NEVER_LOGGED_IN)) {
                 ((Client) user).setStatus(ClientStatus.ACTIVE);
             }
         } else if (user instanceof Agent) {
-            if(((Agent) user).getStatus().equals(AgentStatus.INACTIVE)) {
+            if (((Agent) user).getStatus().equals(AgentStatus.INACTIVE)) {
                 ((Agent) user).setStatus(AgentStatus.ACTIVE);
             }
-        }else if (user instanceof Admin) {
-            if(((Admin) user).getStatus().equals(AdminStatus.INACTIVE)) {
+        } else if (user instanceof Admin) {
+            if (((Admin) user).getStatus().equals(AdminStatus.INACTIVE)) {
                 ((Admin) user).setStatus(AdminStatus.ACTIVE);
             }
         }
 
         if (!passwordEncoder.matches(changePasswordDTO.getOldPassword(), user.getPassword())) {
             changePasswordAttemptService.changePassFailed();
-            throw new InvalidUserDataException("Invalid password.", HttpStatus.BAD_REQUEST);
+            throw new InvalidUserDataException("Invalid email or password. Please try again.", HttpStatus.BAD_REQUEST);
         }
         checkPassword(changePasswordDTO.getNewPassword());
         user.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
@@ -154,11 +154,11 @@ public class AuthentificationServiceImpl implements AuthentificationService {
             if (((Agent) user).getStatus().equals(AgentStatus.INACTIVE)) {
                 return true;
             }
-        } else if(user instanceof Client){
+        } else if (user instanceof Client) {
             if (((Client) user).getStatus().equals(ClientStatus.NEVER_LOGGED_IN)) {
                 return true;
             }
-        }else if (((Admin) user).getStatus().equals(AdminStatus.INACTIVE)){
+        } else if (((Admin) user).getStatus().equals(AdminStatus.INACTIVE)) {
             return true;
         }
         return false;

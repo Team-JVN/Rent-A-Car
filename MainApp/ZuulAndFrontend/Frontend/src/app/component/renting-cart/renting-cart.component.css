@@ -112,3 +112,10 @@ th.mat-header-cell{
 .select-owner {
     width: 300px;
 }
+
+.empty-cart {
+    font-size: 23px;
+    font-weight: 550;
+    color: gray;
+    text-align: center;
+}
