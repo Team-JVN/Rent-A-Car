@@ -111,7 +111,7 @@ public class ClientServiceImpl implements ClientService {
         statuses.add(ClientStatus.NEVER_LOGGED_IN);
         statuses.add(ClientStatus.ACTIVE);
         statuses.add(ClientStatus.APPROVED);
-        return clientRepository.findByStatusInAndIdNot(statuses, loggedInClientId);
+        return clientRepository.findByStatusIn(statuses);
     }
 
     @Override

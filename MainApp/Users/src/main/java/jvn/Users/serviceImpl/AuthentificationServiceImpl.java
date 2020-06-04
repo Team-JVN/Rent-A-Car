@@ -150,6 +150,9 @@ public class AuthentificationServiceImpl implements AuthentificationService {
     @Override
     public boolean userIsNeverLoggedIn(String email) {
         User user = userRepository.findByEmail(email);
+        if(user == null){
+            return false;
+        }
         if (user instanceof Agent) {
             if (((Agent) user).getStatus().equals(AgentStatus.INACTIVE)) {
                 return true;

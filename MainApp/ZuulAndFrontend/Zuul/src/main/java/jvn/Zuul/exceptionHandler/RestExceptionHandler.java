@@ -1,5 +1,6 @@
 package jvn.Zuul.exceptionHandler;
 
+import com.netflix.client.ClientException;
 import com.netflix.zuul.exception.ZuulException;
 import feign.FeignException;
 import org.springframework.core.Ordered;
@@ -46,6 +47,20 @@ public class RestExceptionHandler {
     @ExceptionHandler(ZuulException.class)
     public ResponseEntity<?> handleZuulException(ZuulException e,
                                                  HttpServletResponse response) {
-        return new ResponseEntity<>("Something goes wrong.Please try again.", HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>("Something goes wrong.Please try again.", HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(ClientException.class)
+    public ResponseEntity<?> handleClientException(ClientException e,
+                                                 HttpServletResponse response) {
+        return new ResponseEntity<>("Something goes wrong.Please try again.", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<?> handleIllegalStateException(IllegalStateException e,
+                                                   HttpServletResponse response) {
+        return new ResponseEntity<>("Something goes wrong.Please try again.", HttpStatus.BAD_REQUEST);
+    }
+
+
 }
