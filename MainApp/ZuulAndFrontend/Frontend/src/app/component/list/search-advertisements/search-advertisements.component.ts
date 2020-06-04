@@ -170,8 +170,9 @@ export class SearchAdvertisementsComponent implements OnInit {
         });
         this.advertisementsDataSource = new MatTableDataSource(data);
       },
-      () => {
-        this.toastr.error("Search did not succeed. Please try again.", 'Search Advertisements');
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.bodyStyles = [];
+        this.toastr.error(httpErrorResponse.error.message, 'Show Advertisements');
       }
     );
   }

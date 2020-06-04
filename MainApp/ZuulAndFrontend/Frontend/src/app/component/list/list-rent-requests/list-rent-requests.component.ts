@@ -46,11 +46,7 @@ export class ListRentRequestsComponent implements OnInit {
       this.fetchRentRequests('all');
     });
     this.fetchRentRequests('all');
-    this.createSuccess = this.rentRequestService.createSuccessEmitter.subscribe(
-      () => {
-        this.fetchRentRequests(this.status)
-      }
-    );
+
   }
 
   fetchRentRequests(status: string) {

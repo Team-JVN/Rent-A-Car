@@ -40,11 +40,6 @@ export class ListClientRentRequestsComponent implements OnInit {
 
   ngOnInit() {
     this.fetchRentRequests('all');
-    this.createSuccess = this.rentRequestService.createSuccessEmitter.subscribe(
-      () => {
-        this.fetchRentRequests(this.status)
-      }
-    );
   }
 
   fetchRentRequests(status: string) {

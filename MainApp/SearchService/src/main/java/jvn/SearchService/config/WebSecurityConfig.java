@@ -30,7 +30,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .authorizeRequests()
                 .antMatchers("/api/advertisement/all/{status}")
-                .hasAuthority("MANAGE_CARS")
+                .hasAuthority("MANAGE_ADVERTISEMENTS")
 
                 .antMatchers("/api/advertisement/by-ids/{advIds}")
                 .hasAnyAuthority("MY_RENT_REQUESTS", "MANAGE_ADVERTISEMENTS")
