@@ -118,7 +118,6 @@ export class AddRentRequestComponent implements OnInit {
         this.informationForm.reset();
         this.dialogRef.close();
         this.toastr.success('Success.', 'Create Rent Request');
-        this.rentRequestService.createSuccessEmitter.next(data);
       },
       (httpErrorResponse: HttpErrorResponse) => {
         this.toastr.error(httpErrorResponse.error.message, 'Create Rent Request');
