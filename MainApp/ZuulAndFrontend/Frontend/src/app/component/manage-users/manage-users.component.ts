@@ -33,7 +33,6 @@ export class ManageUsersComponent implements OnInit {
   status: string = "all";
   agentStatus: string = "all";
   adminStatus: string = "all";
-  createClientSuccess: Subscription;
   createAgentSuccess: Subscription;
   createAminSuccess: Subscription;
 
@@ -57,11 +56,6 @@ export class ManageUsersComponent implements OnInit {
     this.fetchAllClients("all");
     this.fetchAllAgents('all');
     this.fetchAllAdmins('all');
-    this.createClientSuccess = this.clientService.createSuccessEmitter.subscribe(
-      () => {
-        this.fetchAllClients('all');
-      }
-    );
 
     this.createAgentSuccess = this.agentService.createSuccessEmitter.subscribe(
       () => {

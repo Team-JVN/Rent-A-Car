@@ -72,8 +72,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .antMatchers(HttpMethod.POST, "/api/client")
                 .hasAuthority("MANAGE_ADVERTISEMENTS")
-//                .antMatchers("/api/client/for-rent-request")
-//                .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
+                // .antMatchers("/api/client/for-rent-request")
+                // .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
 
                 .antMatchers("/api/role").hasAuthority("MANAGE_ROLES")
                 .antMatchers(HttpMethod.GET, "/api/permission").hasAuthority("MANAGE_ROLES")
@@ -99,7 +99,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers(HttpMethod.POST, "/api/auth/**");
         web.ignoring().antMatchers(HttpMethod.PUT, "/api/auth");
         web.ignoring().antMatchers(HttpMethod.PUT, "/api/client/activate**");
-//        web.ignoring().antMatchers(HttpMethod.GET, "/api/client/for-rent-request");
+        web.ignoring().antMatchers(HttpMethod.GET, "/api/client/for-rent-request");
     }
 
 }
