@@ -6,13 +6,13 @@
             </div>
             <div class="col-3" align="end">
                 <button mat-button color="warn" (click)="emptyCart()"
-                    *ngIf="this.advertisementsDataSource && this.advertisementsDataSource.data.length != 0">
+                    *ngIf="this.rentInfosDataSource && this.rentInfosDataSource.data.length != 0">
                     <mat-icon>remove_shopping_cart</mat-icon>
                     Empty Cart
                 </button>
             </div>
         </div>
-        <div *ngIf="this.advertisementsDataSource && this.advertisementsDataSource.data.length != 0">
+        <div *ngIf="this.rentInfosDataSource && this.rentInfosDataSource.data.length != 0">
             <div class="status-filter">
                 <span class="filter-span">Filter by owner:</span>
                 <mat-form-field class="select-owner">
@@ -106,18 +106,13 @@
 
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
             </table>
-            <div class="col-9">
-                <span>Total price:</span>
-            </div>
-            <div class="col-3" align="end">
-                <button mat-button color="warn" (click)="emptyCart()"
-                    *ngIf="this.advertisementsDataSource && this.advertisementsDataSource.data.length != 0">
-                    <mat-icon>remove_shopping_cart</mat-icon>
-                    Empty Cart
-                </button>
-            </div>
-            <div class="mt-2" align="end">
-                <button mat-raised-button color="primary" (click)="createRentRequest()">Create Rent Request</button>
+            <div class="row mt-2">
+                <div class="col-9 mt-1">
+                    <h4>Total price: <span class="total-price">{{calculateTotalPrice() | number: '1.2-2'}} €</span></h4>
+                </div>
+                <div class="col-3" align="end">
+                    <button mat-raised-button color="primary" (click)="createRentRequest()">Create Rent Request</button>
+                </div>
             </div>
         </div>
 

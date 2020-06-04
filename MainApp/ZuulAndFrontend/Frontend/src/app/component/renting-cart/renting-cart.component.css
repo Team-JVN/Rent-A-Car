@@ -119,3 +119,8 @@ th.mat-header-cell{
     color: gray;
     text-align: center;
 }
+
+.total-price {
+    font-weight: bold;
+    color: red;
+}

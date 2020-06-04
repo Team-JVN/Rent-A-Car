@@ -156,6 +156,13 @@ export class RentingCartComponent implements OnInit {
     return calculatedPrice;
   }
 
+  calculateTotalPrice() {
+    let totalPrice = 0.0;
+    this.rentInfos.forEach(item => totalPrice += this.calculatePrice(item));
+
+    return totalPrice;
+  }
+
   viewDetails(element: RentInfo) {
     this.router.navigate(['/advertisement/' + element.advertisement.id]);
   }

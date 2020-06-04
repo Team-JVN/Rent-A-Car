@@ -40,9 +40,9 @@
       <span *ngIf="isLoggedIn() && hasPermissionClientEditProfile()">
         <a mat-list-item routerLink="/edit-client-info">Edit Profile Client</a>
       </span>
-      <mat-nav-list *ngIf="isLoggedIn() && hasPermissionManageRoles()">
+      <span *ngIf="isLoggedIn() && hasPermissionManageRoles()">
         <a mat-list-item routerLink="/role">Manage permissions</a>
-      </mat-nav-list>
+      </span>
       <span *ngIf="isLoggedIn()">
         <a mat-list-item (click)="onLogout()">Log out</a>
       </span>

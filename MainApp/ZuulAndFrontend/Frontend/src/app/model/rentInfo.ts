@@ -6,8 +6,8 @@ export class RentInfo {
     dateTimeTo: string;
     optedForCDW: boolean;
     advertisement: AdvertisementFromSearch;
-    index: number;
     inBundle: boolean;
+    index: number;
 
     constructor(dateTimeFrom: string, dateTimeTo: string, optedForCDW: boolean, advertisement: AdvertisementFromSearch, id?: number) {
         this.dateTimeFrom = dateTimeFrom;
