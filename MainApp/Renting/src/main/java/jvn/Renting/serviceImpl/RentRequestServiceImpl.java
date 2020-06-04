@@ -159,7 +159,7 @@ public class RentRequestServiceImpl implements RentRequestService {
         comment.setStatus(CommentStatus.AWAITING);
         RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
         for(RentInfo rentInfo: rentRequest.getRentInfos()){
-            if(rentInfo.getId() == rentInfoId){
+            if(rentInfo.getId().equals(rentInfoId)){
                 rentInfo.getComments().add(comment);
                 rentRequestRepository.save(rentRequest);
                 break;
@@ -174,7 +174,7 @@ public class RentRequestServiceImpl implements RentRequestService {
 
         RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
         for(RentInfo rentInfo: rentRequest.getRentInfos()){
-            if(rentInfo.getId() == rentInfoId){
+            if(rentInfo.getId().equals(rentInfoId)){
                 Comment comment = commentDtoMapper.toEntity(feedbackDTO.getComment());
                 comment.setSender(userId);
                 comment.setStatus(CommentStatus.AWAITING);
@@ -194,11 +194,11 @@ public class RentRequestServiceImpl implements RentRequestService {
         FeedbackDTO feedbackDTO = new FeedbackDTO();
         RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
         for(RentInfo rentInfo: rentRequest.getRentInfos()){
-            if(rentInfo.getId() == rentInfoId){
+            if(rentInfo.getId().equals(rentInfoId)){
                 feedbackDTO.setRating(rentInfo.getRating());
                 for(Comment comment: rentInfo.getComments()){
                     //TODO:find comment which is made by userId
-                    if(comment.getSender() == userId){
+                    if(comment.getSender().equals(userId)){
                         feedbackDTO.setComment(commentDtoMapper.toDto(comment));
                         break;
                     }
@@ -216,10 +216,10 @@ public class RentRequestServiceImpl implements RentRequestService {
 
         RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
         for(RentInfo rentInfo: rentRequest.getRentInfos()){
-            if(rentInfo.getId() == rentInfoId){
+            if(rentInfo.getId().equals(rentInfoId)){
                 message.setRentRequest(rentRequest);
                 message.setSender(userId);
-                rentInfo.getMessages().add(message);
+                rentRequest.getMessages().add(message);
 //                this.simpMessagingTemplate.convertAndSend("/socket-publisher/" + rentRequest.getCreatedBy(), message);
 //                this.simpMessagingTemplate.convertAndSend("/socket-publisher/" + rentRequest.getClient(), message);
                 rentRequestRepository.save(rentRequest);
@@ -234,7 +234,7 @@ public class RentRequestServiceImpl implements RentRequestService {
         RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
         List<Message> messages = new ArrayList<Message>();
         for(Message message: rentRequest.getMessages()){
-            if(message.getSender() == userId || message.getSender() == rentRequest.getCreatedBy()){
+            if(message.getSender().equals(userId) || message.getSender().equals(rentRequest.getCreatedBy())){
                 messages.add(message);
             }
         }
