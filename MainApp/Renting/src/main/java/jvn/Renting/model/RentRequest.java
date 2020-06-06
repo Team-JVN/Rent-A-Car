@@ -36,4 +36,7 @@ public class RentRequest {
 
     @Column(nullable = false)
     private Long createdBy;
+
+    @Column(nullable = false)
+    private Long advertisementOwner;
 }

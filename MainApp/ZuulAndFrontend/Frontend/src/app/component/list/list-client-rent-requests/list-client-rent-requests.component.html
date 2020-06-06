@@ -43,10 +43,6 @@
                         *ngIf="element.rentRequestStatus == 'PENDING'" color="warn" (click)="cancel(element)">
                         <mat-icon>cancel</mat-icon>
                     </button>
-                    <button mat-icon-button aria-label="Delete" matTooltip="Delete"
-                        *ngIf="element.rentRequestStatus != 'PAID'" color="warn" (click)="delete(element)">
-                        <mat-icon>delete</mat-icon>
-                    </button>
                 </td>
             </ng-container>
 
