@@ -92,9 +92,11 @@ services:
             DATABASE_PASSWORD: RentACarTeam29
             DATABASE_DOMAIN: mainapp-mysql
             DATABASE_SCHEMA: rentacardb
+            RMQ_HOST: rabbitmq-broker
         depends_on:
             - mainapp-mysql
             - eureka-serviceregistry
+            - rabbitmq-broker
 
     users:
         build: ./Users
@@ -111,9 +113,11 @@ services:
             DATABASE_PASSWORD: RentACarTeam29
             DATABASE_DOMAIN: mainapp-mysql
             DATABASE_SCHEMA: rentacardb
+            RMQ_HOST: rabbitmq-broker
         depends_on:
             - mainapp-mysql
             - eureka-serviceregistry
+            - rabbitmq-broker
 
     search-service:
         build: ./SearchService

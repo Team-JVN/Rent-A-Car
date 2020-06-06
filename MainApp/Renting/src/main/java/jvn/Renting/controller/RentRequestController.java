@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Renting.dto.both.RentRequestDTO;
 import jvn.Renting.dto.both.UserDTO;
+import jvn.Renting.dto.request.RentRequestStatusDTO;
 import jvn.Renting.exceptionHandler.InvalidRentRequestDataException;
 import jvn.Renting.mapper.RentRequestDtoMapper;
 import jvn.Renting.service.RentRequestService;
@@ -67,6 +68,12 @@ public class RentRequestController {
         return new ResponseEntity<>(rentRequestService.getMine(status, userDTO.getId(), request.getHeader("Auth"), request.getHeader("user")), HttpStatus.OK);
     }
 
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<RentRequestDTO> changeRentRequestStatus(@PathVariable @Positive(message = "Id must be positive.") Long id,
+                                                                  @Valid @RequestBody RentRequestStatusDTO status) {
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        return new ResponseEntity<>(rentRequestDtoMapper.toDto(rentRequestService.changeRentRequestStatus(id, status, userDTO.getId())), HttpStatus.OK);
+    }
 
     private UserDTO stringToObject(String user) {
         try {

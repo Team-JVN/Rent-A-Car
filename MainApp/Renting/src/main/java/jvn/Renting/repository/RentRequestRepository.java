@@ -11,9 +11,9 @@ import java.util.List;
 @Repository
 public interface RentRequestRepository extends JpaRepository<RentRequest, Long> {
 
-    List<RentRequest> findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualAndRentInfosAdvertisement(RentRequestStatus status, LocalDateTime localDate, LocalDateTime localDate1, Long advertisementId);
+    List<RentRequest> findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanAndRentInfosAdvertisement(RentRequestStatus status, LocalDateTime localDate, LocalDateTime localDate1, Long advertisementId);
 
-    List<RentRequest> findByRentRequestStatusAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanEqualAndRentInfosAdvertisement(RentRequestStatus status, LocalDateTime localDateFrom, LocalDateTime localDateTo, Long advertisementId);
+    List<RentRequest> findByRentRequestStatusAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanAndRentInfosAdvertisement(RentRequestStatus status, LocalDateTime localDateFrom, LocalDateTime localDateTo, Long advertisementId);
 
     List<RentRequest> findByRentRequestStatusNotAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualAndRentInfosAdvertisementOrRentRequestStatusNotAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualAndRentInfosAdvertisementOrRentRequestStatusNotAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanEqualAndRentInfosAdvertisement(
             RentRequestStatus status, LocalDateTime localDateFrom, LocalDateTime localDateFrom1, Long advertisement1, RentRequestStatus status1, LocalDateTime localDateTo, LocalDateTime localDateTo1, Long advertisement2, RentRequestStatus status2, LocalDateTime localDateFrom2, LocalDateTime localDateTo2, Long advertisementId3
@@ -28,4 +28,6 @@ public interface RentRequestRepository extends JpaRepository<RentRequest, Long> 
     List<RentRequest> findByClient(Long id);
 
     List<RentRequest> findByClientAndRentRequestStatus(Long id, RentRequestStatus status);
+
+    RentRequest findOneByIdAndRentRequestStatus(Long id, RentRequestStatus status);
 }

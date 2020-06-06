@@ -10,6 +10,7 @@ import { RentInfo } from 'src/app/model/rentInfo';
 import { MatTableDataSource } from '@angular/material/table';
 import { Component, OnInit } from '@angular/core';
 import * as moment from 'moment';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-renting-cart',
@@ -81,20 +82,17 @@ export class RentingCartComponent implements OnInit {
       bundleRequests.set(owner.email, new RentRequest(null, []));
     });
 
-    let error = false;
-
     rentInfosCopy.forEach(item => {
       if (item.inBundle) {
         bundleRequests.get(item.advertisement.owner.email).rentInfos.push(item);
       } else {
         this.rentRequestService.create(new RentRequest(null, [item])).subscribe(
-          () => { },
-          () => {
-            console.log("error")
-            error = true;
+          () => { this.toastr.success('Rent requests is successfully sent!', 'Create Rent Request(s)'); },
+          (httpErrorResponse: HttpErrorResponse) => {
             this.rentInfos.push(item);
             this.rentInfosDataSource = new MatTableDataSource(this.rentInfos);
             localStorage.setItem("rentInfos", JSON.stringify(this.rentInfos));
+            this.toastr.error(httpErrorResponse.error.message, 'Create Rent Request(s)');
           }
         );
       }
@@ -103,23 +101,24 @@ export class RentingCartComponent implements OnInit {
     for (let [_, req] of bundleRequests) {
       if (req.rentInfos.length > 0) {
         this.rentRequestService.create(req).subscribe(
-          () => { },
           () => {
-            error = true;
-            console.log("error 1")
-            req.rentInfos.forEach(item => this.rentInfos.push());
+            this.toastr.success('Rent requests is successfully sent!', 'Create Rent Request(s)');
+          },
+          (httpErrorResponse: HttpErrorResponse) => {
+            req.rentInfos.forEach(item => this.rentInfos.push(item));
             this.rentInfosDataSource = new MatTableDataSource(this.rentInfos);
             localStorage.setItem("rentInfos", JSON.stringify(this.rentInfos));
+            this.toastr.error(httpErrorResponse.error.message, 'Create Rent Request(s)');
           }
         );
       }
     }
 
-    if (error) {
-      this.toastr.error('Some rent requests were not send. Please try again later.', 'Create Rent Request(s)');
-    } else {
-      this.toastr.success('All rent requests are successfully sent!', 'Create Rent Request(s)');
-    }
+    // if (error) {
+    //   this.toastr.error('Some rent requests were not send. Please try again later.', 'Create Rent Request(s)');
+    // } else {
+    //   this.toastr.success('All rent requests are successfully sent!', 'Create Rent Request(s)');
+    // }
 
   }
 
