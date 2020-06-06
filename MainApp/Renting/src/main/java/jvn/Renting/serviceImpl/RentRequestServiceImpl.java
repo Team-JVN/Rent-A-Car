@@ -70,7 +70,6 @@ public class RentRequestServiceImpl implements RentRequestService {
 
         savedRequest = rentRequestRepository.save(setRentInfosData(savedRequest, rentInfos, advertisementDTOS));
         if (savedRequest.getRentRequestStatus().equals(RentRequestStatus.PAID)) {
-            //TODO: REJECT OTHER REQUESTS!!!!
             rejectOtherRequests(savedRequest);
         }
 
