@@ -7,12 +7,18 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfiguration {
 
-    public static final String QUEUE_NAME = "advertisements-for-search";
+    public static final String ADVERTISEMENT_FOR_SEARCH = "advertisements-for-search";
+
+    public static final String DELETED_ADVERTISEMENT = "advertisements-for-search-deleted-adv";
 
     @Bean
-    public Queue queue() {
-        return new Queue(QUEUE_NAME, false);
+    public Queue queueCreatedAdvertisement() {
+        return new Queue(ADVERTISEMENT_FOR_SEARCH, false);
     }
 
+    @Bean
+    public Queue queueDeletedAdvertisement() {
+        return new Queue(DELETED_ADVERTISEMENT, false);
+    }
 }
 

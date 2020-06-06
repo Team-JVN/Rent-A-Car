@@ -24,10 +24,6 @@ export class AdvertisementService {
     return this.httpClient.put(this.url + '/' + advertisement.id, advertisement);
   }
 
-  public getEditType(id: number) {
-    return this.httpClient.get(this.url + '/' + id + '/edit');
-  }
-
   public editPartial(advertisement: AdvertisementEdit, id: number): any {
     return this.httpClient.put(this.url + '/' + id + '/partial', advertisement);
   }

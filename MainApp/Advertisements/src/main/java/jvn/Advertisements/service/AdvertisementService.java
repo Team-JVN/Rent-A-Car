@@ -9,5 +9,7 @@ public interface AdvertisementService {
     Advertisement create(Advertisement createAdvertisementDTO, UserDTO userDTO, String jwtToken, String user);
 
     List<Advertisement> get(List<Long> advertisements);
+
+    void delete(Long id, Long loggedInUserId, String jwtToken, String user);
 }
 

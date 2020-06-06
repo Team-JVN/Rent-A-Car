@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.text.ParseException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,6 +54,13 @@ public class AdvertisementController {
         List<AdvertisementDTO> list = advertisementService.get(advertisements).stream().map(advertisementDtoMapper::toDto).
                 collect(Collectors.toList());
         return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable("id") @Positive(message = "Id must be positive.") Long id) {
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        advertisementService.delete(id, userDTO.getId(), request.getHeader("Auth"), request.getHeader("user"));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     private UserDTO stringToObject(String user) {

@@ -1,6 +1,7 @@
 package jvn.Advertisements.serviceImpl;
 
 import jvn.Advertisements.client.CarClient;
+import jvn.Advertisements.client.RentingClient;
 import jvn.Advertisements.dto.message.AdvertisementMessageDTO;
 import jvn.Advertisements.dto.message.OwnerMessageDTO;
 import jvn.Advertisements.dto.request.UserDTO;
@@ -37,6 +38,8 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     private AdvertisementProducer advertisementProducer;
 
     private CarClient carClient;
+
+    private RentingClient rentingClient;
 
     @Override
     public Advertisement create(Advertisement createAdvertisementDTO, UserDTO userDTO, String jwtToken, String user) {
@@ -80,12 +83,43 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         return advertisementRepository.findByIdInAndLogicalStatus(advertisements, LogicalStatus.EXISTING);
     }
 
+    @Override
+    public void delete(Long id, Long loggedInUserId, String jwtToken, String user) {
+        Advertisement advertisement = get(id, LogicalStatus.EXISTING);
+        checkOwner(advertisement, loggedInUserId);
+
+        if (rentingClient.canDeleteAdvertisement(jwtToken, user, id)) {
+            advertisement.setLogicalStatus(LogicalStatus.DELETED);
+            advertisementRepository.save(advertisement);
+            sendMessageToSearchService(advertisement.getId());
+            rejectAllRequests(id);
+        } else {
+            throw new InvalidAdvertisementDataException("This advertisement is in use and therefore can not be deleted.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Async
+    public void rejectAllRequests(Long advId) {
+        advertisementProducer.sendMessageToRentingService(advId);
+    }
+
     @Async
     public void sendMessageToSearchService(Advertisement savedAdvertisement, UserDTO userDTO, CarWithAllInformationDTO carDTO) {
         AdvertisementMessageDTO advertisementMessageDTO = advertisementMessageMapper.toDto(savedAdvertisement);
         advertisementMessageDTO.setCar(carDTO);
         advertisementMessageDTO.setOwner(new OwnerMessageDTO(userDTO.getId(), userDTO.getName(), userDTO.getEmail()));
-        advertisementProducer.send(advertisementMessageDTO);
+        advertisementProducer.sendMessageForSearch(advertisementMessageDTO);
+    }
+
+    @Async
+    public void sendMessageToSearchService(Long advId) {
+        advertisementProducer.sendMessageForSearch(advId);
+    }
+
+    private void checkOwner(Advertisement advertisement, Long loggedInUserId) {
+        if (!advertisement.getOwner().equals(loggedInUserId)) {
+            throw new InvalidAdvertisementDataException("You are not owner of this advertisement so you cannot edit/delete it.", HttpStatus.BAD_REQUEST);
+        }
     }
 
     private void checkIfCarIsAvailable(Long carId, LocalDate advertisementDateFrom, LocalDate advertisementDateTo) {
@@ -119,15 +153,24 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         }
     }
 
+    private Advertisement get(Long id, LogicalStatus status) {
+        Advertisement advertisement = advertisementRepository.findByIdAndLogicalStatus(id, status);
+        if (advertisement == null) {
+            throw new InvalidAdvertisementDataException("Requested advertisement does not exist.", HttpStatus.NOT_FOUND);
+        }
+        return advertisement;
+    }
+
     @Autowired
     public AdvertisementServiceImpl(PriceListService priceListService, CarClient carClient, AdvertisementRepository advertisementRepository,
                                     AdvertisementDtoMapper advertisementMapper, AdvertisementMessageDtoMapper advertisementMessageMapper,
-                                    AdvertisementProducer advertisementProducer) {
+                                    AdvertisementProducer advertisementProducer, RentingClient rentingClient) {
         this.priceListService = priceListService;
         this.carClient = carClient;
         this.advertisementRepository = advertisementRepository;
         this.advertisementMapper = advertisementMapper;
         this.advertisementMessageMapper = advertisementMessageMapper;
         this.advertisementProducer = advertisementProducer;
+        this.rentingClient = rentingClient;
     }
 }

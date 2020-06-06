@@ -3,6 +3,7 @@ package jvn.SearchService.consumer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.SearchService.config.RabbitMQConfiguration;
+import jvn.SearchService.enumeration.LogicalStatus;
 import jvn.SearchService.model.Advertisement;
 import jvn.SearchService.repository.AdvertisementRepository;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -16,9 +17,16 @@ public class AdvertisementConsumer {
 
     private AdvertisementRepository advertisementRepository;
 
-    @RabbitListener(queues = RabbitMQConfiguration.QUEUE_NAME)
+    @RabbitListener(queues = RabbitMQConfiguration.ADVERTISEMENT_FOR_SEARCH)
     public void listen(String advertisementMessageStr) {
         Advertisement advertisement = stringToObject(advertisementMessageStr);
+        advertisementRepository.save(advertisement);
+    }
+
+    @RabbitListener(queues = RabbitMQConfiguration.DELETED_ADVERTISEMENT)
+    public void listen(Long advId) {
+        Advertisement advertisement = advertisementRepository.findOneById(advId);
+        advertisement.setLogicalStatus(LogicalStatus.DELETED);
         advertisementRepository.save(advertisement);
     }
 

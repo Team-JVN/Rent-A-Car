@@ -5,6 +5,7 @@ import jvn.Renting.client.SearchClient;
 import jvn.Renting.client.UserClient;
 import jvn.Renting.dto.both.*;
 import jvn.Renting.dto.request.RentRequestStatusDTO;
+import jvn.Renting.enumeration.EditType;
 import jvn.Renting.enumeration.RentRequestStatus;
 import jvn.Renting.exceptionHandler.InvalidRentRequestDataException;
 import jvn.Renting.model.RentInfo;
@@ -163,6 +164,21 @@ public class RentRequestServiceImpl implements RentRequestService {
             return accept(rentRequest, loggedInUserId);
         }
         throw new InvalidRentRequestDataException("This rent request's status doesn't exist.", HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    public EditType getAdvertisementEditType(Long advId) {
+        List<RentRequest> rentRequests = rentRequestRepository.findByRentInfosAdvertisementAndRentInfosRentRequestRentRequestStatusNot(advId, RentRequestStatus.CANCELED);
+        if (rentRequests != null && !rentRequests.isEmpty()) {
+            return EditType.PARTIAL;
+        }
+        return EditType.ALL;
+    }
+
+    @Override
+    public Boolean canDeleteAdvertisement(Long advId) {
+        List<RentRequest> rentRequests = rentRequestRepository.findByRentInfosAdvertisementAndRentInfosRentRequestRentRequestStatusAndRentInfosDateTimeToGreaterThanEqual(advId, RentRequestStatus.PAID, LocalDateTime.now());
+        return rentRequests == null || rentRequests.isEmpty();
     }
 
     private RentRequest cancel(RentRequest rentRequest, Long loggedInUserId) {
@@ -356,7 +372,8 @@ public class RentRequestServiceImpl implements RentRequestService {
         return ownerId;
     }
 
-    private void rejectOtherRequests(RentRequest rentRequest) {
+    @Async
+    public void rejectOtherRequests(RentRequest rentRequest) {
         for (RentInfo rentInfo : rentRequest.getRentInfos()) {
             LocalDateTime rentInfoDateTimeFrom = rentInfo.getDateTimeFrom();
             LocalDateTime rentInfoDateTimeTo = rentInfo.getDateTimeTo();
@@ -365,6 +382,7 @@ public class RentRequestServiceImpl implements RentRequestService {
                     RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeTo, rentInfo.getAdvertisement());
             for (RentRequest rentRequest1 : rentRequests) {
                 rentRequest1.setRentRequestStatus(RentRequestStatus.CANCELED);
+                sendRejectedReservation(rentRequest.getClient(), rentRequest.getId());
             }
             if (!rentRequests.isEmpty()) {
                 rentRequestRepository.saveAll(rentRequests);

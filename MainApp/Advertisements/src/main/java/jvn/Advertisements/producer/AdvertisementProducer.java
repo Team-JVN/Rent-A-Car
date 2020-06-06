@@ -10,12 +10,26 @@ import org.springframework.stereotype.Service;
 @Service
 public class AdvertisementProducer {
 
+    private static final String ADVERTISEMENT_FOR_SEARCH = "advertisements-for-search";
+
+    private static final String DELETED_ADVERTISEMENT = "advertisements-for-search-deleted-adv";
+
+    private static final String REJECT_ALL_REQUESTS = "reject-all-requests";
+
     private RabbitTemplate rabbitTemplate;
 
     private ObjectMapper objectMapper;
 
-    public void send(AdvertisementMessageDTO advertisementMessageDTO) {
-        rabbitTemplate.convertAndSend("advertisements-for-search", jsonToString(advertisementMessageDTO));
+    public void sendMessageForSearch(AdvertisementMessageDTO advertisementMessageDTO) {
+        rabbitTemplate.convertAndSend(ADVERTISEMENT_FOR_SEARCH, jsonToString(advertisementMessageDTO));
+    }
+
+    public void sendMessageToRentingService(Long advId) {
+        rabbitTemplate.convertAndSend(REJECT_ALL_REQUESTS, advId);
+    }
+
+    public void sendMessageForSearch(Long advId) {
+        rabbitTemplate.convertAndSend(DELETED_ADVERTISEMENT, advId);
     }
 
     private String jsonToString(AdvertisementMessageDTO advertisementMessageDTO) {

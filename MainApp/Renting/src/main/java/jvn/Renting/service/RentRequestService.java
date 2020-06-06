@@ -3,6 +3,7 @@ package jvn.Renting.service;
 import jvn.Renting.dto.both.RentRequestDTO;
 import jvn.Renting.dto.both.UserDTO;
 import jvn.Renting.dto.request.RentRequestStatusDTO;
+import jvn.Renting.enumeration.EditType;
 import jvn.Renting.model.RentRequest;
 
 import java.text.ParseException;
@@ -19,4 +20,8 @@ public interface RentRequestService {
     RentRequestDTO get(Long id, Long loggedInUserId, String jwt, String user);
 
     RentRequest changeRentRequestStatus(Long id, RentRequestStatusDTO status, Long loggedInUserId);
+
+    EditType getAdvertisementEditType(Long advId);
+
+    Boolean canDeleteAdvertisement(Long advId);
 }
