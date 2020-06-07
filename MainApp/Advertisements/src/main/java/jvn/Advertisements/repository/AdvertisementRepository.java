@@ -28,4 +28,6 @@ public interface AdvertisementRepository extends JpaRepository<Advertisement, Lo
 
     List<Advertisement> findByCar(Long carId);
 
+    List<Advertisement> findByCarAndLogicalStatus(Long carId, LogicalStatus logicalStatus);
+
 }

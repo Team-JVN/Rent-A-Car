@@ -1,5 +1,6 @@
 package jvn.Cars.service;
 
+import jvn.Cars.dto.request.CarEditDTO;
 import jvn.Cars.dto.request.UserDTO;
 import jvn.Cars.enumeration.LogicalStatus;
 import jvn.Cars.model.Car;
@@ -22,10 +23,9 @@ public interface CarService {
     Car editAll(Long id, Car car, List<MultipartFile> multipartFiles, Long loggedInUserId, String jwtToken, String user,
                 UserDTO userDTO);
 
-//    Car editPartial(Long id, CarEditDTO carDTO, List<MultipartFile> multipartFiles);
+    Car editPartial(Long id, CarEditDTO carDTO, List<MultipartFile> multipartFiles, Long loggedInUserId, String jwtToken,
+                    String user, UserDTO userDTO);
 
     void delete(Long id, Long loggedInUserId, String jwtToken, String user);
-
-//    EditType getEditType(Long id);
 
 }

@@ -86,6 +86,10 @@ public class RentRequestController {
         return new ResponseEntity<>(rentRequestService.canDeleteAdvertisement(advId), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/advertisement/{advIds}/check-rent-infos", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> hasRentInfos(@PathVariable("advIds") List<Long> advIds) {
+        return new ResponseEntity<>(rentRequestService.hasRentInfos(advIds), HttpStatus.OK);
+    }
 
     private UserDTO stringToObject(String user) {
         try {

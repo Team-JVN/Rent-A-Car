@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AdvertisementServiceImpl implements AdvertisementService {
@@ -135,6 +136,16 @@ public class AdvertisementServiceImpl implements AdvertisementService {
             return EditType.PARTIAL;
         }
         return EditType.ALL;
+    }
+
+    @Override
+    public Boolean canEditCarPartially(Long carId, String jwtToken, String user) {
+        List<Advertisement> advertisements = advertisementRepository.findByCarAndLogicalStatus(carId, LogicalStatus.EXISTING);
+        if (advertisements == null || advertisements.isEmpty()) {
+            return true;
+        } else {
+            return !rentingClient.hasRentInfos(jwtToken, user, advertisements.stream().map(Advertisement::getId).collect(Collectors.toList()));
+        }
     }
 
     @Override

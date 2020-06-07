@@ -1,18 +1,21 @@
 package jvn.Cars.serviceImpl;
 
 import jvn.Cars.client.AdvertisementClient;
+import jvn.Cars.dto.request.CarEditDTO;
 import jvn.Cars.dto.request.UserDTO;
 import jvn.Cars.enumeration.EditType;
 import jvn.Cars.enumeration.LogicalStatus;
 import jvn.Cars.exceptionHandler.InvalidCarDataException;
 import jvn.Cars.mapper.CarDtoMapper;
 import jvn.Cars.model.Car;
+import jvn.Cars.producer.CarProducer;
 import jvn.Cars.repository.CarRepository;
 import jvn.Cars.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +47,7 @@ public class CarServiceImpl implements CarService {
 
     private AdvertisementClient advertisementClient;
 
-//    private UserService userService;
+    private CarProducer carProducer;
 
     @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
@@ -116,7 +119,7 @@ public class CarServiceImpl implements CarService {
         if (multipartFiles.size() > 5) {
             throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
         }
-        Car dbCar = get(car.getId(), LogicalStatus.EXISTING);
+        Car dbCar = get(id, LogicalStatus.EXISTING);
         checkOwner(dbCar, loggedInUserId);
 
         if (!advertisementClient.getCarEditType(jwtToken, user, id).equals(EditType.ALL)) {
@@ -137,28 +140,37 @@ public class CarServiceImpl implements CarService {
         pictureService.editCarPictures(multipartFiles, UPLOADED_PICTURES_PATH, dbCar);
         return newCar;
     }
-/*
-            @Override
-            @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-            public Car editPartial(Long id, CarEditDTO carDTO, List<MultipartFile> multipartFiles) {
-                if (multipartFiles.size() > 5) {
-                    throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
-                }
-                Car car = get(id);
-                checkOwner(car);
-                for (Advertisement advertisement : get(id).getAdvertisements()) {
-                    if (advertisement.getLogicalStatus().equals(LogicalStatus.EXISTING) && !advertisement.getRentInfos().isEmpty()) {
-                        throw new InvalidCarDataException("Car is in use and therefore can not be edited.", HttpStatus.BAD_REQUEST);
-                    }
-                }
-                car.setMileageInKm(carDTO.getMileageInKm());
-                car.setKidsSeats(carDTO.getKidsSeats());
-                car.setAvailableTracking(carDTO.getAvailableTracking());
-                Car newCar = carRepository.save(car);
-                pictureService.editCarPictures(multipartFiles, UPLOADED_PICTURES_PATH, car);
-                return newCar;
-            }
-    */
+
+    @Override
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+    public Car editPartial(Long id, CarEditDTO carDTO, List<MultipartFile> multipartFiles, Long loggedInUserId, String jwtToken,
+                           String user, UserDTO userDTO) {
+        if (multipartFiles.size() > 5) {
+            throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
+        }
+        Car dbCar = get(id, LogicalStatus.EXISTING);
+        checkOwner(dbCar, loggedInUserId);
+
+        if (advertisementClient.canEditCarPartially(jwtToken, user, id)) {
+            dbCar.setMileageInKm(carDTO.getMileageInKm());
+            dbCar.setKidsSeats(carDTO.getKidsSeats());
+            dbCar.setAvailableTracking(carDTO.getAvailableTracking());
+            Car newCar = carRepository.save(dbCar);
+            pictureService.editCarPictures(multipartFiles, UPLOADED_PICTURES_PATH, dbCar);
+
+            carDTO.setId(id);
+            editCar(carDTO);
+
+            return newCar;
+        } else {
+            throw new InvalidCarDataException("This car is in use and therefore it cannot be edited.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Async
+    public void editCar(CarEditDTO carEditDTO) {
+        carProducer.sendMessageForSearch(carEditDTO);
+    }
 
     private void checkOwner(Car car, Long loggedInUserId) {
         if (!car.getOwner().equals(loggedInUserId)) {
@@ -169,7 +181,8 @@ public class CarServiceImpl implements CarService {
     @Autowired
     public CarServiceImpl(CarRepository carRepository, BodyStyleService bodyStyleService, FuelTypeService fuelTypeService,
                           GearboxTypeService gearboxTypeService, PictureService pictureService, CarDtoMapper carMapper,
-                          ModelService modelService, MakeService makeService, AdvertisementClient advertisementClient) {
+                          ModelService modelService, MakeService makeService, AdvertisementClient advertisementClient,
+                          CarProducer carProducer) {
         this.carRepository = carRepository;
         this.bodyStyleService = bodyStyleService;
         this.fuelTypeService = fuelTypeService;
@@ -179,5 +192,6 @@ public class CarServiceImpl implements CarService {
         this.modelService = modelService;
         this.makeService = makeService;
         this.advertisementClient = advertisementClient;
+        this.carProducer = carProducer;
     }
 }

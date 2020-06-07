@@ -38,7 +38,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/advertisement/by-ids/{advIds}")
                 .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
 
-                .antMatchers(HttpMethod.GET, "/api/advertisement/car/{carId}/check-for-delete", "/api/advertisement/car/{carId}/edit-type")
+                .antMatchers(HttpMethod.GET, "/api/advertisement/car/{carId}/check-for-delete", "/api/advertisement/car/{carId}/edit-type",
+                        "/api/advertisement/car/{carId}/check-for-partial-edit")
                 .hasAnyAuthority("MANAGE_CARS")
 
                 .anyRequest().authenticated().and()

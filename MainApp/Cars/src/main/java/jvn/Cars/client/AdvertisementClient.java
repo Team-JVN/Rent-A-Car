@@ -13,6 +13,9 @@ public interface AdvertisementClient {
     @RequestMapping(method = RequestMethod.GET, path = "/api/advertisement/car/{carId}/check-for-delete")
     boolean canDeleteCar(@RequestHeader("Auth") String token, @RequestHeader("user") String user, @PathVariable("carId") Long carId);
 
+    @RequestMapping(method = RequestMethod.GET, path = "/api/advertisement/car/{carId}/check-for-partial-edit")
+    boolean canEditCarPartially(@RequestHeader("Auth") String token, @RequestHeader("user") String user, @PathVariable("carId") Long carId);
+
     @RequestMapping(method = RequestMethod.GET, path = "/api/advertisement/car/{carId}/edit-type")
     EditType getCarEditType(@RequestHeader("Auth") String token, @RequestHeader("user") String user, @PathVariable("carId") Long carId);
 }

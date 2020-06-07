@@ -111,23 +111,22 @@ public class CarController {
         return new ResponseEntity<>(carDtoMapper.toDto(carService.editAll(id, carDtoMapper.toEntity(carDTO), multipartFiles, userDTO.getId(), request.getHeader("Auth"), request.getHeader("user"), userDTO)), HttpStatus.OK);
     }
 
-    /*
-        @PutMapping(value = "/{id}/partial", produces = MediaType.APPLICATION_JSON_VALUE)
-        public ResponseEntity<CarDTO> editPartial(@PathVariable @Positive(message = "Id must be positive.") Long id,
-                                                  @RequestParam("carData") String jsonString, @RequestParam("files") List<MultipartFile> multipartFiles) {
-            ObjectMapper mapper = new ObjectMapper();
-            CarEditDTO carEditDTO;
-            try {
-                carEditDTO = mapper.readValue(jsonString, CarEditDTO.class);
-                validateCarEditDTO(carEditDTO);
-            } catch (IOException e) {
-                throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
-            }
-
-            UserDTO userDTO = stringToObject(request.getHeader("user"));
-            return new ResponseEntity<>(carDtoMapper.toDto(carService.editPartial(id, carEditDTO, multipartFiles, userDTO.getId())), HttpStatus.OK);
+    @PutMapping(value = "/{id}/partial", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CarDTO> editPartial(@PathVariable @Positive(message = "Id must be positive.") Long id,
+                                              @RequestParam("carData") String jsonString, @RequestParam("files") List<MultipartFile> multipartFiles) {
+        ObjectMapper mapper = new ObjectMapper();
+        CarEditDTO carEditDTO;
+        try {
+            carEditDTO = mapper.readValue(jsonString, CarEditDTO.class);
+            validateCarEditDTO(carEditDTO);
+        } catch (IOException e) {
+            throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
-    */
+
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        return new ResponseEntity<>(carDtoMapper.toDto(carService.editPartial(id, carEditDTO, multipartFiles, userDTO.getId(), request.getHeader("Auth"), request.getHeader("user"), userDTO)), HttpStatus.OK);
+    }
+
     private void validateCreateCarDTO(CreateCarDTO createCarDTO) {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();

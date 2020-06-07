@@ -20,6 +20,8 @@ public interface AdvertisementService {
 
     EditType getCarEditType(Long carId);
 
+    Boolean canEditCarPartially(Long carId, String jwtToken, String user);
+
     Boolean canDeleteCar(Long carId);
 }
 

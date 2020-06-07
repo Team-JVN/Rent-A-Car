@@ -181,6 +181,17 @@ public class RentRequestServiceImpl implements RentRequestService {
         return rentRequests == null || rentRequests.isEmpty();
     }
 
+    @Override
+    public Boolean hasRentInfos(List<Long> advIds) {
+        for (Long advId : advIds) {
+            List<RentRequest> rentRequests = rentRequestRepository.findByRentInfosAdvertisement(advId);
+            if (rentRequests != null && !rentRequests.isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private RentRequest cancel(RentRequest rentRequest, Long loggedInUserId) {
         rentRequest.setRentRequestStatus(RentRequestStatus.CANCELED);
         RentRequest canceledRentRequest = rentRequestRepository.save(rentRequest);

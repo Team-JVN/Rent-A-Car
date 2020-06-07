@@ -90,6 +90,11 @@ public class AdvertisementController {
         return new ResponseEntity<>(advertisementService.getCarEditType(id), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/car/{carId}/check-for-partial-edit", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> canEditCarPartially(@PathVariable("carId") @Positive(message = "Id must be positive.") Long carId) {
+        return new ResponseEntity<>(advertisementService.canEditCarPartially(carId, request.getHeader("Auth"), request.getHeader("user")), HttpStatus.OK);
+    }
+
     @GetMapping(value = "/car/{carId}/check-for-delete", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Boolean> canDeleteCar(@PathVariable("carId") @Positive(message = "Id must be positive.") Long carId) {
         return new ResponseEntity<>(advertisementService.canDeleteCar(carId), HttpStatus.OK);

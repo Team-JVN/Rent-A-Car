@@ -42,6 +42,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .hasAuthority("MANAGE_ADVERTISEMENTS")
                 .antMatchers(HttpMethod.POST, "/api/rent-request")
                 .hasAuthority("MANAGE_ADVERTISEMENTS")
+
+                .antMatchers(HttpMethod.GET, "/api/rent-request/advertisement/{advIds}/check-rent-infos")
+                .hasAuthority("MANAGE_CARS")
+
                 .anyRequest().authenticated().and()
 
                 .cors().and()

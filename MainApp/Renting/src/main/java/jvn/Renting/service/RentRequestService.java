@@ -24,4 +24,7 @@ public interface RentRequestService {
     EditType getAdvertisementEditType(Long advId);
 
     Boolean canDeleteAdvertisement(Long advId);
+
+    Boolean hasRentInfos(List<Long> advIds);
+
 }
