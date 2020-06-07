@@ -48,11 +48,11 @@ export class EditPriceListComponent implements OnInit {
 
   edit() {
     if (this.visiblePricePerKm && !this.editForm.value.pricePerKm) {
-      this.toastr.error("Please enter prica per kilometre", 'Edit Price List');
+      this.toastr.error("Please enter prica per kilometre.", 'Edit Price List');
       return;
     }
     if (this.visiblePriceForCDW && !this.editForm.value.priceForCDW) {
-      this.toastr.error("Please enter prica for CDW", 'Edit Price List');
+      this.toastr.error("Please enter prica for CDW.", 'Edit Price List');
       return;
     }
 
