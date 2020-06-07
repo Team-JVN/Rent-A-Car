@@ -23,8 +23,8 @@ public class PriceListServiceImpl implements PriceListService {
     }
 
     @Override
-    public PriceList get(Long id, UserDTO userDTO) {
-        PriceList priceList = priceListRepository.findOneByIdAndStatusNotAndOwnerId(id, LogicalStatus.DELETED,userDTO.getId());
+    public PriceList get(Long id, Long loggedInUserId) {
+        PriceList priceList = priceListRepository.findOneByIdAndStatusNotAndOwnerId(id, LogicalStatus.DELETED, loggedInUserId);
         if (priceList == null) {
             throw new InvalidPriceListDataException("Requested price list does not exist.", HttpStatus.NOT_FOUND);
         }
@@ -32,8 +32,8 @@ public class PriceListServiceImpl implements PriceListService {
     }
 
     @Override
-    public List<PriceList> getAll( UserDTO userDTO) {
-        return priceListRepository.findByStatusAndOwnerId(LogicalStatus.EXISTING,userDTO.getId());
+    public List<PriceList> getAll(UserDTO userDTO) {
+        return priceListRepository.findByStatusAndOwnerId(LogicalStatus.EXISTING, userDTO.getId());
     }
 
     @Override
@@ -43,8 +43,8 @@ public class PriceListServiceImpl implements PriceListService {
     }
 
     @Override
-    public PriceList edit(Long id, PriceList priceList,UserDTO userDTO) {
-        PriceList dbPriceList = get(id,userDTO);
+    public PriceList edit(Long id, PriceList priceList, UserDTO userDTO) {
+        PriceList dbPriceList = get(id, userDTO.getId());
         dbPriceList.setPriceForCDW(priceList.getPriceForCDW());
         dbPriceList.setPricePerDay(priceList.getPricePerDay());
         dbPriceList.setPricePerKm(priceList.getPricePerKm());
@@ -52,8 +52,8 @@ public class PriceListServiceImpl implements PriceListService {
     }
 
     @Override
-    public void delete(Long id,UserDTO userDTO) {
-        PriceList priceList = get(id,userDTO);
+    public void delete(Long id, UserDTO userDTO) {
+        PriceList priceList = get(id, userDTO.getId());
 
         if (priceListRepository.findByIdAndStatusNotAndAdvertisementsLogicalStatusNot(id, LogicalStatus.DELETED, LogicalStatus.DELETED) != null) {
             throw new InvalidPriceListDataException("Price list is used in advertisements, so it can't be deleted.", HttpStatus.BAD_REQUEST);

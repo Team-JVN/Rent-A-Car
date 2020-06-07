@@ -70,7 +70,7 @@
                 <div>
                     <table class="form-full-width mt-2" cellspacing="0">
                         <tr>
-                            <td class="form-full-width-left">
+                            <td class="form-full-width-left" *ngIf="!isClient">
                                 <mat-form-field class="form-full-width-95">
                                     <input matInput placeholder="Discount for 30+ days rent" type="number"
                                         formControlName="discount" min="0" max="99">

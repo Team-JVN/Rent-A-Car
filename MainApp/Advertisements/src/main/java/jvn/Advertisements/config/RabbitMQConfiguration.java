@@ -13,6 +13,8 @@ public class RabbitMQConfiguration {
 
     private static final String DELETED_ADVERTISEMENT = "advertisements-for-search-deleted-adv";
 
+    private static final String EDIT_PARTIAL_ADVERTISEMENT = "advertisements-for-search-edit-partial-adv";
+
     @Bean
     public Queue queueCreatedAdvertisement() {
         return new Queue(ADVERTISEMENT_FOR_SEARCH, false);
@@ -26,6 +28,11 @@ public class RabbitMQConfiguration {
     @Bean
     public Queue queueDeletedAdvertisement() {
         return new Queue(DELETED_ADVERTISEMENT, false);
+    }
+
+    @Bean
+    public Queue queueEditedPartialAdvertisement() {
+        return new Queue(EDIT_PARTIAL_ADVERTISEMENT, false);
     }
 }
 

@@ -3,6 +3,7 @@ package jvn.Advertisements.producer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Advertisements.dto.message.AdvertisementMessageDTO;
+import jvn.Advertisements.dto.request.AdvertisementEditDTO;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,12 +17,18 @@ public class AdvertisementProducer {
 
     private static final String REJECT_ALL_REQUESTS = "reject-all-requests";
 
+    private static final String EDIT_PARTIAL_ADVERTISEMENT = "advertisements-for-search-edit-partial-adv";
+
     private RabbitTemplate rabbitTemplate;
 
     private ObjectMapper objectMapper;
 
     public void sendMessageForSearch(AdvertisementMessageDTO advertisementMessageDTO) {
         rabbitTemplate.convertAndSend(ADVERTISEMENT_FOR_SEARCH, jsonToString(advertisementMessageDTO));
+    }
+
+    public void sendMessageForSearch(AdvertisementEditDTO advertisementEditDTO) {
+        rabbitTemplate.convertAndSend(EDIT_PARTIAL_ADVERTISEMENT, jsonToString(advertisementEditDTO));
     }
 
     public void sendMessageToRentingService(Long advId) {
@@ -35,6 +42,15 @@ public class AdvertisementProducer {
     private String jsonToString(AdvertisementMessageDTO advertisementMessageDTO) {
         try {
             return objectMapper.writeValueAsString(advertisementMessageDTO);
+        } catch (JsonProcessingException e) {
+            //TODO: Add to log and delete return null;
+            return null;
+        }
+    }
+
+    private String jsonToString(AdvertisementEditDTO advertisementEditDTO) {
+        try {
+            return objectMapper.writeValueAsString(advertisementEditDTO);
         } catch (JsonProcessingException e) {
             //TODO: Add to log and delete return null;
             return null;

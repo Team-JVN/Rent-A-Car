@@ -4,8 +4,10 @@ import jvn.Advertisements.client.CarClient;
 import jvn.Advertisements.client.RentingClient;
 import jvn.Advertisements.dto.message.AdvertisementMessageDTO;
 import jvn.Advertisements.dto.message.OwnerMessageDTO;
+import jvn.Advertisements.dto.request.AdvertisementEditDTO;
 import jvn.Advertisements.dto.request.UserDTO;
 import jvn.Advertisements.dto.response.CarWithAllInformationDTO;
+import jvn.Advertisements.enumeration.EditType;
 import jvn.Advertisements.enumeration.LogicalStatus;
 import jvn.Advertisements.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.Advertisements.mapper.AdvertisementDtoMapper;
@@ -48,20 +50,8 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         CarWithAllInformationDTO carDTO = carClient.verify(jwtToken, user, userDTO.getId(), createAdvertisementDTO.getCar());
         checkIfCarIsAvailable(createAdvertisementDTO.getCar(), createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
         createAdvertisementDTO.setOwner(userDTO.getId());
-        createAdvertisementDTO.setPriceList(priceListService.get(createAdvertisementDTO.getPriceList().getId(), userDTO));
-        PriceList priceList = createAdvertisementDTO.getPriceList();
-        if (priceList.getPricePerKm() != null && createAdvertisementDTO.getKilometresLimit() == null) {
-            throw new InvalidAdvertisementDataException("You have to set kilometres limit.", HttpStatus.BAD_REQUEST);
-        }
-        if (priceList.getPricePerKm() == null) {
-            createAdvertisementDTO.setKilometresLimit(null);
-        }
-
-        if (priceList.getPriceForCDW() != null) {
-            createAdvertisementDTO.setCDW(true);
-        } else {
-            createAdvertisementDTO.setCDW(false);
-        }
+        createAdvertisementDTO.setPriceList(priceListService.get(createAdvertisementDTO.getPriceList().getId(), userDTO.getId()));
+        createAdvertisementDTO = setPriceList(createAdvertisementDTO, createAdvertisementDTO.getKilometresLimit());
 
         if (userDTO.getRole().equals("ROLE_CLIENT")) {
             createAdvertisementDTO.setDiscount(null);
@@ -96,6 +86,47 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         } else {
             throw new InvalidAdvertisementDataException("This advertisement is in use and therefore can not be deleted.", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @Override
+    public Advertisement edit(Long id, Advertisement advertisement, Long loggedInUserId, String jwtToken, String user, UserDTO userDTO) {
+        Advertisement dbAdvertisement = get(id, LogicalStatus.EXISTING);
+        checkOwner(dbAdvertisement, loggedInUserId);
+        if (!rentingClient.getAdvertisementEditType(jwtToken, user, id).equals(EditType.ALL)) {
+            throw new InvalidAdvertisementDataException("This advertisement is in use and therefore can not be edited.", HttpStatus.BAD_REQUEST);
+        }
+
+        if (!dbAdvertisement.getCar().equals(advertisement.getCar())) {
+            dbAdvertisement.setCar(advertisement.getCar());
+            checkIfCarIsAvailable(dbAdvertisement.getCar(), dbAdvertisement.getDateFrom(), dbAdvertisement.getDateTo());
+        }
+        CarWithAllInformationDTO carDTO = carClient.verify(jwtToken, user, loggedInUserId, dbAdvertisement.getCar());
+        dbAdvertisement.setDateFrom(advertisement.getDateFrom());
+        dbAdvertisement.setPriceList(priceListService.get(advertisement.getPriceList().getId(), loggedInUserId));
+        dbAdvertisement.setPickUpPoint(advertisement.getPickUpPoint());
+        dbAdvertisement = setPriceList(dbAdvertisement, advertisement.getKilometresLimit());
+        dbAdvertisement.setDiscount(advertisement.getDiscount());
+        dbAdvertisement = advertisementRepository.save(dbAdvertisement);
+
+        sendMessageToSearchService(dbAdvertisement, userDTO, carDTO);
+        return dbAdvertisement;
+    }
+
+    @Override
+    public Advertisement editPartial(Long id, AdvertisementEditDTO advertisement, Long loggedInUserId) {
+        Advertisement dbAdvertisement = get(id, LogicalStatus.EXISTING);
+        checkOwner(dbAdvertisement, loggedInUserId);
+        dbAdvertisement.setPriceList(priceListService.get(advertisement.getPriceList().getId(), loggedInUserId));
+        dbAdvertisement = setPriceList(dbAdvertisement, advertisement.getKilometresLimit());
+        dbAdvertisement.setDiscount(advertisement.getDiscount());
+        advertisement.setId(id);
+        editAdvertisement(advertisement);
+        return advertisementRepository.save(dbAdvertisement);
+    }
+
+    @Async
+    public void editAdvertisement(AdvertisementEditDTO advertisementEditDTO) {
+        advertisementProducer.sendMessageForSearch(advertisementEditDTO);
     }
 
     @Async
@@ -159,6 +190,24 @@ public class AdvertisementServiceImpl implements AdvertisementService {
             throw new InvalidAdvertisementDataException("Requested advertisement does not exist.", HttpStatus.NOT_FOUND);
         }
         return advertisement;
+    }
+
+    private Advertisement setPriceList(Advertisement dbAdvertisement, Integer kilometresLimit) {
+        PriceList priceList = dbAdvertisement.getPriceList();
+        if (priceList.getPricePerKm() != null && kilometresLimit == null) {
+            throw new InvalidAdvertisementDataException("You have to set kilometres limit.", HttpStatus.BAD_REQUEST);
+        }
+        if (priceList.getPricePerKm() == null) {
+            dbAdvertisement.setKilometresLimit(null);
+        } else {
+            dbAdvertisement.setKilometresLimit(kilometresLimit);
+        }
+        if (priceList.getPriceForCDW() != null) {
+            dbAdvertisement.setCDW(true);
+        } else {
+            dbAdvertisement.setCDW(false);
+        }
+        return dbAdvertisement;
     }
 
     @Autowired

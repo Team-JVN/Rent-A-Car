@@ -1,6 +1,7 @@
 package jvn.Advertisements.dto.request;
 
 import jvn.Advertisements.dto.both.PriceListDTO;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,9 +11,11 @@ import javax.validation.constraints.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CreateAdvertisementDTO {
+@AllArgsConstructor
+public class AdvertisementEditAllInfoDTO {
+    private Long id;
+
     @NotNull(message = "Car is null.")
-    @Positive(message = "Id must be positive.")
     private Long car;
 
     @NotNull(message = "Price list is null.")

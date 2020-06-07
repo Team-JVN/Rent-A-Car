@@ -76,8 +76,8 @@ public class RentRequestController {
         return new ResponseEntity<>(rentRequestDtoMapper.toDto(rentRequestService.changeRentRequestStatus(id, status, userDTO.getId())), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/advertisement/{id}/edit-type", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EditType> getAdvertisementEditType(@PathVariable @Positive(message = "Id must be positive.") Long id) {
+    @GetMapping(value = "/advertisement/{advId}/edit-type", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<EditType> getAdvertisementEditType(@PathVariable("advId") @Positive(message = "Id must be positive.") Long id) {
         return new ResponseEntity<>(rentRequestService.getAdvertisementEditType(id), HttpStatus.OK);
     }
 

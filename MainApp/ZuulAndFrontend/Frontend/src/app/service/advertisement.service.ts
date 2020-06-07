@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { CreateAdvertisement } from '../model/createAdvertisement';
+import { AdvertisementEditAllInfo } from '../model/advertisement.edit.all.info';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +21,7 @@ export class AdvertisementService {
     return this.httpClient.post(this.url, advertisement);
   }
 
-  public edit(advertisement: Advertisement): any {
+  public edit(advertisement: AdvertisementEditAllInfo): any {
     return this.httpClient.put(this.url + '/' + advertisement.id, advertisement);
   }
 
