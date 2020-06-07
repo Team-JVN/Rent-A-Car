@@ -15,6 +15,7 @@ import { AddAdvertisementComponent } from '../../add/add-advertisement/add-adver
 import { MatTableDataSource } from '@angular/material/table';
 import { AdvertisementFromSearch } from 'src/app/model/advertisementFromSearch';
 import { SearchService } from 'src/app/service/search.service';
+import { EditAdvertisementComponent } from '../../edit/edit-advertisement/edit-advertisement.component';
 
 @Component({
   selector: 'app-list-advertisements',
@@ -84,30 +85,30 @@ export class ListAdvertisementsComponent implements OnInit {
   }
 
   edit(element: AdvertisementFromSearch) {
-    // this.advertisementService.getEditType(element.id).subscribe(
-    //   (data: string) => {
-    //     if (data === "ALL") {
-    //       this.dialog.open(EditAdvertisementComponent, { data: element });
-    //     } else {
-    //       this.dialog.open(EditAdvertisementPartialComponent, { data: element });
-    //     }
-    //   },
-    //   (httpErrorResponse: HttpErrorResponse) => {
-    //     this.toastr.error(httpErrorResponse.error.message, 'Get edit type');
-    //   }
-    // );
+    this.rentRequestService.getAdvertisementEditType(element.id).subscribe(
+      (data: string) => {
+        if (data === "ALL") {
+          this.dialog.open(EditAdvertisementComponent, { data: element });
+        } else {
+          this.dialog.open(EditAdvertisementPartialComponent, { data: element });
+        }
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Get edit type');
+      }
+    );
   }
 
   delete(element: AdvertisementFromSearch) {
-    // this.advertisementService.delete(element.id).subscribe(
-    //   () => {
-    //     this.fetchAll(this.status);
-    //     this.toastr.success('Successfully deleted Advertisement!', 'Delete Advertisement');
-    //   },
-    //   (httpErrorResponse: HttpErrorResponse) => {
-    //     this.toastr.error(httpErrorResponse.error.message, 'Delete Advertisement');
-    //   }
-    // );
+    this.advertisementService.delete(element.id).subscribe(
+      () => {
+        this.fetchAll(this.status);
+        this.toastr.success('Successfully deleted Advertisement!', 'Delete Advertisement');
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Delete Advertisement');
+      }
+    );
   }
 
   rent(element: AdvertisementFromSearch) {

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Renting.dto.both.RentRequestDTO;
 import jvn.Renting.dto.both.UserDTO;
 import jvn.Renting.dto.request.RentRequestStatusDTO;
+import jvn.Renting.enumeration.EditType;
 import jvn.Renting.exceptionHandler.InvalidRentRequestDataException;
 import jvn.Renting.mapper.RentRequestDtoMapper;
 import jvn.Renting.service.RentRequestService;
@@ -74,6 +75,17 @@ public class RentRequestController {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
         return new ResponseEntity<>(rentRequestDtoMapper.toDto(rentRequestService.changeRentRequestStatus(id, status, userDTO.getId())), HttpStatus.OK);
     }
+
+    @GetMapping(value = "/advertisement/{advId}/edit-type", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<EditType> getAdvertisementEditType(@PathVariable("advId") @Positive(message = "Id must be positive.") Long id) {
+        return new ResponseEntity<>(rentRequestService.getAdvertisementEditType(id), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/advertisement/{advId}/check-for-delete", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> canDeleteAdvertisement(@PathVariable("advId") @Positive(message = "Id must be positive.") Long advId) {
+        return new ResponseEntity<>(rentRequestService.canDeleteAdvertisement(advId), HttpStatus.OK);
+    }
+
 
     private UserDTO stringToObject(String user) {
         try {

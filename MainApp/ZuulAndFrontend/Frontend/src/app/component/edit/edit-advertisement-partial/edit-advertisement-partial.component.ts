@@ -11,6 +11,8 @@ import { ToastrService } from 'ngx-toastr';
 import { PriceListService } from 'src/app/service/price-list.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Advertisement } from 'src/app/model/advertisement';
+import { AdvertisementFromSearch } from 'src/app/model/advertisementFromSearch';
+import { AuthentificationService } from 'src/app/service/authentification.service';
 
 @Component({
   selector: 'app-edit-advertisement-partial',
@@ -22,12 +24,16 @@ export class EditAdvertisementPartialComponent implements OnInit {
   dateForm: FormGroup;
   priceLists: PriceList[] = [];
   successCreatedList: Subscription;
+  isClient: boolean = false;
 
   constructor(private toastr: ToastrService, private priceListService: PriceListService, private advertisementService: AdvertisementService,
-    private dialogRef: MatDialogRef<EditAdvertisementPartialComponent>, @Inject(MAT_DIALOG_DATA) public selectedItem: AdvertisementWithPictures,
-    private formBuilder: FormBuilder, public dialog: MatDialog) { }
+    private dialogRef: MatDialogRef<EditAdvertisementPartialComponent>, @Inject(MAT_DIALOG_DATA) public selectedItem: AdvertisementFromSearch,
+    private formBuilder: FormBuilder, public dialog: MatDialog, private authentificationService: AuthentificationService) { }
 
   ngOnInit() {
+    if (this.authentificationService.isClient()) {
+      this.isClient = true;
+    }
     this.priceListForm = this.formBuilder.group({
       priceList: new FormControl(null, Validators.required)
     })

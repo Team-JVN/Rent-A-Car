@@ -13,6 +13,8 @@ public class RabbitMQConfiguration {
 
     private static final String ACCEPTED_RESERVATION = "accepted-reservation";
 
+    public static final String REJECT_ALL_REQUESTS = "reject-all-requests";
+
     @Bean
     public Queue queueCanceledReservation() {
         return new Queue(CANCELED_RESERVATION, false);
@@ -26,5 +28,10 @@ public class RabbitMQConfiguration {
     @Bean
     public Queue queueAcceptedReservation() {
         return new Queue(ACCEPTED_RESERVATION, false);
+    }
+
+    @Bean
+    public Queue queueDeletedAdvertisement() {
+        return new Queue(REJECT_ALL_REQUESTS, false);
     }
 }

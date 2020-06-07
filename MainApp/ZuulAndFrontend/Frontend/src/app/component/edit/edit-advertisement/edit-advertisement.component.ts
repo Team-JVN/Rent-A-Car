@@ -1,5 +1,3 @@
-import { DateTime } from 'luxon';
-import { AdvertisementWithPictures } from './../../../model/advertisementWithPictures';
 import { AddPriceListComponent } from './../../add/add-price-list/add-price-list.component';
 import { AddCarComponent } from './../../add/add-car/add-car.component';
 import { PriceList } from './../../../model/priceList';
@@ -13,10 +11,11 @@ import { ToastrService } from 'ngx-toastr';
 import { CarWithPictures } from 'src/app/model/carWithPictures';
 import { PriceListService } from 'src/app/service/price-list.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { formatDate, DatePipe } from '@angular/common';
+import { formatDate } from '@angular/common';
 import { Advertisement } from 'src/app/model/advertisement';
-import { parse } from 'querystring';
-import * as moment from 'moment';
+import { AdvertisementFromSearch } from 'src/app/model/advertisementFromSearch';
+import { AdvertisementEditAllInfo } from 'src/app/model/advertisement.edit.all.info';
+import { AuthentificationService } from 'src/app/service/authentification.service';
 @Component({
   selector: 'app-edit-advertisement',
   templateUrl: './edit-advertisement.component.html',
@@ -31,12 +30,16 @@ export class EditAdvertisementComponent implements OnInit {
   priceLists: PriceList[] = [];
   successCreatedCar: Subscription;
   successCreatedList: Subscription;
+  isClient: boolean = false;
 
   constructor(private toastr: ToastrService, private carService: CarService, private priceListService: PriceListService, private advertisementService: AdvertisementService,
-    private dialogRef: MatDialogRef<EditAdvertisementComponent>, @Inject(MAT_DIALOG_DATA) public selectedItem: AdvertisementWithPictures,
-    private formBuilder: FormBuilder, public dialog: MatDialog) { }
+    private dialogRef: MatDialogRef<EditAdvertisementComponent>, @Inject(MAT_DIALOG_DATA) public selectedItem: AdvertisementFromSearch,
+    private formBuilder: FormBuilder, public dialog: MatDialog, private authentificationService: AuthentificationService) { }
 
   ngOnInit() {
+    if (this.authentificationService.isClient()) {
+      this.isClient = true;
+    }
     this.carForm = this.formBuilder.group({
       car: new FormControl(null, Validators.required),
     })
@@ -48,9 +51,11 @@ export class EditAdvertisementComponent implements OnInit {
     this.dateForm = this.formBuilder.group({
       pickUpPoint: new FormControl(this.selectedItem.pickUpPoint, Validators.required),
       validFrom: new FormControl(new Date(this.selectedItem.dateFrom), Validators.required),
+      validTo: new FormControl(this.selectedItem.dateTo),
       discount: new FormControl(this.selectedItem.discount, [Validators.min(0), Validators.max(99)]),
       kilometresLimit: new FormControl(this.selectedItem.kilometresLimit, Validators.min(1))
     })
+
 
     this.successCreatedCar = this.carService.createSuccessEmitter.subscribe(
       () => {
@@ -133,13 +138,13 @@ export class EditAdvertisementComponent implements OnInit {
       return;
     }
 
-    const validFrom = formatDate(this.dateForm.value.validFrom, 'yyyy-MM-dd', 'en-US')
-    var cdw = true;
-    if (!this.priceListForm.value.priceList.priceForCDW) {
-      cdw = false;
+    const validFrom = formatDate(this.dateForm.value.validFrom, 'yyyy-MM-dd', 'en-US');
+    var validTo: string = null;
+    if (this.dateForm.value.validTo) {
+      validTo = formatDate(this.dateForm.value.validTo, 'yyyy-MM-dd', 'en-US');
     }
-    const advertisement = new Advertisement(this.carForm.value.car, this.priceListForm.value.priceList,
-      this.dateForm.value.discount, this.dateForm.value.kilometresLimit, cdw, this.dateForm.value.pickUpPoint, validFrom, this.selectedItem.id);
+    const advertisement = new AdvertisementEditAllInfo(this.carForm.value.car.id, this.priceListForm.value.priceList,
+      this.dateForm.value.discount, this.dateForm.value.kilometresLimit, this.dateForm.value.pickUpPoint, validFrom, this.selectedItem.id, validTo);
 
     this.advertisementService.edit(advertisement).subscribe(
       (data: Advertisement) => {

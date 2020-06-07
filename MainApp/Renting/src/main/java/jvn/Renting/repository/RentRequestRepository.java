@@ -30,4 +30,10 @@ public interface RentRequestRepository extends JpaRepository<RentRequest, Long> 
     List<RentRequest> findByClientAndRentRequestStatus(Long id, RentRequestStatus status);
 
     RentRequest findOneByIdAndRentRequestStatus(Long id, RentRequestStatus status);
+
+    List<RentRequest> findByRentInfosAdvertisementAndRentInfosRentRequestRentRequestStatusNot(Long advId, RentRequestStatus status);
+
+    List<RentRequest> findByRentInfosAdvertisementAndRentInfosRentRequestRentRequestStatus(Long advId, RentRequestStatus status);
+
+    List<RentRequest> findByRentInfosAdvertisementAndRentInfosRentRequestRentRequestStatusAndRentInfosDateTimeToGreaterThanEqual(Long advId, RentRequestStatus status, LocalDateTime localDateTime);
 }

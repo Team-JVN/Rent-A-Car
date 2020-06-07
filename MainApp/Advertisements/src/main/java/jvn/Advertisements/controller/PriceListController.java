@@ -6,7 +6,6 @@ import jvn.Advertisements.dto.both.PriceListDTO;
 import jvn.Advertisements.dto.request.UserDTO;
 import jvn.Advertisements.mapper.PriceListDtoMapper;
 import jvn.Advertisements.service.PriceListService;
-import org.apache.commons.fileupload.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,7 +35,7 @@ public class PriceListController {
     @GetMapping("/{id}")
     public ResponseEntity<PriceListDTO> get(@PathVariable @Positive(message = "Id must be positive.") Long id) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.get(id,userDTO)), HttpStatus.OK);
+        return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.get(id, userDTO.getId())), HttpStatus.OK);
     }
 
     @GetMapping
@@ -49,20 +48,20 @@ public class PriceListController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PriceListDTO> create(@Valid @RequestBody PriceListDTO priceListDTO) {
-        UserDTO userDTO = stringToObject( request.getHeader("user"));
-        return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.create(priceListDtoMapper.toEntity(priceListDTO),userDTO)), HttpStatus.CREATED);
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.create(priceListDtoMapper.toEntity(priceListDTO), userDTO)), HttpStatus.CREATED);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PriceListDTO> edit(@PathVariable @Positive(message = "Id must be positive.") Long id, @Valid @RequestBody PriceListDTO priceListDTO) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.edit(id, priceListDtoMapper.toEntity(priceListDTO),userDTO)), HttpStatus.OK);
+        return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.edit(id, priceListDtoMapper.toEntity(priceListDTO), userDTO)), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable @Positive(message = "Id must be positive.") Long id) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        priceListService.delete(id,userDTO);
+        priceListService.delete(id, userDTO);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -76,7 +75,7 @@ public class PriceListController {
     }
 
     @Autowired
-    public PriceListController(PriceListService priceListService, PriceListDtoMapper priceListDtoMapper,HttpServletRequest request,
+    public PriceListController(PriceListService priceListService, PriceListDtoMapper priceListDtoMapper, HttpServletRequest request,
                                ObjectMapper objectMapper) {
         this.priceListService = priceListService;
         this.priceListDtoMapper = priceListDtoMapper;

@@ -67,4 +67,9 @@ export class RentRequestService {
   public leaveFeedback(feedback: Feedback, rentInfoId: number, rentRequestId: number): any {
     return this.httpClient.post(this.url + "/" + rentRequestId + "/rent-info/" + rentInfoId + "/feedback", feedback);
   }
+
+  public getAdvertisementEditType(id: number) {
+    return this.httpClient.get(this.url + '/advertisement/' + id + '/edit-type');
+  }
+
 }

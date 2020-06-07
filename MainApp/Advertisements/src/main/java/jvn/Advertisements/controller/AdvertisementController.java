@@ -2,11 +2,14 @@ package jvn.Advertisements.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jvn.Advertisements.dto.request.AdvertisementEditAllInfoDTO;
+import jvn.Advertisements.dto.request.AdvertisementEditDTO;
 import jvn.Advertisements.dto.request.CreateAdvertisementDTO;
 import jvn.Advertisements.dto.request.UserDTO;
 import jvn.Advertisements.dto.response.AdvertisementDTO;
 import jvn.Advertisements.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.Advertisements.mapper.AdvertisementDtoMapper;
+import jvn.Advertisements.mapper.AdvertisementEditAllInfoDtoMapper;
 import jvn.Advertisements.mapper.CreateAdvertisementDtoMapper;
 import jvn.Advertisements.service.AdvertisementService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.text.ParseException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +39,8 @@ public class AdvertisementController {
     private ObjectMapper objectMapper;
 
     private HttpServletRequest request;
+
+    private AdvertisementEditAllInfoDtoMapper advertisementEditAllInfoDtoMapper;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AdvertisementDTO> create(@Valid @RequestBody CreateAdvertisementDTO createAdvertisementDTO) {
@@ -55,6 +61,29 @@ public class AdvertisementController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable("id") @Positive(message = "Id must be positive.") Long id) {
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        advertisementService.delete(id, userDTO.getId(), request.getHeader("Auth"), request.getHeader("user"));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AdvertisementDTO> edit(@PathVariable @Positive(message = "Id must be positive.") Long id, @Valid @RequestBody AdvertisementEditAllInfoDTO advertisementDTO) {
+        try {
+            UserDTO userDTO = stringToObject(request.getHeader("user"));
+            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.edit(id, advertisementEditAllInfoDtoMapper.toEntity(advertisementDTO), userDTO.getId(), request.getHeader("Auth"), request.getHeader("user"), userDTO)), HttpStatus.OK);
+        } catch (ParseException e) {
+            throw new InvalidAdvertisementDataException("Please choose valid date.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping(value = "/{id}/partial", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AdvertisementDTO> editPartial(@PathVariable @Positive(message = "Id must be positive.") Long id, @Valid @RequestBody AdvertisementEditDTO advertisementDTO) {
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.editPartial(id, advertisementDTO, userDTO.getId())), HttpStatus.OK);
+    }
+
     private UserDTO stringToObject(String user) {
         try {
             return objectMapper.readValue(user, UserDTO.class);
@@ -67,12 +96,14 @@ public class AdvertisementController {
 
     @Autowired
     public AdvertisementController(AdvertisementService advertisementService, CreateAdvertisementDtoMapper createAdvertisementDtoMapper,
-                                   AdvertisementDtoMapper advertisementDtoMapper, ObjectMapper objectMapper, HttpServletRequest request) {
+                                   AdvertisementDtoMapper advertisementDtoMapper, ObjectMapper objectMapper, HttpServletRequest request,
+                                   AdvertisementEditAllInfoDtoMapper advertisementEditAllInfoDtoMapper) {
         this.advertisementService = advertisementService;
         this.createAdvertisementDtoMapper = createAdvertisementDtoMapper;
         this.advertisementDtoMapper = advertisementDtoMapper;
         this.objectMapper = objectMapper;
         this.request = request;
+        this.advertisementEditAllInfoDtoMapper = advertisementEditAllInfoDtoMapper;
     }
 
 

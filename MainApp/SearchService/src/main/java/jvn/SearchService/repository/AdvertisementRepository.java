@@ -14,6 +14,8 @@ public interface AdvertisementRepository extends JpaRepository<Advertisement, Lo
 
     Advertisement findByIdAndLogicalStatus(Long id, LogicalStatus logicalStatus);
 
+    Advertisement findOneById(Long id);
+
     List<Advertisement> findByLogicalStatus(LogicalStatus logicalStatus);
 
     // With CDW available
