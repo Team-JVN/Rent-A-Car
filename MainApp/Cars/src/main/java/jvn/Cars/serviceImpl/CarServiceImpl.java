@@ -1,5 +1,6 @@
 package jvn.Cars.serviceImpl;
 
+import jvn.Cars.client.AdvertisementClient;
 import jvn.Cars.dto.request.UserDTO;
 import jvn.Cars.enumeration.LogicalStatus;
 import jvn.Cars.exceptionHandler.InvalidCarDataException;
@@ -40,6 +41,8 @@ public class CarServiceImpl implements CarService {
 
     private MakeService makeService;
 
+    private AdvertisementClient advertisementClient;
+
 //    private UserService userService;
 
     @Override
@@ -55,8 +58,6 @@ public class CarServiceImpl implements CarService {
         }
 
         car.setOwner(userDTO.getId());
-//        car.setOwner(userService.getLoginUser());
-
         car.setMake(makeService.get(car.getMake().getId()));
         car.setModel(modelService.get(car.getModel().getId(), car.getMake().getId()));
         car.setBodyStyle(bodyStyleService.get(car.getBodyStyle().getId()));
@@ -78,73 +79,81 @@ public class CarServiceImpl implements CarService {
     public List<Car> get(UserDTO userDTO) {
         return carRepository.findAllByLogicalStatusNotAndOwner(LogicalStatus.DELETED, userDTO.getId());
     }
+
+    @Override
+    public Car get(Long id, Long loggedInUser) {
+        Car car = carRepository.findOneByIdAndLogicalStatusNotAndOwner(id, LogicalStatus.DELETED, loggedInUser);
+        if (car == null) {
+            throw new InvalidCarDataException("This car doesn't exist.", HttpStatus.NOT_FOUND);
+        }
+        return car;
+    }
+
+    @Override
+    public Car get(Long id, LogicalStatus logicalStatus) {
+        return carRepository.findByIdAndLogicalStatus(id, logicalStatus);
+    }
+
+    @Override
+    public void delete(Long id, Long loggedInUserId, String jwtToken, String user) {
+        Car dbCar = get(id, LogicalStatus.EXISTING);
+        checkOwner(dbCar, loggedInUserId);
+
+        if (advertisementClient.canDeleteCar(jwtToken, user, id)) {
+            dbCar.setLogicalStatus(LogicalStatus.DELETED);
+            carRepository.save(dbCar);
+        } else {
+            throw new InvalidCarDataException("This car is in use and therefore it cannot be deleted.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
     /*
-        @Override
-        public List<Car> get() {
-            return carRepository.findAllByLogicalStatusNot(LogicalStatus.DELETED);
-        }
+            @Override
+            @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+            public Car editAll(Long id, CarDTO carDTO, List<MultipartFile> multipartFiles) {
 
-        @Override
-        @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-        public Car editAll(Long id, CarDTO carDTO, List<MultipartFile> multipartFiles) {
-
-            if (multipartFiles.size() > 5) {
-                throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
-            }
-            Car car = get(id);
-            checkOwner(car);
-            Set<Advertisement> advertisements = get(id).getAdvertisements();
-            if (advertisements != null && !advertisements.isEmpty()) {
-                throw new InvalidCarDataException("Car is in use and therefore can not be edited.", HttpStatus.BAD_REQUEST);
-            }
-            car.setMake(makeService.get(carDTO.getMake().getId()));
-            car.setModel(modelService.get(carDTO.getModel().getId(), carDTO.getMake().getId()));
-            car.setBodyStyle(bodyStyleService.get(carDTO.getBodyStyle().getId()));
-            car.setFuelType(fuelTypeService.get(carDTO.getFuelType().getId()));
-            car.setGearBoxType(gearboxTypeService.get(carDTO.getGearBoxType().getId()));
-            car.setMileageInKm(carDTO.getMileageInKm());
-            car.setKidsSeats(carDTO.getKidsSeats());
-            car.setAvailableTracking(carDTO.getAvailableTracking());
-            Car newCar = carRepository.save(car);
-            pictureService.editCarPictures(multipartFiles, UPLOADED_PICTURES_PATH, car);
-            return newCar;
-        }
-
-        @Override
-        @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-        public Car editPartial(Long id, CarEditDTO carDTO, List<MultipartFile> multipartFiles) {
-            if (multipartFiles.size() > 5) {
-                throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
-            }
-            Car car = get(id);
-            checkOwner(car);
-            for (Advertisement advertisement : get(id).getAdvertisements()) {
-                if (advertisement.getLogicalStatus().equals(LogicalStatus.EXISTING) && !advertisement.getRentInfos().isEmpty()) {
+                if (multipartFiles.size() > 5) {
+                    throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
+                }
+                Car car = get(id);
+                checkOwner(car);
+                Set<Advertisement> advertisements = get(id).getAdvertisements();
+                if (advertisements != null && !advertisements.isEmpty()) {
                     throw new InvalidCarDataException("Car is in use and therefore can not be edited.", HttpStatus.BAD_REQUEST);
                 }
-            }
-            car.setMileageInKm(carDTO.getMileageInKm());
-            car.setKidsSeats(carDTO.getKidsSeats());
-            car.setAvailableTracking(carDTO.getAvailableTracking());
-            Car newCar = carRepository.save(car);
-            pictureService.editCarPictures(multipartFiles, UPLOADED_PICTURES_PATH, car);
-            return newCar;
-        }
-
-        @Override
-        public void delete(Long id) {
-            Car car = get(id);
-            checkOwner(car);
-            if (carRepository.findByIdAndAdvertisementsLogicalStatusAndAdvertisementsDateToGreaterThanEqual(id, LogicalStatus.EXISTING, LocalDate.now()) != null) {
-                throw new InvalidCarDataException("Car is in use and therefore can not be deleted.", HttpStatus.BAD_REQUEST);
+                car.setMake(makeService.get(carDTO.getMake().getId()));
+                car.setModel(modelService.get(carDTO.getModel().getId(), carDTO.getMake().getId()));
+                car.setBodyStyle(bodyStyleService.get(carDTO.getBodyStyle().getId()));
+                car.setFuelType(fuelTypeService.get(carDTO.getFuelType().getId()));
+                car.setGearBoxType(gearboxTypeService.get(carDTO.getGearBoxType().getId()));
+                car.setMileageInKm(carDTO.getMileageInKm());
+                car.setKidsSeats(carDTO.getKidsSeats());
+                car.setAvailableTracking(carDTO.getAvailableTracking());
+                Car newCar = carRepository.save(car);
+                pictureService.editCarPictures(multipartFiles, UPLOADED_PICTURES_PATH, car);
+                return newCar;
             }
 
-            if (carRepository.findByIdAndAdvertisementsLogicalStatusAndAdvertisementsDateToEquals(id, LogicalStatus.EXISTING, null) != null) {
-                throw new InvalidCarDataException("Car is in use and therefore can not be deleted.", HttpStatus.BAD_REQUEST);
+            @Override
+            @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+            public Car editPartial(Long id, CarEditDTO carDTO, List<MultipartFile> multipartFiles) {
+                if (multipartFiles.size() > 5) {
+                    throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
+                }
+                Car car = get(id);
+                checkOwner(car);
+                for (Advertisement advertisement : get(id).getAdvertisements()) {
+                    if (advertisement.getLogicalStatus().equals(LogicalStatus.EXISTING) && !advertisement.getRentInfos().isEmpty()) {
+                        throw new InvalidCarDataException("Car is in use and therefore can not be edited.", HttpStatus.BAD_REQUEST);
+                    }
+                }
+                car.setMileageInKm(carDTO.getMileageInKm());
+                car.setKidsSeats(carDTO.getKidsSeats());
+                car.setAvailableTracking(carDTO.getAvailableTracking());
+                Car newCar = carRepository.save(car);
+                pictureService.editCarPictures(multipartFiles, UPLOADED_PICTURES_PATH, car);
+                return newCar;
             }
-            car.setLogicalStatus(LogicalStatus.DELETED);
-            carRepository.save(car);
-        }
 
         @Override
         public EditType getEditType(Long id) {
@@ -156,26 +165,16 @@ public class CarServiceImpl implements CarService {
         }
     */
 
-    @Override
-    public Car get(Long id, Long loggedInUser) {
-        Car car = carRepository.findOneByIdAndLogicalStatusNotAndOwner(id, LogicalStatus.DELETED, loggedInUser);
-        if (car == null) {
-            throw new InvalidCarDataException("This car doesn't exist.", HttpStatus.NOT_FOUND);
+    private void checkOwner(Car car, Long loggedInUserId) {
+        if (!car.getOwner().equals(loggedInUserId)) {
+            throw new InvalidCarDataException("You are not the owner of this car, therefore you cannot edit or delete it.", HttpStatus.BAD_REQUEST);
         }
-        return car;
     }
 
-    /*
-        private void checkOwner(Car car) {
-            if (!userService.getLoginAgent().getEmail().equals(car.getOwner().getEmail())) {
-                throw new InvalidCarDataException("You are not owner of this car.", HttpStatus.BAD_REQUEST);
-            }
-        }
-    */
     @Autowired
-    public CarServiceImpl(CarRepository carRepository, BodyStyleService bodyStyleService,
-                          FuelTypeService fuelTypeService, GearboxTypeService gearboxTypeService,
-                          PictureService pictureService, CarDtoMapper carMapper, ModelService modelService, MakeService makeService) {
+    public CarServiceImpl(CarRepository carRepository, BodyStyleService bodyStyleService, FuelTypeService fuelTypeService,
+                          GearboxTypeService gearboxTypeService, PictureService pictureService, CarDtoMapper carMapper,
+                          ModelService modelService, MakeService makeService, AdvertisementClient advertisementClient) {
         this.carRepository = carRepository;
         this.bodyStyleService = bodyStyleService;
         this.fuelTypeService = fuelTypeService;
@@ -184,5 +183,6 @@ public class CarServiceImpl implements CarService {
         this.carMapper = carMapper;
         this.modelService = modelService;
         this.makeService = makeService;
+        this.advertisementClient = advertisementClient;
     }
 }

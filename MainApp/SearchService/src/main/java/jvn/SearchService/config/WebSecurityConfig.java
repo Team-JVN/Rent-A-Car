@@ -46,6 +46,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/h2");
         web.ignoring().antMatchers(HttpMethod.POST, "/api/advertisement/search");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/advertisement/{id}");
 

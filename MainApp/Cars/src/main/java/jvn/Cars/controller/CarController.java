@@ -70,7 +70,6 @@ public class CarController {
         return new ResponseEntity<>(carDTO, HttpStatus.CREATED);
     }
 
-
     @GetMapping
     public ResponseEntity<List<CarWithPicturesDTO>> get() {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
@@ -90,13 +89,14 @@ public class CarController {
                                         @RequestParam(value = "fileName") String fileName) {
         return new ResponseEntity<>(carService.get(fileName), HttpStatus.OK);
     }
-/*
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") @Positive(message = "Id must be positive.") Long id) {
-        carService.delete(id);
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        carService.delete(id, userDTO.getId(), request.getHeader("Auth"), request.getHeader("user"));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
+/*
     @GetMapping(value = "/{id}/edit", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EditType> getEditType(@PathVariable @Positive(message = "Id must be positive.") Long id) {
         return new ResponseEntity<>(carService.getEditType(id), HttpStatus.OK);

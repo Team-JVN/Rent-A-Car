@@ -5,6 +5,7 @@ import jvn.Advertisements.security.RestAuthenticationEntryPoint;
 import jvn.Advertisements.security.TokenAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -36,6 +37,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .antMatchers("/api/advertisement/by-ids/{advIds}")
                 .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
+
+                .antMatchers(HttpMethod.GET, "/api/advertisement/car/{carId}/check-for-delete")
+                .hasAnyAuthority("MANAGE_CARS")
 
                 .anyRequest().authenticated().and()
 

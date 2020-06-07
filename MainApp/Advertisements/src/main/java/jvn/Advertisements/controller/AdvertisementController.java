@@ -84,6 +84,11 @@ public class AdvertisementController {
         return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.editPartial(id, advertisementDTO, userDTO.getId())), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/car/{carId}/check-for-delete", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> canDeleteCar(@PathVariable("carId") @Positive(message = "Id must be positive.") Long carId) {
+        return new ResponseEntity<>(advertisementService.canDeleteCar(carId), HttpStatus.OK);
+    }
+
     private UserDTO stringToObject(String user) {
         try {
             return objectMapper.readValue(user, UserDTO.class);

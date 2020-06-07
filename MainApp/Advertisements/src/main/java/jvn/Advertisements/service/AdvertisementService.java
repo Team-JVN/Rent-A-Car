@@ -16,5 +16,7 @@ public interface AdvertisementService {
     Advertisement edit(Long id, Advertisement advertisement, Long loggedInUserId, String jwtToken, String user, UserDTO userDTO);
 
     Advertisement editPartial(Long id, AdvertisementEditDTO advertisement, Long loggedInUserId);
+
+    Boolean canDeleteCar(Long carId);
 }
 
