@@ -19,7 +19,8 @@ public interface CarService {
 
     List<Car> get(UserDTO userDTO);
 
-//    Car editAll(Long id, CarDTO carDTO, List<MultipartFile> multipartFiles);
+    Car editAll(Long id, Car car, List<MultipartFile> multipartFiles, Long loggedInUserId, String jwtToken, String user,
+                UserDTO userDTO);
 
 //    Car editPartial(Long id, CarEditDTO carDTO, List<MultipartFile> multipartFiles);
 

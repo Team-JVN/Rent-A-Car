@@ -7,7 +7,6 @@ import { FuelTypeService } from './../../../service/fuelType.service';
 import { BodyStyle } from '../../../model/bodyStyle';
 import { GearBoxType } from './../../../model/gearboxType';
 import { FuelType } from './../../../model/fuelType';
-import { CarEdit } from './../../../model/carEdit';
 import { CarWithPictures } from './../../../model/carWithPictures';
 import { CarService } from './../../../service/car.service';
 import { Component, OnInit, Inject } from '@angular/core';
@@ -65,7 +64,7 @@ export class EditCarComponent implements OnInit {
     });
   }
 
-  selectfetchFuelType() {
+  selectFuelType() {
     this.fuelTypes.forEach((element: FuelType) => {
       if (element.id === this.selectedItem.fuelType.id) {
         this.editForm.controls['fuelType'].setValue(element);
@@ -73,7 +72,7 @@ export class EditCarComponent implements OnInit {
     });
   }
 
-  selectfetchGearboxType() {
+  selectGearboxType() {
     this.gearBoxTypes.forEach((element: GearBoxType) => {
       if (element.id === this.selectedItem.gearBoxType.id) {
         this.editForm.controls['gearBoxType'].setValue(element);
@@ -114,7 +113,7 @@ export class EditCarComponent implements OnInit {
     this.fuelTypeService.getFuelTypes().subscribe(
       (data: FuelType[]) => {
         this.fuelTypes = data;
-        this.selectfetchFuelType();
+        this.selectFuelType();
       },
       (httpErrorResponse: HttpErrorResponse) => {
         this.fuelTypes = [];
@@ -127,7 +126,7 @@ export class EditCarComponent implements OnInit {
     this.gearboxTypeService.getGearboxTypes().subscribe(
       (data: GearBoxType[]) => {
         this.gearBoxTypes = data;
-        this.selectfetchGearboxType();
+        this.selectGearboxType();
       },
       (httpErrorResponse: HttpErrorResponse) => {
         this.gearBoxTypes = [];

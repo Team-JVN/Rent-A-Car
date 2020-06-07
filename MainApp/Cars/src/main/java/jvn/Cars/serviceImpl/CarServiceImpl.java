@@ -2,6 +2,7 @@ package jvn.Cars.serviceImpl;
 
 import jvn.Cars.client.AdvertisementClient;
 import jvn.Cars.dto.request.UserDTO;
+import jvn.Cars.enumeration.EditType;
 import jvn.Cars.enumeration.LogicalStatus;
 import jvn.Cars.exceptionHandler.InvalidCarDataException;
 import jvn.Cars.mapper.CarDtoMapper;
@@ -107,33 +108,36 @@ public class CarServiceImpl implements CarService {
         }
     }
 
-    /*
-            @Override
-            @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-            public Car editAll(Long id, CarDTO carDTO, List<MultipartFile> multipartFiles) {
+    @Override
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+    public Car editAll(Long id, Car car, List<MultipartFile> multipartFiles, Long loggedInUserId, String jwtToken, String user,
+                       UserDTO userDTO) {
 
-                if (multipartFiles.size() > 5) {
-                    throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
-                }
-                Car car = get(id);
-                checkOwner(car);
-                Set<Advertisement> advertisements = get(id).getAdvertisements();
-                if (advertisements != null && !advertisements.isEmpty()) {
-                    throw new InvalidCarDataException("Car is in use and therefore can not be edited.", HttpStatus.BAD_REQUEST);
-                }
-                car.setMake(makeService.get(carDTO.getMake().getId()));
-                car.setModel(modelService.get(carDTO.getModel().getId(), carDTO.getMake().getId()));
-                car.setBodyStyle(bodyStyleService.get(carDTO.getBodyStyle().getId()));
-                car.setFuelType(fuelTypeService.get(carDTO.getFuelType().getId()));
-                car.setGearBoxType(gearboxTypeService.get(carDTO.getGearBoxType().getId()));
-                car.setMileageInKm(carDTO.getMileageInKm());
-                car.setKidsSeats(carDTO.getKidsSeats());
-                car.setAvailableTracking(carDTO.getAvailableTracking());
-                Car newCar = carRepository.save(car);
-                pictureService.editCarPictures(multipartFiles, UPLOADED_PICTURES_PATH, car);
-                return newCar;
-            }
+        if (multipartFiles.size() > 5) {
+            throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
+        }
+        Car dbCar = get(car.getId(), LogicalStatus.EXISTING);
+        checkOwner(dbCar, loggedInUserId);
 
+        if (!advertisementClient.getCarEditType(jwtToken, user, id).equals(EditType.ALL)) {
+            throw new InvalidCarDataException(
+                    "This car is in use and therefore it cannot be edited.", HttpStatus.BAD_REQUEST);
+        }
+
+        dbCar.setMake(makeService.get(car.getMake().getId()));
+        dbCar.setModel(modelService.get(car.getModel().getId(), car.getMake().getId()));
+        dbCar.setBodyStyle(bodyStyleService.get(car.getBodyStyle().getId()));
+        dbCar.setFuelType(fuelTypeService.get(car.getFuelType().getId()));
+        dbCar.setGearBoxType(gearboxTypeService.get(car.getGearBoxType().getId()));
+        dbCar.setMileageInKm(car.getMileageInKm());
+        dbCar.setKidsSeats(car.getKidsSeats());
+        dbCar.setAvailableTracking(car.getAvailableTracking());
+
+        Car newCar = carRepository.save(dbCar);
+        pictureService.editCarPictures(multipartFiles, UPLOADED_PICTURES_PATH, dbCar);
+        return newCar;
+    }
+/*
             @Override
             @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
             public Car editPartial(Long id, CarEditDTO carDTO, List<MultipartFile> multipartFiles) {
@@ -154,15 +158,6 @@ public class CarServiceImpl implements CarService {
                 pictureService.editCarPictures(multipartFiles, UPLOADED_PICTURES_PATH, car);
                 return newCar;
             }
-
-        @Override
-        public EditType getEditType(Long id) {
-            Set<Advertisement> advertisements = get(id).getAdvertisements();
-            if (advertisements == null || advertisements.isEmpty()) {
-                return EditType.ALL;
-            }
-            return EditType.PARTIAL;
-        }
     */
 
     private void checkOwner(Car car, Long loggedInUserId) {

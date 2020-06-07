@@ -1,5 +1,6 @@
 package jvn.Cars.client;
 
+import jvn.Cars.enumeration.EditType;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -12,6 +13,6 @@ public interface AdvertisementClient {
     @RequestMapping(method = RequestMethod.GET, path = "/api/advertisement/car/{carId}/check-for-delete")
     boolean canDeleteCar(@RequestHeader("Auth") String token, @RequestHeader("user") String user, @PathVariable("carId") Long carId);
 
-//    @RequestMapping(method = RequestMethod.GET, path = "/api/rent-request/advertisement/{advId}/edit-type")
-//    EditType getAdvertisementEditType(@RequestHeader("Auth") String token, @RequestHeader("user") String user, @PathVariable("advId") Long advId);
+    @RequestMapping(method = RequestMethod.GET, path = "/api/advertisement/car/{carId}/edit-type")
+    EditType getCarEditType(@RequestHeader("Auth") String token, @RequestHeader("user") String user, @PathVariable("carId") Long carId);
 }

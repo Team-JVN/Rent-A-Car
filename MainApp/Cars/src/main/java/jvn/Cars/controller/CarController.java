@@ -42,12 +42,9 @@ public class CarController {
 
     private CarService carService;
 
-    private CarDtoMapper carMapper;
-
+    private CarDtoMapper carDtoMapper;
     private CreateCarDtoMapper createCarDtoMapper;
-
     private CarWithPicturesDtoMapper carWithPicturesDtoMapper;
-
     private CarWithAllInformationDtoMapper carWithAllInformationDtoMapper;
 
     private HttpServletRequest request;
@@ -66,7 +63,7 @@ public class CarController {
             throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        CarDTO carDTO = carMapper.toDto(carService.create(createCarDtoMapper.toEntity(createCarDTO), multipartFiles, userDTO));
+        CarDTO carDTO = carDtoMapper.toDto(carService.create(createCarDtoMapper.toEntity(createCarDTO), multipartFiles, userDTO));
         return new ResponseEntity<>(carDTO, HttpStatus.CREATED);
     }
 
@@ -96,11 +93,6 @@ public class CarController {
         carService.delete(id, userDTO.getId(), request.getHeader("Auth"), request.getHeader("user"));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-/*
-    @GetMapping(value = "/{id}/edit", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EditType> getEditType(@PathVariable @Positive(message = "Id must be positive.") Long id) {
-        return new ResponseEntity<>(carService.getEditType(id), HttpStatus.OK);
-    }
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CarDTO> editAll(@PathVariable @Positive(message = "Id must be positive.") Long id, @RequestParam("carData") String jsonString,
@@ -114,26 +106,28 @@ public class CarController {
         } catch (IOException e) {
             throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
-        CarDTO newCarDTO = carMapper.toDto(carService.editAll(id, carDTO, multipartFiles));
-        return new ResponseEntity<>(newCarDTO, HttpStatus.OK);
+
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        return new ResponseEntity<>(carDtoMapper.toDto(carService.editAll(id, carDtoMapper.toEntity(carDTO), multipartFiles, userDTO.getId(), request.getHeader("Auth"), request.getHeader("user"), userDTO)), HttpStatus.OK);
     }
 
-    @PutMapping(value = "/{id}/partial", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CarDTO> editPartial(@PathVariable @Positive(message = "Id must be positive.") Long id,
-                                              @RequestParam("carData") String jsonString, @RequestParam("files") List<MultipartFile> multipartFiles) {
-        ObjectMapper mapper = new ObjectMapper();
-        CarEditDTO carEditDTO;
-        try {
-            carEditDTO = mapper.readValue(jsonString, CarEditDTO.class);
-            validateCarEditDTO(carEditDTO);
-        } catch (IOException e) {
-            throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
+    /*
+        @PutMapping(value = "/{id}/partial", produces = MediaType.APPLICATION_JSON_VALUE)
+        public ResponseEntity<CarDTO> editPartial(@PathVariable @Positive(message = "Id must be positive.") Long id,
+                                                  @RequestParam("carData") String jsonString, @RequestParam("files") List<MultipartFile> multipartFiles) {
+            ObjectMapper mapper = new ObjectMapper();
+            CarEditDTO carEditDTO;
+            try {
+                carEditDTO = mapper.readValue(jsonString, CarEditDTO.class);
+                validateCarEditDTO(carEditDTO);
+            } catch (IOException e) {
+                throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
+            }
+
+            UserDTO userDTO = stringToObject(request.getHeader("user"));
+            return new ResponseEntity<>(carDtoMapper.toDto(carService.editPartial(id, carEditDTO, multipartFiles, userDTO.getId())), HttpStatus.OK);
         }
-        CarDTO newCarDTO = carMapper.toDto(carService.editPartial(id, carEditDTO, multipartFiles));
-        return new ResponseEntity<>(newCarDTO, HttpStatus.OK);
-    }
-*/
-
+    */
     private void validateCreateCarDTO(CreateCarDTO createCarDTO) {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
@@ -143,19 +137,19 @@ public class CarController {
         }
     }
 
-    private void validateCarDTO(CarDTO carDTO) {
+    private void validateCarEditDTO(CarEditDTO carDTO) {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
-        Set<ConstraintViolation<CarDTO>> violations = validator.validate(carDTO);
+        Set<ConstraintViolation<CarEditDTO>> violations = validator.validate(carDTO);
         if (!violations.isEmpty()) {
             throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
     }
 
-    private void validateCarEditDTO(CarEditDTO carDTO) {
+    private void validateCarDTO(CarDTO carDTO) {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
-        Set<ConstraintViolation<CarEditDTO>> violations = validator.validate(carDTO);
+        Set<ConstraintViolation<CarDTO>> violations = validator.validate(carDTO);
         if (!violations.isEmpty()) {
             throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
@@ -171,11 +165,11 @@ public class CarController {
     }
 
     @Autowired
-    public CarController(CarService carService, CarDtoMapper carMapper, CreateCarDtoMapper createCarDtoMapper, HttpServletRequest request,
+    public CarController(CarService carService, CarDtoMapper carDtoMapper, CreateCarDtoMapper createCarDtoMapper, HttpServletRequest request,
                          CarWithPicturesDtoMapper carWithPicturesDtoMapper, CarWithAllInformationDtoMapper carWithAllInformationDtoMapper,
                          ObjectMapper objectMapper) {
         this.carService = carService;
-        this.carMapper = carMapper;
+        this.carDtoMapper = carDtoMapper;
         this.createCarDtoMapper = createCarDtoMapper;
         this.carWithPicturesDtoMapper = carWithPicturesDtoMapper;
         this.carWithAllInformationDtoMapper = carWithAllInformationDtoMapper;

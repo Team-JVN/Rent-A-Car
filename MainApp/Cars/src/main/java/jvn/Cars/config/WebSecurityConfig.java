@@ -28,10 +28,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
                 .authorizeRequests()
 
-                .antMatchers("/api/car", "/api/car/{id}", "/api/car/{id}/partial", "/api/car/{id}/edit")
+                .antMatchers("/api/car", "/api/car/{id}", "/api/car/{id}/partial")
                 .hasAuthority("MANAGE_CARS")
 
-                .antMatchers("/api/car/verify/{userId}/{carId}r")
+                .antMatchers("/api/car/verify/{userId}/{carId}")
                 .hasAuthority("MANAGE_ADVERTISEMENTS")
 
                 .antMatchers("/api/body-style/{id}", "/api/fuel-type/{id}", "/api/gearbox-type", "/api/gearbox-type/{id}",

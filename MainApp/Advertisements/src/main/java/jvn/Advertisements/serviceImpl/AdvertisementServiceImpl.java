@@ -10,7 +10,6 @@ import jvn.Advertisements.dto.response.CarWithAllInformationDTO;
 import jvn.Advertisements.enumeration.EditType;
 import jvn.Advertisements.enumeration.LogicalStatus;
 import jvn.Advertisements.exceptionHandler.InvalidAdvertisementDataException;
-import jvn.Advertisements.mapper.AdvertisementDtoMapper;
 import jvn.Advertisements.mapper.AdvertisementMessageDtoMapper;
 import jvn.Advertisements.model.Advertisement;
 import jvn.Advertisements.model.PriceList;
@@ -32,8 +31,6 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     private PriceListService priceListService;
 
     private AdvertisementRepository advertisementRepository;
-
-    private AdvertisementDtoMapper advertisementMapper;
 
     private AdvertisementMessageDtoMapper advertisementMessageMapper;
 
@@ -132,8 +129,19 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     }
 
     @Override
+    public EditType getCarEditType(Long carId) {
+        List<Advertisement> advertisements = advertisementRepository.findByCar(carId);
+        if (advertisements != null && !advertisements.isEmpty()) {
+            return EditType.PARTIAL;
+        }
+        return EditType.ALL;
+    }
+
+    @Override
     public Boolean canDeleteCar(Long carId) {
-        List<Advertisement> advertisements = advertisementRepository.findByCarAndLogicalStatusAndDateToGreaterThanEqualOrCarAndLogicalStatusAndDateToEquals(carId, LogicalStatus.EXISTING, LocalDate.now(), carId, LogicalStatus.EXISTING, null);
+        List<Advertisement> advertisements = advertisementRepository
+                .findByCarAndLogicalStatusAndDateToGreaterThanEqualOrCarAndLogicalStatusAndDateToEquals(carId,
+                        LogicalStatus.EXISTING, LocalDate.now(), carId, LogicalStatus.EXISTING, null);
         return advertisements == null || advertisements.isEmpty();
     }
 
@@ -238,13 +246,11 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     @Autowired
     public AdvertisementServiceImpl(PriceListService priceListService, CarClient carClient,
-                                    AdvertisementRepository advertisementRepository, AdvertisementDtoMapper advertisementMapper,
-                                    AdvertisementMessageDtoMapper advertisementMessageMapper, AdvertisementProducer advertisementProducer,
-                                    RentingClient rentingClient) {
+                                    AdvertisementRepository advertisementRepository, AdvertisementMessageDtoMapper advertisementMessageMapper,
+                                    AdvertisementProducer advertisementProducer, RentingClient rentingClient) {
         this.priceListService = priceListService;
         this.carClient = carClient;
         this.advertisementRepository = advertisementRepository;
-        this.advertisementMapper = advertisementMapper;
         this.advertisementMessageMapper = advertisementMessageMapper;
         this.advertisementProducer = advertisementProducer;
         this.rentingClient = rentingClient;

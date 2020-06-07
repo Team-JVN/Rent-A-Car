@@ -7,6 +7,7 @@ import jvn.Advertisements.dto.request.AdvertisementEditDTO;
 import jvn.Advertisements.dto.request.CreateAdvertisementDTO;
 import jvn.Advertisements.dto.request.UserDTO;
 import jvn.Advertisements.dto.response.AdvertisementDTO;
+import jvn.Advertisements.enumeration.EditType;
 import jvn.Advertisements.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.Advertisements.mapper.AdvertisementDtoMapper;
 import jvn.Advertisements.mapper.AdvertisementEditAllInfoDtoMapper;
@@ -82,6 +83,11 @@ public class AdvertisementController {
     public ResponseEntity<AdvertisementDTO> editPartial(@PathVariable @Positive(message = "Id must be positive.") Long id, @Valid @RequestBody AdvertisementEditDTO advertisementDTO) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
         return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.editPartial(id, advertisementDTO, userDTO.getId())), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/car/{carId}/edit-type", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<EditType> getCarEditType(@PathVariable("carId") @Positive(message = "Id must be positive.") Long id) {
+        return new ResponseEntity<>(advertisementService.getCarEditType(id), HttpStatus.OK);
     }
 
     @GetMapping(value = "/car/{carId}/check-for-delete", produces = MediaType.APPLICATION_JSON_VALUE)

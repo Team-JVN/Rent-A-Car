@@ -45,4 +45,8 @@ export class AdvertisementService {
     return this.httpClient.delete(this.url + '/' + id);
   }
 
+  public getCarEditType(id: number) {
+    return this.httpClient.get(this.url + '/car/' + id + '/edit-type');
+  }
+
 }

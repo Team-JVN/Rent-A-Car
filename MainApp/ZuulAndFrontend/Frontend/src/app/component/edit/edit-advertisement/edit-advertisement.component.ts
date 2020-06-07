@@ -134,7 +134,7 @@ export class EditAdvertisementComponent implements OnInit {
 
   edit() {
     if (this.getSelectedPriceList().pricePerKm && !this.dateForm.value.kilometresLimit) {
-      this.toastr.error("Please enter Kilometres limit", 'Create Advertisement');
+      this.toastr.error("Please enter Kilometres limit", 'Edit Advertisement');
       return;
     }
 
