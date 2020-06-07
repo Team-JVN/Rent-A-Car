@@ -1,5 +1,3 @@
-import { DateTime } from 'luxon';
-import { AdvertisementWithPictures } from './../../../model/advertisementWithPictures';
 import { AddPriceListComponent } from './../../add/add-price-list/add-price-list.component';
 import { AddCarComponent } from './../../add/add-car/add-car.component';
 import { PriceList } from './../../../model/priceList';
@@ -13,10 +11,8 @@ import { ToastrService } from 'ngx-toastr';
 import { CarWithPictures } from 'src/app/model/carWithPictures';
 import { PriceListService } from 'src/app/service/price-list.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { formatDate, DatePipe } from '@angular/common';
+import { formatDate } from '@angular/common';
 import { Advertisement } from 'src/app/model/advertisement';
-import { parse } from 'querystring';
-import * as moment from 'moment';
 import { AdvertisementFromSearch } from 'src/app/model/advertisementFromSearch';
 import { AdvertisementEditAllInfo } from 'src/app/model/advertisement.edit.all.info';
 import { AuthentificationService } from 'src/app/service/authentification.service';

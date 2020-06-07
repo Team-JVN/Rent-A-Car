@@ -61,6 +61,20 @@ public class AdvertisementConsumer {
         advertisementRepository.save(advertisement);
     }
 
+    @RabbitListener(queues = RabbitMQConfiguration.EDIT_PRICE_LIST_ADVERTISEMENT)
+    public void listenEditPriceList(String message) {
+        PriceListDTO priceListDTO = stringToObjectPriceListDTO(message);
+        PriceList priceList = priceListRepository.findOneById(priceListDTO.getId());
+        if (priceList == null) {
+            priceList = new PriceList();
+            priceList.setId(priceListDTO.getId());
+        }
+        priceList.setPricePerDay(priceListDTO.getPricePerDay());
+        priceList.setPricePerKm(priceListDTO.getPricePerKm());
+        priceList.setPriceForCDW(priceListDTO.getPriceForCDW());
+        priceListRepository.save(priceList);
+    }
+
     private Advertisement stringToObject(String advertisementMessageStr) {
         try {
             return objectMapper.readValue(advertisementMessageStr, Advertisement.class);
@@ -73,6 +87,15 @@ public class AdvertisementConsumer {
     private AdvertisementEditDTO stringToObjectAdvEditDTO(String advertisementMessageStr) {
         try {
             return objectMapper.readValue(advertisementMessageStr, AdvertisementEditDTO.class);
+        } catch (JsonProcessingException e) {
+            //TODO: Add to log and delete return null;
+            return null;
+        }
+    }
+
+    private PriceListDTO stringToObjectPriceListDTO(String message) {
+        try {
+            return objectMapper.readValue(message, PriceListDTO.class);
         } catch (JsonProcessingException e) {
             //TODO: Add to log and delete return null;
             return null;

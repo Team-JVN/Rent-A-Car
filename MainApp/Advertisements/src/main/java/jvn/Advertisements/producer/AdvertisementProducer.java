@@ -2,6 +2,7 @@ package jvn.Advertisements.producer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jvn.Advertisements.dto.both.PriceListDTO;
 import jvn.Advertisements.dto.message.AdvertisementMessageDTO;
 import jvn.Advertisements.dto.request.AdvertisementEditDTO;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -19,6 +20,8 @@ public class AdvertisementProducer {
 
     private static final String EDIT_PARTIAL_ADVERTISEMENT = "advertisements-for-search-edit-partial-adv";
 
+    private static final String EDIT_PRICE_LIST_ADVERTISEMENT = "advertisements-for-search-edit-price-list";
+
     private RabbitTemplate rabbitTemplate;
 
     private ObjectMapper objectMapper;
@@ -31,12 +34,16 @@ public class AdvertisementProducer {
         rabbitTemplate.convertAndSend(EDIT_PARTIAL_ADVERTISEMENT, jsonToString(advertisementEditDTO));
     }
 
-    public void sendMessageToRentingService(Long advId) {
-        rabbitTemplate.convertAndSend(REJECT_ALL_REQUESTS, advId);
-    }
-
     public void sendMessageForSearch(Long advId) {
         rabbitTemplate.convertAndSend(DELETED_ADVERTISEMENT, advId);
+    }
+
+    public void sendMessageForSearch(PriceListDTO priceListDTO) {
+        rabbitTemplate.convertAndSend(EDIT_PRICE_LIST_ADVERTISEMENT, jsonToString(priceListDTO));
+    }
+
+    public void sendMessageToRentingService(Long advId) {
+        rabbitTemplate.convertAndSend(REJECT_ALL_REQUESTS, advId);
     }
 
     private String jsonToString(AdvertisementMessageDTO advertisementMessageDTO) {
@@ -51,6 +58,15 @@ public class AdvertisementProducer {
     private String jsonToString(AdvertisementEditDTO advertisementEditDTO) {
         try {
             return objectMapper.writeValueAsString(advertisementEditDTO);
+        } catch (JsonProcessingException e) {
+            //TODO: Add to log and delete return null;
+            return null;
+        }
+    }
+
+    private String jsonToString(PriceListDTO priceListDTO) {
+        try {
+            return objectMapper.writeValueAsString(priceListDTO);
         } catch (JsonProcessingException e) {
             //TODO: Add to log and delete return null;
             return null;
