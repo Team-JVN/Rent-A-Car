@@ -102,6 +102,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         }
         CarWithAllInformationDTO carDTO = carClient.verify(jwtToken, user, loggedInUserId, dbAdvertisement.getCar());
         dbAdvertisement.setDateFrom(advertisement.getDateFrom());
+        dbAdvertisement.setDateTo(advertisement.getDateTo());
         dbAdvertisement.setPriceList(priceListService.get(advertisement.getPriceList().getId(), loggedInUserId));
         dbAdvertisement.setPickUpPoint(advertisement.getPickUpPoint());
         dbAdvertisement = setPriceList(dbAdvertisement, advertisement.getKilometresLimit());

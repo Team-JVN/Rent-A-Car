@@ -55,9 +55,11 @@ export class EditAdvertisementComponent implements OnInit {
     this.dateForm = this.formBuilder.group({
       pickUpPoint: new FormControl(this.selectedItem.pickUpPoint, Validators.required),
       validFrom: new FormControl(new Date(this.selectedItem.dateFrom), Validators.required),
+      validTo: new FormControl(this.selectedItem.dateTo),
       discount: new FormControl(this.selectedItem.discount, [Validators.min(0), Validators.max(99)]),
       kilometresLimit: new FormControl(this.selectedItem.kilometresLimit, Validators.min(1))
     })
+
 
     this.successCreatedCar = this.carService.createSuccessEmitter.subscribe(
       () => {
@@ -141,8 +143,12 @@ export class EditAdvertisementComponent implements OnInit {
     }
 
     const validFrom = formatDate(this.dateForm.value.validFrom, 'yyyy-MM-dd', 'en-US');
+    var validTo: string = null;
+    if (this.dateForm.value.validTo) {
+      validTo = formatDate(this.dateForm.value.validTo, 'yyyy-MM-dd', 'en-US');
+    }
     const advertisement = new AdvertisementEditAllInfo(this.carForm.value.car.id, this.priceListForm.value.priceList,
-      this.dateForm.value.discount, this.dateForm.value.kilometresLimit, this.dateForm.value.pickUpPoint, validFrom, this.selectedItem.id);
+      this.dateForm.value.discount, this.dateForm.value.kilometresLimit, this.dateForm.value.pickUpPoint, validFrom, this.selectedItem.id, validTo);
 
     this.advertisementService.edit(advertisement).subscribe(
       (data: Advertisement) => {
