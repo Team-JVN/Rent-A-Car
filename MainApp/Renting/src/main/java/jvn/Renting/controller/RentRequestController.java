@@ -2,12 +2,15 @@ package jvn.Renting.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jvn.Renting.dto.both.RentInfoDTO;
 import jvn.Renting.dto.both.RentRequestDTO;
 import jvn.Renting.dto.both.UserDTO;
 import jvn.Renting.dto.request.RentRequestStatusDTO;
 import jvn.Renting.enumeration.EditType;
 import jvn.Renting.exceptionHandler.InvalidRentRequestDataException;
+import jvn.Renting.mapper.RentInfoDtoMapper;
 import jvn.Renting.mapper.RentRequestDtoMapper;
+import jvn.Renting.service.RentInfoService;
 import jvn.Renting.service.RentRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,6 +39,10 @@ public class RentRequestController {
     private ObjectMapper objectMapper;
 
     private HttpServletRequest request;
+
+    private RentInfoService rentInfoService;
+
+    private RentInfoDtoMapper rentInfoDtoMapper;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<RentRequestDTO> create(@Valid @RequestBody RentRequestDTO rentRequestDTO) {
@@ -91,6 +98,13 @@ public class RentRequestController {
         return new ResponseEntity<>(rentRequestService.hasRentInfos(advIds), HttpStatus.OK);
     }
 
+    @PutMapping(value = "/{rentRequestId}/rent-info/{rentInfoId}/pay")
+    public ResponseEntity<RentInfoDTO> pay(@PathVariable("rentRequestId") @Positive(message = "Id must be positive.") Long rentRequestId,
+                                           @PathVariable("rentInfoId") @Positive(message = "Id must be positive.") Long rentInfoId) {
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        return new ResponseEntity<>(rentInfoDtoMapper.toDto(rentInfoService.pay(rentRequestId, rentInfoId, userDTO.getId())), HttpStatus.OK);
+    }
+
     private UserDTO stringToObject(String user) {
         try {
             return objectMapper.readValue(user, UserDTO.class);
@@ -102,10 +116,13 @@ public class RentRequestController {
 
     @Autowired
     public RentRequestController(RentRequestService rentRequestService, RentRequestDtoMapper rentRequestDtoMapper,
-                                 ObjectMapper objectMapper, HttpServletRequest request) {
+                                 ObjectMapper objectMapper, HttpServletRequest request, RentInfoService rentInfoService,
+                                 RentInfoDtoMapper rentInfoDtoMapper) {
         this.rentRequestService = rentRequestService;
         this.rentRequestDtoMapper = rentRequestDtoMapper;
         this.objectMapper = objectMapper;
         this.request = request;
+        this.rentInfoService = rentInfoService;
+        this.rentInfoDtoMapper = rentInfoDtoMapper;
     }
 }

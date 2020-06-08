@@ -29,6 +29,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
 
                 .authorizeRequests()
+                .antMatchers("/h2/**").permitAll()
                 .antMatchers("/api/advertisement/all/{status}")
                 .hasAuthority("MANAGE_ADVERTISEMENTS")
 
@@ -42,11 +43,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(new TokenAuthenticationFilter(), BasicAuthenticationFilter.class);
 
         http.csrf().disable();
+        http.headers().frameOptions().disable();
     }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/h2");
+        web.ignoring().antMatchers("/h2/**");
         web.ignoring().antMatchers(HttpMethod.POST, "/api/advertisement/search");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/advertisement/{id}");
     }

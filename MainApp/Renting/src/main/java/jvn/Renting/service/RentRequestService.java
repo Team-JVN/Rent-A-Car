@@ -27,4 +27,5 @@ public interface RentRequestService {
 
     Boolean hasRentInfos(List<Long> advIds);
 
+
 }

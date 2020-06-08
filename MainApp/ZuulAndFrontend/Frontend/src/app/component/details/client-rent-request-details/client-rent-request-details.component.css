@@ -95,3 +95,9 @@ mat-card {
 .form-full-width {
     width: 100%;
 }
+
+
+.pay-btn {
+    margin-top: 5px;
+    font-size: 16px;
+}
