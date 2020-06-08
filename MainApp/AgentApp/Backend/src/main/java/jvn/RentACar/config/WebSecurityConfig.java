@@ -89,6 +89,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                                 .antMatchers(HttpMethod.GET, "/api/rent-request/{status}/mine")
                                 .hasAuthority("MY_RENT_REQUESTS")
+                                .antMatchers(HttpMethod.PUT, "/api/rent-request/{rentRequestId}/rent-info/{rentInfoId}/pay")
+                                .hasAuthority("MY_RENT_REQUESTS")
 
                                 .antMatchers(HttpMethod.GET,
                                                 "/api/advertisement/{advertisementId}/rent-requests/{status}")

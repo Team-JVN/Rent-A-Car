@@ -89,4 +89,27 @@ export class ClientRentRequestDetailsComponent implements OnInit {
   leaveFeedback(rentInfo: RentInfo) {
     // this.dialog.open(LeaveFeedbackComponent, { data: { rentInfo: rentInfo, rentRequest: this.rentRequest } });
   }
+  pay(rentInfo: RentInfo, rentRequest: RentRequest) {
+    this.rentRequestService.pay(rentRequest.id, rentInfo.id).subscribe(
+      () => {
+        this.toastr.success("Success", 'Pay Rent Info');
+        this.fetchRentRequest();
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Pay Rent Info');
+      }
+    );
+  }
+
+  fetchRentRequest() {
+    this.rentRequestService.get(this.rentRequestId).subscribe(
+      (data: RentRequest) => {
+        this.rentRequest = data;
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Rent Request Details');
+        this.location.back();
+      }
+    )
+  }
 }
