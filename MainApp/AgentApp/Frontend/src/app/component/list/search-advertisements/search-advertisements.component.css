@@ -1,0 +1,176 @@
+mat-card {
+    max-width: 1050px;
+    margin: 2em auto;
+}
+
+mat-card-content {
+    margin-right: 16px;
+    margin-left: 16px;
+    margin-bottom: 0;
+}
+
+mat-panel-title {
+    font-weight: 550;
+}
+
+.basic-search .mat-card-content {
+    margin-left: 8px;
+}
+
+.basic-search-title {
+    font-weight: 550;
+    margin-bottom: 10px;
+}
+
+.rating-div {
+    padding-right: 0;
+    padding-top: 1px;
+}
+
+.search-btn {
+    width: 200px;
+}
+
+td.mat-cell{
+    border-bottom-style: none;
+}
+
+th.mat-header-cell{
+    border-bottom-style: none;
+}
+
+.advertisement-list-table td.mat-cell:first-of-type{
+    padding-left: 8px;
+}
+
+.advertisement-list-table td.mat-cell:last-of-type{
+    padding-right: 8px;
+}
+
+.advertisement-div {
+    width: 100%;
+}
+
+.advertisement-table tr {
+    border-bottom: 1px solid #ddd;
+}
+
+.advertisement-table th, .table td {
+    font-size: 15px;
+    vertical-align: bottom;
+    padding: 0.6rem;
+}
+
+.theader {
+    font-weight: 550;
+    display: inline-flex;
+    vertical-align: middle;
+}
+
+.item-card {
+    width: 100%;
+    display: inline-flex;
+    background-color: #F5F5F5;    
+    margin: 0.7em auto;
+    align-items: center;    
+    transition: all 0.1s ease-in-out;
+}
+
+.item-card:hover {
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
+}
+
+.image {
+    max-width: 300px;
+    max-height: 200px;
+    border-radius: 5px;
+}
+
+.image-div {
+    width: 300px;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.advertisement-card-header{
+    display:inline-block;
+    width:100%;
+    vertical-align: middle;
+}
+
+.advertisement-card-title{
+    float: left;
+}
+
+.rating{
+    float:right;
+    margin-top: -9px;
+    margin-right: 10px;
+}
+
+.per-km {
+    font-weight: 550;
+}
+
+.price-header {
+    font-size: 23px;
+    font-weight: 550;
+}
+
+.price-text {    
+    font-size: 26px;
+    font-weight: bold;
+    color: red;
+}
+
+.price-table {
+    text-align: center;
+    width: 290px;
+}
+
+.rent-btn {
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+.form-full-width {
+    width: 100%;
+}
+
+.form-full-width-95 {
+    width: 95%;
+}
+
+.form-full-width-90 {
+    width: 90%;
+}
+
+.form-width-30 {
+    width: 30%;
+}
+
+.form-width-40 {
+    width: 40%;
+}
+
+.no-ads {
+    font-size: 23px;
+    font-weight: 550;
+    color: gray;
+    text-align: center;
+}
+
+/* Hides arrow buttons in input type="number" */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}

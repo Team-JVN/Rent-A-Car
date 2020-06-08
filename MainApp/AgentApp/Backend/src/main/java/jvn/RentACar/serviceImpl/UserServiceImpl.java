@@ -91,6 +91,12 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     }
 
     @Override
+    public Client getLoginClient() {
+        Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
+        return (Client) userRepository.findByEmail(currentUser.getName());
+    }
+
+    @Override
     public void generateResetToken(String email) throws NoSuchAlgorithmException {
         User user = findByEmail(email);
         if (user == null) {

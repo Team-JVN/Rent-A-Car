@@ -52,15 +52,29 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                                 "/api/advertisement/all/{status}")
                                 .hasAuthority("MANAGE_ADVERTISEMENTS")
 
-                                .antMatchers("/api/body-style", "/api/body-style/{id}", "/api/fuel-type",
-                                                "/api/fuel-type/{id}", "/api/gearbox-type", "/api/gearbox-type/{id}",
-                                                "/api/make/**")
+                                .antMatchers("/api/body-style/{id}", "/api/fuel-type/{id}", "/api/gearbox-type", "/api/gearbox-type/{id}",
+                                        "/api/make/{id}", "/api/make/{makeId}/model/{modelId}")
+                                .hasAuthority("MANAGE_CODE_BOOKS")
+
+                                .antMatchers(HttpMethod.POST, "/api/body-style", "/api/fuel-type", "/api/gearbox-type",
+                                        "/api/make/", "/api/make/{makeId}/model")
                                 .hasAuthority("MANAGE_CODE_BOOKS")
 
                                 .antMatchers("/api/car", "/api/car/{id}", "/api/car/{id}/partial", "/api/car/{id}/edit")
                                 .hasAuthority("MANAGE_CARS")
 
-                                .antMatchers("/api/client", "/api/client/{id}").hasAuthority("MANAGE_CLIENTS")
+                                .antMatchers(HttpMethod.POST,"/api/client").hasAnyAuthority("MANAGE_CLIENTS","MANAGE_ADVERTISEMENTS")
+                                .antMatchers( "/api/client/{id}").hasAnyAuthority("MANAGE_CLIENTS","MANAGE_ADVERTISEMENTS")
+
+                                .antMatchers(HttpMethod.PUT, "/api/client")
+                                .hasAuthority("CLIENT_EDIT_PROFILE")
+                                .antMatchers(HttpMethod.GET, "/api/client/profile")
+                                .hasAuthority("CLIENT_EDIT_PROFILE")
+
+                                .antMatchers(HttpMethod.PUT, "/api/agent")
+                                .hasAuthority("AGENT_EDIT_PROFILE")
+                                .antMatchers(HttpMethod.GET, "/api/agent/profile")
+                                .hasAuthority("AGENT_EDIT_PROFILE")
 
                                 .antMatchers("/api/price-list", "/api/price-list/{id}")
                                 .hasAuthority("MANAGE_PRICE_LISTS")
@@ -71,24 +85,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                 .antMatchers("/api/role").hasAuthority("MANAGE_ROLES")
                                 .antMatchers(HttpMethod.GET, "/api/permission").hasAuthority("MANAGE_ROLES")
 
-                                .antMatchers(HttpMethod.POST, "/api/rent-request").hasAuthority("CREATE_RENT_REQUEST")
+                                .antMatchers(HttpMethod.POST, "/api/rent-request").hasAnyAuthority("MANAGE_ADVERTISEMENTS","MY_RENT_REQUESTS")
 
-                                .antMatchers(HttpMethod.GET, "/api/rent-request/{status}/mine",
-                                                "/api/rent-request/{id}")
-                                .hasAuthority("GET_MY_RENT_REQUESTS")
+                                .antMatchers(HttpMethod.GET, "/api/rent-request/{status}/mine")
+                                .hasAuthority("MY_RENT_REQUESTS")
 
                                 .antMatchers(HttpMethod.GET,
                                                 "/api/advertisement/{advertisementId}/rent-requests/{status}")
-                                .hasAuthority("GET_RECEIVED_RENT_REQUESTS")
-                                .antMatchers(HttpMethod.GET,
-                                "/api/rent-request/{id}")
-                                .hasAuthority("GET_RECEIVED_RENT_REQUESTS")
-                                
-                                .antMatchers(HttpMethod.DELETE, "/api/rent-request/{id}")
-                                .hasAuthority("DELETE_RENT_REQUEST")
+                                .hasAuthority("MANAGE_ADVERTISEMENTS")
 
                                 .antMatchers(HttpMethod.PUT, "/api/rent-request/{id}")
-                                .hasAuthority("CHANGE_RENT_REQUEST_STATUS")
+                                .hasAnyAuthority("MANAGE_ADVERTISEMENTS","MY_RENT_REQUESTS")
 
                                 .anyRequest().authenticated().and()
 
@@ -111,6 +118,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 web.ignoring().antMatchers(HttpMethod.PUT, "/api/client/activate**");
                 web.ignoring().antMatchers(HttpMethod.GET, "/api/advertisement/{id}");
                 web.ignoring().antMatchers(HttpMethod.GET, "/api/car/{id}/picture");
+                web.ignoring().antMatchers(HttpMethod.GET, "/api/car/{id}/picture");
+                web.ignoring().antMatchers(HttpMethod.GET, "/api/body-style");
+                web.ignoring().antMatchers(HttpMethod.GET, "/api/fuel-type");
+                web.ignoring().antMatchers(HttpMethod.GET, "/api/gearbox-type");
+                web.ignoring().antMatchers(HttpMethod.GET, "/api/make");
+                web.ignoring().antMatchers(HttpMethod.GET, "/api/make/{makeId}/models");
+                web.ignoring().antMatchers(HttpMethod.POST, "/api/advertisement/search");
+                web.ignoring().antMatchers(HttpMethod.GET, "/api/advertisement/{id}");
+
                 web.ignoring().antMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "/favicon.ico","/favicon.png", "/**/*.html",
                                 "/**/*.css", "/**/*.js", "/assets/**", "/*.jpg");
         }

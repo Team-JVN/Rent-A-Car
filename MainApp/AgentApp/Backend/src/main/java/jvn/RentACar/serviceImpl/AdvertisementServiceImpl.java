@@ -1,6 +1,7 @@
 package jvn.RentACar.serviceImpl;
 
 import jvn.RentACar.dto.request.AdvertisementEditDTO;
+import jvn.RentACar.dto.response.SearchParamsDTO;
 import jvn.RentACar.enumeration.EditType;
 import jvn.RentACar.enumeration.LogicalStatus;
 import jvn.RentACar.enumeration.RentRequestStatus;
@@ -18,7 +19,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AdvertisementServiceImpl implements AdvertisementService {
@@ -37,25 +41,12 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     @Override
     public Advertisement create(Advertisement createAdvertisementDTO) {
-
         checkDate(createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
         createAdvertisementDTO.setCar(carService.get(createAdvertisementDTO.getCar().getId()));
         checkOwner(createAdvertisementDTO.getCar());
-
         checkIfCarIsAvailable(createAdvertisementDTO.getCar().getId(), createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
         createAdvertisementDTO.setPriceList(priceListService.get(createAdvertisementDTO.getPriceList().getId()));
-        PriceList priceList = createAdvertisementDTO.getPriceList();
-        if (priceList.getPricePerKm() != null && createAdvertisementDTO.getKilometresLimit() == null) {
-            throw new InvalidAdvertisementDataException("You have to set kilometres limit.", HttpStatus.BAD_REQUEST);
-        }
-        if (priceList.getPricePerKm() == null) {
-            createAdvertisementDTO.setKilometresLimit(null);
-        }
-        if (priceList.getPriceForCDW() != null) {
-            createAdvertisementDTO.setCDW(true);
-        } else {
-            createAdvertisementDTO.setCDW(false);
-        }
+        createAdvertisementDTO = setPriceList(createAdvertisementDTO, createAdvertisementDTO.getKilometresLimit());
         return advertisementRepository.save(createAdvertisementDTO);
     }
 
@@ -63,27 +54,16 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     public Advertisement edit(Long id, Advertisement advertisement) {
         Advertisement dbAdvertisement = get(advertisement.getId());
         isEditable(dbAdvertisement);
-        checkIfCarIsAvailableForEdit(advertisement.getCar().getId(), advertisement.getDateFrom(), advertisement.getDateTo(), advertisement.getId());
+        if (!dbAdvertisement.getCar().equals(advertisement.getCar())) {
+            dbAdvertisement.setCar(advertisement.getCar());
+            checkIfCarIsAvailable(dbAdvertisement.getCar().getId(), dbAdvertisement.getDateFrom(), dbAdvertisement.getDateTo());
+        }
         dbAdvertisement.setDateFrom(advertisement.getDateFrom());
         dbAdvertisement.setCar(carService.get(advertisement.getCar().getId()));
         checkOwner(dbAdvertisement.getCar());
         dbAdvertisement.setPriceList(priceListService.get(advertisement.getPriceList().getId()));
         dbAdvertisement.setPickUpPoint(advertisement.getPickUpPoint());
-        PriceList priceList = dbAdvertisement.getPriceList();
-        if (priceList.getPricePerKm() != null && advertisement.getKilometresLimit() == null) {
-            throw new InvalidAdvertisementDataException("You have to set kilometres limit.", HttpStatus.BAD_REQUEST);
-        }
-        if (priceList.getPricePerKm() == null) {
-            dbAdvertisement.setKilometresLimit(null);
-        } else {
-            dbAdvertisement.setKilometresLimit(advertisement.getKilometresLimit());
-        }
-        if (priceList.getPriceForCDW() != null) {
-            dbAdvertisement.setCDW(true);
-        } else {
-            dbAdvertisement.setCDW(false);
-        }
-
+        dbAdvertisement = setPriceList(dbAdvertisement, advertisement.getKilometresLimit());
         dbAdvertisement.setDiscount(advertisement.getDiscount());
         return advertisementRepository.save(dbAdvertisement);
     }
@@ -93,21 +73,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         Advertisement dbAdvertisement = get(id);
         checkOwner(dbAdvertisement.getCar());
         dbAdvertisement.setPriceList(priceListService.get(advertisement.getPriceList().getId()));
-        PriceList priceList = dbAdvertisement.getPriceList();
-        if (priceList.getPricePerKm() != null && advertisement.getKilometresLimit() == null) {
-            throw new InvalidAdvertisementDataException("You have to set kilometres limit.", HttpStatus.BAD_REQUEST);
-        }
-        if (priceList.getPricePerKm() == null) {
-            dbAdvertisement.setKilometresLimit(null);
-        } else {
-            dbAdvertisement.setKilometresLimit(advertisement.getKilometresLimit());
-        }
-        if (priceList.getPriceForCDW() != null) {
-            dbAdvertisement.setCDW(true);
-        } else {
-            dbAdvertisement.setCDW(false);
-        }
-
+        dbAdvertisement = setPriceList(dbAdvertisement, advertisement.getKilometresLimit());
         dbAdvertisement.setDiscount(advertisement.getDiscount());
         return advertisementRepository.save(dbAdvertisement);
     }
@@ -124,13 +90,13 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     @Override
     public void delete(Long id) {
         Advertisement advertisement = get(id);
-        //TODO: Odbi sve zahteve koji su PENDING
         checkOwner(advertisement.getCar());
         if (advertisementRepository.findByIdAndLogicalStatusAndRentInfosRentRequestRentRequestStatusAndRentInfosDateTimeToGreaterThanEqual(advertisement.getId(), LogicalStatus.EXISTING, RentRequestStatus.PAID, LocalDateTime.now()) != null) {
             throw new InvalidAdvertisementDataException("This advertisement is in use and therefore can not be deleted.", HttpStatus.BAD_REQUEST);
         }
         advertisement.setLogicalStatus(LogicalStatus.DELETED);
         advertisementRepository.save(advertisement);
+
     }
 
     @Override
@@ -142,19 +108,110 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         return advertisement;
     }
 
-    public List<Advertisement> getAll(String status) {
-        List<Advertisement> ads = null;
-        if (status.equals("all")) {
-            ads = advertisementRepository.findAllByLogicalStatusNot(LogicalStatus.DELETED);
-        } else if (status.equals("active")) {
-            ads = advertisementRepository.findAllByLogicalStatusNotAndDateToEqualsOrLogicalStatusNotAndDateToGreaterThan(LogicalStatus.DELETED, null, LogicalStatus.DELETED,
-                    LocalDate.now());
+    @Override
+    public List<Advertisement> searchAdvertisements(SearchParamsDTO searchParamsDTO) {
+        LocalDateTime dateTimeFrom = getDateConverted(searchParamsDTO.getDateTimeFrom());
+        LocalDateTime dateTimeTo = getDateConverted(searchParamsDTO.getDateTimeTo());
+        LocalDateTime todayPlus48h = (LocalDateTime.now().minusMinutes(3)).plusDays(2);
+        if (dateTimeFrom.isBefore(todayPlus48h)) {
+            throw new InvalidAdvertisementDataException("Date and time from must be at least 48h from now.", HttpStatus.BAD_REQUEST);
+        }
+        if (dateTimeTo.isBefore(todayPlus48h)) {
+            throw new InvalidAdvertisementDataException("Date and time to must be at least 48h from now.", HttpStatus.BAD_REQUEST);
+        }
+
+        SearchParamsDTO newSearchParamsDTO = replaceNullValues(searchParamsDTO);
+
+        List<Advertisement> searchedAdsList;
+        if (newSearchParamsDTO.getCDW() != null && newSearchParamsDTO.getCDW()) {
+            searchedAdsList = advertisementRepository.findByCDWAndLogicalStatusAndDateFromLessThanEqualAndDateToIsNotNullAndDateToGreaterThanEqualAndPickUpPointContainsIgnoringCaseAndCarMakeNameContainsAndCarModelNameContainsAndCarFuelTypeNameContainsAndCarGearBoxTypeNameContainsAndCarBodyStyleNameContainsAndCarMileageInKmLessThanEqualAndCarKidsSeatsGreaterThanEqualAndCarAvgRatingGreaterThanEqualAndPriceListPricePerDayBetweenOrCDWAndLogicalStatusAndDateFromLessThanEqualAndDateToIsNullAndPickUpPointContainsIgnoringCaseAndCarMakeNameContainsAndCarModelNameContainsAndCarFuelTypeNameContainsAndCarGearBoxTypeNameContainsAndCarBodyStyleContainsAndCarMileageInKmLessThanEqualAndCarKidsSeatsGreaterThanEqualAndCarAvgRatingGreaterThanEqualAndPriceListPricePerDayBetween(
+                    newSearchParamsDTO.getCDW(), LogicalStatus.EXISTING, dateTimeFrom.toLocalDate(), dateTimeTo.toLocalDate(), newSearchParamsDTO.getPickUpPoint(),
+                    newSearchParamsDTO.getMake(), newSearchParamsDTO.getModel(), newSearchParamsDTO.getFuelType(), newSearchParamsDTO.getGearBoxType(),
+                    newSearchParamsDTO.getBodyStyle(), newSearchParamsDTO.getMileageInKm(), newSearchParamsDTO.getKidsSeats(), newSearchParamsDTO.getMinRating().doubleValue(),
+                    newSearchParamsDTO.getMinPricePerDay(), newSearchParamsDTO.getMaxPricePerDay(),
+                    newSearchParamsDTO.getCDW(), LogicalStatus.EXISTING, dateTimeFrom.toLocalDate(), newSearchParamsDTO.getPickUpPoint(), newSearchParamsDTO.getMake(),
+                    newSearchParamsDTO.getModel(), newSearchParamsDTO.getFuelType(), newSearchParamsDTO.getGearBoxType(), newSearchParamsDTO.getBodyStyle(),
+                    newSearchParamsDTO.getMileageInKm(), newSearchParamsDTO.getKidsSeats(), newSearchParamsDTO.getMinRating().doubleValue(),
+                    newSearchParamsDTO.getMinPricePerDay(), newSearchParamsDTO.getMaxPricePerDay()
+            );
         } else {
-            ads = advertisementRepository.findAllByLogicalStatusNotAndDateToLessThanEqual(LogicalStatus.DELETED, LocalDate.now());
+            searchedAdsList = advertisementRepository.findByLogicalStatusAndDateFromLessThanEqualAndDateToIsNotNullAndDateToGreaterThanEqualAndPickUpPointContainsIgnoringCaseAndCarMakeNameContainsAndCarModelNameContainsAndCarFuelTypeNameContainsAndCarGearBoxTypeNameContainsAndCarBodyStyleNameContainsAndCarMileageInKmLessThanEqualAndCarKidsSeatsGreaterThanEqualAndCarAvgRatingGreaterThanEqualAndPriceListPricePerDayBetweenOrLogicalStatusAndDateFromLessThanEqualAndDateToIsNullAndPickUpPointContainsIgnoringCaseAndCarMakeNameContainsAndCarModelNameContainsAndCarFuelTypeNameContainsAndCarGearBoxTypeNameContainsAndCarBodyStyleNameContainsAndCarMileageInKmLessThanEqualAndCarKidsSeatsGreaterThanEqualAndCarAvgRatingGreaterThanEqualAndPriceListPricePerDayBetween(
+                    LogicalStatus.EXISTING, dateTimeFrom.toLocalDate(), dateTimeTo.toLocalDate(), newSearchParamsDTO.getPickUpPoint(),
+                    newSearchParamsDTO.getMake(), newSearchParamsDTO.getModel(), newSearchParamsDTO.getFuelType(), newSearchParamsDTO.getGearBoxType(),
+                    newSearchParamsDTO.getBodyStyle(), newSearchParamsDTO.getMileageInKm(), newSearchParamsDTO.getKidsSeats(), newSearchParamsDTO.getMinRating().doubleValue(),
+                    newSearchParamsDTO.getMinPricePerDay(), newSearchParamsDTO.getMaxPricePerDay(),
+                    LogicalStatus.EXISTING, dateTimeFrom.toLocalDate(), newSearchParamsDTO.getPickUpPoint(), newSearchParamsDTO.getMake(),
+                    newSearchParamsDTO.getModel(), newSearchParamsDTO.getFuelType(), newSearchParamsDTO.getGearBoxType(), newSearchParamsDTO.getBodyStyle(),
+                    newSearchParamsDTO.getMileageInKm(), newSearchParamsDTO.getKidsSeats(), newSearchParamsDTO.getMinRating().doubleValue(),
+                    newSearchParamsDTO.getMinPricePerDay(), newSearchParamsDTO.getMaxPricePerDay()
+            );
+        }
+
+        searchedAdsList.stream().filter(ad -> ad.getKilometresLimit() == null || ad.getKilometresLimit() >= newSearchParamsDTO.getKilometresLimit()).collect(Collectors.toList());
+
+        return searchedAdsList;
+    }
+
+    @Override
+    public List<Advertisement> getAll(String status) {
+        List<Advertisement> ads;
+        switch (status) {
+            case "all":
+                ads = advertisementRepository.findAllByLogicalStatusNot(LogicalStatus.DELETED);
+                break;
+            case "active":
+                ads = advertisementRepository.findAllByLogicalStatusNotAndDateToEqualsOrLogicalStatusNotAndDateToGreaterThan(LogicalStatus.DELETED, null, LogicalStatus.DELETED,
+                        LocalDate.now());
+                break;
+            default:
+                ads = advertisementRepository.findAllByLogicalStatusNotAndDateToLessThanEqual(LogicalStatus.DELETED, LocalDate.now());
+                break;
         }
         return ads;
     }
 
+    private LocalDateTime getDateConverted(String dateTime) throws DateTimeParseException {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        return LocalDateTime.parse(dateTime, formatter);
+    }
+
+    private SearchParamsDTO replaceNullValues(SearchParamsDTO searchParamsDTO) {
+        if (searchParamsDTO.getMake() == null) {
+            searchParamsDTO.setMake("");
+        }
+        if (searchParamsDTO.getModel() == null) {
+            searchParamsDTO.setModel("");
+        }
+        if (searchParamsDTO.getMinRating() == null) {
+            searchParamsDTO.setMinRating(0);
+        }
+        if (searchParamsDTO.getFuelType() == null) {
+            searchParamsDTO.setFuelType("");
+        }
+        if (searchParamsDTO.getGearBoxType() == null) {
+            searchParamsDTO.setGearBoxType("");
+        }
+        if (searchParamsDTO.getBodyStyle() == null) {
+            searchParamsDTO.setBodyStyle("");
+        }
+        if (searchParamsDTO.getMinPricePerDay() == null) {
+            searchParamsDTO.setMinPricePerDay(0.0);
+        }
+        if (searchParamsDTO.getMaxPricePerDay() == null) {
+            searchParamsDTO.setMaxPricePerDay(Double.MAX_VALUE);
+        }
+        if (searchParamsDTO.getKidsSeats() == null) {
+            searchParamsDTO.setKidsSeats(0);
+        }
+        if (searchParamsDTO.getMileageInKm() == null) {
+            searchParamsDTO.setMileageInKm(Integer.MAX_VALUE);
+        }
+        if (searchParamsDTO.getKilometresLimit() == null) {
+            searchParamsDTO.setKilometresLimit(0);
+        }
+
+        return searchParamsDTO;
+    }
     private void checkIfCarIsAvailable(Long carId, LocalDate advertisementDateFrom, LocalDate advertisementDateTo) {
         if (!advertisementRepository.findByCarIdAndLogicalStatusNotAndDateToEquals(carId, LogicalStatus.DELETED, null).isEmpty()) {
             throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
@@ -171,30 +228,6 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         }
     }
 
-    private void checkIfCarIsAvailableForEdit(Long carId, LocalDate advertisementDateFrom, LocalDate advertisementDateTo, Long advertisementId) {
-        List<Advertisement> advertisements = advertisementRepository.findByCarIdAndLogicalStatusNotAndDateToEquals(carId, LogicalStatus.DELETED, null);
-        if (!advertisements.isEmpty() && advertisements.size() != 1) {
-            throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
-        }
-        if (advertisements.size() == 1 && !advertisements.get(0).getId().equals(advertisementId)) {
-            throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
-        }
-        if (advertisementDateTo == null) {
-            advertisements = advertisementRepository.findByCarIdAndLogicalStatusNotAndDateToGreaterThanEqual(carId, LogicalStatus.DELETED, advertisementDateFrom);
-            if (!advertisements.isEmpty()) {
-                if (advertisements.size() == 1 && !advertisements.get(0).getId().equals(advertisementId)) {
-                    throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
-                }
-            }
-        } else {
-            advertisements = advertisementRepository.findByCarIdAndLogicalStatusNotAndDateFromLessThanEqualAndDateToGreaterThanEqual(carId, LogicalStatus.DELETED, advertisementDateTo, advertisementDateFrom);
-            if (!advertisements.isEmpty()) {
-                if (advertisements.size() == 1 && !advertisements.get(0).getId().equals(advertisementId)) {
-                    throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
-                }
-            }
-        }
-    }
 
     private void checkDate(LocalDate dateFrom, LocalDate dateTo) {
         if (dateFrom.isBefore(LocalDate.now()) || (dateTo != null && dateTo.isBefore(LocalDate.now()))) {
@@ -217,6 +250,23 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         }
     }
 
+    private Advertisement setPriceList(Advertisement dbAdvertisement, Integer kilometresLimit) {
+        PriceList priceList = dbAdvertisement.getPriceList();
+        if (priceList.getPricePerKm() != null && kilometresLimit == null) {
+            throw new InvalidAdvertisementDataException("You have to set kilometres limit.", HttpStatus.BAD_REQUEST);
+        }
+        if (priceList.getPricePerKm() == null) {
+            dbAdvertisement.setKilometresLimit(null);
+        } else {
+            dbAdvertisement.setKilometresLimit(kilometresLimit);
+        }
+        if (priceList.getPriceForCDW() != null) {
+            dbAdvertisement.setCDW(true);
+        } else {
+            dbAdvertisement.setCDW(false);
+        }
+        return dbAdvertisement;
+    }
     @Autowired
     public AdvertisementServiceImpl(CarService carService, PriceListService priceListService, RentInfoService rentInfoService, UserService userService,
                                     AdvertisementRepository advertisementRepository, AdvertisementDtoMapper advertisementMapper) {

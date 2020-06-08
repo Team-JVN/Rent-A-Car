@@ -2,41 +2,53 @@ package jvn.RentACar.mapper;
 
 import jvn.RentACar.dto.both.RentInfoDTO;
 import jvn.RentACar.dto.both.RentRequestDTO;
+import jvn.RentACar.model.Advertisement;
 import jvn.RentACar.model.RentInfo;
 import jvn.RentACar.model.RentRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Component
 public class RentRequestDtoMapper implements MapperInterface<RentRequest, RentRequestDTO> {
     private ModelMapper modelMapper;
 
+    private ClientDtoMapper clientDtoMapper;
+
+    private AdvertisementWithPicturesDtoMapper advertisementWithPicturesDtoMapper;
+
     @Override
-    public RentRequest toEntity(RentRequestDTO dto) {
-        RentRequest entity = modelMapper.map(dto, RentRequest.class);
-        List<RentInfo> entityRentInfos = new ArrayList<>(entity.getRentInfos().size());
-        entityRentInfos.addAll(entity.getRentInfos());
+    public RentRequest toEntity(RentRequestDTO dto)  {
+        RentRequest entity = new RentRequest();
+        if (dto.getClient() != null) {
+            entity.setClient(clientDtoMapper.toEntity(dto.getClient()));
+        }
+        entity.setTotalPrice(dto.getTotalPrice());
+        entity.setId(dto.getId());
 
-        List<RentInfoDTO> rentInfos = new ArrayList<>(dto.getRentInfos().size());
-        rentInfos.addAll(dto.getRentInfos());
-
-        for (int i = 0; i < entityRentInfos.size(); i++) {
-            RentInfoDTO rentInfoDTO = rentInfos.get(i);
-
-            RentInfo rentInfo = entityRentInfos.get(i);
+        List<RentInfo> entityRentInfos = new ArrayList<>(dto.getRentInfos().size());
+        for (RentInfoDTO rentInfoDTO : dto.getRentInfos()) {
+            RentInfo rentInfo = new RentInfo();
             rentInfo.setDateTimeFrom(getLocalDateTime(rentInfoDTO.getDateTimeFrom()));
             rentInfo.setDateTimeTo(getLocalDateTime(rentInfoDTO.getDateTimeTo()));
+            Advertisement advertisement = new Advertisement();
+            advertisement.setId(rentInfoDTO.getAdvertisement().getId());
+            rentInfo.setAdvertisement(advertisement);
+            rentInfo.setOptedForCDW(rentInfoDTO.getOptedForCDW());
+            rentInfo.setId(rentInfoDTO.getId());
+            entityRentInfos.add(rentInfo);
         }
-
+        entity.setRentInfos(new HashSet<>(entityRentInfos));
         return entity;
     }
 
@@ -54,7 +66,9 @@ public class RentRequestDtoMapper implements MapperInterface<RentRequest, RentRe
     }
 
     @Autowired
-    public RentRequestDtoMapper(ModelMapper modelMapper) {
+    public RentRequestDtoMapper(ModelMapper modelMapper,ClientDtoMapper clientDtoMapper, AdvertisementWithPicturesDtoMapper advertisementWithPicturesDtoMapper) {
         this.modelMapper = modelMapper;
+        this.clientDtoMapper = clientDtoMapper;
+        this.advertisementWithPicturesDtoMapper =advertisementWithPicturesDtoMapper;
     }
 }

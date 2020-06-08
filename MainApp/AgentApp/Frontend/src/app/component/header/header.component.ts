@@ -28,7 +28,7 @@ export class HeaderComponent implements OnInit {
 
   }
 
-  hasPermissionManageAdvertisement() {
+  hasPermissionManageAdvertisements() {
     return this.authentificationService.hasPermission("MANAGE_ADVERTISEMENTS");
   }
 
@@ -56,24 +56,16 @@ export class HeaderComponent implements OnInit {
     return this.authentificationService.hasPermission("MANAGE_ROLES");
   }
 
-  hasPermissionCreateRentRequest() {
-    return this.authentificationService.hasPermission("CREATE_RENT_REQUEST");
+  hasPermissionAgentEditProfile() {
+    return this.authentificationService.hasPermission("AGENT_EDIT_PROFILE");
   }
 
-  hasPermissionGetMyRentRequests() {
-    return this.authentificationService.hasPermission("GET_MY_RENT_REQUESTS");
+  hasPermissionClientEditProfile() {
+    return this.authentificationService.hasPermission("CLIENT_EDIT_PROFILE");
   }
 
-  hasPermissionGetReceivedRentRequests() {
-    return this.authentificationService.hasPermission("GET_RECEIVED_RENT_REQUESTS");
-  }
-
-  hasPermissionDeleteRentRequest() {
-    return this.authentificationService.hasPermission("DELETE_RENT_REQUEST");
-  }
-
-  hasPermissionChangeRentRequestStatus() {
-    return this.authentificationService.hasPermission("CHANGE_RENT_REQUEST_STATUS");
+  hasPermissionMyRentRequests() {
+    return this.authentificationService.hasPermission("MY_RENT_REQUESTS");
   }
 
   isLoggedIn() {

@@ -98,7 +98,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Client edit(Long id, Client client) {
-        Client dbClient = get(client.getId());
+        Client dbClient = get(id);
         if (clientRepository.findByPhoneNumberAndIdNot(client.getPhoneNumber(), id) != null) {
             throw new InvalidClientDataException("Client with same phone number already exists.",
                     HttpStatus.BAD_REQUEST);
@@ -106,7 +106,8 @@ public class ClientServiceImpl implements ClientService {
         dbClient.setPhoneNumber(client.getPhoneNumber());
         dbClient.setName(client.getName());
         dbClient.setAddress(client.getAddress());
-        return clientRepository.save(dbClient);
+        dbClient = clientRepository.save(dbClient);
+        return dbClient;
     }
 
     @Override

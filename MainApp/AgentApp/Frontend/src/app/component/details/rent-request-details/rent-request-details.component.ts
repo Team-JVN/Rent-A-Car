@@ -10,6 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Location } from '@angular/common';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
+import { Client } from 'src/app/model/client';
 
 @Component({
   selector: 'app-rent-request-details',
@@ -20,7 +21,7 @@ export class RentRequestDetailsComponent implements OnInit {
   messageForm: FormGroup;
 
   rentRequestId: number;
-  rentRequest: RentRequest;
+  rentRequest: RentRequest = new RentRequest(new Client("", "", "", ""), null, 0, "");
   loggedInUserEmail: string;
 
   // messages: Message[];
@@ -53,9 +54,9 @@ export class RentRequestDetailsComponent implements OnInit {
       )
     });
     this.loggedInUserEmail = this.authentificationService.getLoggedInUserEmail();
-    // this.getMessages();
+    this.getMessages();
 
-    // //Delete this
+    //Delete this
     // this.messages = [new Message("Cao sta radi,kako si, da li si dorbo.Kako su tvoji. sta radis", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 1), new Message("Kako si", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 2),
     // new Message("Dobro", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 1), new Message("To?", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 2)];
     // this.rentRequestId = 2;
@@ -81,7 +82,7 @@ export class RentRequestDetailsComponent implements OnInit {
     //   }
     // );
 
-    //this.dialog.open(ReviewFeedbackComponent, { data: { feedback: null, rentInfoId: rentInfo.id, rentRequestId: this.rentRequestId } });
+    // this.dialog.open(ReviewFeedbackComponent, { data: { feedback: null, rentInfoId: rentInfo.id, rentRequestId: this.rentRequestId } });
   }
 
   checkIfCanCreateComment(rentInfo: RentInfo) {
@@ -99,15 +100,15 @@ export class RentRequestDetailsComponent implements OnInit {
     }
     return false;
   }
-  // getMessages() {
-  //   this.messageService.getMessages(this.rentRequest.client).subscribe(
-  //     (data: Message[]) => {
-  //       this.toastr.success('Success!', 'Fetch messages');
-  //       this.messages = data;
-  //     },
-  //     (httpErrorResponse: HttpErrorResponse) => {
-  //       this.toastr.error(httpErrorResponse.error.message, 'Fetch messages');
-  //     }
-  //   );
-  // }
+  getMessages() {
+    // this.messageService.getMessages(this.rentRequest.client).subscribe(
+    //   (data: Message[]) => {
+    //     this.toastr.success('Success!', 'Fetch messages');
+    //     this.messages = data;
+    //   },
+    //   (httpErrorResponse: HttpErrorResponse) => {
+    //     this.toastr.error(httpErrorResponse.error.message, 'Fetch messages');
+    //   }
+    // );
+  }
 }

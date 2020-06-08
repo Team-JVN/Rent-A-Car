@@ -55,7 +55,7 @@ public class RentRequestServiceImpl implements RentRequestService {
         Long loggedInUserId = loggedInUser.getId();
         List<RentInfo> rentInfos = new ArrayList<>(rentRequest.getRentInfos());
         List<AdvertisementWithIdsDTO> advertisementDTOS = getAdvertisements(jwt, user, rentInfos);
-        Long ownerId = advertisementOwnerId(advertisementDTOS);
+        Long ownerId = getAdvertisementOwnerId(advertisementDTOS);
         rentRequest.setAdvertisementOwner(ownerId);
 
         if (ownerId.equals(loggedInUserId)) {
@@ -401,7 +401,7 @@ public class RentRequestServiceImpl implements RentRequestService {
         return advertisementClient.get(jwt, user, new ArrayList<>(advertisements));
     }
 
-    private Long advertisementOwnerId(List<AdvertisementWithIdsDTO> advertisementDTOS) {
+    private Long getAdvertisementOwnerId(List<AdvertisementWithIdsDTO> advertisementDTOS) {
         Long ownerId = advertisementDTOS.get(0).getOwner();
         for (AdvertisementWithIdsDTO advertisementDTO : advertisementDTOS) {
             if (!advertisementDTO.getOwner().equals(ownerId)) {

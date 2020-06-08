@@ -3,7 +3,7 @@ import { AuthentificationService } from '../service/authentification.service';
 import { Injectable } from '@angular/core';
 import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 @Injectable({ providedIn: 'root' })
-export class DeleteRentRequestGuard implements CanActivate {
+export class AgentEditProfileGuard implements CanActivate {
     constructor(
         private router: Router,
         private authentificationService: AuthentificationService
@@ -12,7 +12,7 @@ export class DeleteRentRequestGuard implements CanActivate {
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
 
         if (this.authentificationService.isLoggedIn()) {
-            if (this.authentificationService.hasPermission("DELETE_RENT_REQUEST")) {
+            if (this.authentificationService.hasPermission("AGENT_EDIT_PROFILE")) {
                 return true;
             }
             else {

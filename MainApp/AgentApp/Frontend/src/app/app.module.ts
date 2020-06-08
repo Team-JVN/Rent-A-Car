@@ -1,4 +1,4 @@
-import { GetMyRentRequestsGuard } from './guard/get.my.rent.requests.guard';
+
 import { ManageCarsGuard } from './guard/manage.cars.guard';
 import { ManageCodeBooksGuard } from './guard/manage.code.books.guard';
 import { ManageAdvertisemetsGuard } from './guard/manage.advertisements.guard';
@@ -46,7 +46,6 @@ import { ViewPicturesComponent } from './component/view-pictures/view-pictures.c
 import { EditAdvertisementComponent } from './component/edit/edit-advertisement/edit-advertisement.component';
 import { ListClientsComponent } from './component/list/list-clients/list-clients.component';
 import { AddClientComponent } from './component/add/add-client/add-client.component';
-import { EditClientComponent } from './component/edit/edit-client/edit-client.component';
 import { AdvertisementDetailsComponent } from './component/advertisement-details/advertisement-details.component';
 import { ListRentRequestsComponent } from './component/list/list-rent-requests/list-rent-requests.component';
 import { LoginComponent } from './component/authentification/login/login.component';
@@ -71,14 +70,19 @@ import { ViewPermissionsComponent } from './component/view/view-permissions/view
 import { ManageClientsGuard } from './guard/manage.clients.guard';
 import { ManagePriceListsGuard } from './guard/manage.price.lists.guard';
 import { ManageRentReportsGuard } from './guard/manage.rent.reports.guard';
-import { CreateRentRequestGuard } from './guard/create.rent.request.guard';
-import { GetReceivedRentRequestsGuard } from './guard/get.received.rent.requests.guard';
-import { DeleteRentRequestGuard } from './guard/delete.rent.request.guard';
-import { ChangeRentRequestStatusGuard } from './guard/change.rent.request.status';
 import { ManageRoleGuard } from './guard/manage.role.guard';
 import { ActivateAccountComponent } from './component/authentification/activate-account/activate-account.component';
 import { ResetPasswordEnterEmailComponent } from './component/authentification/reset-password-enter-email/reset-password-enter-email.component';
 import { ResetPasswordEnterNewPassComponent } from './component/authentification/reset-password-enter-new-pass/reset-password-enter-new-pass.component';
+import { MyRentRequestsGuard } from './guard/my.rent.requests.guard';
+import { AgentEditProfileGuard } from './guard/agent.edit.profile';
+import { ClientEditProfileGuard } from './guard/client.edit.profile';
+import { ListClientRentRequestsComponent } from './component/list/list-client-rent-requests/list-client-rent-requests.component';
+import { SearchAdvertisementsComponent } from './component/list/search-advertisements/search-advertisements.component';
+import { RentingCartComponent } from './component/renting-cart/renting-cart.component';
+import { AddToCartComponent } from './component/add/add-to-cart/add-to-cart.component';
+import { EditAgentComponent } from './component/edit/editPersonalInfo/edit-agent/edit-agent.component';
+import { EditClientComponent } from './component/edit/editPersonalInfo/edit-client/edit-client.component';
 
 @NgModule({
   declarations: [
@@ -108,7 +112,6 @@ import { ResetPasswordEnterNewPassComponent } from './component/authentification
     EditAdvertisementComponent,
     ListClientsComponent,
     AddClientComponent,
-    EditClientComponent,
     AddRentRequestComponent,
     AdvertisementDetailsComponent,
     ListRentRequestsComponent,
@@ -134,6 +137,12 @@ import { ResetPasswordEnterNewPassComponent } from './component/authentification
     ActivateAccountComponent,
     ResetPasswordEnterEmailComponent,
     ResetPasswordEnterNewPassComponent,
+    ListClientRentRequestsComponent,
+    SearchAdvertisementsComponent,
+    RentingCartComponent,
+    AddToCartComponent,
+    EditAgentComponent,
+    EditClientComponent
   ],
   imports: [
     BrowserModule,
@@ -176,7 +185,6 @@ import { ResetPasswordEnterNewPassComponent } from './component/authentification
     EditAdvertisementComponent,
     EditAdvertisementPartialComponent,
     AddClientComponent,
-    EditClientComponent,
     AddRentRequestComponent,
     AddMakeComponent,
     EditModelComponent,
@@ -198,11 +206,9 @@ import { ResetPasswordEnterNewPassComponent } from './component/authentification
     ManageClientsGuard,
     ManagePriceListsGuard,
     ManageRentReportsGuard,
-    CreateRentRequestGuard,
-    GetMyRentRequestsGuard,
-    GetReceivedRentRequestsGuard,
-    DeleteRentRequestGuard,
-    ChangeRentRequestStatusGuard,
+    MyRentRequestsGuard,
+    AgentEditProfileGuard,
+    ClientEditProfileGuard,
     ManageRoleGuard
   ],
   bootstrap: [AppComponent]

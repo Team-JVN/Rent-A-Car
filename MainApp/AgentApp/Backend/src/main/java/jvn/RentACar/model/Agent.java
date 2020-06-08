@@ -17,15 +17,19 @@ import java.util.HashSet;
 @DiscriminatorValue("AGENT")
 public class Agent extends User {
 
+    @Column(columnDefinition = "VARCHAR(10)", unique = true)
+    private String phoneNumber;
+
     @Column
     private String taxIdNumber;
 
     @Enumerated(EnumType.STRING)
     private AgentStatus status;
 
-    public Agent(String name, String email, String password, String address, String taxIdNumber) {
+    public Agent(String name, String email, String password, String address, String taxIdNumber,String phoneNumber) {
         super(null, name, email, password, address, true, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(), null, new Timestamp(DateTime.now().getMillis()));
         this.taxIdNumber = taxIdNumber;
         this.status = AgentStatus.INACTIVE;
+        this.phoneNumber = phoneNumber;
     }
 }
