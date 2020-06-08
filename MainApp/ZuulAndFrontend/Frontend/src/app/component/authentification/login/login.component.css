@@ -8,11 +8,12 @@ mat-card {
 }
 
 .reset-password {
+    font-family: 'Comfortaa', sans-serif;
     text-align: center;
 }
 
 .link-color {
-    color: #3f51b5;
+    color: #009688;
 }
 
 .hide-btn {
