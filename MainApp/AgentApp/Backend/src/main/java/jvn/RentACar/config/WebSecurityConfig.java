@@ -64,7 +64,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                 .hasAuthority("MANAGE_CARS")
 
                                 .antMatchers(HttpMethod.POST,"/api/client").hasAnyAuthority("MANAGE_CLIENTS","MANAGE_ADVERTISEMENTS")
-                                .antMatchers( "/api/client/{id}").hasAnyAuthority("MANAGE_CLIENTS","MANAGE_ADVERTISEMENTS")
+                                .antMatchers(HttpMethod.GET,"/api/client/{id}").hasAnyAuthority("MANAGE_CLIENTS","MANAGE_ADVERTISEMENTS")
 
                                 .antMatchers(HttpMethod.PUT, "/api/client")
                                 .hasAuthority("CLIENT_EDIT_PROFILE")
@@ -88,6 +88,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                 .antMatchers(HttpMethod.POST, "/api/rent-request").hasAnyAuthority("MANAGE_ADVERTISEMENTS","MY_RENT_REQUESTS")
 
                                 .antMatchers(HttpMethod.GET, "/api/rent-request/{status}/mine")
+                                .hasAuthority("MY_RENT_REQUESTS")
+                                .antMatchers(HttpMethod.PUT, "/api/rent-request/{rentRequestId}/rent-info/{rentInfoId}/pay")
                                 .hasAuthority("MY_RENT_REQUESTS")
 
                                 .antMatchers(HttpMethod.GET,

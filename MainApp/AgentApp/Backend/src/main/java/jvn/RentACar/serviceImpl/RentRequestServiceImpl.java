@@ -53,6 +53,7 @@ public class RentRequestServiceImpl implements RentRequestService {
             rentRequest.setClient(clientService.get(rentRequest.getClient().getId()));
             rentRequest.setRentRequestStatus(RentRequestStatus.PAID);
         } else {
+            hasDebt(user.getId());
             rentRequest.setClient((Client) user);
             rentRequest.setRentRequestStatus(RentRequestStatus.PENDING);
         }
@@ -349,6 +350,13 @@ public class RentRequestServiceImpl implements RentRequestService {
             }
         };
     }
+
+    private void hasDebt(Long loggedInUserId) {
+        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosRentReportPaidAndClientId(RentRequestStatus.PAID, false, loggedInUserId).isEmpty()) {
+            throw new InvalidRentRequestDataException("You are not allowed to create rent requests because you have outstanding debts. ", HttpStatus.BAD_REQUEST);
+        }
+    }
+
 
     private String getLocalhostURL() {
         return environment.getProperty("LOCALHOST_URL");

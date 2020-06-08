@@ -18,6 +18,8 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class RentRequestDtoMapper implements MapperInterface<RentRequest, RentRequestDTO> {
@@ -55,6 +57,15 @@ public class RentRequestDtoMapper implements MapperInterface<RentRequest, RentRe
     @Override
     public RentRequestDTO toDto(RentRequest entity) {
         RentRequestDTO dto = modelMapper.map(entity, RentRequestDTO.class);
+        Map<Long, RentInfo> rentInfoMap = entity.getRentInfos().stream().collect(Collectors.toMap(RentInfo::getId, rentInfo -> rentInfo));
+        for (RentInfoDTO rentInfoDTO: dto.getRentInfos()) {
+            RentInfo rentInfo = rentInfoMap.get(rentInfoDTO.getId());
+            if (rentInfo.getRentReport() != null && rentInfo.getRentReport().getAdditionalCost() != null) {
+                rentInfoDTO.setAdditionalCost(rentInfo.getRentReport().getAdditionalCost());
+                rentInfoDTO.setPaid(rentInfo.getRentReport().getPaid());
+            }
+        }
+
         return dto;
     }
 

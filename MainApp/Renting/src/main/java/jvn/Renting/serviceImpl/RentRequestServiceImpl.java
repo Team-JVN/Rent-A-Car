@@ -68,6 +68,7 @@ public class RentRequestServiceImpl implements RentRequestService {
             if (!loggedInUser.getCanCreateRentRequests()) {
                 throw new InvalidRentRequestDataException("You are not allowed to create rent requests because you canceled your reservations many times. ", HttpStatus.BAD_REQUEST);
             }
+            hasDebt(loggedInUserId);
             rentRequest.setClient(loggedInUserId);
             rentRequest.setRentRequestStatus(RentRequestStatus.PENDING);
         }
@@ -295,6 +296,11 @@ public class RentRequestServiceImpl implements RentRequestService {
                 throw new InvalidRentRequestDataException("You are not allowed to see rent requests of this advertisement.",
                         HttpStatus.NOT_FOUND);
             }
+
+            if (rentInfo.getRentReport() != null && rentInfo.getRentReport().getAdditionalCost() != null) {
+                rentInfoDTO.setAdditionalCost(rentInfo.getRentReport().getAdditionalCost());
+                rentInfoDTO.setPaid(rentInfo.getRentReport().getPaid());
+            }
         }
         rentRequestDTO.setRentInfos(rentInfoDTOS);
         return rentRequestDTO;
@@ -453,6 +459,12 @@ public class RentRequestServiceImpl implements RentRequestService {
                 throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
                         HttpStatus.BAD_REQUEST);
             }
+        }
+    }
+
+    private void hasDebt(Long loggedInUserId) {
+        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosRentReportPaidAndClient(RentRequestStatus.PAID, false, loggedInUserId).isEmpty()) {
+            throw new InvalidRentRequestDataException("You are not allowed to create rent requests because you have outstanding debts. ", HttpStatus.BAD_REQUEST);
         }
     }
 

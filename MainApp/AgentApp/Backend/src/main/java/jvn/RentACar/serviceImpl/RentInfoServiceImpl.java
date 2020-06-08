@@ -2,6 +2,7 @@ package jvn.RentACar.serviceImpl;
 
 import jvn.RentACar.enumeration.RentRequestStatus;
 import jvn.RentACar.exceptionHandler.InvalidCarDataException;
+import jvn.RentACar.exceptionHandler.InvalidRentRequestDataException;
 import jvn.RentACar.model.RentInfo;
 import jvn.RentACar.repository.RentInfoRepository;
 import jvn.RentACar.service.RentInfoService;
@@ -27,6 +28,17 @@ public class RentInfoServiceImpl implements RentInfoService {
         for (RentInfo rentInfo : rentInfos) {
             delete(rentInfo);
         }
+    }
+
+    @Override
+    public RentInfo pay(Long rentRequestId, Long rentInfoId, Long loggedInUserId) {
+        RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestIdAndRentRequestRentRequestStatusAndRentReportPaidAndRentRequestClientId(
+                rentInfoId, rentRequestId, RentRequestStatus.PAID, false, loggedInUserId);
+        if (rentInfo == null) {
+            throw new InvalidRentRequestDataException("This rent info is already paid.", HttpStatus.BAD_REQUEST);
+        }
+        rentInfo.getRentReport().setPaid(true);
+        return rentInfoRepository.save(rentInfo);
     }
 
     private void delete(RentInfo rentInfo) {
