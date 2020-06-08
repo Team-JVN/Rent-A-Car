@@ -45,6 +45,10 @@ export class HeaderComponent implements OnInit {
     return this.authentificationService.hasPermission("MANAGE_CARS");
   }
 
+  hasPermissionGetStatistics() {
+    return this.authentificationService.hasPermission("GET_STATISTICS");
+  }
+
   hasPermissionManageUsers() {
     return this.authentificationService.hasPermission("MANAGE_USERS");
   }

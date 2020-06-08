@@ -2,6 +2,7 @@ package jvn.Cars.repository;
 
 import jvn.Cars.enumeration.LogicalStatus;
 import jvn.Cars.model.Car;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,5 +15,7 @@ public interface CarRepository extends JpaRepository<Car, Long> {
     Car findOneByIdAndLogicalStatusNotAndOwner(Long id, LogicalStatus logicalStatus, Long owner);
 
     Car findByIdAndLogicalStatus(Long id, LogicalStatus logicalStatus);
+
+    List<Car> findFirst3ByLogicalStatus(LogicalStatus logicalStatus, Sort sort);
 
 }

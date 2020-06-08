@@ -1,3 +1,4 @@
+import { GetStatisticsGuard } from './guard/get.statistics.guard';
 import { AdminEditProfileGuard } from './guard/admin.edit.profile.guard';
 import { AgentEditProfileGuard } from './guard/agent.edit.profile.guard';
 import { ClientEditProfileGuard } from './guard/client.edit.profile.guard';
@@ -91,6 +92,12 @@ const routes: Routes = [
     component: ListCarsComponent,
     canActivate: [ManageCarsGuard],
   },
+  /** GET STATISTICS */
+  {
+    path: 'statistics',
+    component: CarsStatisticsComponent,
+    canActivate: [GetStatisticsGuard],
+  },
   /** MANAGE PRICE LISTS */
   {
     path: 'price-lists',
@@ -150,11 +157,6 @@ const routes: Routes = [
   {
     path: "reset-password",
     component: ResetPasswordEnterNewPassComponent,
-  },
-
-  {
-    path: 'statistics',
-    component: CarsStatisticsComponent
   },
   {
     path: "client/pending-approval",

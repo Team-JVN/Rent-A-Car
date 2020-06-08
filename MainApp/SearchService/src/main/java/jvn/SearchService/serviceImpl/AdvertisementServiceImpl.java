@@ -63,6 +63,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         return advertisementRepository.findByIdInAndLogicalStatus(advertisements, LogicalStatus.EXISTING);
     }
 
+    @Override
     public List<Advertisement> searchAdvertisements(SearchParamsDTO searchParamsDTO) {
         LocalDateTime dateTimeFrom = getDateConverted(searchParamsDTO.getDateTimeFrom());
         LocalDateTime dateTimeTo = getDateConverted(searchParamsDTO.getDateTimeTo());
