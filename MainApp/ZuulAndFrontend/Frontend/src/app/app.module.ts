@@ -1,3 +1,4 @@
+import { GetStatisticsGuard } from './guard/get.statistics.guard';
 import { MyRentRequestsGuard } from './guard/my.rent.requests.guard';
 import { ManagePriceListsGuard } from './guard/manage.pricelists.guard';
 import { ManageAdvertisementsGuard } from './guard/manage.advertisements.guard';
@@ -235,6 +236,7 @@ import { AddToCartComponent } from './component/add/add-to-cart/add-to-cart.comp
     AgentEditProfileGuard,
     ClientEditProfileGuard,
     ManageCarsGuard,
+    GetStatisticsGuard,
     ManageCodeBooksGuard,
     ManageAdvertisementsGuard,
     ManagePriceListsGuard,

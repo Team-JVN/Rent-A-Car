@@ -31,6 +31,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/car", "/api/car/{id}", "/api/car/{id}/partial")
                 .hasAuthority("MANAGE_CARS")
 
+                .antMatchers("/api/car/statistics/{filter}")
+                .hasAuthority("GET_STATISTICS")
+
                 .antMatchers("/api/car/verify/{userId}/{carId}")
                 .hasAuthority("MANAGE_ADVERTISEMENTS")
 
@@ -41,6 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/body-style", "/api/fuel-type", "/api/gearbox-type",
                         "/api/make/", "/api/make/{makeId}/model")
                 .hasAuthority("MANAGE_CODE_BOOKS")
+
                 .anyRequest().authenticated().and()
 
                 .cors().and()

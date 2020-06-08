@@ -28,6 +28,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 import java.io.IOException;
 import java.util.List;
@@ -85,6 +86,13 @@ public class CarController {
     public ResponseEntity<Resource> get(@PathVariable @Positive(message = "Id must be positive.") Long id,
                                         @RequestParam(value = "fileName") String fileName) {
         return new ResponseEntity<>(carService.get(fileName), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/statistics/{filter}")
+    public ResponseEntity<List<CarWithPicturesDTO>> getStatistics(
+            @PathVariable(value = "filter") @Pattern(regexp = "(?i)(most-km-made|best-rated|most-commented)$", message = "Filter is not valid.") String filter) {
+
+        return new ResponseEntity<>(carService.getStatistics(filter).stream().map(carWithPicturesDtoMapper::toDto).collect(Collectors.toList()), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

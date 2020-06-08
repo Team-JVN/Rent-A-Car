@@ -14,6 +14,7 @@ import jvn.Cars.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -82,6 +83,24 @@ public class CarServiceImpl implements CarService {
     @Override
     public List<Car> get(UserDTO userDTO) {
         return carRepository.findAllByLogicalStatusNotAndOwner(LogicalStatus.DELETED, userDTO.getId());
+    }
+
+    @Override
+    public List<Car> getStatistics(String filter) {
+        String sortFilter = "";
+        switch (filter) {
+            case "most-km-made":
+                sortFilter = "mileageInKm";
+                break;
+            case "best-rated":
+                sortFilter = "avgRating";
+                break;
+            case "most-commented":
+                sortFilter = "commentsCount";
+                break;
+        }
+
+        return carRepository.findFirst3ByLogicalStatus(LogicalStatus.EXISTING, Sort.by(Sort.Direction.DESC, sortFilter));
     }
 
     @Override
