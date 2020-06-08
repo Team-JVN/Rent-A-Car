@@ -7,11 +7,16 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.util.List;
+
 @FeignClient(name = "renting")
 public interface RentingClient {
 
     @RequestMapping(method = RequestMethod.GET, path = "/api/rent-request/advertisement/{advId}/check-for-delete")
     boolean canDeleteAdvertisement(@RequestHeader("Auth") String token, @RequestHeader("user") String user, @PathVariable("advId") Long advId);
+
+    @RequestMapping(method = RequestMethod.GET, path = "/api/rent-request/advertisement/{advIds}/check-rent-infos")
+    boolean hasRentInfos(@RequestHeader("Auth") String token, @RequestHeader("user") String user, @PathVariable("advIds") List<Long> advIds);
 
     @RequestMapping(method = RequestMethod.GET, path = "/api/rent-request/advertisement/{advId}/edit-type")
     EditType getAdvertisementEditType(@RequestHeader("Auth") String token, @RequestHeader("user") String user, @PathVariable("advId") Long advId);

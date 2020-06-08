@@ -17,6 +17,8 @@ public class RabbitMQConfiguration {
 
     public static final String USERS_FOR_SEARCH = "users-for-search";
 
+    public static final String EDIT_PARTIAL_CAR = "edit-partial-car";
+
     @Bean
     public Queue queueCreatedAdvertisement() {
         return new Queue(ADVERTISEMENT_FOR_SEARCH, false);
@@ -40,6 +42,11 @@ public class RabbitMQConfiguration {
     @Bean
     public Queue queueUsersForSearch() {
         return new Queue(USERS_FOR_SEARCH, false);
+    }
+
+    @Bean
+    public Queue queueEditPartialCar() {
+        return new Queue(EDIT_PARTIAL_CAR, false);
     }
 }
 

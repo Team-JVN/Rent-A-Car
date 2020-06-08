@@ -1,7 +1,5 @@
-import { CarEdit } from './../model/carEdit';
 import { Car } from './../model/car';
 import { Router } from '@angular/router';
-import { BodyStyle } from '../model/bodyStyle';
 import { environment } from './../../environments/environment';
 import { Injectable } from '@angular/core';
 import { Subject, Observable } from 'rxjs';

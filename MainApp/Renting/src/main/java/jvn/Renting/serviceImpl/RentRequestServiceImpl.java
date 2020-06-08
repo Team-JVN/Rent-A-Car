@@ -15,18 +15,23 @@ import jvn.Renting.repository.RentRequestRepository;
 import jvn.Renting.service.RentRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,6 +46,8 @@ public class RentRequestServiceImpl implements RentRequestService {
     private SearchClient searchClient;
 
     private RentRequestProducer rentRequestProducer;
+
+    private TaskScheduler scheduler;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -72,9 +79,30 @@ public class RentRequestServiceImpl implements RentRequestService {
         savedRequest = rentRequestRepository.save(setRentInfosData(savedRequest, rentInfos, advertisementDTOS));
         if (savedRequest.getRentRequestStatus().equals(RentRequestStatus.PAID)) {
             rejectOtherRequests(savedRequest);
+        } else if (savedRequest.getRentRequestStatus().equals(RentRequestStatus.PENDING)) {
+            Instant today = (new Date()).toInstant();
+            executeRejectTask(savedRequest.getId(), today.plus(24, ChronoUnit.HOURS));
         }
 
         return savedRequest;
+    }
+
+    private Runnable createRunnable(final Long rentReqId) {
+        return () -> {
+            RentRequest rentRequest = rentRequestRepository.findOneById(rentReqId);
+            if (rentRequest.getRentRequestStatus() == RentRequestStatus.PENDING) {
+                rentRequest.setRentRequestStatus(RentRequestStatus.CANCELED);
+                rentRequestRepository.save(rentRequest);
+                sendRejectedReservation(rentRequest.getClient(), rentRequest.getId());
+            }
+        };
+    }
+
+    @Async
+    public void executeRejectTask(Long rentReqId, Instant executionMoment) {
+        ScheduledExecutorService localExecutor = Executors.newSingleThreadScheduledExecutor();
+        scheduler = new ConcurrentTaskScheduler(localExecutor);
+        scheduler.schedule(createRunnable(rentReqId), executionMoment);
     }
 
     @Override
@@ -179,6 +207,17 @@ public class RentRequestServiceImpl implements RentRequestService {
     public Boolean canDeleteAdvertisement(Long advId) {
         List<RentRequest> rentRequests = rentRequestRepository.findByRentInfosAdvertisementAndRentInfosRentRequestRentRequestStatusAndRentInfosDateTimeToGreaterThanEqual(advId, RentRequestStatus.PAID, LocalDateTime.now());
         return rentRequests == null || rentRequests.isEmpty();
+    }
+
+    @Override
+    public Boolean hasRentInfos(List<Long> advIds) {
+        for (Long advId : advIds) {
+            List<RentRequest> rentRequests = rentRequestRepository.findByRentInfosAdvertisement(advId);
+            if (rentRequests != null && !rentRequests.isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private RentRequest cancel(RentRequest rentRequest, Long loggedInUserId) {

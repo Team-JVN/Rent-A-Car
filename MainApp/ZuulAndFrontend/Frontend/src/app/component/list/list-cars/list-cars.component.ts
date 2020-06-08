@@ -1,3 +1,4 @@
+import { AdvertisementService } from './../../../service/advertisement.service';
 import { ViewPicturesComponent } from './../../view-pictures/view-pictures.component';
 import { EditCarPartialComponent } from './../../edit/edit-car-partial/edit-car-partial.component';
 import { CarWithPictures } from './../../../model/carWithPictures';
@@ -24,6 +25,7 @@ export class ListCarsComponent implements OnInit {
 
   constructor(public dialog: MatDialog,
     private carService: CarService,
+    private advertisementService: AdvertisementService,
     private toastr: ToastrService) { }
 
   ngOnInit() {
@@ -77,7 +79,7 @@ export class ListCarsComponent implements OnInit {
   }
 
   edit(element: CarWithPictures) {
-    this.carService.getEditType(element.id).subscribe(
+    this.advertisementService.getCarEditType(element.id).subscribe(
       (data: string) => {
         if (data === "ALL") {
           this.dialog.open(EditCarComponent, { data: element });

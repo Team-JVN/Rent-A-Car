@@ -10,7 +10,6 @@ import jvn.Advertisements.dto.response.CarWithAllInformationDTO;
 import jvn.Advertisements.enumeration.EditType;
 import jvn.Advertisements.enumeration.LogicalStatus;
 import jvn.Advertisements.exceptionHandler.InvalidAdvertisementDataException;
-import jvn.Advertisements.mapper.AdvertisementDtoMapper;
 import jvn.Advertisements.mapper.AdvertisementMessageDtoMapper;
 import jvn.Advertisements.model.Advertisement;
 import jvn.Advertisements.model.PriceList;
@@ -25,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AdvertisementServiceImpl implements AdvertisementService {
@@ -32,8 +32,6 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     private PriceListService priceListService;
 
     private AdvertisementRepository advertisementRepository;
-
-    private AdvertisementDtoMapper advertisementMapper;
 
     private AdvertisementMessageDtoMapper advertisementMessageMapper;
 
@@ -47,10 +45,13 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     public Advertisement create(Advertisement createAdvertisementDTO, UserDTO userDTO, String jwtToken, String user) {
 
         checkDate(createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
-        CarWithAllInformationDTO carDTO = carClient.verify(jwtToken, user, userDTO.getId(), createAdvertisementDTO.getCar());
-        checkIfCarIsAvailable(createAdvertisementDTO.getCar(), createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
+        CarWithAllInformationDTO carDTO = carClient.verify(jwtToken, user, userDTO.getId(),
+                createAdvertisementDTO.getCar());
+        checkIfCarIsAvailable(createAdvertisementDTO.getCar(), createAdvertisementDTO.getDateFrom(),
+                createAdvertisementDTO.getDateTo());
         createAdvertisementDTO.setOwner(userDTO.getId());
-        createAdvertisementDTO.setPriceList(priceListService.get(createAdvertisementDTO.getPriceList().getId(), userDTO.getId()));
+        createAdvertisementDTO
+                .setPriceList(priceListService.get(createAdvertisementDTO.getPriceList().getId(), userDTO.getId()));
         createAdvertisementDTO = setPriceList(createAdvertisementDTO, createAdvertisementDTO.getKilometresLimit());
 
         if (userDTO.getRole().equals("ROLE_CLIENT")) {
@@ -84,16 +85,19 @@ public class AdvertisementServiceImpl implements AdvertisementService {
             sendMessageToSearchService(advertisement.getId());
             rejectAllRequests(id);
         } else {
-            throw new InvalidAdvertisementDataException("This advertisement is in use and therefore can not be deleted.", HttpStatus.BAD_REQUEST);
+            throw new InvalidAdvertisementDataException(
+                    "This advertisement is in use and therefore it cannot be deleted.", HttpStatus.BAD_REQUEST);
         }
     }
 
     @Override
-    public Advertisement edit(Long id, Advertisement advertisement, Long loggedInUserId, String jwtToken, String user, UserDTO userDTO) {
+    public Advertisement edit(Long id, Advertisement advertisement, Long loggedInUserId, String jwtToken, String user,
+                              UserDTO userDTO) {
         Advertisement dbAdvertisement = get(id, LogicalStatus.EXISTING);
         checkOwner(dbAdvertisement, loggedInUserId);
         if (!rentingClient.getAdvertisementEditType(jwtToken, user, id).equals(EditType.ALL)) {
-            throw new InvalidAdvertisementDataException("This advertisement is in use and therefore can not be edited.", HttpStatus.BAD_REQUEST);
+            throw new InvalidAdvertisementDataException(
+                    "This advertisement is in use and therefore it cannot be edited.", HttpStatus.BAD_REQUEST);
         }
 
         if (!dbAdvertisement.getCar().equals(advertisement.getCar())) {
@@ -125,6 +129,33 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         return advertisementRepository.save(dbAdvertisement);
     }
 
+    @Override
+    public EditType getCarEditType(Long carId) {
+        List<Advertisement> advertisements = advertisementRepository.findByCar(carId);
+        if (advertisements != null && !advertisements.isEmpty()) {
+            return EditType.PARTIAL;
+        }
+        return EditType.ALL;
+    }
+
+    @Override
+    public Boolean canEditCarPartially(Long carId, String jwtToken, String user) {
+        List<Advertisement> advertisements = advertisementRepository.findByCarAndLogicalStatus(carId, LogicalStatus.EXISTING);
+        if (advertisements == null || advertisements.isEmpty()) {
+            return true;
+        } else {
+            return !rentingClient.hasRentInfos(jwtToken, user, advertisements.stream().map(Advertisement::getId).collect(Collectors.toList()));
+        }
+    }
+
+    @Override
+    public Boolean canDeleteCar(Long carId) {
+        List<Advertisement> advertisements = advertisementRepository
+                .findByCarAndLogicalStatusAndDateToGreaterThanEqualOrCarAndLogicalStatusAndDateToEquals(carId,
+                        LogicalStatus.EXISTING, LocalDate.now(), carId, LogicalStatus.EXISTING, null);
+        return advertisements == null || advertisements.isEmpty();
+    }
+
     @Async
     public void editAdvertisement(AdvertisementEditDTO advertisementEditDTO) {
         advertisementProducer.sendMessageForSearch(advertisementEditDTO);
@@ -136,7 +167,8 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     }
 
     @Async
-    public void sendMessageToSearchService(Advertisement savedAdvertisement, UserDTO userDTO, CarWithAllInformationDTO carDTO) {
+    public void sendMessageToSearchService(Advertisement savedAdvertisement, UserDTO userDTO,
+                                           CarWithAllInformationDTO carDTO) {
         AdvertisementMessageDTO advertisementMessageDTO = advertisementMessageMapper.toDto(savedAdvertisement);
         advertisementMessageDTO.setCar(carDTO);
         advertisementMessageDTO.setOwner(new OwnerMessageDTO(userDTO.getId(), userDTO.getName(), userDTO.getEmail()));
@@ -150,22 +182,30 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     private void checkOwner(Advertisement advertisement, Long loggedInUserId) {
         if (!advertisement.getOwner().equals(loggedInUserId)) {
-            throw new InvalidAdvertisementDataException("You are not owner of this advertisement so you cannot edit/delete it.", HttpStatus.BAD_REQUEST);
+            throw new InvalidAdvertisementDataException(
+                    "You are not the owner of this advertisement, therefore you cannot edit or delete it.",
+                    HttpStatus.BAD_REQUEST);
         }
     }
 
     private void checkIfCarIsAvailable(Long carId, LocalDate advertisementDateFrom, LocalDate advertisementDateTo) {
-        if (!advertisementRepository.findByCarAndLogicalStatusNotAndDateToEquals(carId, LogicalStatus.DELETED, null).isEmpty()) {
-            throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
+        if (!advertisementRepository.findByCarAndLogicalStatusNotAndDateToEquals(carId, LogicalStatus.DELETED, null)
+                .isEmpty()) {
+            throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!",
+                    HttpStatus.BAD_REQUEST);
         }
 
         if (advertisementDateTo == null) {
-            if (!advertisementRepository.findByCarAndLogicalStatusNotAndDateToGreaterThanEqual(carId, LogicalStatus.DELETED, advertisementDateFrom).isEmpty()) {
-                throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
+            if (!advertisementRepository.findByCarAndLogicalStatusNotAndDateToGreaterThanEqual(carId,
+                    LogicalStatus.DELETED, advertisementDateFrom).isEmpty()) {
+                throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!",
+                        HttpStatus.BAD_REQUEST);
             }
         } else {
-            if (!advertisementRepository.findByCarAndLogicalStatusNotAndDateFromLessThanEqualAndDateToGreaterThanEqual(carId, LogicalStatus.DELETED, advertisementDateTo, advertisementDateFrom).isEmpty()) {
-                throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
+            if (!advertisementRepository.findByCarAndLogicalStatusNotAndDateFromLessThanEqualAndDateToGreaterThanEqual(
+                    carId, LogicalStatus.DELETED, advertisementDateTo, advertisementDateFrom).isEmpty()) {
+                throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!",
+                        HttpStatus.BAD_REQUEST);
             }
         }
     }
@@ -180,15 +220,19 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     }
 
     private void checkIfClientCanCreateAdvertisement(Advertisement advertisement) {
-        if (advertisementRepository.findByOwnerAndDateToGreaterThanEqualAndLogicalStatus(advertisement.getOwner(), LocalDate.now(), LogicalStatus.EXISTING).size() >= 3) {
-            throw new InvalidAdvertisementDataException("You already have 3 active advertisements, therefore you cannot create a new one.", HttpStatus.BAD_REQUEST);
+        if (advertisementRepository.findByOwnerAndDateToGreaterThanEqualAndLogicalStatus(advertisement.getOwner(),
+                LocalDate.now(), LogicalStatus.EXISTING).size() >= 3) {
+            throw new InvalidAdvertisementDataException(
+                    "You already have 3 active advertisements, therefore you cannot create a new one.",
+                    HttpStatus.BAD_REQUEST);
         }
     }
 
     private Advertisement get(Long id, LogicalStatus status) {
         Advertisement advertisement = advertisementRepository.findByIdAndLogicalStatus(id, status);
         if (advertisement == null) {
-            throw new InvalidAdvertisementDataException("Requested advertisement does not exist.", HttpStatus.NOT_FOUND);
+            throw new InvalidAdvertisementDataException("Requested advertisement does not exist.",
+                    HttpStatus.NOT_FOUND);
         }
         return advertisement;
     }
@@ -212,13 +256,12 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     }
 
     @Autowired
-    public AdvertisementServiceImpl(PriceListService priceListService, CarClient carClient, AdvertisementRepository advertisementRepository,
-                                    AdvertisementDtoMapper advertisementMapper, AdvertisementMessageDtoMapper advertisementMessageMapper,
+    public AdvertisementServiceImpl(PriceListService priceListService, CarClient carClient,
+                                    AdvertisementRepository advertisementRepository, AdvertisementMessageDtoMapper advertisementMessageMapper,
                                     AdvertisementProducer advertisementProducer, RentingClient rentingClient) {
         this.priceListService = priceListService;
         this.carClient = carClient;
         this.advertisementRepository = advertisementRepository;
-        this.advertisementMapper = advertisementMapper;
         this.advertisementMessageMapper = advertisementMessageMapper;
         this.advertisementProducer = advertisementProducer;
         this.rentingClient = rentingClient;
