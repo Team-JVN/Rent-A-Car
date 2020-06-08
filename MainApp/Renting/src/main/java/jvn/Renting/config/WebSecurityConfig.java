@@ -47,6 +47,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/rent-request/advertisement/{advIds}/check-rent-infos")
                 .hasAuthority("MANAGE_CARS")
 
+                .antMatchers(HttpMethod.PUT, "/api/rent-request/{id}")
+                .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
+
                 .anyRequest().authenticated().and()
 
                 .cors().and()
@@ -59,12 +62,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers(HttpMethod.GET, "/api/car/{id}/picture");
-        web.ignoring().antMatchers(HttpMethod.GET, "/api/body-style");
-        web.ignoring().antMatchers(HttpMethod.GET, "/api/fuel-type");
-        web.ignoring().antMatchers(HttpMethod.GET, "/api/gearbox-type");
-        web.ignoring().antMatchers(HttpMethod.GET, "/api/make");
-        web.ignoring().antMatchers(HttpMethod.GET, "/api/make/{makeId}/models");
+
         web.ignoring().antMatchers(HttpMethod.GET, "/api/car/verify/{userId}/{carId}");
     }
 

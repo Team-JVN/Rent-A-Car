@@ -200,6 +200,10 @@ const routes: Routes = [
     component: NonAuthorizedErrorPageComponent,
   },
   {
+    path: "",
+    component: SearchAdvertisementsComponent, //set search page
+  },
+  {
     path: '**',
     component: SearchAdvertisementsComponent
   },

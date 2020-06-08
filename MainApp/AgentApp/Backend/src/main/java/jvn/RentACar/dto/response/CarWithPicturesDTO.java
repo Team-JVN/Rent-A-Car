@@ -55,4 +55,6 @@ public class CarWithPicturesDTO {
 
     @NotEmpty(message = "Pictures are null.")
     private List<PicturesDTO> pictures;
+
+    private UserDTO owner;
 }

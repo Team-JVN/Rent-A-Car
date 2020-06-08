@@ -44,12 +44,6 @@ export class ListAdvertisementsComponent implements OnInit {
         this.fetchAll(this.status)
       }
     );
-
-    this.createSuccess = this.rentRequestService.createSuccessEmitter.subscribe(
-      () => {
-        this.fetchAll(this.status);
-      }
-    );
   }
 
   fetchAll(status: string) {

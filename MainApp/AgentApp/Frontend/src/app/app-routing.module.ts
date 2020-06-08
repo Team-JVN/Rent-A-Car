@@ -1,8 +1,7 @@
+
 import { ResetPasswordEnterNewPassComponent } from './component/authentification/reset-password-enter-new-pass/reset-password-enter-new-pass.component';
 import { ResetPasswordEnterEmailComponent } from './component/authentification/reset-password-enter-email/reset-password-enter-email.component';
 import { ActivateAccountComponent } from './component/authentification/activate-account/activate-account.component';
-import { GetMyRentRequestsGuard } from './guard/get.my.rent.requests.guard';
-import { GetReceivedRentRequestsGuard } from './guard/get.received.rent.requests.guard';
 import { ManageRentReportsGuard } from './guard/manage.rent.reports.guard';
 import { ManageRoleGuard } from './guard/manage.role.guard';
 import { ManageClientsGuard } from './guard/manage.clients.guard';
@@ -32,6 +31,16 @@ import { NonAuthorizedErrorPageComponent } from './error/non-authorized-error-pa
 import { ListMakesComponent } from './component/list/list-makes/list-makes.component';
 import { ListModelsComponent } from './component/list/list-models/list-models.component';
 import { ListRentReportsComponent } from './component/list/list-rent-reports/list-rent-reports.component';
+import { MyRentRequestsGuard } from './guard/my.rent.requests.guard';
+import { ListClientRentRequestsComponent } from './component/list/list-client-rent-requests/list-client-rent-requests.component';
+import { SearchAdvertisementsComponent } from './component/list/search-advertisements/search-advertisements.component';
+import { RentingCartComponent } from './component/renting-cart/renting-cart.component';
+import { ClientEditProfileGuard } from './guard/client.edit.profile';
+import { EditAgentComponent } from './component/edit/editPersonalInfo/edit-agent/edit-agent.component';
+import { AgentEditProfileGuard } from './guard/agent.edit.profile';
+import { EditClientComponent } from './component/edit/editPersonalInfo/edit-client/edit-client.component';
+import { GetStatisticsGuard } from './guard/get.statistics.guard';
+import { CarsStatisticsComponent } from './component/list/cars-statistics/cars-statistics.component';
 
 const routes: Routes = [
   /** MANAGE ADVERTISEMENTS */
@@ -40,7 +49,16 @@ const routes: Routes = [
     component: ListAdvertisementsComponent,
     canActivate: [ManageAdvertisemetsGuard],
   },
-
+  {
+    path: 'rent-requests/:id',
+    component: ListRentRequestsComponent,
+    canActivate: [ManageAdvertisemetsGuard],
+  },
+  {
+    path: 'rent-request/:id',
+    component: RentRequestDetailsComponent,
+    canActivate: [ManageAdvertisemetsGuard],
+  },
   /** MANAGE CODE BOOKS */
   {
     path: "body-styles",
@@ -73,6 +91,12 @@ const routes: Routes = [
     component: ListCarsComponent,
     canActivate: [ManageCarsGuard],
   },
+  /** GET STATISTICS */
+  {
+    path: 'statistics',
+    component: CarsStatisticsComponent,
+    canActivate: [GetStatisticsGuard],
+  },
   /** MANAGE PRICE LISTS */
   {
     path: 'price-lists',
@@ -85,22 +109,22 @@ const routes: Routes = [
     component: ListClientsComponent,
     canActivate: [ManageClientsGuard],
   },
-  /** Get received rent requests */
-  {
-    path: 'rent-requests/:id',
-    component: ListRentRequestsComponent,
-    canActivate: [GetReceivedRentRequestsGuard],
-  },
-  {
-    path: 'rent-request/:id',
-    component: RentRequestDetailsComponent,
-    canActivate: [GetReceivedRentRequestsGuard],
-  },
+
   /** Get my rent requests */
   {
     path: 'client-rent-request/:id',
     component: ClientRentRequestDetailsComponent,
-    canActivate: [GetMyRentRequestsGuard],
+    canActivate: [MyRentRequestsGuard],
+  },
+  {
+    path: 'client/renting-cart',
+    component: RentingCartComponent,
+    canActivate: [MyRentRequestsGuard],
+  },
+  {
+    path: 'client-rent-requests',
+    component: ListClientRentRequestsComponent,
+    canActivate: [MyRentRequestsGuard],
   },
   /** MANAGE RENT REPORTS */
   {
@@ -113,6 +137,18 @@ const routes: Routes = [
     path: "role",
     component: EditRoleComponent,
     canActivate: [ManageRoleGuard],
+  },
+  /**EDIT CLIENT INFO */
+  {
+    path: "edit-client-info",
+    component: EditClientComponent,
+    canActivate: [ClientEditProfileGuard],
+  },
+  /**EDIT AGENT INFO */
+  {
+    path: "edit-agent-info",
+    component: EditAgentComponent,
+    canActivate: [AgentEditProfileGuard],
   },
   /** Unauthorized user */
   {
@@ -143,6 +179,10 @@ const routes: Routes = [
     path: "reset-password",
     component: ResetPasswordEnterNewPassComponent,
   },
+  {
+    path: 'search-advertisements',
+    component: SearchAdvertisementsComponent
+  },
   //******************* ERROR PAGES ************************
   {
     path: "error/non-authenticated",
@@ -154,11 +194,11 @@ const routes: Routes = [
   },
   {
     path: "",
-    component: LoginComponent, //set search page
+    component: SearchAdvertisementsComponent,
   },
   {
     path: "**",
-    component: LoginComponent, //set search page
+    component: SearchAdvertisementsComponent,
   },
 ];
 

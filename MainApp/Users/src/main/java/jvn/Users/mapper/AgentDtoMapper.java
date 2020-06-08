@@ -6,10 +6,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.text.ParseException;
-
 @Component
-public class AgentDtoMapper implements MapperInterface<Agent, AgentDTO>{
+public class AgentDtoMapper implements MapperInterface<Agent, AgentDTO> {
 
     public ModelMapper modelMapper;
 

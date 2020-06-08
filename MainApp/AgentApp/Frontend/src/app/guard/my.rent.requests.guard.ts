@@ -3,7 +3,7 @@ import { AuthentificationService } from '../service/authentification.service';
 import { Injectable } from '@angular/core';
 import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 @Injectable({ providedIn: 'root' })
-export class GetReceivedRentRequestsGuard implements CanActivate {
+export class MyRentRequestsGuard implements CanActivate {
     constructor(
         private router: Router,
         private authentificationService: AuthentificationService
@@ -12,8 +12,7 @@ export class GetReceivedRentRequestsGuard implements CanActivate {
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
 
         if (this.authentificationService.isLoggedIn()) {
-            console.log(this.authentificationService.permissions);
-            if (this.authentificationService.hasPermission("GET_RECEIVED_RENT_REQUESTS")) {
+            if (this.authentificationService.hasPermission("MY_RENT_REQUESTS")) {
                 return true;
             }
             else {

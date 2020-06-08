@@ -1,6 +1,7 @@
 package jvn.RentACar.service;
 
 import jvn.RentACar.dto.request.AdvertisementEditDTO;
+import jvn.RentACar.dto.response.SearchParamsDTO;
 import jvn.RentACar.enumeration.EditType;
 import jvn.RentACar.model.Advertisement;
 
@@ -20,4 +21,6 @@ public interface AdvertisementService {
     EditType getEditType(Long id);
 
     List<Advertisement> getAll(String status);
+
+    List<Advertisement> searchAdvertisements(SearchParamsDTO searchParamsDTO);
 }

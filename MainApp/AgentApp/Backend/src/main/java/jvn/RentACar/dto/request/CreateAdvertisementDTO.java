@@ -29,7 +29,7 @@ public class CreateAdvertisementDTO {
     @Pattern(regexp = "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$",message = "Date from is not validly formatted")
     private String dateFrom;
 
-    @Pattern(regexp = "^(\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]))?$",message = "Date to is not validly formatted")
+    @Pattern(regexp = "^(\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]))?$", message = "Date to is not validly formatted")
     private String dateTo;
 
     @NotBlank(message = "Pick-up point  is empty.")

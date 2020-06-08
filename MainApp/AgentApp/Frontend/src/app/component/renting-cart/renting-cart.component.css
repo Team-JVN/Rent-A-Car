@@ -1,0 +1,126 @@
+mat-card {
+    max-width: 950px;
+    margin: 2em auto;
+}
+
+mat-card-content {
+    margin-left: 16px;
+    margin-right: 16px;
+    margin-bottom: 0;
+}
+
+mat-card-header mat-card-title {
+    font-size: 24px;
+    font-weight: 550;
+}
+
+.at {
+    font-weight: 550;
+}
+
+.car-data {
+    width: 100%;
+}
+
+td.mat-cell{
+    border-bottom-style: none;
+}
+
+th.mat-header-cell{
+    border-bottom-style: none;
+}
+
+.rent-info-list-table td.mat-cell:first-of-type{
+    padding-left: 8px;
+}
+
+.rent-info-list-table td.mat-cell:last-of-type{
+    padding-right: 8px;
+}
+
+.rent-info-div {
+    width: 100%;
+}
+
+.rent-info-table tr {
+    border-bottom: 1px solid #ddd;
+}
+
+.rent-info-table th, .table td {
+    font-size: 15px;
+    vertical-align: middle;
+    padding: 0.6rem;
+}
+
+.theader {
+    font-weight: 550;
+    display: inline-flex;
+    vertical-align: middle;
+}
+
+.item-card {
+    width: 100%;
+    display: inline-flex;
+    background-color: #F5F5F5;    
+    margin: 0.7em auto;
+    align-items: center;    
+    transition: all 0.1s ease-in-out;
+}
+
+.item-card:hover {
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
+}
+
+.image {
+    max-width: 300px;
+    max-height: 200px;
+    border-radius: 5px;
+}
+
+.image-div {
+    width: 300px;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.rent-info-card-header{
+    display:inline-block;
+    width:100%;
+    vertical-align: middle;
+}
+
+.rent-info-card-title{
+    float: left;
+}
+
+.rent-info-card-buttons{
+    float: right;
+    margin-top: -3px;
+}
+
+.status-filter {    
+    font-size: 110%;
+}
+
+.filter-span {
+    margin-right: 20px;
+}
+
+.select-owner {
+    width: 300px;
+}
+
+.empty-cart {
+    font-size: 23px;
+    font-weight: 550;
+    color: gray;
+    text-align: center;
+}
+
+.total-price {
+    font-weight: bold;
+    color: red;
+}

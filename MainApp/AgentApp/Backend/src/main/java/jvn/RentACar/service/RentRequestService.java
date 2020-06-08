@@ -14,7 +14,7 @@ public interface RentRequestService {
 
     RentRequest get(Long id);
 
-    void delete(Long id);
-
     RentRequest changeRentRequestStatus(Long id, RentRequestStatusDTO status);
+
+    void rejectAllRequests(Long advId);
 }

@@ -142,16 +142,14 @@ public class AuthentificationServiceImpl implements AuthentificationService {
     @Override
     public boolean userIsNeverLoggedIn(String email) {
         User user = userRepository.findByEmail(email);
-        if (user instanceof Agent) {
-            if (((Agent) user).getStatus().equals(AgentStatus.INACTIVE)) {
-                return true;
-            }
-        } else {
-            if (((Client) user).getStatus().equals(ClientStatus.NEVER_LOGGED_IN)) {
-                return true;
-            }
+        if(user == null){
+            return false;
         }
-        return false;
+        if (user instanceof Agent) {
+            return ((Agent) user).getStatus().equals(AgentStatus.INACTIVE);
+        } else {
+            return ((Client) user).getStatus().equals(ClientStatus.NEVER_LOGGED_IN);
+        }
     }
 
     private String getHashValue(String password) throws NoSuchAlgorithmException {
