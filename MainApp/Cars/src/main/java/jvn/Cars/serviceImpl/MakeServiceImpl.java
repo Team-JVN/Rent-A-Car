@@ -40,7 +40,7 @@ public class MakeServiceImpl implements MakeService {
 
     @Override
     public List<Make> get() {
-        return makeRepository.findAll();
+        return makeRepository.findAllByOrderByNameAsc();
     }
 
     @Override
