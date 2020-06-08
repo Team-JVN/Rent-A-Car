@@ -83,6 +83,9 @@ import { RentingCartComponent } from './component/renting-cart/renting-cart.comp
 import { AddToCartComponent } from './component/add/add-to-cart/add-to-cart.component';
 import { EditAgentComponent } from './component/edit/editPersonalInfo/edit-agent/edit-agent.component';
 import { EditClientComponent } from './component/edit/editPersonalInfo/edit-client/edit-client.component';
+import { GetStatisticsGuard } from './guard/get.statistics.guard';
+import { TableForStatisticsComponent } from './component/table-for-statistics/table-for-statistics.component';
+import { CarsStatisticsComponent } from './component/list/cars-statistics/cars-statistics.component';
 
 @NgModule({
   declarations: [
@@ -142,7 +145,9 @@ import { EditClientComponent } from './component/edit/editPersonalInfo/edit-clie
     RentingCartComponent,
     AddToCartComponent,
     EditAgentComponent,
-    EditClientComponent
+    EditClientComponent,
+    TableForStatisticsComponent,
+    CarsStatisticsComponent
   ],
   imports: [
     BrowserModule,
@@ -210,7 +215,8 @@ import { EditClientComponent } from './component/edit/editPersonalInfo/edit-clie
     MyRentRequestsGuard,
     AgentEditProfileGuard,
     ClientEditProfileGuard,
-    ManageRoleGuard
+    ManageRoleGuard,
+    GetStatisticsGuard
   ],
   bootstrap: [AppComponent]
 })

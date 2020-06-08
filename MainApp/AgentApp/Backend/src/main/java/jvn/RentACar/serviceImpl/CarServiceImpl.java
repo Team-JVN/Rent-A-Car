@@ -12,6 +12,7 @@ import jvn.RentACar.repository.CarRepository;
 import jvn.RentACar.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -161,6 +162,23 @@ public class CarServiceImpl implements CarService {
         return car;
     }
 
+    @Override
+    public List<Car> getStatistics(String filter) {
+        String sortFilter = "";
+        switch (filter) {
+            case "most-km-made":
+                sortFilter = "mileageInKm";
+                break;
+            case "best-rated":
+                sortFilter = "avgRating";
+                break;
+            case "most-commented":
+                sortFilter = "commentsCount";
+                break;
+        }
+
+        return carRepository.findFirst3ByLogicalStatus(LogicalStatus.EXISTING, Sort.by(Sort.Direction.DESC, sortFilter));
+    }
     private void checkOwner(Car car) {
         if (!userService.getLoginAgent().getEmail().equals(car.getOwner().getEmail())) {
             throw new InvalidCarDataException("You are not owner of this car.", HttpStatus.BAD_REQUEST);

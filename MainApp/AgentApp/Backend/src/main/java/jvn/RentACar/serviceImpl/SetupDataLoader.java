@@ -52,6 +52,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         Permission managePriceLists = createPermissionIfNotFound("MANAGE_PRICE_LISTS");
         Permission manageRentReports = createPermissionIfNotFound("MANAGE_RENT_REPORTS");
         Permission manageRoles = createPermissionIfNotFound("MANAGE_ROLES");
+        Permission getStatistics = createPermissionIfNotFound("GET_STATISTICS");
 
         Permission myRentRequests = createPermissionIfNotFound("MY_RENT_REQUESTS");
 
@@ -59,7 +60,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         Permission clientEditProfile = createPermissionIfNotFound("CLIENT_EDIT_PROFILE");
 
         Set<Permission> agentPermissions = new HashSet<>(Arrays.asList(manageAdvertisements, manageCodeBooks, manageCars, manageClients,
-                managePriceLists, manageRentReports, manageRoles,agentEditProfile));
+                managePriceLists, manageRentReports, manageRoles,agentEditProfile,getStatistics));
         createRoleIfNotFound("ROLE_AGENT", agentPermissions);
 
         Set<Permission> clientPermissions = new HashSet<>(Arrays.asList(clientEditProfile, myRentRequests));

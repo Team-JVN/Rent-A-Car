@@ -39,6 +39,8 @@ import { ClientEditProfileGuard } from './guard/client.edit.profile';
 import { EditAgentComponent } from './component/edit/editPersonalInfo/edit-agent/edit-agent.component';
 import { AgentEditProfileGuard } from './guard/agent.edit.profile';
 import { EditClientComponent } from './component/edit/editPersonalInfo/edit-client/edit-client.component';
+import { GetStatisticsGuard } from './guard/get.statistics.guard';
+import { CarsStatisticsComponent } from './component/list/cars-statistics/cars-statistics.component';
 
 const routes: Routes = [
   /** MANAGE ADVERTISEMENTS */
@@ -88,6 +90,12 @@ const routes: Routes = [
     path: "cars",
     component: ListCarsComponent,
     canActivate: [ManageCarsGuard],
+  },
+  /** GET STATISTICS */
+  {
+    path: 'statistics',
+    component: CarsStatisticsComponent,
+    canActivate: [GetStatisticsGuard],
   },
   /** MANAGE PRICE LISTS */
   {

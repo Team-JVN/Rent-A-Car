@@ -68,6 +68,10 @@ export class HeaderComponent implements OnInit {
     return this.authentificationService.hasPermission("MY_RENT_REQUESTS");
   }
 
+  hasPermissionGetStatistics() {
+    return this.authentificationService.hasPermission("GET_STATISTICS");
+  }
+
   isLoggedIn() {
     return this.authentificationService.isLoggedIn();
   }

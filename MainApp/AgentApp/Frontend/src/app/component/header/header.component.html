@@ -16,6 +16,9 @@
       <span *ngIf="isLoggedIn() && hasPermissionManageCars()">
         <a mat-list-item routerLink="/cars">Cars</a>
       </span>
+      <span *ngIf="isLoggedIn() && hasPermissionGetStatistics()">
+        <a mat-list-item routerLink="/statistics">Statistics</a>
+      </span>
       <span *ngIf="isLoggedIn() && hasPermissionManagePriceLists()">
         <a mat-list-item routerLink="/price-lists">Price Lists</a>
       </span>

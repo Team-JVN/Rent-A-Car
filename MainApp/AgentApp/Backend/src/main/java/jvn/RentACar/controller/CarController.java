@@ -24,6 +24,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 import java.io.IOException;
 import java.util.List;
@@ -114,7 +115,12 @@ public class CarController {
         return new ResponseEntity<>(newCarDTO, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/statistics/{filter}")
+    public ResponseEntity<List<CarWithPicturesDTO>> getStatistics(
+            @PathVariable(value = "filter") @Pattern(regexp = "(?i)(most-km-made|best-rated|most-commented)$", message = "Filter is not valid.") String filter) {
 
+        return new ResponseEntity<>(carService.getStatistics(filter).stream().map(carWithPicturesDtoMapper::toDto).collect(Collectors.toList()), HttpStatus.OK);
+    }
     private void validateCreateCarDTO(CreateCarDTO createCarDTO) {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
