@@ -191,6 +191,7 @@ import { EditClientComponent } from './component/edit/editPersonalInfo/edit-clie
     EditMakeComponent,
     AddModelComponent,
     AddRentReportComponent,
+    AddToCartComponent
   ],
   providers: [
     {
