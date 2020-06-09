@@ -24,8 +24,8 @@ export class ClientRegistrationComponent implements OnInit {
   ngOnInit() {
     this.registrationForm = this.formBuilder.group({
       email: new FormControl(null, [Validators.required, Validators.email]),
-      password: new FormControl(null, [Validators.required, Validators.minLength(8), Validators.maxLength(64), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,64}$')]),
-      repeatedPassword: new FormControl(null, [Validators.required, Validators.minLength(8), Validators.maxLength(64), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,64}$')]),
+      password: new FormControl(null, [Validators.required, Validators.minLength(10), Validators.maxLength(64), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[_#?!@$%^&*-.,:;]).{10,64}$')]),
+      repeatedPassword: new FormControl(null, [Validators.required, Validators.minLength(10), Validators.maxLength(64), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[_#?!@$%^&*-.,:;]).{10,64}$')]),
       firstName: new FormControl(null, Validators.required),
       lastName: new FormControl(null, Validators.required),
       address: new FormControl(null, Validators.required),
