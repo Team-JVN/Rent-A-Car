@@ -105,15 +105,15 @@ export class RentRequestDetailsComponent implements OnInit {
     return false;
   }
   getMessages() {
-    this.messageService.getMessages(this.rentRequest.client).subscribe(
-      (data: Message[]) => {
-        this.toastr.success('Success!', 'Fetch messages');
-        this.messages = data;
-      },
-      (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Fetch messages');
-      }
-    );
+    // this.messageService.getMessages(this.rentRequest.client).subscribe(
+    //   (data: Message[]) => {
+    //     this.toastr.success('Success!', 'Fetch messages');
+    //     this.messages = data;
+    //   },
+    //   (httpErrorResponse: HttpErrorResponse) => {
+    //     this.toastr.error(httpErrorResponse.error.message, 'Fetch messages');
+    //   }
+    // );
   }
 
 }

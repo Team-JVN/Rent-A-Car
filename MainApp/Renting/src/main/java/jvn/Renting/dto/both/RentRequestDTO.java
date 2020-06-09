@@ -23,6 +23,5 @@ public class RentRequestDTO {
     @Positive(message = "Total price is not a positive number.")
     private Double totalPrice;
 
-    //    @Pattern(regexp = "(?i)(Pending|Reserved|Paid|Canceled|undefined)?$", message = "Rent request status is not valid.")
     private String rentRequestStatus;
 }

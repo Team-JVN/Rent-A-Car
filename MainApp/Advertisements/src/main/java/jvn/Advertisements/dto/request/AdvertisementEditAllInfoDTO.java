@@ -13,9 +13,11 @@ import javax.validation.constraints.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AdvertisementEditAllInfoDTO {
+    @Positive(message = "Id must be positive.")
     private Long id;
 
     @NotNull(message = "Car is null.")
+    @Positive(message = "Id must be positive.")
     private Long car;
 
     @NotNull(message = "Price list is null.")

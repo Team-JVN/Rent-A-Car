@@ -38,7 +38,8 @@ public class FuelTypeController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<FuelTypeDTO> edit(@PathVariable @Positive(message = "Id must be positive.") Long id, @Valid @RequestBody FuelTypeDTO fuelTypeDTO) {
+    public ResponseEntity<FuelTypeDTO> edit(@PathVariable @Positive(message = "Id must be positive.") Long id,
+                                            @Valid @RequestBody FuelTypeDTO fuelTypeDTO) {
         return new ResponseEntity<>(fuelTypeDtoMapper.toDto(fuelTypeService.edit(id, fuelTypeDTO)), HttpStatus.OK);
     }
 

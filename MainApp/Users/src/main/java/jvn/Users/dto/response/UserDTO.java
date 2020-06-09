@@ -27,6 +27,7 @@ public class UserDTO {
     private String email;
 
     @NotBlank(message = "Role is empty.")
+    @Pattern(regexp = "(?i)(ROLE_AGENT|ROLE_CLIENT|ROLE_ADMIN)$", message = "Role is not valid.")
     private String role;
 
     @NotEmpty

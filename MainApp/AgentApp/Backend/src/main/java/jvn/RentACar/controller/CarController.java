@@ -85,7 +85,8 @@ public class CarController {
     }
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CarDTO> editAll(@PathVariable @Positive(message = "Id must be positive.") Long id, @RequestParam("carData") String jsonString,
+    public ResponseEntity<CarDTO> editAll(@PathVariable @Positive(message = "Id must be positive.") Long id,
+                                          @RequestParam("carData") String jsonString,
                                           @RequestParam("files") List<MultipartFile> multipartFiles) {
 
         ObjectMapper mapper = new ObjectMapper();

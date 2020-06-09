@@ -38,7 +38,8 @@ public class GearboxTypeController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GearboxTypeDTO> edit(@PathVariable @Positive(message = "Id must be positive.") Long id, @Valid @RequestBody GearboxTypeDTO gearBoxTypeDTO) {
+    public ResponseEntity<GearboxTypeDTO> edit(@PathVariable @Positive(message = "Id must be positive.") Long id,
+                                               @Valid @RequestBody GearboxTypeDTO gearBoxTypeDTO) {
         return new ResponseEntity<>(gearboxTypeDtoMapper.toDto(gearBoxTypeService.edit(id, gearBoxTypeDTO)), HttpStatus.OK);
     }
 
