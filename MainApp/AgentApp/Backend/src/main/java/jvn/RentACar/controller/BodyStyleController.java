@@ -38,7 +38,8 @@ public class BodyStyleController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<BodyStyleDTO> edit(@PathVariable @Positive(message = "Id must be positive.") Long id, @Valid @RequestBody BodyStyleDTO bodyStyleDTO) {
+    public ResponseEntity<BodyStyleDTO> edit(@PathVariable @Positive(message = "Id must be positive.") Long id,
+                                             @Valid @RequestBody BodyStyleDTO bodyStyleDTO) {
         return new ResponseEntity<>(bodyStyleDtoMapper.toDto(bodyStyleService.edit(id, bodyStyleDTO)), HttpStatus.OK);
     }
 

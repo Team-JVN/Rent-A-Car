@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
-import java.text.ParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +32,7 @@ public class AdminController {
     private UserService userService;
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AdminDTO> create(@Valid @RequestBody AdminDTO adminDTO) throws ParseException {
+    public ResponseEntity<AdminDTO> create(@Valid @RequestBody AdminDTO adminDTO) {
         return new ResponseEntity<>(adminDtoMapper.toDto(adminService.create(adminDtoMapper.toEntity(adminDTO))), HttpStatus.CREATED);
     }
 

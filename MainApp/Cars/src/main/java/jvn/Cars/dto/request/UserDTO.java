@@ -26,6 +26,7 @@ public class UserDTO {
     private String email;
 
     @NotBlank(message = "Role is empty.")
+    @Positive(message = "Id must be positive.")
     private String role;
 
     @NotEmpty

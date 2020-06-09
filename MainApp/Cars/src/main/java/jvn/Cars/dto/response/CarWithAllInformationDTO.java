@@ -1,6 +1,5 @@
 package jvn.Cars.dto.response;
 
-import jvn.Cars.dto.both.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,22 +18,27 @@ public class CarWithAllInformationDTO {
     @NotNull(message = "Id is null.")
     private Long id;
 
-    @NotBlank(message ="Logical status is empty.")
+    @NotBlank(message = "Logical status is empty.")
     private String logicalStatus;
 
     @NotBlank(message = "Make is empty.")
+    @Pattern(regexp = "^(([A-Za-zÀ-ƒ]+[.]?[ ]?|[a-zÀ-ƒ]+['-]?){0,4})$", message = "Name is not valid.")
     private String make;
 
     @NotBlank(message = "Model is empty.")
+    @Pattern(regexp = "^(([A-Za-zÀ-ƒ0-9]+[.]?[ ]?|[a-zÀ-ƒ0-9]+['-]?){0,4})$", message = "Name is not valid.")
     private String model;
 
     @NotBlank(message = "Fuel type is empty.")
+    @Pattern(regexp = "^(([A-Za-zÀ-ƒ]+[ ]?|[a-zÀ-ƒ]+['-]?){0,4})$", message = "Name is not valid.")
     private String fuelType;
 
     @NotBlank(message = "Gearbox type is empty.")
+    @Pattern(regexp = "^(([A-Za-zÀ-ƒ0-9]+[ ]?|[a-zÀ-ƒ0-9]+['-]?){0,4})$", message = "Name is not valid.")
     private String gearBoxType;
 
     @NotBlank(message = "Body style is empty.")
+    @Pattern(regexp = "^(([A-Za-zÀ-ƒ]+[ ]?|[a-zÀ-ƒ]+['-]?){0,4})$", message = "Name is not valid.")
     private String bodyStyle;
 
     @NotNull(message = "Mileage is null.")
@@ -61,5 +65,6 @@ public class CarWithAllInformationDTO {
     private List<String> pictures;
 
     @NotNull(message = "Owner is null")
+    @Positive(message = "Id must be positive.")
     private Long owner;
 }

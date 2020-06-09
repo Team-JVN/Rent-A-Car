@@ -56,7 +56,8 @@ public class AdvertisementController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AdvertisementDTO> edit(@PathVariable @Positive(message = "Id must be positive.") Long id, @Valid @RequestBody AdvertisementWithPicturesDTO advertisementDTO) {
+    public ResponseEntity<AdvertisementDTO> edit(@PathVariable @Positive(message = "Id must be positive.") Long id,
+                                                 @Valid @RequestBody AdvertisementWithPicturesDTO advertisementDTO) {
         try {
             return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.edit(id, adWithPicturesDtoMapper.toEntity(advertisementDTO))), HttpStatus.OK);
         } catch (ParseException e) {
@@ -65,7 +66,8 @@ public class AdvertisementController {
     }
 
     @PutMapping(value = "/{id}/partial", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AdvertisementDTO> editPartial(@PathVariable @Positive(message = "Id must be positive.") Long id, @Valid @RequestBody AdvertisementEditDTO advertisementDTO) {
+    public ResponseEntity<AdvertisementDTO> editPartial(@PathVariable @Positive(message = "Id must be positive.") Long id,
+                                                        @Valid @RequestBody AdvertisementEditDTO advertisementDTO) {
         return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.editPartial(id, advertisementDTO)), HttpStatus.OK);
     }
 
