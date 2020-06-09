@@ -3,9 +3,9 @@ package jvn.Users.controller;
 import jvn.Users.dto.both.AgentDTO;
 import jvn.Users.dto.both.ClientDTO;
 import jvn.Users.dto.request.ChangePasswordDTO;
-import jvn.Users.exceptionHandler.BlockedUserException;
 import jvn.Users.dto.request.RequestTokenDTO;
 import jvn.Users.dto.request.ResetPasswordDTO;
+import jvn.Users.exceptionHandler.BlockedUserException;
 import jvn.Users.exceptionHandler.InvalidTokenException;
 import jvn.Users.exceptionHandler.InvalidUserDataException;
 import jvn.Users.mapper.AgentDtoMapper;
@@ -18,10 +18,10 @@ import jvn.Users.service.AuthentificationService;
 import jvn.Users.service.ClientService;
 import jvn.Users.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +30,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
 
 @RestController
 @RequestMapping(value = "/api/auth", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -57,7 +56,7 @@ public class UserController {
             if (userTokenState == null) {
                 throw new UsernameNotFoundException(String.format("Invalid email or password. Please try again."));
             }
-            return new ResponseEntity<>(userTokenState, HttpStatus.OK);
+            return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(userTokenState);
         } catch (AuthenticationException e) {
             if (authentificationService.userIsNeverLoggedIn(authenticationRequest.getUsername())) {
                 return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
@@ -82,7 +81,7 @@ public class UserController {
         } catch (NoSuchAlgorithmException e) {
             throw new InvalidUserDataException("Password cannot be checked. Please try again.", HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(null);
     }
 
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
