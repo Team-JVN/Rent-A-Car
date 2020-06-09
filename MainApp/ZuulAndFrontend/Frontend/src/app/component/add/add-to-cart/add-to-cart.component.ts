@@ -1,14 +1,9 @@
 import { SearchParamsForRentInfo } from './../../../model/searchParamsForRentInfo';
-import { AuthentificationService } from './../../../service/authentification.service';
 import { RentInfo } from './../../../model/rentInfo';
-import { RentRequest } from './../../../model/rentRequest';
-import { HttpErrorResponse } from '@angular/common/http';
 import { MatDialogRef, MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ClientService } from './../../../service/client.service';
 import { ToastrService } from 'ngx-toastr';
 import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
 import { Component, OnInit, Inject } from '@angular/core';
-import { RentRequestService } from 'src/app/service/rent-request.service';
 
 @Component({
   selector: 'app-add-to-cart',
@@ -21,8 +16,6 @@ export class AddToCartComponent implements OnInit {
 
   constructor(
     private toastr: ToastrService,
-    private rentRequestService: RentRequestService,
-    private authService: AuthentificationService,
     private dialogRef: MatDialogRef<AddToCartComponent>,
     private formBuilder: FormBuilder,
     public dialog: MatDialog,
