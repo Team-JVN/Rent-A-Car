@@ -32,11 +32,11 @@
                 </mat-error>
                 <mat-error
                     *ngIf="registrationForm.get('password').errors && registrationForm.get('password').errors['minlength']">
-                    Password must be at least 8 characters long
+                    Password must be at least 10 characters long.
                 </mat-error>
                 <mat-error
                     *ngIf="registrationForm.get('password').errors && registrationForm.get('password').errors['pattern']">
-                    Password must contain at least 1 lowercase, 1 uppercase letter and 1 number
+                    Password must contain a number, a special character, a lowercase and an uppercase letter.
                 </mat-error>
             </mat-form-field>
             <mat-form-field class="form-full-width">
@@ -52,11 +52,11 @@
                 </mat-error>
                 <mat-error
                     *ngIf="registrationForm.get('repeatedPassword').errors && registrationForm.get('repeatedPassword').errors['minlength']">
-                    Password must be at least 8 characters long
+                    Password must be at least 10 characters long.
                 </mat-error>
                 <mat-error
                     *ngIf="registrationForm.get('repeatedPassword').errors && registrationForm.get('repeatedPassword').errors['pattern']">
-                    Password must contain at least 1 lowercase, 1 uppercase letter and 1 number
+                    Password must contain a number, a special character, a lowercase and an uppercase letter.
                 </mat-error>
                 <mat-error
                     *ngIf="registrationForm.get('repeatedPassword').errors && registrationForm.get('repeatedPassword').errors['mustMatch']">
