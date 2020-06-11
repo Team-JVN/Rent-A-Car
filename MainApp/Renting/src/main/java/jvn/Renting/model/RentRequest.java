@@ -1,5 +1,7 @@
 package jvn.Renting.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jvn.Renting.enumeration.RentRequestStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,6 +31,7 @@ public class RentRequest {
     private Double totalPrice;
 
     @OneToMany(mappedBy = "rentRequest", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonIgnore
     private Set<RentInfo> rentInfos = new HashSet<RentInfo>();
 
     @OneToMany(mappedBy = "rentRequest", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

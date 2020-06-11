@@ -27,7 +27,7 @@ public interface RentRequestService {
 
     FeedbackDTO getFeedback(Long id, Long rentInfoId, Long userId);
 
-    Message createMessage(Message message, Long id, Long rentInfoId, Long userId);
+    Message createMessage(Message message, Long id, Long userId);
 
-    List<Message> getMessages(Long id, Long rentInfoId, Long userId);
+    List<Message> getMessages(Long id, Long userId);
 }

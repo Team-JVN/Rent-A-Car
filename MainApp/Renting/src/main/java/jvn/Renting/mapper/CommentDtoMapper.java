@@ -1,6 +1,7 @@
 package jvn.Renting.mapper;
 
 import jvn.Renting.dto.both.CommentDTO;
+import jvn.Renting.dto.both.RentInfoDTO;
 import jvn.Renting.model.Comment;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ public class CommentDtoMapper implements MapperInterface<Comment, CommentDTO>{
     @Override
     public Comment toEntity(CommentDTO dto) {
         Comment entity = modelMapper.map(dto, Comment.class);
+
         return entity;
     }
 

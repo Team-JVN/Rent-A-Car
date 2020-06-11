@@ -17,9 +17,15 @@ public class MessageDtoMapper implements MapperInterface<Message, MessageDTO>{
 
     private ModelMapper modelMapper;
 
+    private RentRequestDtoMapper rentRequestDtoMapper;
+
     @Override
     public Message toEntity(MessageDTO dto) {
-        Message entity = modelMapper.map(dto, Message.class);
+//        Message entity = modelMapper.map(dto, Message.class);
+        Message entity = new Message();
+        entity.setText(dto.getText());
+        entity.setSender(new Long(1));
+        entity.setRentRequest(rentRequestDtoMapper.toEntity(dto.getRentRequest()));
         entity.setDateAndTime(getLocalDateTime(dto.getDateAndTime()));
         return entity;
     }
@@ -37,7 +43,8 @@ public class MessageDtoMapper implements MapperInterface<Message, MessageDTO>{
     }
 
     @Autowired
-    public MessageDtoMapper(ModelMapper modelMapper) {
+    public MessageDtoMapper(ModelMapper modelMapper, RentRequestDtoMapper rentRequestDtoMapper) {
         this.modelMapper = modelMapper;
+        this.rentRequestDtoMapper = rentRequestDtoMapper;
     }
 }

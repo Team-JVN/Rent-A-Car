@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
+import java.io.IOException;
 import java.text.ParseException;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -83,27 +85,35 @@ public class RentRequestController {
     @PostMapping(value="/{id}/rent-info/{rentInfoId}/feedback")
     public ResponseEntity<FeedbackDTO> leaveFeedback(@PathVariable Long id, @PathVariable Long rentInfoId, @Valid @RequestBody FeedbackDTO feedbackDTO){
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(rentRequestService.leaveFeedback(feedbackDTO, id, rentInfoId, userDTO.getId()),
+        return new ResponseEntity<>(rentRequestService.leaveFeedback(feedbackDTO, id, rentInfoId, new Long(1)),
                 HttpStatus.CREATED);
     }
 
     @GetMapping(value="/{id}/rent-info/{rentInfoId}/feedback")
     public ResponseEntity<FeedbackDTO> getFeedback(@PathVariable Long id, @PathVariable Long rentInfoId){
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(rentRequestService.getFeedback(id, rentInfoId, userDTO.getId()), HttpStatus.OK);
+        return new ResponseEntity<>(rentRequestService.getFeedback(id, rentInfoId, new Long(1)), HttpStatus.OK);
     }
 
-    @PostMapping(value="/{id}/rent-info/{rentInfoId}/message")
-    public ResponseEntity<MessageDTO> createMessage(@PathVariable Long id, @PathVariable Long rentInfoId, @Valid @RequestBody MessageDTO messageDTO){
-        UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(messageDtoMapper.toDto(rentRequestService.createMessage(messageDtoMapper.toEntity(messageDTO), id, rentInfoId, userDTO.getId())),
+    @MessageMapping("/message")
+    public ResponseEntity<MessageDTO> createMessage(String message){
+        System.out.println("SLANJE PORUKE");
+//        System.out.println(messageDTO.getText());
+//        System.out.println(id);
+        MessageDTO messageDTO = parseMessage(message);
+        System.out.println(messageDTO.getText());
+        System.out.println(messageDTO.getDateAndTime());
+        System.out.println(messageDTO.getRentRequest().getId());
+        System.out.println(messageDTO.getSender().getEmail());
+//        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        return new ResponseEntity<>(messageDtoMapper.toDto(rentRequestService.createMessage(messageDtoMapper.toEntity(messageDTO), messageDTO.getRentRequest().getId(), new Long(1))),
                 HttpStatus.CREATED);
     }
 
-    @GetMapping(value="/{id}/rent-info/{rentInfoId}/message")
-    public ResponseEntity<List<MessageDTO>> getMessages(@PathVariable Long id, @PathVariable Long rentInfoId){
+    @GetMapping(value="/{id}/message")
+    public ResponseEntity<List<MessageDTO>> getMessages(@PathVariable Long id){
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        List<MessageDTO> list = rentRequestService.getMessages(id, rentInfoId, userDTO.getId()).stream().map(messageDtoMapper::toDto).
+        List<MessageDTO> list = rentRequestService.getMessages(id, new Long(1)).stream().map(messageDtoMapper::toDto).
                 collect(Collectors.toList());
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
@@ -115,6 +125,21 @@ public class RentRequestController {
             //TODO: Add to log and delete return null;
             return null;
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private MessageDTO parseMessage(String message) {
+        System.out.println("PARSIRANJE STRINGA");
+        ObjectMapper mapper = new ObjectMapper();
+        MessageDTO retVal;
+
+        try {
+            retVal = mapper.readValue(message, MessageDTO.class); // parsiranje JSON stringa
+        } catch (IOException e) {
+            retVal = null;
+        }
+
+        return retVal;
     }
 
     @Autowired

@@ -7,6 +7,7 @@ import lombok.Setter;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -18,7 +19,6 @@ public class FeedbackDTO {
     @Max(value = 5, message = "Max rating is 5.")
     private Integer rating;
 
-    @NotNull(message = "Comment is empty.")
-    private CommentDTO comment;
+    private Set<CommentDTO> comments;
 
 }

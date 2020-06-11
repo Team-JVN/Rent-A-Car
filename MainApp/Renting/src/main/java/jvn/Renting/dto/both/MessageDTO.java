@@ -20,7 +20,7 @@ public class MessageDTO {
 
     private String text;
 
-    private Long sender;
+    private UserDTO sender;
 
     private String dateAndTime;
 

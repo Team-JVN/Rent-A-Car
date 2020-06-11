@@ -8,10 +8,12 @@ import jvn.Renting.enumeration.CommentStatus;
 import jvn.Renting.enumeration.RentRequestStatus;
 import jvn.Renting.exceptionHandler.InvalidRentRequestDataException;
 import jvn.Renting.mapper.CommentDtoMapper;
+import jvn.Renting.mapper.MessageDtoMapper;
 import jvn.Renting.model.Comment;
 import jvn.Renting.model.Message;
 import jvn.Renting.model.RentInfo;
 import jvn.Renting.model.RentRequest;
+import jvn.Renting.repository.CommentRepository;
 import jvn.Renting.repository.RentRequestRepository;
 import jvn.Renting.service.RentRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.net.SocketException;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -44,6 +48,10 @@ public class RentRequestServiceImpl implements RentRequestService {
     private CommentDtoMapper commentDtoMapper;
 
     private SimpMessagingTemplate simpMessagingTemplate;
+
+    private CommentRepository commentRepository;
+
+    private MessageDtoMapper messageDtoMapper;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -165,7 +173,7 @@ public class RentRequestServiceImpl implements RentRequestService {
                 break;
             }
         }
-        //TODO:save comment in comment repository and return comment
+        commentRepository.save(comment);
         return comment;
     }
 
@@ -173,15 +181,21 @@ public class RentRequestServiceImpl implements RentRequestService {
     public FeedbackDTO leaveFeedback(FeedbackDTO feedbackDTO, Long id, Long rentInfoId, Long userId){
 
         RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
-        for(RentInfo rentInfo: rentRequest.getRentInfos()){
+        Set<RentInfo> rentInfos = rentRequest.getRentInfos();
+        for(RentInfo rentInfo: rentInfos){
             if(rentInfo.getId().equals(rentInfoId)){
-                Comment comment = commentDtoMapper.toEntity(feedbackDTO.getComment());
+                Comment comment = commentDtoMapper.toEntity(feedbackDTO.getComments().iterator().next());
                 comment.setSender(userId);
                 comment.setStatus(CommentStatus.AWAITING);
+                comment.setRentInfo(rentInfo);
                 rentInfo.getComments().add(comment);
                 Integer currRating = rentInfo.getRating();
                 rentInfo.setRating((currRating + feedbackDTO.getRating())/2);
+                rentRequest.setRentInfos(new HashSet<>(rentInfos));
                 rentRequestRepository.save(rentRequest);
+                for(RentInfo ri: rentRequest.getRentInfos()){
+                    System.out.println(ri.getComments().size());
+                }
                 break;
             }
         }
@@ -196,41 +210,42 @@ public class RentRequestServiceImpl implements RentRequestService {
         for(RentInfo rentInfo: rentRequest.getRentInfos()){
             if(rentInfo.getId().equals(rentInfoId)){
                 feedbackDTO.setRating(rentInfo.getRating());
+                System.out.println("SIZE: " + rentInfo.getComments().size());
                 for(Comment comment: rentInfo.getComments()){
-                    //TODO:find comment which is made by userId
-                    if(comment.getSender().equals(userId)){
-                        feedbackDTO.setComment(commentDtoMapper.toDto(comment));
-                        break;
-                    }
+                    if(comment.getStatus().equals(CommentStatus.APPROVED))
+                        feedbackDTO.getComments().add(commentDtoMapper.toDto(comment));
                 }
-
-            }
-        }
-        return feedbackDTO;
-
-
-    }
-
-    @Override
-    public Message createMessage(Message message, Long id, Long rentInfoId, Long userId) {
-
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
-        for(RentInfo rentInfo: rentRequest.getRentInfos()){
-            if(rentInfo.getId().equals(rentInfoId)){
-                message.setRentRequest(rentRequest);
-                message.setSender(userId);
-                rentRequest.getMessages().add(message);
-//                this.simpMessagingTemplate.convertAndSend("/socket-publisher/" + rentRequest.getCreatedBy(), message);
-//                this.simpMessagingTemplate.convertAndSend("/socket-publisher/" + rentRequest.getClient(), message);
-                rentRequestRepository.save(rentRequest);
                 break;
             }
         }
+        return feedbackDTO;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Message createMessage(Message message, Long id, Long userId) {
+
+        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
+
+        message.setRentRequest(rentRequest);
+        message.setSender(userId);
+        rentRequest.getMessages().add(message);
+
+//        this.simpMessagingTemplate.convertAndSend("/socket-publisher/" + rentRequest.getCreatedBy(), message);
+
+        try {
+            this.simpMessagingTemplate.convertAndSend("/socket-publisher", messageDtoMapper.toDto(message));
+        } catch (Exception e) {
+            throw new InvalidRentRequestDataException("Socket error", HttpStatus.BAD_REQUEST);
+        }
+
+        rentRequestRepository.save(rentRequest);
+
         return message;
     }
 
     @Override
-    public List<Message> getMessages(Long id, Long rentInfoId, Long userId) {
+    public List<Message> getMessages(Long id, Long userId) {
         RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
         List<Message> messages = new ArrayList<Message>();
         for(Message message: rentRequest.getMessages()){
@@ -402,13 +417,16 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     @Autowired
     public RentRequestServiceImpl(RentRequestRepository rentRequestRepository, AdvertisementClient advertisementClient, UserClient userClient,
-                                  SearchClient searchClient, CommentDtoMapper commentDtoMapper, SimpMessagingTemplate simpMessagingTemplate) {
+                                  SearchClient searchClient, CommentDtoMapper commentDtoMapper, SimpMessagingTemplate simpMessagingTemplate,
+                                  CommentRepository commentRepository, MessageDtoMapper messageDtoMapper) {
         this.rentRequestRepository = rentRequestRepository;
         this.advertisementClient = advertisementClient;
         this.userClient = userClient;
         this.searchClient = searchClient;
         this.commentDtoMapper = commentDtoMapper;
         this.simpMessagingTemplate = simpMessagingTemplate;
+        this.commentRepository = commentRepository;
+        this.messageDtoMapper = messageDtoMapper;
 
     }
 }

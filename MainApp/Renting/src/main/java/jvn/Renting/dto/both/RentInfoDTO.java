@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.*;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -28,4 +29,7 @@ public class RentInfoDTO {
     private AdvertisementDTO advertisement;
 
     private Boolean inBundle;
+
+    private Set<CommentDTO> comments;
+
 }
