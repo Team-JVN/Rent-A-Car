@@ -3,6 +3,7 @@ export class CarEdit {
     mileageInKm: number;
     kidsSeats: number;
     availableTracking: boolean;
+
     constructor(mileageInKm: number, kidsSeats: number, availableTracking: boolean, id?: number) {
         this.mileageInKm = mileageInKm;
         this.kidsSeats = kidsSeats;

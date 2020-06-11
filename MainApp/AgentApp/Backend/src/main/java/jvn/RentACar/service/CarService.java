@@ -3,9 +3,11 @@ package jvn.RentACar.service;
 import jvn.RentACar.dto.both.CarDTO;
 import jvn.RentACar.dto.request.CarEditDTO;
 import jvn.RentACar.enumeration.EditType;
+import jvn.RentACar.enumeration.LogicalStatus;
 import jvn.RentACar.model.Car;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -25,4 +27,6 @@ public interface CarService {
     void delete(Long id);
 
     EditType getEditType(Long id);
+
+    List<Car> getStatistics(String filter);
 }

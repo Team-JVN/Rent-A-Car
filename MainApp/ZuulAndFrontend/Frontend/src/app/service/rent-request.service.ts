@@ -92,4 +92,12 @@ export class RentRequestService {
       feedback
     );
   }
+
+  public getAdvertisementEditType(id: number) {
+    return this.httpClient.get(this.url + '/advertisement/' + id + '/edit-type');
+  }
+
+  public pay(rentRequestId: number, rentInfoId: number): any {
+    return this.httpClient.put(this.url + '/' + rentRequestId + '/rent-info/' + rentInfoId + '/pay', null);
+  }
 }

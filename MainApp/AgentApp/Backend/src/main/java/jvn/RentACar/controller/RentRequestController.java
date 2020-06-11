@@ -1,10 +1,15 @@
 package jvn.RentACar.controller;
 
+import jvn.RentACar.dto.both.RentInfoDTO;
 import jvn.RentACar.dto.both.RentRequestDTO;
 import jvn.RentACar.dto.request.RentRequestStatusDTO;
+import jvn.RentACar.dto.response.UserDTO;
 import jvn.RentACar.exceptionHandler.InvalidAdvertisementDataException;
+import jvn.RentACar.mapper.RentInfoDtoMapper;
 import jvn.RentACar.mapper.RentRequestDtoMapper;
+import jvn.RentACar.service.RentInfoService;
 import jvn.RentACar.service.RentRequestService;
+import jvn.RentACar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
+import java.text.ParseException;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,6 +33,12 @@ public class RentRequestController {
     private RentRequestService rentRequestService;
 
     private RentRequestDtoMapper rentRequestDtoMapper;
+
+    private RentInfoService rentInfoService;
+
+    private RentInfoDtoMapper rentInfoDtoMapper;
+
+    private UserService userService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<RentRequestDTO> create(@Valid @RequestBody RentRequestDTO rentRequestDTO) {
@@ -50,21 +62,25 @@ public class RentRequestController {
         return new ResponseEntity<>(rentRequestDtoMapper.toDto(rentRequestService.get(id)), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable @Positive(message = "Id must be positive.") Long id) {
-        rentRequestService.delete(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<RentRequestDTO> changeRentRequestStatus(@PathVariable @Positive(message = "Id must be positive.") Long id,
                                                                   @Valid @RequestBody RentRequestStatusDTO status) {
         return new ResponseEntity<>(rentRequestDtoMapper.toDto(rentRequestService.changeRentRequestStatus(id, status)), HttpStatus.OK);
     }
 
+    @PutMapping(value = "/{rentRequestId}/rent-info/{rentInfoId}/pay")
+    public ResponseEntity<RentInfoDTO> pay(@PathVariable("rentRequestId") @Positive(message = "Id must be positive.") Long rentRequestId,
+                                           @PathVariable("rentInfoId") @Positive(message = "Id must be positive.") Long rentInfoId) {
+        return new ResponseEntity<>(rentInfoDtoMapper.toDto(rentInfoService.pay(rentRequestId, rentInfoId,userService.getLoginUser().getId())), HttpStatus.OK);
+    }
+
     @Autowired
-    public RentRequestController(RentRequestService rentRequestService, RentRequestDtoMapper rentRequestDtoMapper) {
+    public RentRequestController(RentRequestService rentRequestService, RentRequestDtoMapper rentRequestDtoMapper,
+                                 RentInfoService rentInfoService, RentInfoDtoMapper rentInfoDtoMapper,UserService userService) {
         this.rentRequestService = rentRequestService;
         this.rentRequestDtoMapper = rentRequestDtoMapper;
+        this.rentInfoService = rentInfoService;
+        this.rentInfoDtoMapper = rentInfoDtoMapper;
+        this.userService = userService;
     }
 }

@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
@@ -48,11 +49,6 @@ public class UserController {
     private AuthentificationService authentificationService;
 
     private UserDtoMapper userDtoMapper;
-
-    @RequestMapping("/health")
-    public String health() {
-        return "Hello world";
-    }
 
     @PostMapping(value = "/login")
     public ResponseEntity<UserTokenState> login(@RequestBody JwtAuthenticationRequest authenticationRequest) {
@@ -105,6 +101,7 @@ public class UserController {
                     HttpStatus.BAD_REQUEST);
         }
     }
+
     @PostMapping(value = "/register-agent", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AgentDTO> registerAgent(@Valid @RequestBody AgentDTO agentDTO) {
         try {
@@ -149,7 +146,7 @@ public class UserController {
 
     @Autowired
     public UserController(UserService userService, ClientService clientService, ClientDtoMapper clientDtoMapper,
-                          AuthentificationService authentificationService,UserDtoMapper userDtoMapper,
+                          AuthentificationService authentificationService, UserDtoMapper userDtoMapper,
                           AgentDtoMapper agentDtoMapper, AgentService agentService) {
 
         this.userService = userService;

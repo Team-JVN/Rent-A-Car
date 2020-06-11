@@ -150,15 +150,6 @@
                         <tr>
                             <td class="form-full-width-left">
                                 <mat-form-field class="form-full-width-95">
-                                    <input matInput placeholder="Pick-up Point" formControlName="pickUpPoint">
-                                    <mat-error
-                                        *ngIf="dateForm.get('pickUpPoint').errors && dateForm.get('pickUpPoint').errors['required']">
-                                        Pick-up Point is required.
-                                    </mat-error>
-                                </mat-form-field>
-                            </td>
-                            <td class="form-full-width-right">
-                                <mat-form-field class="form-full-width">
                                     <input matInput [matDatepicker]="pickerFrom" placeholder="Valid from"
                                         formControlName="validFrom" readonly [min]="minDate">
                                     <mat-datepicker-toggle matSuffix [for]="pickerFrom">
@@ -166,10 +157,35 @@
                                     <mat-datepicker #pickerFrom disabled="false"></mat-datepicker>
                                 </mat-form-field>
                             </td>
+                            <td class="form-full-width-right" *ngIf="isClient">
+                                <mat-form-field class="form-full-width">
+                                    <input matInput [matDatepicker]="pickerTo" placeholder="Valid to"
+                                        formControlName="validTo" readonly [min]="minDate">
+                                    <mat-datepicker-toggle matSuffix [for]="pickerTo">
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #pickerTo disabled="false"></mat-datepicker>
+                                </mat-form-field>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <mat-error class="date-err" *ngIf="dateForm.errors && dateForm.errors['validError']">
+                                    Date form must be at least the present day and must be before date to.
+                                </mat-error>
+                            </td>
                         </tr>
                         <tr>
                             <td class="form-full-width-left">
                                 <mat-form-field class="form-full-width-95">
+                                    <input matInput placeholder="Pick-up Point" formControlName="pickUpPoint">
+                                    <mat-error
+                                        *ngIf="dateForm.get('pickUpPoint').errors && dateForm.get('pickUpPoint').errors['required']">
+                                        Pick-up Point is required.
+                                    </mat-error>
+                                </mat-form-field>
+                            </td>
+                            <td class="form-full-width-right" *ngIf="!isClient">
+                                <mat-form-field class="form-full-width">
                                     <input matInput placeholder="Discount for 30+ days rent" type="number"
                                         formControlName="discount" min="0" max="99">
                                     <span matSuffix class="ml-2">%</span>
@@ -183,9 +199,12 @@
                                     </mat-error>
                                 </mat-form-field>
                             </td>
-                            <td class="form-full-width-right">
+                        </tr>
+
+                        <tr>
+                            <td class="form-full-width-left">
                                 <div *ngIf="getSelectedPriceList() && getSelectedPriceList().pricePerKm">
-                                    <mat-form-field class="form-full-width">
+                                    <mat-form-field class="form-full-width-95">
                                         <input matInput placeholder="Kilometres Limit" type="number"
                                             formControlName="kilometresLimit" min="0">
                                         <span matSuffix class="ml-2">Km</span>

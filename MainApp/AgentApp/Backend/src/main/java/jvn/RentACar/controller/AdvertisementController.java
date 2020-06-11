@@ -5,6 +5,7 @@ import jvn.RentACar.dto.request.AdvertisementEditDTO;
 import jvn.RentACar.dto.request.CreateAdvertisementDTO;
 import jvn.RentACar.dto.response.AdvertisementDTO;
 import jvn.RentACar.dto.response.AdvertisementWithPicturesDTO;
+import jvn.RentACar.dto.response.SearchParamsDTO;
 import jvn.RentACar.enumeration.EditType;
 import jvn.RentACar.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.RentACar.mapper.AdvertisementDtoMapper;
@@ -55,7 +56,8 @@ public class AdvertisementController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AdvertisementDTO> edit(@PathVariable @Positive(message = "Id must be positive.") Long id, @Valid @RequestBody AdvertisementWithPicturesDTO advertisementDTO) {
+    public ResponseEntity<AdvertisementDTO> edit(@PathVariable @Positive(message = "Id must be positive.") Long id,
+                                                 @Valid @RequestBody AdvertisementWithPicturesDTO advertisementDTO) {
         try {
             return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.edit(id, adWithPicturesDtoMapper.toEntity(advertisementDTO))), HttpStatus.OK);
         } catch (ParseException e) {
@@ -64,7 +66,8 @@ public class AdvertisementController {
     }
 
     @PutMapping(value = "/{id}/partial", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AdvertisementDTO> editPartial(@PathVariable @Positive(message = "Id must be positive.") Long id, @Valid @RequestBody AdvertisementEditDTO advertisementDTO) {
+    public ResponseEntity<AdvertisementDTO> editPartial(@PathVariable @Positive(message = "Id must be positive.") Long id,
+                                                        @Valid @RequestBody AdvertisementEditDTO advertisementDTO) {
         return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.editPartial(id, advertisementDTO)), HttpStatus.OK);
     }
 
@@ -76,6 +79,7 @@ public class AdvertisementController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") @Positive(message = "Id must be positive.") Long id) {
         advertisementService.delete(id);
+        rentRequestService.rejectAllRequests(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -99,6 +103,12 @@ public class AdvertisementController {
     @GetMapping("/{id}")
     public ResponseEntity<AdvertisementWithPicturesDTO> get(@PathVariable @Positive(message = "Id must be positive.") Long id) {
         return new ResponseEntity<>(adWithPicturesDtoMapper.toDto(advertisementService.get(id)), HttpStatus.OK);
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<List<AdvertisementWithPicturesDTO>> searchAdvertisements(@Valid @RequestBody SearchParamsDTO searchParamsDTO) {
+        List<AdvertisementWithPicturesDTO> list = advertisementService.searchAdvertisements(searchParamsDTO).stream().map(adWithPicturesDtoMapper::toDto).collect(Collectors.toList());
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @Autowired

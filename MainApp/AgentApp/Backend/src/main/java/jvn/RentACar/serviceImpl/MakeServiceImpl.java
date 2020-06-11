@@ -40,7 +40,7 @@ public class MakeServiceImpl implements MakeService {
 
     @Override
     public List<Make> get() {
-        return makeRepository.findAll();
+        return makeRepository.findAllByOrderByNameAsc();
     }
 
     @Override
@@ -69,7 +69,8 @@ public class MakeServiceImpl implements MakeService {
         if (make.getCars().isEmpty()) {
             return make;
         }
-        throw new InvalidMakeDataException("There's at least one car with this make so you can not edit it.", HttpStatus.BAD_REQUEST);
+        throw new InvalidMakeDataException("There's at least one car with this make so you can not edit it.",
+                HttpStatus.BAD_REQUEST);
     }
 
     @Autowired

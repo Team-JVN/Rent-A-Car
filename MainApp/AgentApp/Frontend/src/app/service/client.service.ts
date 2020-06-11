@@ -19,7 +19,7 @@ export class ClientService {
   }
 
   public edit(client: Client): any {
-    return this.httpClient.put(this.url + '/' + client.id, client);
+    return this.httpClient.put(this.url, client);
   }
 
   public getClients() {
@@ -30,10 +30,13 @@ export class ClientService {
     return this.httpClient.delete(this.url + '/' + id);
   }
 
-  activateAccount(token: string) {
+  public activateAccount(token: string) {
     let params = new HttpParams();
     params = params.append('t', token);
     return this.httpClient.put(this.url + '/activate', {}, { params: params });
   }
 
+  public getLoggedInUser() {
+    return this.httpClient.get(this.url + '/profile');
+  }
 }

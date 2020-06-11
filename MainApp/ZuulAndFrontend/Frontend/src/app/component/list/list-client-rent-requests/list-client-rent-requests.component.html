@@ -43,10 +43,6 @@
                         *ngIf="element.rentRequestStatus == 'PENDING'" color="warn" (click)="cancel(element)">
                         <mat-icon>cancel</mat-icon>
                     </button>
-                    <button mat-icon-button aria-label="Delete" matTooltip="Delete"
-                        *ngIf="element.rentRequestStatus != 'PAID'" color="warn" (click)="delete(element)">
-                        <mat-icon>delete</mat-icon>
-                    </button>
                 </td>
             </ng-container>
 
@@ -61,8 +57,8 @@
                                             <mat-card-title>
                                                 Rent info for
                                                 <span (click)="advertisementDetails(rentInfo)" class="btn-adv-details">
-                                                    {{rentInfo.advertisement.car.make.name }}
-                                                    {{rentInfo.advertisement.car.model.name}}
+                                                    {{rentInfo.advertisement.car.make}}
+                                                    {{rentInfo.advertisement.car.model}}
                                                 </span>
                                             </mat-card-title>
                                         </mat-card-header>
@@ -107,6 +103,7 @@
                                                     <span *ngIf="!rentInfo.optedForCDW">No</span>
                                                 </td>
                                             </tr>
+
                                         </tbody>
                                     </table>
                                 </mat-card-content>

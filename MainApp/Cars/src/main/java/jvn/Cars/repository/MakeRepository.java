@@ -13,7 +13,7 @@ public interface MakeRepository extends JpaRepository<Make, Long> {
 
     Make findByNameAndIdNot(String name, Long id);
 
-    List<Make> findAll();
+    List<Make> findAllByOrderByNameAsc();
 
     Make findOneById(Long id);
 }

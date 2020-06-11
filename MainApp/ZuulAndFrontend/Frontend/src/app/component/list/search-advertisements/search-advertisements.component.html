@@ -112,10 +112,10 @@
                         </td>
                         <td class="form-width-30">
                             <div class="row">
-                                <div class="col-4 rating-div">
+                                <div class="col-5 rating-div">
                                     <mat-label>Minimal rating:</mat-label>
                                 </div>
-                                <div class="col-8">
+                                <div class="col-7">
                                     <star-rating class="rating-style" totalstars="5" checkedcolor="#87C7F3"
                                         uncheckedcolor="black" size="30px" [(value)]="minRating"
                                         (rate)="onRate($event)">
@@ -318,9 +318,9 @@
                                     {{element.priceList.pricePerDay | number: '1.2-2'}} €</td>
                             </tr>
                             <tr><button mat-raised-button color="primary" class="rent-btn"
-                                    *ngIf="this.authService.isLoggedIn() && checkIfCanRentAdvertisement(element)"
-                                    (click)="rent(element);$event.stopPropagation()">Rent
-                                    me!</button></tr>
+                                    (click)="rent(element);$event.stopPropagation()"
+                                    *ngIf="this.authService.isLoggedIn() && element.owner.email !== this.authService.getLoggedInUserEmail() && checkIfCanRentAdvertisement(element)">
+                                    Rent me!</button></tr>
                         </table>
                     </mat-card>
                 </td>

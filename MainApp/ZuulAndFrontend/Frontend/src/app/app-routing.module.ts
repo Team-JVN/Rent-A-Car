@@ -1,3 +1,13 @@
+import { GetStatisticsGuard } from './guard/get.statistics.guard';
+import { AdminEditProfileGuard } from './guard/admin.edit.profile.guard';
+import { AgentEditProfileGuard } from './guard/agent.edit.profile.guard';
+import { ClientEditProfileGuard } from './guard/client.edit.profile.guard';
+import { ManageRoleGuard } from './guard/manage.role.guard';
+import { MyRentRequestsGuard } from './guard/my.rent.requests.guard';
+import { ManageUsersGuard } from './guard/manage.users.guard';
+import { ManagePriceListsGuard } from './guard/manage.pricelists.guard';
+import { ManageCarsGuard } from './guard/manage.cars.guard';
+import { ManageCodeBooksGuard } from './guard/manage.code.books.guard';
 import { RentingCartComponent } from './component/renting-cart/renting-cart.component';
 import { CarsStatisticsComponent } from './component/list/cars-statistics/cars-statistics.component';
 import { SearchAdvertisementsComponent } from './component/list/search-advertisements/search-advertisements.component';
@@ -30,64 +40,96 @@ import { ResetPasswordEnterNewPassComponent } from './component/authentification
 import { ResetPasswordEnterEmailComponent } from './component/authentification/reset-password-enter-email/reset-password-enter-email.component';
 import { EditRoleComponent } from './component/edit/edit-role/edit-role.component';
 import { ActivateAccountComponent } from './component/authentification/activate-account/activate-account.component';
+import { ManageAdvertisementsGuard } from './guard/manage.advertisements.guard';
 
 const routes: Routes = [
+  /** MANAGE ADVERTISEMENTS */
   {
-    path: "advertisement/:id",
-    component: AdvertisementDetailsComponent,
+    path: "advertisements",
+    component: ListAdvertisementsComponent,
+    canActivate: [ManageAdvertisementsGuard],
+  },
+  /** Get received rent requests */
+  {
+    path: 'rent-requests/:id',
+    component: ListRentRequestsComponent,
+    canActivate: [ManageAdvertisementsGuard],
   },
   {
-    path: "activate-account",
-    component: ActivateAccountComponent,
+    path: 'rent-request/:id',
+    component: RentRequestDetailsComponent,
+    canActivate: [ManageAdvertisementsGuard],
   },
+  /** MANAGE CODE BOOKS */
   {
     path: "body-styles",
     component: ListBodyStylesComponent,
+    canActivate: [ManageCodeBooksGuard],
   },
   {
     path: "fuel-types",
     component: ListFuelTypeComponent,
+    canActivate: [ManageCodeBooksGuard],
   },
   {
     path: "gearbox-types",
     component: ListGearBoxTypesComponent,
+    canActivate: [ManageCodeBooksGuard],
   },
+  {
+    path: "makes",
+    component: ListMakesComponent,
+    canActivate: [ManageCodeBooksGuard],
+  },
+  {
+    path: "models/:id",
+    component: ListModelsComponent,
+    canActivate: [ManageCodeBooksGuard],
+  },
+  /** MANAGE CARS */
   {
     path: "cars",
     component: ListCarsComponent,
+    canActivate: [ManageCarsGuard],
   },
+  /** GET STATISTICS */
   {
     path: 'statistics',
-    component: CarsStatisticsComponent
+    component: CarsStatisticsComponent,
+    canActivate: [GetStatisticsGuard],
   },
+  /** MANAGE PRICE LISTS */
   {
     path: 'price-lists',
-    component: ListPriceListsComponent
+    component: ListPriceListsComponent,
+    canActivate: [ManagePriceListsGuard],
+  },
+
+  /** MANAGE USERS */
+  {
+    path: "manage-users",
+    component: ManageUsersComponent,
+    canActivate: [ManageUsersGuard]
+  },
+
+  /** Get my rent requests */
+  {
+    path: 'client-rent-request/:id',
+    component: ClientRentRequestDetailsComponent,
+    canActivate: [MyRentRequestsGuard],
   },
   {
-    path: 'rent-requests/:id',
-    component: ListRentRequestsComponent,
+    path: 'client/renting-cart',
+    component: RentingCartComponent,
+    canActivate: [MyRentRequestsGuard],
   },
   {
     path: 'client-rent-requests',
     component: ListClientRentRequestsComponent,
+    canActivate: [MyRentRequestsGuard],
   },
-  {
-    path: 'rent-request/:id',
-    component: RentRequestDetailsComponent
-  },
-  {
-    path: 'client-rent-request/:id',
-    component: ClientRentRequestDetailsComponent
-  },
-  {
-    path: "reset-password",
-    component: ResetPasswordEnterNewPassComponent,
-  },
-  {
-    path: "forgot-password",
-    component: ResetPasswordEnterEmailComponent,
-  },
+
+  /** Unauthorized user */
   {
     path: "login",
     component: LoginComponent,
@@ -97,53 +139,56 @@ const routes: Routes = [
     component: ChangePasswordComponent,
   },
   {
-    path: "client/registration",
-    component: ClientRegistrationComponent,
+    path: 'client/registration',
+    component: ClientRegistrationComponent
+  },
+  {
+    path: "advertisement/:id",
+    component: AdvertisementDetailsComponent,
+  },
+  {
+    path: "activate-account",
+    component: ActivateAccountComponent,
+  },
+  {
+    path: "forgot-password",
+    component: ResetPasswordEnterEmailComponent,
+  },
+  {
+    path: "reset-password",
+    component: ResetPasswordEnterNewPassComponent,
   },
   {
     path: "client/pending-approval",
     component: ClientPendingApprovalComponent,
   },
   {
-    path: "manage-users",
-    component: ManageUsersComponent,
-  },
-  {
-    path: "edit-client-info",
-    component: EditClientInfoComponent,
-  },
-  {
     path: 'search-advertisements',
     component: SearchAdvertisementsComponent
   },
+  /**EDIT CLIENT INFO */
   {
-    path: 'client/registration',
-    component: ClientRegistrationComponent
+    path: "edit-client-info",
+    component: EditClientInfoComponent,
+    canActivate: [ClientEditProfileGuard],
   },
+  /**EDIT AGENT INFO */
   {
     path: "edit-agent-info",
     component: EditAgentComponent,
+    canActivate: [AgentEditProfileGuard],
   },
+  /**EDIT ADMIN INFO */
   {
     path: "edit-admin-info",
     component: EditAdminComponent,
-  },
-  {
-    path: 'client/renting-cart',
-    component: RentingCartComponent
-  },
-  {
-    path: "makes",
-    component: ListMakesComponent,
-  },
-  {
-    path: "models/:id",
-    component: ListModelsComponent,
+    canActivate: [AdminEditProfileGuard],
   },
   /** MANAGE ROLES */
   {
     path: "role",
     component: EditRoleComponent,
+    canActivate: [ManageRoleGuard],
   },
   //******************* ERROR PAGES ************************
   {
@@ -155,8 +200,8 @@ const routes: Routes = [
     component: NonAuthorizedErrorPageComponent,
   },
   {
-    path: "advertisements",
-    component: ListAdvertisementsComponent,
+    path: "",
+    component: SearchAdvertisementsComponent, //set search page
   },
   {
     path: '**',

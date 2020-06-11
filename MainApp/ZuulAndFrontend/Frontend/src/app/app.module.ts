@@ -1,3 +1,14 @@
+import { GetStatisticsGuard } from './guard/get.statistics.guard';
+import { MyRentRequestsGuard } from './guard/my.rent.requests.guard';
+import { ManagePriceListsGuard } from './guard/manage.pricelists.guard';
+import { ManageAdvertisementsGuard } from './guard/manage.advertisements.guard';
+import { ManageCodeBooksGuard } from './guard/manage.code.books.guard';
+import { ManageCarsGuard } from './guard/manage.cars.guard';
+import { ClientEditProfileGuard } from './guard/client.edit.profile.guard';
+import { AgentEditProfileGuard } from './guard/agent.edit.profile.guard';
+import { AdminEditProfileGuard } from './guard/admin.edit.profile.guard';
+import { ManageUsersGuard } from './guard/manage.users.guard';
+import { ManageRoleGuard } from './guard/manage.role.guard';
 
 import { TokenInterceptor } from './interceptor/token.interceptor';
 import { AddRentRequestComponent } from './component/add/add-rent-request/add-rent-request.component';
@@ -82,6 +93,7 @@ import { RejectRequestToRegisterComponent } from './component/reject-request-to-
 import { ConfirmDeleteClientComponent } from './component/confirm-dialog/confirm-delete-client/confirm-delete-client.component';
 import { ConfirmDialogDeleteAgentComponent } from './component/confirm-dialog/confirm-dialog-delete-agent/confirm-dialog-delete-agent.component';
 import { ConfirmDialogDeleteAdminComponent } from './component/confirm-dialog/confirm-dialog-delete-admin/confirm-dialog-delete-admin.component';
+import { AddToCartComponent } from './component/add/add-to-cart/add-to-cart.component';
 
 @NgModule({
   declarations: [
@@ -153,6 +165,7 @@ import { ConfirmDialogDeleteAdminComponent } from './component/confirm-dialog/co
     ConfirmDeleteClientComponent,
     ConfirmDialogDeleteAgentComponent,
     ConfirmDialogDeleteAdminComponent,
+    AddToCartComponent,
   ],
   imports: [
     BrowserModule,
@@ -209,6 +222,7 @@ import { ConfirmDialogDeleteAdminComponent } from './component/confirm-dialog/co
     RejectRequestToRegisterComponent,
     ConfirmDialogDeleteAgentComponent,
     ConfirmDialogDeleteAdminComponent,
+    AddToCartComponent,
   ],
   providers: [
     {
@@ -216,6 +230,17 @@ import { ConfirmDialogDeleteAdminComponent } from './component/confirm-dialog/co
     },
     { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    ManageRoleGuard,
+    ManageUsersGuard,
+    AdminEditProfileGuard,
+    AgentEditProfileGuard,
+    ClientEditProfileGuard,
+    ManageCarsGuard,
+    GetStatisticsGuard,
+    ManageCodeBooksGuard,
+    ManageAdvertisementsGuard,
+    ManagePriceListsGuard,
+    MyRentRequestsGuard,
   ],
   bootstrap: [AppComponent]
 })

@@ -48,7 +48,7 @@ export class EditAgentComponent implements OnInit {
         );
       },
       () => {
-        this.toastr.error('Something goes wrong. Please try again.', 'Show clients');
+        this.toastr.error('Something went wrong. Please try again.', 'Edit profile');
       }
     );
   }

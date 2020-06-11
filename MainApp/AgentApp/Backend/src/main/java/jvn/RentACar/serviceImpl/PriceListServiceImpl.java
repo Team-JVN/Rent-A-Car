@@ -43,9 +43,15 @@ public class PriceListServiceImpl implements PriceListService {
     @Override
     public PriceList edit(Long id, PriceList priceList) {
         PriceList dbPriceList = get(id);
-        dbPriceList.setPriceForCDW(priceList.getPriceForCDW());
         dbPriceList.setPricePerDay(priceList.getPricePerDay());
-        dbPriceList.setPricePerKm(priceList.getPricePerKm());
+
+        if (dbPriceList.getPricePerKm() != null) {
+            dbPriceList.setPricePerKm(priceList.getPricePerKm());
+        }
+        if (dbPriceList.getPriceForCDW() != null) {
+            dbPriceList.setPriceForCDW(priceList.getPriceForCDW());
+        }
+
         return priceListRepository.save(dbPriceList);
     }
 

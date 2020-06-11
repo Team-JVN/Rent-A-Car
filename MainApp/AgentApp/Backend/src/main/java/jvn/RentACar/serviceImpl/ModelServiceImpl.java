@@ -37,7 +37,7 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     public List<Model> getAll(Long makeId) {
-        return modelRepository.findByMakeId(makeId);
+        return modelRepository.findByMakeIdOrderByNameAsc(makeId);
     }
 
     @Override

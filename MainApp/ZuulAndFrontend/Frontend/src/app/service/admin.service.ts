@@ -27,7 +27,7 @@ export class AdminService {
   }
 
   public getLoggedInUser() {
-    return this.httpClient.get(this.url + '/logged-in-user');
+    return this.httpClient.get(this.url + '/profile');
   }
 
   public delete(id: number): any {

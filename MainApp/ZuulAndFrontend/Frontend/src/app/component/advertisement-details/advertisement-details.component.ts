@@ -1,4 +1,3 @@
-import { AuthentificationService } from './../../service/authentification.service';
 import { SearchService } from 'src/app/service/search.service';
 import { AdvertisementFromSearch } from './../../model/advertisementFromSearch';
 import { NgxGalleryOptions, NgxGalleryImage, NgxGalleryAnimation } from 'ngx-gallery';
@@ -8,7 +7,6 @@ import { ToastrService } from 'ngx-toastr';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { AddRentRequestComponent } from '../add/add-rent-request/add-rent-request.component';
 
 @Component({
   selector: 'app-advertisement-details',
@@ -29,7 +27,6 @@ export class AdvertisementDetailsComponent implements OnInit {
     private router: Router,
     private toastr: ToastrService,
     private searchService: SearchService,
-    private authService: AuthentificationService,
     public dialog: MatDialog,
   ) { }
 

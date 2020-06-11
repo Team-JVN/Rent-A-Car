@@ -24,7 +24,7 @@ import { trigger, state, transition, style, animate } from '@angular/animations'
   ],
 })
 export class ListRentRequestsComponent implements OnInit {
-  //CLIENT AND AGENT HAVE ACCESS TO THIS PAGE
+  
   displayedColumns: string[] = ['client', 'totalPrice', 'status', 'buttons'];
   expandedElement: RentRequest | null;
   rentRequestsDataSource: MatTableDataSource<RentRequest>;
@@ -46,11 +46,7 @@ export class ListRentRequestsComponent implements OnInit {
       this.fetchRentRequests('all');
     });
     this.fetchRentRequests('all');
-    this.createSuccess = this.rentRequestService.createSuccessEmitter.subscribe(
-      () => {
-        this.fetchRentRequests(this.status)
-      }
-    );
+
   }
 
   fetchRentRequests(status: string) {
@@ -67,21 +63,8 @@ export class ListRentRequestsComponent implements OnInit {
     );
   }
 
-
-  delete(element: RentRequest) {
-    this.rentRequestService.delete(element.id).subscribe(
-      () => {
-        this.fetchRentRequests(this.status);
-        this.toastr.success('Successfully deleted Rent Request!', 'Delete Rent Request');
-      },
-      (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Delete Rent Request');
-      }
-    );
-  }
-
   createRentReport(rentRequest: RentRequest, rentInfo: RentInfo) {
-    // this.dialog.open(AddRentRequestComponent, { data: element.advertisement });
+    //this.dialog.open(AddRentReportComponent, { data: rentInfo });
   }
 
   advertisementDetails(rentInfo: RentInfo) {

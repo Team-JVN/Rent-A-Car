@@ -28,6 +28,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 import java.io.IOException;
 import java.util.List;
@@ -42,12 +43,9 @@ public class CarController {
 
     private CarService carService;
 
-    private CarDtoMapper carMapper;
-
+    private CarDtoMapper carDtoMapper;
     private CreateCarDtoMapper createCarDtoMapper;
-
     private CarWithPicturesDtoMapper carWithPicturesDtoMapper;
-
     private CarWithAllInformationDtoMapper carWithAllInformationDtoMapper;
 
     private HttpServletRequest request;
@@ -66,10 +64,9 @@ public class CarController {
             throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        CarDTO carDTO = carMapper.toDto(carService.create(createCarDtoMapper.toEntity(createCarDTO), multipartFiles,userDTO));
+        CarDTO carDTO = carDtoMapper.toDto(carService.create(createCarDtoMapper.toEntity(createCarDTO), multipartFiles, userDTO));
         return new ResponseEntity<>(carDTO, HttpStatus.CREATED);
     }
-
 
     @GetMapping
     public ResponseEntity<List<CarWithPicturesDTO>> get() {
@@ -81,8 +78,8 @@ public class CarController {
 
     @GetMapping("/verify/{userId}/{carId}")
     public ResponseEntity<CarWithAllInformationDTO> verify(@PathVariable("userId") @Positive(message = "Id must be positive.") Long userId,
-            @PathVariable("carId") @Positive(message = "Id must be positive.") Long carId) {
-        return new ResponseEntity<>(carWithAllInformationDtoMapper.toDto(carService.get(carId,userId)), HttpStatus.OK);
+                                                           @PathVariable("carId") @Positive(message = "Id must be positive.") Long carId) {
+        return new ResponseEntity<>(carWithAllInformationDtoMapper.toDto(carService.get(carId, userId)), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}/picture", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
@@ -90,16 +87,19 @@ public class CarController {
                                         @RequestParam(value = "fileName") String fileName) {
         return new ResponseEntity<>(carService.get(fileName), HttpStatus.OK);
     }
-/*
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") @Positive(message = "Id must be positive.") Long id) {
-        carService.delete(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+    @GetMapping(value = "/statistics/{filter}")
+    public ResponseEntity<List<CarWithPicturesDTO>> getStatistics(
+            @PathVariable(value = "filter") @Pattern(regexp = "(?i)(most-km-made|best-rated|most-commented)$", message = "Filter is not valid.") String filter) {
+
+        return new ResponseEntity<>(carService.getStatistics(filter).stream().map(carWithPicturesDtoMapper::toDto).collect(Collectors.toList()), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{id}/edit", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EditType> getEditType(@PathVariable @Positive(message = "Id must be positive.") Long id) {
-        return new ResponseEntity<>(carService.getEditType(id), HttpStatus.OK);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable("id") @Positive(message = "Id must be positive.") Long id) {
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        carService.delete(id, userDTO.getId(), request.getHeader("Auth"), request.getHeader("user"));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -114,8 +114,9 @@ public class CarController {
         } catch (IOException e) {
             throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
-        CarDTO newCarDTO = carMapper.toDto(carService.editAll(id, carDTO, multipartFiles));
-        return new ResponseEntity<>(newCarDTO, HttpStatus.OK);
+
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        return new ResponseEntity<>(carDtoMapper.toDto(carService.editAll(id, carDtoMapper.toEntity(carDTO), multipartFiles, userDTO.getId(), request.getHeader("Auth"), request.getHeader("user"), userDTO)), HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}/partial", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -129,10 +130,10 @@ public class CarController {
         } catch (IOException e) {
             throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
-        CarDTO newCarDTO = carMapper.toDto(carService.editPartial(id, carEditDTO, multipartFiles));
-        return new ResponseEntity<>(newCarDTO, HttpStatus.OK);
+
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        return new ResponseEntity<>(carDtoMapper.toDto(carService.editPartial(id, carEditDTO, multipartFiles, userDTO.getId(), request.getHeader("Auth"), request.getHeader("user"), userDTO)), HttpStatus.OK);
     }
-*/
 
     private void validateCreateCarDTO(CreateCarDTO createCarDTO) {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -143,19 +144,19 @@ public class CarController {
         }
     }
 
-    private void validateCarDTO(CarDTO carDTO) {
+    private void validateCarEditDTO(CarEditDTO carDTO) {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
-        Set<ConstraintViolation<CarDTO>> violations = validator.validate(carDTO);
+        Set<ConstraintViolation<CarEditDTO>> violations = validator.validate(carDTO);
         if (!violations.isEmpty()) {
             throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
     }
 
-    private void validateCarEditDTO(CarEditDTO carDTO) {
+    private void validateCarDTO(CarDTO carDTO) {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
-        Set<ConstraintViolation<CarEditDTO>> violations = validator.validate(carDTO);
+        Set<ConstraintViolation<CarDTO>> violations = validator.validate(carDTO);
         if (!violations.isEmpty()) {
             throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
@@ -171,15 +172,15 @@ public class CarController {
     }
 
     @Autowired
-    public CarController(CarService carService, CarDtoMapper carMapper, CreateCarDtoMapper createCarDtoMapper,HttpServletRequest request,
-                         CarWithPicturesDtoMapper carWithPicturesDtoMapper,CarWithAllInformationDtoMapper carWithAllInformationDtoMapper,
+    public CarController(CarService carService, CarDtoMapper carDtoMapper, CreateCarDtoMapper createCarDtoMapper, HttpServletRequest request,
+                         CarWithPicturesDtoMapper carWithPicturesDtoMapper, CarWithAllInformationDtoMapper carWithAllInformationDtoMapper,
                          ObjectMapper objectMapper) {
         this.carService = carService;
-        this.carMapper = carMapper;
+        this.carDtoMapper = carDtoMapper;
         this.createCarDtoMapper = createCarDtoMapper;
         this.carWithPicturesDtoMapper = carWithPicturesDtoMapper;
         this.carWithAllInformationDtoMapper = carWithAllInformationDtoMapper;
-        this.request=request;
+        this.request = request;
         this.objectMapper = objectMapper;
     }
 }

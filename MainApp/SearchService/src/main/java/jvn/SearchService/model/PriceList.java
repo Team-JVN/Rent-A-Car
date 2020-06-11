@@ -35,4 +35,10 @@ public class PriceList {
     @Column(nullable = false)
     private LogicalStatus status = LogicalStatus.EXISTING;
 
+    public PriceList(Long id, Double pricePerDay, Double pricePerKm, Double priceForCDW) {
+        this.id = id;
+        this.pricePerDay = pricePerDay;
+        this.pricePerKm = pricePerKm;
+        this.priceForCDW = priceForCDW;
+    }
 }

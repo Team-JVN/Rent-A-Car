@@ -1,8 +1,6 @@
 package jvn.Renting.dto.both;
 
-
 import jvn.Renting.enumeration.LogicalStatus;
-import jvn.Renting.model.CarDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,11 +22,11 @@ public class AdvertisementDTO {
     @NotNull(message = "PriceList is null.")
     private PriceListDTO priceList;
 
-    //    @NotBlank(message = "Date from is empty.")
-//    @Pattern(regexp = "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$", message = "Date from is not validly formatted")
+    @NotBlank(message = "Date from is empty.")
+    @Pattern(regexp = "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$", message = "Date from is not validly formatted")
     private String dateFrom;
 
-    //    @Pattern(regexp = "^(\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]))?$", message = "Date to is not validly formatted")
+    @Pattern(regexp = "^(\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]))?$", message = "Date to is not validly formatted")
     private String dateTo;
 
     @Min(value = 0, message = "Kilometres limit must be positive number.")
@@ -38,14 +36,12 @@ public class AdvertisementDTO {
     @Max(value = 99, message = "Maximal discount is 99%.")
     private Integer discount;
 
-    //    @NotNull(message = "CDW is null.")
     private Boolean CDW;
 
     @NotBlank(message = "Pick-up point  is empty.")
     @Pattern(regexp = "^([#.0-9a-zA-ZÀ-ƒ,-/]+[ ]?){1,10}$", message = "Pick up point is not valid.")
     private String pickUpPoint;
 
-    //    @NotNull(message = "Owner is null.")
     private OwnerDTO owner;
 
     private LogicalStatus logicalStatus;

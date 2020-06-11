@@ -1,22 +1,25 @@
 package jvn.Users.serviceImpl;
 
 import jvn.Users.common.RandomPasswordGenerator;
+import jvn.Users.dto.message.OwnerMessageDTO;
 import jvn.Users.enumeration.ClientStatus;
 import jvn.Users.exceptionHandler.InvalidClientDataException;
 import jvn.Users.exceptionHandler.InvalidTokenException;
 import jvn.Users.model.Client;
 import jvn.Users.model.Role;
 import jvn.Users.model.VerificationToken;
+import jvn.Users.producer.UserProducer;
 import jvn.Users.repository.ClientRepository;
 import jvn.Users.repository.VerificationTokenRepository;
 import jvn.Users.service.ClientService;
 import jvn.Users.service.EmailNotificationService;
 import jvn.Users.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.core.env.Environment;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -38,7 +41,10 @@ public class ClientServiceImpl implements ClientService {
     private EmailNotificationService emailNotificationService;
 
     private Environment environment;
+
     private VerificationTokenRepository verificationTokenRepository;
+
+    private UserProducer userProducer;
 
     @Override
     public Client create(Client client) throws NoSuchAlgorithmException {
@@ -106,7 +112,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public List<Client> getForRentRequest() {
+    public List<Client> getForRentRequest(Long loggedInClientId) {
         Collection<ClientStatus> statuses = new ArrayList<>();
         statuses.add(ClientStatus.NEVER_LOGGED_IN);
         statuses.add(ClientStatus.ACTIVE);
@@ -124,8 +130,11 @@ public class ClientServiceImpl implements ClientService {
         dbClient.setPhoneNumber(client.getPhoneNumber());
         dbClient.setName(client.getName());
         dbClient.setAddress(client.getAddress());
-        return clientRepository.save(dbClient);
+        dbClient = clientRepository.save(dbClient);
+        sendMessageForSearch(new OwnerMessageDTO(id, dbClient.getName(), dbClient.getEmail()));
+        return dbClient;
     }
+
 
     @Override
     public void delete(Long id) {
@@ -238,6 +247,11 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public List<Client> getClientsById(List<Long> clients) {
         return clientRepository.findByIdIn(clients);
+    }
+
+    @Async
+    public void sendMessageForSearch(OwnerMessageDTO ownerMessageDTO) {
+        userProducer.sendMessageForSearch(ownerMessageDTO);
     }
 
     private void composeAndSendDisableCreatingRentRequests(String recipientEmail) {
@@ -371,13 +385,14 @@ public class ClientServiceImpl implements ClientService {
     @Autowired
     public ClientServiceImpl(ClientRepository clientRepository, UserService userService,
                              PasswordEncoder passwordEncoder, EmailNotificationService emailNotificationService, Environment environment,
-                             VerificationTokenRepository verificationTokenRepository) {
+                             VerificationTokenRepository verificationTokenRepository, UserProducer userProducer) {
         this.clientRepository = clientRepository;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.emailNotificationService = emailNotificationService;
         this.environment = environment;
         this.verificationTokenRepository = verificationTokenRepository;
+        this.userProducer = userProducer;
     }
 
     private String getLocalhostURL() {

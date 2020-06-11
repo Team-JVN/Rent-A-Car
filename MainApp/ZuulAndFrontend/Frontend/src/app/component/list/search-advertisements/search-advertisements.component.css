@@ -24,7 +24,6 @@ mat-panel-title {
 
 .rating-div {
     padding-right: 0;
-    padding-top: 1px;
 }
 
 .search-btn {
@@ -70,7 +69,7 @@ th.mat-header-cell{
 .item-card {
     width: 100%;
     display: inline-flex;
-    background-color: #F5F5F5;    
+    background-color: #e8f5e9;    
     margin: 0.7em auto;
     align-items: center;    
     transition: all 0.1s ease-in-out;
@@ -128,7 +127,7 @@ th.mat-header-cell{
 
 .price-table {
     text-align: center;
-    width: 290px;
+    width: 310px;
 }
 
 .rent-btn {

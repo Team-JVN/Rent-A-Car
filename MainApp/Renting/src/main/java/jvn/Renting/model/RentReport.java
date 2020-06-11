@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Map;
 
 @Entity
 @Getter
@@ -28,4 +27,7 @@ public class RentReport {
 
     @Column
     private Integer madeMileage;
+
+    @Column
+    private Boolean paid;
 }

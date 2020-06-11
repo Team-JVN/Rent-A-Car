@@ -3,10 +3,11 @@ package jvn.Advertisements.service;
 
 import jvn.Advertisements.dto.request.UserDTO;
 import jvn.Advertisements.model.PriceList;
+
 import java.util.List;
 
 public interface PriceListService {
-    PriceList get(Long id, UserDTO userDTO);
+    PriceList get(Long id, Long loggedInUserId);
 
     List<PriceList> getAll(UserDTO userDTO);
 

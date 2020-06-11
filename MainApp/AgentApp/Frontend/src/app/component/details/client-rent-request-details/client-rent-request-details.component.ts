@@ -10,6 +10,8 @@ import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Location } from '@angular/common';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
+import { Message } from '@angular/compiler/src/i18n/i18n_ast';
+import { Client } from 'src/app/model/client';
 
 @Component({
   selector: 'app-client-rent-request-details',
@@ -20,9 +22,9 @@ export class ClientRentRequestDetailsComponent implements OnInit {
 
   messageForm: FormGroup;
   rentRequestId: number;
-  rentRequest: RentRequest;
+  rentRequest: RentRequest = new RentRequest(new Client("", "", "", ""), null, 0, "");
   loggedInUserEmail: string;
-  // messages: Message[];
+  messages: Message[];
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -52,7 +54,7 @@ export class ClientRentRequestDetailsComponent implements OnInit {
       )
     });
     this.loggedInUserEmail = this.authentificationService.getLoggedInUserEmail();
-    // this.getMessages();
+    this.getMessages();
 
     //Delete this
     // this.messages = [new Message("Cao sta radi,kako si, da li si dorbo.Kako su tvoji. sta radis", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 1), new Message("Kako si", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 2),
@@ -64,17 +66,17 @@ export class ClientRentRequestDetailsComponent implements OnInit {
     this.router.navigate(['/advertisement/' + rentInfo.advertisement.id]);
   }
 
-  // getMessages() {
-  //   this.messageService.getMessages(this.rentRequest.client).subscribe(
-  //     (data: Message[]) => {
-  //       this.toastr.success('Success!', 'Fetch messages');
-  //       this.messages = data;
-  //     },
-  //     (httpErrorResponse: HttpErrorResponse) => {
-  //       this.toastr.error(httpErrorResponse.error.message, 'Fetch messages');
-  //     }
-  //   );
-  // }
+  getMessages() {
+    // this.messageService.getMessages(this.rentRequest.client).subscribe(
+    //   (data: Message[]) => {
+    //     this.toastr.success('Success!', 'Fetch messages');
+    //     this.messages = data;
+    //   },
+    //   (httpErrorResponse: HttpErrorResponse) => {
+    //     this.toastr.error(httpErrorResponse.error.message, 'Fetch messages');
+    //   }
+    // );
+  }
 
   checkIfCanLeaveFeedback(rentInfo: RentInfo, rentRequest: RentRequest) {
     const dateTimeTo = new Date(rentInfo.dateTimeTo.substring(0, 10));
@@ -86,5 +88,28 @@ export class ClientRentRequestDetailsComponent implements OnInit {
 
   leaveFeedback(rentInfo: RentInfo) {
     // this.dialog.open(LeaveFeedbackComponent, { data: { rentInfo: rentInfo, rentRequest: this.rentRequest } });
+  }
+  pay(rentInfo: RentInfo, rentRequest: RentRequest) {
+    this.rentRequestService.pay(rentRequest.id, rentInfo.id).subscribe(
+      () => {
+        this.toastr.success("Success", 'Pay Rent Info');
+        this.fetchRentRequest();
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Pay Rent Info');
+      }
+    );
+  }
+
+  fetchRentRequest() {
+    this.rentRequestService.get(this.rentRequestId).subscribe(
+      (data: RentRequest) => {
+        this.rentRequest = data;
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, 'Rent Request Details');
+        this.location.back();
+      }
+    )
   }
 }

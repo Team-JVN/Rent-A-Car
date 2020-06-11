@@ -29,4 +29,8 @@ public class RentInfoDTO {
     private AdvertisementWithPicturesDTO advertisement;
 
 //    private RentReportDTO rentReport;
+
+    private Double additionalCost;
+
+    private Boolean paid;
 }

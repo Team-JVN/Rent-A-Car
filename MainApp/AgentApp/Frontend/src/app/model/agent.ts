@@ -5,13 +5,13 @@ export class Agent {
     email: string;
     address: string;
     phoneNumber: string;
-    taxId: number;
-    constructor(name: string, email: string, address: string, phoneNumber: string, taxId: number, id?: number) {
+    taxIdNumber: number;
+    constructor(name: string, email: string, address: string, phoneNumber: string, taxIdNumber: number, id?: number) {
         this.name = name;
         this.email = email;
         this.address = address;
         this.phoneNumber = phoneNumber;
-        this.taxId = taxId;
+        this.taxIdNumber = taxIdNumber;
         this.id = id;
     }
 

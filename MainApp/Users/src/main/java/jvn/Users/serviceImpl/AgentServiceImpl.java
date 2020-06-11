@@ -1,18 +1,20 @@
 package jvn.Users.serviceImpl;
 
 import jvn.Users.common.RandomPasswordGenerator;
-import jvn.Users.enumeration.ClientStatus;
-import jvn.Users.exceptionHandler.InvalidAgentDataException;
-import org.springframework.core.env.Environment;
+import jvn.Users.dto.message.OwnerMessageDTO;
 import jvn.Users.enumeration.AgentStatus;
+import jvn.Users.exceptionHandler.InvalidAgentDataException;
 import jvn.Users.model.Agent;
 import jvn.Users.model.Role;
+import jvn.Users.producer.UserProducer;
 import jvn.Users.repository.AgentRepository;
 import jvn.Users.service.AgentService;
 import jvn.Users.service.EmailNotificationService;
 import jvn.Users.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,8 @@ public class AgentServiceImpl implements AgentService {
     private EmailNotificationService emailNotificationService;
 
     private Environment environment;
+
+    private UserProducer userProducer;
 
     @Override
     public Agent create(Agent agent) {
@@ -57,7 +61,7 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     public Agent get(Long id) {
-        Agent agent = agentRepository.findOneByIdAndStatusNot(id,AgentStatus.DELETED);
+        Agent agent = agentRepository.findOneByIdAndStatusNot(id, AgentStatus.DELETED);
         if (agent == null) {
             throw new InvalidAgentDataException("Requested agent does not exist.", HttpStatus.NOT_FOUND);
         }
@@ -65,19 +69,19 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
-    public List<Agent> getAll(String status,Long id) {
+    public List<Agent> getAll(String status, Long id) {
         List<Agent> agents;
-        if(status.equals("all")){
-            agents = agentRepository.findByStatusNotAndIdNot(AgentStatus.DELETED,id);
-        }else {
-            agents = agentRepository.findByStatusAndIdNot(getAgentStatus(status),id);
+        if (status.equals("all")) {
+            agents = agentRepository.findByStatusNotAndIdNot(AgentStatus.DELETED, id);
+        } else {
+            agents = agentRepository.findByStatusAndIdNot(getAgentStatus(status), id);
         }
         return agents;
     }
 
     @Override
     public void delete(Long id) {
-        Agent agent = agentRepository.findOneByIdAndStatusNot(id,AgentStatus.DELETED);
+        Agent agent = agentRepository.findOneByIdAndStatusNot(id, AgentStatus.DELETED);
         if (agent == null) {
             throw new InvalidAgentDataException("This agent is already deleted.", HttpStatus.NOT_FOUND);
         }
@@ -92,7 +96,14 @@ public class AgentServiceImpl implements AgentService {
         dbAgent.setAddress(agent.getAddress());
         dbAgent.setPhoneNumber(agent.getPhoneNumber());
         dbAgent.setTaxIdNumber(agent.getTaxIdNumber());
-        return agentRepository.save(dbAgent);
+        dbAgent = agentRepository.save(dbAgent);
+        sendMessageForSearch(new OwnerMessageDTO(id, dbAgent.getName(), dbAgent.getEmail()));
+        return dbAgent;
+    }
+
+    @Async
+    public void sendMessageForSearch(OwnerMessageDTO ownerMessageDTO) {
+        userProducer.sendMessageForSearch(ownerMessageDTO);
     }
 
     private void composeAndSendEmailToChangePassword(String recipientEmail, String generatedPassword) {
@@ -116,6 +127,7 @@ public class AgentServiceImpl implements AgentService {
 
         emailNotificationService.sendEmail(recipientEmail, subject, text);
     }
+
     private String getLocalhostURL() {
         return environment.getProperty("LOCALHOST_URL");
     }
@@ -127,13 +139,15 @@ public class AgentServiceImpl implements AgentService {
             throw new InvalidAgentDataException("Please choose valid agent's status", HttpStatus.NOT_FOUND);
         }
     }
+
     @Autowired
-    public AgentServiceImpl(AgentRepository agentRepository, UserService userService,PasswordEncoder passwordEncoder,
-                            EmailNotificationService emailNotificationService, Environment environment) {
+    public AgentServiceImpl(AgentRepository agentRepository, UserService userService, PasswordEncoder passwordEncoder,
+                            EmailNotificationService emailNotificationService, Environment environment, UserProducer userProducer) {
         this.agentRepository = agentRepository;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.emailNotificationService = emailNotificationService;
         this.environment = environment;
+        this.userProducer = userProducer;
     }
 }

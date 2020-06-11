@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -22,4 +21,13 @@ public interface AdvertisementRepository extends JpaRepository<Advertisement, Lo
     List<Advertisement> findByOwnerAndDateToGreaterThanEqualAndLogicalStatus(Long id, LocalDate localDate, LogicalStatus status);
 
     List<Advertisement> findByIdInAndLogicalStatus(Collection<Long> id, LogicalStatus logicalStatus);
+
+    Advertisement findByIdAndLogicalStatus(Long id, LogicalStatus status);
+
+    List<Advertisement> findByCarAndLogicalStatusAndDateToGreaterThanEqualOrCarAndLogicalStatusAndDateToEquals(Long carId1, LogicalStatus logicalStatus1, LocalDate currentDate, Long carId2, LogicalStatus logicalStatus2, LocalDate nullDate);
+
+    List<Advertisement> findByCar(Long carId);
+
+    List<Advertisement> findByCarAndLogicalStatus(Long carId, LogicalStatus logicalStatus);
+
 }

@@ -14,6 +14,8 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 export class EditPriceListComponent implements OnInit {
 
   editForm: FormGroup;
+  visiblePricePerKm: boolean = false;
+  visiblePriceForCDW: boolean = false;
 
   constructor(
     private dialogRef: MatDialogRef<EditPriceListComponent>,
@@ -35,9 +37,25 @@ export class EditPriceListComponent implements OnInit {
       'pricePerKm': this.selectedItem.pricePerKm,
       'priceForCDW': this.selectedItem.priceForCDW,
     })
+    if (this.selectedItem.pricePerKm) {
+      this.visiblePricePerKm = true;
+    }
+
+    if (this.selectedItem.priceForCDW) {
+      this.visiblePriceForCDW = true;
+    }
   }
 
   edit() {
+    if (this.visiblePricePerKm && !this.editForm.value.pricePerKm) {
+      this.toastr.error("Please enter prica per kilometre.", 'Edit Price List');
+      return;
+    }
+    if (this.visiblePriceForCDW && !this.editForm.value.priceForCDW) {
+      this.toastr.error("Please enter prica for CDW.", 'Edit Price List');
+      return;
+    }
+
     const priceList = new PriceList(this.editForm.value.pricePerDay, this.editForm.value.pricePerKm, this.editForm.value.priceForCDW, this.selectedItem.id);
     this.priceListService.edit(priceList).subscribe(
       (data: PriceList) => {

@@ -1,9 +1,13 @@
 package jvn.RentACar.controller;
 
 import jvn.RentACar.dto.both.ClientDTO;
+import jvn.RentACar.exceptionHandler.InvalidClientDataException;
 import jvn.RentACar.exceptionHandler.InvalidTokenException;
 import jvn.RentACar.mapper.ClientDtoMapper;
+import jvn.RentACar.model.Client;
+import jvn.RentACar.model.User;
 import jvn.RentACar.service.ClientService;
+import jvn.RentACar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,6 +31,8 @@ public class ClientController {
 
     private ClientDtoMapper clientDtoMapper;
 
+    private UserService userService;
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ClientDTO> create(@Valid @RequestBody ClientDTO clientDTO) {
         try {
@@ -43,9 +49,13 @@ public class ClientController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ClientDTO> edit(@PathVariable @Positive(message = "Id must be positive.") Long id, @Valid @RequestBody ClientDTO clientDTO) {
-        return new ResponseEntity<>(clientDtoMapper.toDto(clientService.edit(id, clientDtoMapper.toEntity(clientDTO))), HttpStatus.OK);
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ClientDTO> edit(@Valid @RequestBody ClientDTO clientDTO) {
+        User user = userService.getLoginUser();
+        if (user instanceof Client) {
+            return new ResponseEntity<>(clientDtoMapper.toDto(clientService.edit(userService.getLoginUser().getId(), clientDtoMapper.toEntity(clientDTO))), HttpStatus.OK);
+        }
+        throw new InvalidClientDataException("As a non-authorized user, you are not allowed to enter this page.", HttpStatus.FORBIDDEN);
     }
 
     @DeleteMapping("/{id}")
@@ -65,9 +75,19 @@ public class ClientController {
         }
     }
 
+    @GetMapping(value = "/profile")
+    public ResponseEntity<ClientDTO> getProfile() {
+        User user = userService.getLoginUser();
+        if (user instanceof Client) {
+            return new ResponseEntity<>(clientDtoMapper.toDto((Client) userService.getLoginUser()), HttpStatus.OK);
+        }
+        throw new InvalidClientDataException("As a non-authorized user, you are not allowed to enter this page.", HttpStatus.FORBIDDEN);
+    }
+
     @Autowired
-    public ClientController(ClientService clientService, ClientDtoMapper clientDtoMapper) {
+    public ClientController(ClientService clientService, ClientDtoMapper clientDtoMapper,UserService userService) {
         this.clientService = clientService;
         this.clientDtoMapper = clientDtoMapper;
+        this.userService = userService;
     }
 }

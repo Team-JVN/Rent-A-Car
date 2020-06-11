@@ -11,4 +11,6 @@ public interface RentInfoService {
     void delete(Set<RentInfo> rentInfos);
 
     RentInfo get(Long id);
+
+    RentInfo pay(Long rentRequestId, Long rentInfoId, Long loggedInUserId);
 }

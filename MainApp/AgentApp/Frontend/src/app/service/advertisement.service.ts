@@ -5,6 +5,7 @@ import { environment } from './../../environments/environment';
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { SearchParams } from '../model/searchParams';
 @Injectable({
   providedIn: 'root'
 })
@@ -42,7 +43,12 @@ export class AdvertisementService {
   public getRentRequests(advertisementId: number, status: string) {
     return this.httpClient.get(this.url + "/" + advertisementId + "/rent-requests/" + status);
   }
+
   public delete(id: number): any {
     return this.httpClient.delete(this.url + '/' + id);
+  }
+
+  public searchAdvertisements(searchParams: SearchParams) {
+    return this.httpClient.post(this.url + "/search", searchParams);
   }
 }

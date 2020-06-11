@@ -48,7 +48,7 @@ th.mat-header-cell{
 
 .rent-info-table th, .table td {
     font-size: 15px;
-    vertical-align: bottom;
+    vertical-align: middle;
     padding: 0.6rem;
 }
 
@@ -61,7 +61,7 @@ th.mat-header-cell{
 .item-card {
     width: 100%;
     display: inline-flex;
-    background-color: #F5F5F5;    
+    background-color: #e8f5e9;    
     margin: 0.7em auto;
     align-items: center;    
     transition: all 0.1s ease-in-out;
@@ -111,4 +111,16 @@ th.mat-header-cell{
 
 .select-owner {
     width: 300px;
+}
+
+.empty-cart {
+    font-size: 23px;
+    font-weight: 550;
+    color: gray;
+    text-align: center;
+}
+
+.total-price {
+    font-weight: bold;
+    color: red;
 }

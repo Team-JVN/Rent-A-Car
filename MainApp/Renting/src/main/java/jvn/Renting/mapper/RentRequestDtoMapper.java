@@ -29,7 +29,9 @@ public class RentRequestDtoMapper implements MapperInterface<RentRequest, RentRe
     @Override
     public RentRequest toEntity(RentRequestDTO dto) {
         RentRequest entity = new RentRequest();
-        entity.setClient(dto.getClient().getId());
+        if (dto.getClient() != null) {
+            entity.setClient(dto.getClient().getId());
+        }
         entity.setTotalPrice(dto.getTotalPrice());
         entity.setId(dto.getId());
 

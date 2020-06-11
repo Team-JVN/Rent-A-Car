@@ -1,3 +1,6 @@
+import { SearchParamsToStore } from './../../../model/searchParamsToStore';
+import { RentInfo } from './../../../model/rentInfo';
+import { AddToCartComponent } from './../../add/add-to-cart/add-to-cart.component';
 import { AuthentificationService } from './../../../service/authentification.service';
 import { AdvertisementFromSearch } from './../../../model/advertisementFromSearch';
 import { SearchParams } from './../../../model/searchParams';
@@ -12,8 +15,6 @@ import { BodyStyle } from '../../../model/bodyStyle';
 import { GearBoxType } from './../../../model/gearboxType';
 import { FuelType } from './../../../model/fuelType';
 import { FormGroup, ValidatorFn, FormControl, FormBuilder, Validators } from '@angular/forms';
-import { AdvertisementWithPictures } from './../../../model/advertisementWithPictures';
-import { AddRentRequestComponent } from './../../add/add-rent-request/add-rent-request.component';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CarService } from './../../../service/car.service';
@@ -23,6 +24,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { StarRatingComponent } from 'ng-starrating';
 import { formatDate } from '@angular/common';
+import { SearchParamsForRentInfo } from 'src/app/model/searchParamsForRentInfo';
 
 const DateValidator: ValidatorFn = (fg: FormGroup) => {
   const from = fg.get('dateFrom').value;
@@ -48,7 +50,11 @@ export class SearchAdvertisementsComponent implements OnInit {
   bodyStyles: BodyStyle[] = [];
   makes: Make[] = [];
   models: Model[] = [];
+  searchParamsToStore: SearchParamsToStore;
 
+  dateTimeFrom: string;
+  dateTimeTo: string;
+  pickUpPoint: string;
   minRating: number = 0.0;
   minDate: Date;
   allMakes: Make;
@@ -100,7 +106,27 @@ export class SearchAdvertisementsComponent implements OnInit {
       cdw: new FormControl(null),
     }, {
       validator: [DateValidator]
-    })
+    });
+
+    this.searchParamsToStore = JSON.parse(localStorage.getItem("searchParams"));
+    if (this.searchParamsToStore) {
+      this.minRating = this.searchParamsToStore.minRating;
+      this.searchForm.patchValue(
+        {
+          'dateFrom': this.searchParamsToStore.dateFrom,
+          'timeFrom': this.searchParamsToStore.timeFrom,
+          'dateTo': this.searchParamsToStore.dateTo,
+          'timeTo': this.searchParamsToStore.timeTo,
+          'pickUpPoint': this.searchParamsToStore.pickUpPoint,
+          'minPricePerDay': this.searchParamsToStore.minPricePerDay,
+          'maxPricePerDay': this.searchParamsToStore.maxPricePerDay,
+          'kidsSeats': this.searchParamsToStore.kidsSeats,
+          'mileageInKm': this.searchParamsToStore.mileageInKm,
+          'kilometresLimit': this.searchParamsToStore.kilometresLimit,
+          'cdw': this.searchParamsToStore.cdw
+        }
+      );
+    }
 
     this.fetchMakes();
     this.fetchFuelTypes();
@@ -109,7 +135,18 @@ export class SearchAdvertisementsComponent implements OnInit {
   }
 
   rent(element: AdvertisementFromSearch) {
-    this.dialog.open(AddRentRequestComponent, { data: element });
+    const searchParams = new SearchParamsForRentInfo(this.dateTimeFrom, this.dateTimeTo, this.pickUpPoint, element);
+
+    if (element.cdw) {
+      this.dialog.open(AddToCartComponent, { data: searchParams });
+    } else {
+      const newRentInfo = new RentInfo(searchParams.dateTimeFrom, searchParams.dateTimeTo, searchParams.optedForCDW, searchParams.advertisement);
+
+      let rentInfos: RentInfo[] = JSON.parse(localStorage.getItem("rentInfos") || "[]");
+      rentInfos.push(newRentInfo);
+      localStorage.setItem("rentInfos", JSON.stringify(rentInfos));
+      this.toastr.success('Success!', 'Add to Cart');
+    }
   }
 
   viewDetails(element: AdvertisementFromSearch) {
@@ -123,6 +160,7 @@ export class SearchAdvertisementsComponent implements OnInit {
   clearSearch() {
     this.searchForm.reset();
     this.minRating = 0.0;
+    localStorage.removeItem("searchParams");
   }
 
   search() {
@@ -132,9 +170,11 @@ export class SearchAdvertisementsComponent implements OnInit {
     }
 
     const dateFrom = formatDate(this.searchForm.value.dateFrom, 'yyyy-MM-dd', 'en-US')
-    const dateTimeFrom = dateFrom + ' ' + this.searchForm.value.timeFrom;
+    this.dateTimeFrom = dateFrom + ' ' + this.searchForm.value.timeFrom;
     const dateTo = formatDate(this.searchForm.value.dateTo, 'yyyy-MM-dd', 'en-US')
-    const dateTimeTo = dateTo + ' ' + this.searchForm.value.timeTo;
+    this.dateTimeTo = dateTo + ' ' + this.searchForm.value.timeTo;
+
+    this.pickUpPoint = this.searchForm.value.pickUpPoint;
 
     const make = this.searchForm.value.make && this.searchForm.value.make !== this.allMakes ? this.searchForm.value.make.name : null;
     const model = this.searchForm.value.model && this.searchForm.value.model !== this.allModels ? this.searchForm.value.model.name : null;
@@ -142,9 +182,16 @@ export class SearchAdvertisementsComponent implements OnInit {
     const gearBoxType = this.searchForm.value.gearBoxType && this.searchForm.value.gearBoxType !== this.allGearboxTypes ? this.searchForm.value.gearBoxType.name : null;
     const bodyStyle = this.searchForm.value.bodyStyle && this.searchForm.value.bodyStyle !== this.allBodyStyles ? this.searchForm.value.bodyStyle.name : null;
 
-    const searchParams = new SearchParams(dateTimeFrom, dateTimeTo, this.searchForm.value.pickUpPoint, make, model, fuelType, gearBoxType, bodyStyle,
+    const searchParams = new SearchParams(this.dateTimeFrom, this.dateTimeTo, this.pickUpPoint, make, model, fuelType, gearBoxType, bodyStyle,
       this.minRating, this.searchForm.value.minPricePerDay, this.searchForm.value.maxPricePerDay, this.searchForm.value.kidsSeats,
       this.searchForm.value.mileageInKm, this.searchForm.value.kilometresLimit, this.searchForm.value.cdw);
+
+    const searchParamsToSave = new SearchParamsToStore(dateFrom, this.searchForm.value.timeFrom, dateTo, this.searchForm.value.timeTo,
+      this.searchForm.value.pickUpPoint, this.searchForm.value.make, this.searchForm.value.model, this.searchForm.value.fuelType,
+      this.searchForm.value.gearBoxType, this.searchForm.value.bodyStyle, this.minRating, this.searchForm.value.minPricePerDay,
+      this.searchForm.value.maxPricePerDay, this.searchForm.value.kidsSeats, this.searchForm.value.mileageInKm, this.searchForm.value.kilometresLimit,
+      this.searchForm.value.cdw);
+    localStorage.setItem("searchParams", JSON.stringify(searchParamsToSave));
 
     this.searchService.searchAdvertisements(searchParams).subscribe(
       (data: AdvertisementFromSearch[]) => {
@@ -153,8 +200,9 @@ export class SearchAdvertisementsComponent implements OnInit {
         });
         this.advertisementsDataSource = new MatTableDataSource(data);
       },
-      () => {
-        this.toastr.error("Search did not succeed. Please try again.", 'Search Advertisements');
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.bodyStyles = [];
+        this.toastr.error(httpErrorResponse.error.message, 'Show Advertisements');
       }
     );
   }
@@ -173,6 +221,7 @@ export class SearchAdvertisementsComponent implements OnInit {
     this.bodyStyleService.getBodyStyles().subscribe(
       (data: BodyStyle[]) => {
         this.bodyStyles = data;
+        this.selectBodyStyle();
       },
       (httpErrorResponse: HttpErrorResponse) => {
         this.bodyStyles = [];
@@ -181,10 +230,18 @@ export class SearchAdvertisementsComponent implements OnInit {
     );
   }
 
+  selectBodyStyle() {
+    if (this.searchParamsToStore && this.searchParamsToStore.bodyStyle) {
+      const element = this.bodyStyles.find(element => element.id === this.searchParamsToStore.bodyStyle.id);
+      this.searchForm.controls['bodyStyle'].setValue(element);
+    }
+  }
+
   fetchFuelTypes(): void {
     this.fuelTypeService.getFuelTypes().subscribe(
       (data: FuelType[]) => {
         this.fuelTypes = data;
+        this.selectFuelType();
       },
       (httpErrorResponse: HttpErrorResponse) => {
         this.fuelTypes = [];
@@ -193,10 +250,18 @@ export class SearchAdvertisementsComponent implements OnInit {
     );
   }
 
+  selectFuelType() {
+    if (this.searchParamsToStore && this.searchParamsToStore.fuelType) {
+      const element = this.fuelTypes.find(element => element.id === this.searchParamsToStore.fuelType.id);
+      this.searchForm.controls['fuelType'].setValue(element);
+    }
+  }
+
   fetchGearboxTypes() {
     this.gearboxTypeService.getGearboxTypes().subscribe(
       (data: GearBoxType[]) => {
         this.gearBoxTypes = data;
+        this.selectGearboxType();
       },
       (httpErrorResponse: HttpErrorResponse) => {
         this.gearBoxTypes = [];
@@ -205,10 +270,18 @@ export class SearchAdvertisementsComponent implements OnInit {
     );
   }
 
+  selectGearboxType() {
+    if (this.searchParamsToStore && this.searchParamsToStore.gearBoxType) {
+      const element = this.gearBoxTypes.find(element => element.id === this.searchParamsToStore.gearBoxType.id);
+      this.searchForm.controls['gearBoxType'].setValue(element);
+    }
+  }
+
   fetchMakes() {
     this.makeService.getMakes().subscribe(
       (data: Make[]) => {
         this.makes = data;
+        this.selectMake();
       },
       (httpErrorResponse: HttpErrorResponse) => {
         this.makes = [];
@@ -217,16 +290,35 @@ export class SearchAdvertisementsComponent implements OnInit {
     );
   }
 
+  selectMake() {
+    if (this.searchParamsToStore && this.searchParamsToStore.make) {
+      const element = this.makes.find(element => element.id === this.searchParamsToStore.make.id);
+      this.searchForm.controls['make'].setValue(element);
+    }
+  }
+
   fetchModels() {
+    if (this.searchForm.value.make === this.allMakes) {
+      return;
+    }
+
     this.makeService.getModels(this.searchForm.value.make.id).subscribe(
       (data: Model[]) => {
         this.models = data;
+        this.selectModel();
       },
       (httpErrorResponse: HttpErrorResponse) => {
         this.models = [];
         this.toastr.error(httpErrorResponse.error.message, 'Show Models');
       }
     );
+  }
+
+  selectModel() {
+    if (this.searchParamsToStore && this.searchParamsToStore.model) {
+      const element = this.models.find(element => element.id === this.searchParamsToStore.model.id);
+      this.searchForm.controls['model'].setValue(element);
+    }
   }
 
   getPicture(adFromSearch: AdvertisementFromSearch) {

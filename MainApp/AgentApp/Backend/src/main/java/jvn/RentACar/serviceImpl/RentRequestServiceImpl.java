@@ -7,18 +7,23 @@ import jvn.RentACar.model.*;
 import jvn.RentACar.repository.RentRequestRepository;
 import jvn.RentACar.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 @Service
 public class RentRequestServiceImpl implements RentRequestService {
@@ -29,34 +34,43 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     private RentRequestRepository rentRequestRepository;
 
-    private RentInfoService rentInfoService;
-
     private UserService userService;
 
+    private EmailNotificationService emailNotificationService;
+
+    private Environment environment;
+
     @Override
-    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public RentRequest create(RentRequest rentRequest) {
         User user = userService.getLoginUser();
-        if (user instanceof Agent) {
-            // TODO: You need to refuse all other requests and send email to client
-            rentRequest.setRentRequestStatus(RentRequestStatus.PAID);
-            if (rentRequest.getClient() == null) {
-                throw new InvalidRentRequestDataException("Please choose a client.", HttpStatus.BAD_REQUEST);
+        Advertisement dbAvd = advertisementService.get((new ArrayList<>(rentRequest.getRentInfos())).get(0).getAdvertisement().getId());
+        Long ownerId = dbAvd.getCar().getOwner().getId();
+        if (ownerId.equals(user.getId())) {
+            if (rentRequest.getClient() == null || rentRequest.getClient().equals(user.getId())) {
+                throw new InvalidRentRequestDataException("Please choose client for which you create rent request.", HttpStatus.BAD_REQUEST);
             }
             rentRequest.setClient(clientService.get(rentRequest.getClient().getId()));
-        } else if (user instanceof Client) {
-            rentRequest.setRentRequestStatus(RentRequestStatus.PENDING);
+            rentRequest.setRentRequestStatus(RentRequestStatus.PAID);
+        } else {
+            hasDebt(user.getId());
             rentRequest.setClient((Client) user);
+            rentRequest.setRentRequestStatus(RentRequestStatus.PENDING);
         }
-
         rentRequest.setCreatedBy(user);
         rentRequest.setTotalPrice(0.0);
-        Set<RentInfo> rentInfos = rentRequest.getRentInfos();
+        Set<RentInfo> rentInfos =  rentRequest.getRentInfos();
         rentRequest.setRentInfos(new HashSet<>());
         RentRequest savedRequest = rentRequestRepository.save(rentRequest);
-        rentRequest.setTotalPrice(setRentInfosData(savedRequest, rentInfos));
-        savedRequest.setRentInfos(rentInfos);
-        return rentRequestRepository.save(savedRequest);
+        savedRequest = rentRequestRepository.save(setRentInfosData(savedRequest,rentInfos));
+        if (savedRequest.getRentRequestStatus().equals(RentRequestStatus.PAID)) {
+            rejectOtherRequests(savedRequest);
+        } else if (savedRequest.getRentRequestStatus().equals(RentRequestStatus.PENDING)) {
+            Instant today = (new Date()).toInstant();
+            executeRejectTask(savedRequest.getId(), today.plus(24, ChronoUnit.HOURS));
+        }
+
+        return savedRequest;
     }
 
     @Override
@@ -90,28 +104,14 @@ public class RentRequestServiceImpl implements RentRequestService {
     }
 
     @Override
-    public void delete(Long id) {
-        RentRequest rentRequest = get(id);
-        checkCreator(rentRequest);
-        if (rentRequest.getRentRequestStatus().equals(RentRequestStatus.PAID)) {
-            throw new InvalidRentRequestDataException("This rent request is PAID so you can not delete it.",
-                    HttpStatus.BAD_REQUEST);
-        }
-        rentRequest.setClient(null);
-        Set<RentInfo> rentInfos = rentRequest.getRentInfos();
-        rentRequest.setRentInfos(new HashSet<>());
-        rentRequest.setCreatedBy(null);
-        rentInfoService.delete(rentInfos);
-        rentRequestRepository.deleteById(id);
-    }
-
-    @Override
     public RentRequest changeRentRequestStatus(Long id, RentRequestStatusDTO newStatus) {
         RentRequestStatus rentRequestStatus = getRentRequestStatus(newStatus.getStatus());
         RentRequest rentRequest = get(id);
-
+        if (!rentRequest.getRentRequestStatus().equals(RentRequestStatus.PENDING)) {
+            throw new InvalidRentRequestDataException("Your request is already expected, therefore you can not cancel/accept/reject it.", HttpStatus.BAD_REQUEST);
+        }
         if (rentRequestStatus.equals(RentRequestStatus.CANCELED)) {
-            if (userService.getLoginUser().getEmail().equals(rentRequest.getCreatedBy().getEmail())) {
+            if (userService.getLoginUser().getId().equals(rentRequest.getCreatedBy().getId())) {
                 return cancel(rentRequest);
             } else {
                 return reject(rentRequest);
@@ -122,13 +122,17 @@ public class RentRequestServiceImpl implements RentRequestService {
         throw new InvalidRentRequestDataException("This rent request's status doesn't exist.", HttpStatus.BAD_REQUEST);
     }
 
+    @Override
+    public void rejectAllRequests(Long advId) {
+        List<RentRequest> rentRequests = rentRequestRepository.findByRentInfosAdvertisementIdAndRentInfosRentRequestRentRequestStatus(advId, RentRequestStatus.PENDING);
+        for (RentRequest rentRequest : rentRequests) {
+            rentRequest.setRentRequestStatus(RentRequestStatus.CANCELED);
+            composeAndSendRejectedRentRequest(rentRequest.getClient().getEmail(), rentRequest.getId());
+        }
+        rentRequestRepository.saveAll(rentRequests);
+    }
+
     private RentRequest cancel(RentRequest rentRequest) {
-        if (!userService.getLoginUser().getEmail().equals(rentRequest.getCreatedBy().getEmail())) {
-            throw new InvalidRentRequestDataException("This rent request is not yours so you can't cancel it.", HttpStatus.BAD_REQUEST);
-        }
-        if (!rentRequest.getRentRequestStatus().equals(RentRequestStatus.PENDING)) {
-            throw new InvalidRentRequestDataException("Your request is already expected, therefore you can not cancel it.", HttpStatus.BAD_REQUEST);
-        }
         rentRequest.setRentRequestStatus(RentRequestStatus.CANCELED);
         return rentRequestRepository.save(rentRequest);
     }
@@ -136,41 +140,48 @@ public class RentRequestServiceImpl implements RentRequestService {
     private RentRequest reject(RentRequest rentRequest) {
         RentInfo rentInfo = (RentInfo) rentRequest.getRentInfos().toArray()[0];
         User advertisementsOwner = rentInfo.getAdvertisement().getCar().getOwner();
-        if (!userService.getLoginUser().getEmail().equals(advertisementsOwner.getEmail())) {
+        if (!userService.getLoginUser().getId().equals(advertisementsOwner.getId())) {
             throw new InvalidRentRequestDataException("You aren't owner of rent request's advertisement so you can't reject this request.", HttpStatus.BAD_REQUEST);
         }
-
-        if (!rentRequest.getRentRequestStatus().equals(RentRequestStatus.PENDING)) {
-            throw new InvalidRentRequestDataException("This request is already expected, therefore you can not reject it.", HttpStatus.BAD_REQUEST);
-        }
-
         rentRequest.setRentRequestStatus(RentRequestStatus.CANCELED);
-        //TODO: Posalji mejl klijentu koji je kreirao taj zahtev
+        composeAndSendRejectedRentRequest(rentRequest.getClient().getEmail(),rentRequest.getId());
         return rentRequestRepository.save(rentRequest);
     }
 
     private RentRequest accept(RentRequest rentRequest) {
         RentInfo rentInfo = (RentInfo) rentRequest.getRentInfos().toArray()[0];
         User advertisementsOwner = rentInfo.getAdvertisement().getCar().getOwner();
-        if (!userService.getLoginUser().getEmail().equals(advertisementsOwner.getEmail())) {
+        if (!userService.getLoginUser().getId().equals(advertisementsOwner.getId())) {
             throw new InvalidRentRequestDataException("You aren't owner of rent request's advertisement so you can't accept this request.", HttpStatus.BAD_REQUEST);
         }
-        //TODO:Implement this method.
-//        if (!rentRequest.getRentRequestStatus().equals(RentRequestStatus.PENDING)) {
-//            throw new InvalidRentRequestDataException("This request is already expected, therefore you can not reject it.", HttpStatus.BAD_REQUEST);
-//        }
-//
-//        rentRequest.setRentRequestStatus(RentRequestStatus.CANCELED);
-        return rentRequest;
+        checkIfCanAcceptRentRequest(rentRequest);
+        rentRequest.setRentRequestStatus(RentRequestStatus.PAID);
+        RentRequest paidRentRequest = rentRequestRepository.save(rentRequest);
+        rejectOtherRequests(rentRequest);
+        composeAndSendAcceptedRentRequest(rentRequest.getClient().getEmail(), rentRequest.getId());
+        return paidRentRequest;
     }
 
-    private void checkCreator(RentRequest rentRequest) {
-        if (!userService.getLoginUser().getEmail().equals(rentRequest.getCreatedBy().getEmail())) {
-            throw new InvalidRentRequestDataException("This rent request is not yours so you can't delete it.", HttpStatus.BAD_REQUEST);
+
+    private void checkIfCanAcceptRentRequest(RentRequest rentRequest) {
+        for (RentInfo rentInfo : rentRequest.getRentInfos()) {
+            LocalDateTime rentInfoDateTimeFrom = LocalDateTime.of(rentInfo.getDateTimeFrom().toLocalDate().minusDays(1), LocalTime.of(23, 59));
+            LocalDateTime rentInfoDateTimeTo = LocalDateTime.of(rentInfo.getDateTimeTo().toLocalDate().plusDays(1), LocalTime.of(0, 0));
+            if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanAndRentInfosAdvertisementId(RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeFrom, rentInfo.getAdvertisement().getId()).isEmpty()) {
+                throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
+                        HttpStatus.BAD_REQUEST);
+            }
+            if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanAndRentInfosAdvertisementId(RentRequestStatus.PAID, rentInfoDateTimeTo, rentInfoDateTimeTo, rentInfo.getAdvertisement().getId()).isEmpty()) {
+                throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
+                        HttpStatus.BAD_REQUEST);
+            }
+            if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanAndRentInfosAdvertisementId(RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeTo, rentInfo.getAdvertisement().getId()).isEmpty()) {
+                throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
+                        HttpStatus.BAD_REQUEST);
+            }
         }
     }
-
-    private double setRentInfosData(RentRequest rentRequest, Set<RentInfo> rentInfos) {
+    private RentRequest setRentInfosData(RentRequest rentRequest, Set<RentInfo> rentInfos) {
         double totalPrice = 0;
         for (RentInfo rentInfo : rentInfos) {
             rentInfo.setRentRequest(rentRequest);
@@ -185,14 +196,10 @@ public class RentRequestServiceImpl implements RentRequestService {
             rentInfo.setPricePerKm(advertisement.getPriceList().getPricePerKm());
             totalPrice += countPrice(rentInfo);
         }
-
-        User owner = ((RentInfo) rentInfos.toArray()[0]).getAdvertisement().getCar().getOwner();
-        for (RentInfo rentInfo : rentInfos) {
-            if (!rentInfo.getAdvertisement().getCar().getOwner().getEmail().equals(owner.getEmail())) {
-                throw new InvalidRentRequestDataException("All advertisements of a rent request must have the same owner.", HttpStatus.BAD_REQUEST);
-            }
-        }
-        return totalPrice;
+        rentRequest.setTotalPrice(totalPrice);
+        rentRequest.setRentInfos(new HashSet<>(rentInfos));
+        getAdvertisementOwnerId(rentRequest.getRentInfos());
+        return rentRequest;
     }
 
 
@@ -217,17 +224,18 @@ public class RentRequestServiceImpl implements RentRequestService {
                         HttpStatus.BAD_REQUEST);
             }
         }
+
         rentInfoDateTimeFrom = LocalDateTime.of(rentInfoDateFrom.minusDays(1), LocalTime.of(23, 59));
         rentInfoDateTimeTo = LocalDateTime.of(rentInfoDateTo.plusDays(1), LocalTime.of(0, 0));
-        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqual(RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeFrom).isEmpty()) {
+        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanAndRentInfosAdvertisementId(RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeFrom, advertisement.getId()).isEmpty()) {
             throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
                     HttpStatus.BAD_REQUEST);
         }
-        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqual(RentRequestStatus.PAID, rentInfoDateTimeTo, rentInfoDateTimeTo).isEmpty()) {
+        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanAndRentInfosAdvertisementId(RentRequestStatus.PAID, rentInfoDateTimeTo, rentInfoDateTimeTo, advertisement.getId()).isEmpty()) {
             throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
                     HttpStatus.BAD_REQUEST);
         }
-        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanEqual(RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeTo).isEmpty()) {
+        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanAndRentInfosAdvertisementId(RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeTo, advertisement.getId()).isEmpty()) {
             throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
                     HttpStatus.BAD_REQUEST);
         }
@@ -261,13 +269,108 @@ public class RentRequestServiceImpl implements RentRequestService {
         }
     }
 
+    private void composeAndSendRejectedRentRequest(String recipientEmail, Long rentRequestId) {
+        String subject = "Rejected rent request";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Your rent request is rejected by advertisement's owner");
+        sb.append(System.lineSeparator());
+        sb.append("To see rejected rent request click the following link:");
+        sb.append(System.lineSeparator());
+        sb.append(getLocalhostURL());
+        sb.append("client-rent-request/");
+        sb.append(rentRequestId);
+        sb.append(System.lineSeparator());
+        String text = sb.toString();
+        emailNotificationService.sendEmail(recipientEmail, subject, text);
+    }
+
+    private void composeAndSendAcceptedRentRequest(String recipientEmail, Long rentRequestId) {
+        String subject = "Accepted rent request";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Your rent request is accepted by advertisement's owner");
+        sb.append(System.lineSeparator());
+        sb.append("To see accepted rent request click the following link:");
+        sb.append(System.lineSeparator());
+        sb.append(getLocalhostURL());
+        sb.append("client-rent-request/");
+        sb.append(rentRequestId);
+        sb.append(System.lineSeparator());
+        String text = sb.toString();
+        emailNotificationService.sendEmail(recipientEmail, subject, text);
+    }
+    private Long getAdvertisementOwnerId(Set<RentInfo> rentInfos) {
+        Set<Long> advertisements = new HashSet<>();
+        Long ownerId = (new ArrayList<>(rentInfos)).get(0).getAdvertisement().getCar().getOwner().getId();
+        for (RentInfo rentInfo : rentInfos) {
+            Long advId = rentInfo.getAdvertisement().getId();
+            if (!rentInfo.getAdvertisement().getCar().getOwner().getId().equals(ownerId)) {
+                throw new InvalidRentRequestDataException("All advertisements of a rent request must have the same owner.", HttpStatus.BAD_REQUEST);
+            }
+            if (advertisements.contains(advId)) {
+                throw new InvalidRentRequestDataException("You cannot choose the same car a couple of time. ", HttpStatus.BAD_REQUEST);
+            }
+            advertisements.add(rentInfo.getAdvertisement().getId());
+        }
+        return ownerId;
+    }
+
+    @Async
+    public void rejectOtherRequests(RentRequest rentRequest) {
+        for (RentInfo rentInfo : rentRequest.getRentInfos()) {
+            LocalDateTime rentInfoDateTimeFrom = rentInfo.getDateTimeFrom();
+            LocalDateTime rentInfoDateTimeTo = rentInfo.getDateTimeTo();
+            Long advId = rentInfo.getAdvertisement().getId();
+            List<RentRequest> rentRequests = rentRequestRepository.findByRentRequestStatusNotAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualAndRentInfosAdvertisementIdOrRentRequestStatusNotAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualAndRentInfosAdvertisementIdOrRentRequestStatusNotAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanEqualAndRentInfosAdvertisementId(
+                    RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeFrom, advId, RentRequestStatus.PAID, rentInfoDateTimeTo, rentInfoDateTimeTo, advId,
+                    RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeTo, advId);
+            for (RentRequest rentRequest1 : rentRequests) {
+                rentRequest1.setRentRequestStatus(RentRequestStatus.CANCELED);
+                composeAndSendRejectedRentRequest(rentRequest.getClient().getEmail(), rentRequest.getId());
+            }
+            if (!rentRequests.isEmpty()) {
+                rentRequestRepository.saveAll(rentRequests);
+            }
+        }
+    }
+
+    @Async
+    public void executeRejectTask(Long rentReqId, Instant executionMoment) {
+        ScheduledExecutorService localExecutor = Executors.newSingleThreadScheduledExecutor();
+        TaskScheduler scheduler = new ConcurrentTaskScheduler(localExecutor);
+        scheduler.schedule(createRunnable(rentReqId), executionMoment);
+    }
+
+    private Runnable createRunnable(final Long rentReqId) {
+        return () -> {
+            RentRequest rentRequest = rentRequestRepository.findOneById(rentReqId);
+            if (rentRequest.getRentRequestStatus() == RentRequestStatus.PENDING) {
+                rentRequest.setRentRequestStatus(RentRequestStatus.CANCELED);
+                rentRequestRepository.save(rentRequest);
+                composeAndSendRejectedRentRequest(rentRequest.getClient().getEmail(), rentRequest.getId());
+            }
+        };
+    }
+
+    private void hasDebt(Long loggedInUserId) {
+        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosRentReportPaidAndClientId(RentRequestStatus.PAID, false, loggedInUserId).isEmpty()) {
+            throw new InvalidRentRequestDataException("You are not allowed to create rent requests because you have outstanding debts. ", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    private String getLocalhostURL() {
+        return environment.getProperty("LOCALHOST_URL");
+    }
+
     @Autowired
     public RentRequestServiceImpl(ClientService clientService, AdvertisementService advertisementService, UserService userService,
-                                  RentRequestRepository rentRequestRepository, RentInfoService rentInfoService) {
+                                  RentRequestRepository rentRequestRepository,
+                                  EmailNotificationService emailNotificationService, Environment environment) {
         this.clientService = clientService;
         this.advertisementService = advertisementService;
         this.rentRequestRepository = rentRequestRepository;
-        this.rentInfoService = rentInfoService;
         this.userService = userService;
+        this.emailNotificationService = emailNotificationService;
+        this.environment = environment;
     }
 }

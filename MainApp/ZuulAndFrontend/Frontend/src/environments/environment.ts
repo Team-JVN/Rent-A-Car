@@ -4,6 +4,7 @@
 
 export const environment = {
   production: false,
+  // baseUrl: 'https://localhost:8080',
   baseUrl: "http://localhost:8080",
   advertisement: "/advertisements/api/advertisement",
   bodyStyle: "/cars/api/body-style",

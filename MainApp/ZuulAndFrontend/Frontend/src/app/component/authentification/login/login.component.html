@@ -28,10 +28,10 @@
                     Please enter password.
                 </mat-error>
                 <mat-error *ngIf="loginForm.get('password').errors && loginForm.get('password').errors['minlength']">
-                    Password must be at least 8 characters long
+                    Password must be at least 10 characters long.
                 </mat-error>
                 <mat-error *ngIf="loginForm.get('password').errors && loginForm.get('password').errors['pattern']">
-                    Password must contain at least 1 lowercase, 1 uppercase letter and 1 number
+                    Password must contain a number, a special character, a lowercase and an uppercase letter.
                 </mat-error>
             </mat-form-field>
             <div class="row mt-4 vertical-align: middle">

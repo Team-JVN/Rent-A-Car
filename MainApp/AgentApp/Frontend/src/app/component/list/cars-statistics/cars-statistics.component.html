@@ -1,0 +1,18 @@
+<mat-card>
+    <mat-card-content>
+        <br />
+        <mat-tab-group>
+            <mat-tab label="Most kilometres made">
+                <app-table-for-statistics [statisticType]="'most-km-made'"></app-table-for-statistics>
+            </mat-tab>
+            <mat-tab label="Best rated">
+                <app-table-for-statistics [statisticType]="'best-rated'"></app-table-for-statistics>
+            </mat-tab>
+            <mat-tab label="Most commented">
+                <app-table-for-statistics [statisticType]="'most-commented'"></app-table-for-statistics>
+            </mat-tab>
+        </mat-tab-group>
+
+    </mat-card-content>
+
+</mat-card>

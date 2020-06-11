@@ -13,7 +13,7 @@ public interface ModelRepository extends JpaRepository<Model, Long> {
 
     Model findByNameAndIdNotAndMakeId(String name, Long modelId, Long makeId);
 
-    List<Model> findByMakeId(Long id);
+    List<Model> findByMakeIdOrderByNameAsc(Long id);
 
     Model findOneByIdAndMakeId(Long id, Long makeId);
 }

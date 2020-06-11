@@ -1,5 +1,4 @@
 import { AddClientComponent } from './../../add/add-client/add-client.component';
-import { EditClientComponent } from './../../edit/edit-client/edit-client.component';
 import { ToastrService } from 'ngx-toastr';
 import { ClientService } from './../../../service/client.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -44,10 +43,6 @@ export class ListClientsComponent implements OnInit {
         this.toastr.error(httpErrorResponse.error.message, 'Show Clients');
       }
     );
-  }
-
-  edit(element: Client) {
-    this.dialog.open(EditClientComponent, { data: element });
   }
 
   openDialog() {

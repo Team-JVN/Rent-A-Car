@@ -32,4 +32,7 @@ public class RentInfoDTO {
 
     private Set<CommentDTO> comments;
 
+    private Double additionalCost;
+
+    private Boolean paid;
 }

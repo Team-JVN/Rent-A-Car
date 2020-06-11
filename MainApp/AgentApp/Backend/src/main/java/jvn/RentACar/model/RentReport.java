@@ -29,4 +29,7 @@ public class RentReport {
 
     @Column
     private Integer madeMileage;
+
+    @Column
+    private Boolean paid;
 }

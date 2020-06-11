@@ -21,7 +21,7 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
     this.loginForm = this.formBuilder.group({
       email: new FormControl(null, [Validators.required, Validators.email]),
-      password: new FormControl(null, [Validators.required, Validators.minLength(8), Validators.maxLength(64), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,64}$')])
+      password: new FormControl(null, [Validators.required, Validators.minLength(10), Validators.maxLength(64), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[_#?!@$%^&*-.,:;]).{10,64}$')])
     })
   }
 
@@ -49,7 +49,7 @@ export class LoginComponent implements OnInit {
     } else if (this.authentificationService.isClient()) {
       this.router.navigate(['/search-advertisements']);
     } else if (this.authentificationService.isAdmin()) {
-      this.router.navigate(['/advertisements']);
+      this.router.navigate(['/manage-users']);
     } else {
       this.authentificationService.logout();
     }

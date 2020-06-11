@@ -52,26 +52,25 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         Permission managePriceLists = createPermissionIfNotFound("MANAGE_PRICE_LISTS");
         Permission manageRentReports = createPermissionIfNotFound("MANAGE_RENT_REPORTS");
         Permission manageRoles = createPermissionIfNotFound("MANAGE_ROLES");
+        Permission getStatistics = createPermissionIfNotFound("GET_STATISTICS");
 
-        Permission createRentRequest = createPermissionIfNotFound("CREATE_RENT_REQUEST");
-        Permission getMyRentRequests = createPermissionIfNotFound("GET_MY_RENT_REQUESTS");
-        Permission getReceivedRentRequest = createPermissionIfNotFound("GET_RECEIVED_RENT_REQUESTS");
-        Permission deleteRentRequest = createPermissionIfNotFound("DELETE_RENT_REQUEST");
-        Permission changeRentRequestStatus = createPermissionIfNotFound("CHANGE_RENT_REQUEST_STATUS");
+        Permission myRentRequests = createPermissionIfNotFound("MY_RENT_REQUESTS");
+
+        Permission agentEditProfile = createPermissionIfNotFound("AGENT_EDIT_PROFILE");
+        Permission clientEditProfile = createPermissionIfNotFound("CLIENT_EDIT_PROFILE");
 
         Set<Permission> agentPermissions = new HashSet<>(Arrays.asList(manageAdvertisements, manageCodeBooks, manageCars, manageClients,
-                managePriceLists, manageRentReports, createRentRequest, getReceivedRentRequest, changeRentRequestStatus, manageRoles));
+                managePriceLists, manageRentReports, manageRoles,agentEditProfile,getStatistics));
         createRoleIfNotFound("ROLE_AGENT", agentPermissions);
 
-        Set<Permission> clientPermissions = new HashSet<>(Arrays.asList(createRentRequest, getMyRentRequests, deleteRentRequest,
-                changeRentRequestStatus));
+        Set<Permission> clientPermissions = new HashSet<>(Arrays.asList(clientEditProfile, myRentRequests,manageClients));
         createRoleIfNotFound("ROLE_CLIENT", clientPermissions);
 
         RandomPasswordGenerator randomPasswordGenerator = new RandomPasswordGenerator();
         String generatedPassword = randomPasswordGenerator.generatePassword();
 
-        Agent agent = new Agent("Rent-a-Car Agency", "rentacar@maildrop.cc",
-                passwordEncoder.encode(generatedPassword), "Beograd", "00000001");
+        Agent agent = new Agent("Rent a Car Agency", "rentacar@maildrop.cc",
+                passwordEncoder.encode(generatedPassword), "Beograd", "100000012","0623546165");
         if (userRepository.findByEmail(agent.getEmail()) != null) {
             return;
         }

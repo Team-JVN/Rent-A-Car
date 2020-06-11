@@ -40,11 +40,6 @@ export class ListClientRentRequestsComponent implements OnInit {
 
   ngOnInit() {
     this.fetchRentRequests('all');
-    this.createSuccess = this.rentRequestService.createSuccessEmitter.subscribe(
-      () => {
-        this.fetchRentRequests(this.status)
-      }
-    );
   }
 
   fetchRentRequests(status: string) {
@@ -61,18 +56,6 @@ export class ListClientRentRequestsComponent implements OnInit {
     );
   }
 
-  delete(element: RentRequest) {
-    this.rentRequestService.delete(element.id).subscribe(
-      () => {
-        this.fetchRentRequests(this.status);
-        this.toastr.success('Successfully deleted Rent Request!', 'Delete Rent Request');
-      },
-      (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Delete Rent Request');
-      }
-    );
-  }
-
   cancel(element: RentRequest) {
     this.rentRequestService.cancel(element.id).subscribe(
       () => {
@@ -84,6 +67,7 @@ export class ListClientRentRequestsComponent implements OnInit {
       }
     );
   }
+
   advertisementDetails(rentInfo: RentInfo) {
     this.router.navigate(['/advertisement/' + rentInfo.advertisement.id]);
   }

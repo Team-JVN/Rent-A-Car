@@ -47,4 +47,6 @@ public class RentInfo {
 
     @Column
     private Double pricePerKm;
+
+
 }
