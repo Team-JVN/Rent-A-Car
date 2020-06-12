@@ -132,4 +132,8 @@ export class ListAdvertisementsComponent implements OnInit {
   viewRentRequests(element: AdvertisementFromSearch) {
     this.router.navigate(['/rent-requests/' + element.id]);
   }
+
+  viewLocation(element: AdvertisementFromSearch) {
+    this.router.navigate(['/advertisement/' + element.id + '/location']);
+  }
 }

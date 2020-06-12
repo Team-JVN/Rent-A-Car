@@ -1,3 +1,4 @@
+import { CarTrackingComponent } from './component/car-tracking/car-tracking.component';
 import { GetStatisticsGuard } from './guard/get.statistics.guard';
 import { AdminEditProfileGuard } from './guard/admin.edit.profile.guard';
 import { AgentEditProfileGuard } from './guard/agent.edit.profile.guard';
@@ -47,6 +48,11 @@ const routes: Routes = [
   {
     path: "advertisements",
     component: ListAdvertisementsComponent,
+    canActivate: [ManageAdvertisementsGuard],
+  },
+  {
+    path: "advertisement/:id/location",
+    component: CarTrackingComponent,
     canActivate: [ManageAdvertisementsGuard],
   },
   /** Get received rent requests */

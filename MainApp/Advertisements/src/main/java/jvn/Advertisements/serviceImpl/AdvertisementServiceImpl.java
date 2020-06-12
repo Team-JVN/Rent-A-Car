@@ -5,6 +5,7 @@ import jvn.Advertisements.client.RentingClient;
 import jvn.Advertisements.dto.message.AdvertisementMessageDTO;
 import jvn.Advertisements.dto.message.OwnerMessageDTO;
 import jvn.Advertisements.dto.request.AdvertisementEditDTO;
+import jvn.Advertisements.dto.request.LocationDTO;
 import jvn.Advertisements.dto.request.UserDTO;
 import jvn.Advertisements.dto.response.CarWithAllInformationDTO;
 import jvn.Advertisements.enumeration.EditType;
@@ -193,7 +194,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     public void sendCarLocation(Long advId) throws InterruptedException {
         for (int i = 0; i < 6; i++) {
             System.out.println("Haj");
-            this.simpMessagingTemplate.convertAndSend("/socket-publisher", "Kako si");
+            this.simpMessagingTemplate.convertAndSend("/socket-publisher", new LocationDTO(":D"));
             Thread.sleep(5000L);
         }
     }

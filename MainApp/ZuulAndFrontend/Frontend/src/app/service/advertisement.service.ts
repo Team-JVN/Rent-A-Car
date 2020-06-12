@@ -49,4 +49,7 @@ export class AdvertisementService {
     return this.httpClient.get(this.url + '/car/' + id + '/edit-type');
   }
 
+  public getLocation(id: number) {
+    return this.httpClient.get(this.url + '/' + id + '/location');
+  }
 }

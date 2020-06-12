@@ -1,8 +1,6 @@
 package jvn.Zuul.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netflix.zuul.ZuulFilter;
-import com.netflix.zuul.context.RequestContext;
+import com.netflix.zuul.filters.ZuulFilter;
 import feign.FeignException;
 import jvn.Zuul.client.AuthClient;
 import jvn.Zuul.dto.UserDTO;
@@ -10,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 @Component
@@ -82,6 +79,12 @@ public class AuthFilter extends ZuulFilter {
         RequestContext ctx = RequestContext.getCurrentContext();
         HttpServletRequest request = ctx.getRequest();
         String header = request.getHeader("Auth");
+        if (request.getRequestURL().toString().contains("/advertisements/socket")) {
+            String value = request.getHeader("Connection");
+            ctx.addZuulRequestHeader("Connection", "Upgrade");
+            ctx.addZuulRequestHeader("Upgrade", "websocket");
+            return null;
+        }
         if (header == null || header.isEmpty() || !header.startsWith("Bearer ")) {
             ctx.setResponseStatusCode(401);
             ctx.setSendZuulResponse(false);

@@ -39,6 +39,11 @@
                                         (click)="viewRentRequests(element)">
                                         <mat-icon>assignment</mat-icon>
                                     </button>
+                                    <button mat-icon-button aria-label="View car's location"
+                                        *ngIf="element.car.availableTracking" matTooltip="View car's location"
+                                        (click)="viewLocation(element)">
+                                        <mat-icon>navigation</mat-icon>
+                                    </button>
                                     <button mat-icon-button aria-label="Edit" color="primary"
                                         *ngIf="element.logicalStatus === 'EXISTING'"
                                         (click)="edit(element);$event.stopPropagation()">
