@@ -18,6 +18,8 @@ public interface AdvertisementService {
 
     Advertisement editPartial(Long id, AdvertisementEditDTO advertisement, Long loggedInUserId);
 
+    String getCarLocation(Long id) throws InterruptedException;
+
     EditType getCarEditType(Long carId);
 
     Boolean canEditCarPartially(Long carId, String jwtToken, String user);

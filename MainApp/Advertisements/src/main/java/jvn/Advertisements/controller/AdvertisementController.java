@@ -2,10 +2,7 @@ package jvn.Advertisements.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jvn.Advertisements.dto.request.AdvertisementEditAllInfoDTO;
-import jvn.Advertisements.dto.request.AdvertisementEditDTO;
-import jvn.Advertisements.dto.request.CreateAdvertisementDTO;
-import jvn.Advertisements.dto.request.UserDTO;
+import jvn.Advertisements.dto.request.*;
 import jvn.Advertisements.dto.response.AdvertisementDTO;
 import jvn.Advertisements.enumeration.EditType;
 import jvn.Advertisements.exceptionHandler.InvalidAdvertisementDataException;
@@ -85,6 +82,12 @@ public class AdvertisementController {
                                                         @Valid @RequestBody AdvertisementEditDTO advertisementDTO) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
         return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.editPartial(id, advertisementDTO, userDTO.getId())), HttpStatus.OK);
+    }
+
+
+    @GetMapping(value = "/{id}/location", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<LocationDTO> getCarLocation(@PathVariable("id") @Positive(message = "Id must be positive.") Long advId) throws InterruptedException {
+        return new ResponseEntity<>(new LocationDTO(advertisementService.getCarLocation(advId)), HttpStatus.OK);
     }
 
     @GetMapping(value = "/car/{carId}/edit-type", produces = MediaType.APPLICATION_JSON_VALUE)

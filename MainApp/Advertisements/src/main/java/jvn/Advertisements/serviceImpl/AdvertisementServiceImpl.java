@@ -19,6 +19,7 @@ import jvn.Advertisements.service.AdvertisementService;
 import jvn.Advertisements.service.PriceListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +41,8 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     private CarClient carClient;
 
     private RentingClient rentingClient;
+
+    private SimpMessagingTemplate simpMessagingTemplate;
 
     @Override
     public Advertisement create(Advertisement createAdvertisementDTO, UserDTO userDTO, String jwtToken, String user) {
@@ -130,6 +133,12 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     }
 
     @Override
+    public String getCarLocation(Long id) throws InterruptedException {
+        sendCarLocation(id);
+        return "Haj";
+    }
+
+    @Override
     public EditType getCarEditType(Long carId) {
         List<Advertisement> advertisements = advertisementRepository.findByCar(carId);
         if (advertisements != null && !advertisements.isEmpty()) {
@@ -178,6 +187,15 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     @Async
     public void sendMessageToSearchService(Long advId) {
         advertisementProducer.sendMessageForSearch(advId);
+    }
+
+    @Async
+    public void sendCarLocation(Long advId) throws InterruptedException {
+        for (int i = 0; i < 6; i++) {
+            System.out.println("Haj");
+            this.simpMessagingTemplate.convertAndSend("/socket-publisher", "Kako si");
+            Thread.sleep(5000L);
+        }
     }
 
     private void checkOwner(Advertisement advertisement, Long loggedInUserId) {
@@ -258,12 +276,13 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     @Autowired
     public AdvertisementServiceImpl(PriceListService priceListService, CarClient carClient,
                                     AdvertisementRepository advertisementRepository, AdvertisementMessageDtoMapper advertisementMessageMapper,
-                                    AdvertisementProducer advertisementProducer, RentingClient rentingClient) {
+                                    AdvertisementProducer advertisementProducer, RentingClient rentingClient, SimpMessagingTemplate simpMessagingTemplate) {
         this.priceListService = priceListService;
         this.carClient = carClient;
         this.advertisementRepository = advertisementRepository;
         this.advertisementMessageMapper = advertisementMessageMapper;
         this.advertisementProducer = advertisementProducer;
         this.rentingClient = rentingClient;
+        this.simpMessagingTemplate = simpMessagingTemplate;
     }
 }

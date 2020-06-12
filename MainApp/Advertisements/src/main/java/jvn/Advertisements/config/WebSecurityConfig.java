@@ -35,6 +35,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/advertisement")
                 .hasAuthority("MANAGE_ADVERTISEMENTS")
 
+                .antMatchers("/api/advertisement/{id}/location")
+                .hasAuthority("MANAGE_ADVERTISEMENTS")
+
                 .antMatchers("/api/advertisement/by-ids/{advIds}")
                 .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
 
