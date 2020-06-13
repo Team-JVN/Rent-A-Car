@@ -10,8 +10,8 @@ public class RandomPasswordGenerator {
         final char[] lowercase = "abcdefghijklmnopqrstuvwxyz".toCharArray();
         final char[] uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
         final char[] numbers = "0123456789".toCharArray();
-        final char[] symbols = "^$?!@#%&_".toCharArray();
-        final char[] allAllowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789^$?!@#%&_".toCharArray();
+        final char[] symbols = "_^#?!@$%^&*-.,:;".toCharArray();
+        final char[] allAllowed = "0123456789abcdefghijklmnopqrstuvwxyz_^#?!@$%^&*-.,:;ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
 
         Random random = new SecureRandom();
 

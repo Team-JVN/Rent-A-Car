@@ -43,7 +43,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(new TokenAuthenticationFilter(), BasicAuthenticationFilter.class);
 
         http.csrf().disable();
-        http.headers().frameOptions().disable();
+//        http.headers().frameOptions().disable();
     }
 
     @Override

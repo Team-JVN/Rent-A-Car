@@ -102,7 +102,7 @@ export class RentingCartComponent implements OnInit {
       if (req.rentInfos.length > 0) {
         this.rentRequestService.create(req).subscribe(
           () => {
-            this.toastr.success('Rent requests is successfully sent!', 'Create Rent Request(s)');
+            this.toastr.success('Rent request(s) successfully sent!', 'Create Rent Request(s)');
           },
           (httpErrorResponse: HttpErrorResponse) => {
             req.rentInfos.forEach(item => this.rentInfos.push(item));
