@@ -17,6 +17,8 @@ public class RabbitMQConfiguration {
 
     private static final String EDIT_PRICE_LIST_ADVERTISEMENT = "advertisements-for-search-edit-price-list";
 
+    public static final String TRACKING = "tracking";
+
     @Bean
     public Queue queueCreatedAdvertisement() {
         return new Queue(ADVERTISEMENT_FOR_SEARCH, false);
@@ -40,6 +42,11 @@ public class RabbitMQConfiguration {
     @Bean
     public Queue queueEditPriceListAdvertisement() {
         return new Queue(EDIT_PRICE_LIST_ADVERTISEMENT, false);
+    }
+
+    @Bean
+    public Queue queueTracking() {
+        return new Queue(TRACKING, false);
     }
 
 }

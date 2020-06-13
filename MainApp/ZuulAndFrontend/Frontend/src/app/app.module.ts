@@ -94,6 +94,7 @@ import { ConfirmDeleteClientComponent } from './component/confirm-dialog/confirm
 import { ConfirmDialogDeleteAgentComponent } from './component/confirm-dialog/confirm-dialog-delete-agent/confirm-dialog-delete-agent.component';
 import { ConfirmDialogDeleteAdminComponent } from './component/confirm-dialog/confirm-dialog-delete-admin/confirm-dialog-delete-admin.component';
 import { AddToCartComponent } from './component/add/add-to-cart/add-to-cart.component';
+import { CarTrackingComponent } from './component/car-tracking/car-tracking.component';
 
 @NgModule({
   declarations: [
@@ -166,6 +167,7 @@ import { AddToCartComponent } from './component/add/add-to-cart/add-to-cart.comp
     ConfirmDialogDeleteAgentComponent,
     ConfirmDialogDeleteAdminComponent,
     AddToCartComponent,
+    CarTrackingComponent,
   ],
   imports: [
     BrowserModule,

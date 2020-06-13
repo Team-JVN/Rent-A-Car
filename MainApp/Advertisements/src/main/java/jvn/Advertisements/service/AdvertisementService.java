@@ -2,9 +2,12 @@ package jvn.Advertisements.service;
 
 import jvn.Advertisements.dto.request.AdvertisementEditDTO;
 import jvn.Advertisements.dto.request.UserDTO;
+import jvn.Advertisements.dto.response.LocationDTO;
 import jvn.Advertisements.enumeration.EditType;
 import jvn.Advertisements.model.Advertisement;
 
+import javax.script.ScriptException;
+import java.io.IOException;
 import java.util.List;
 
 public interface AdvertisementService {
@@ -20,8 +23,12 @@ public interface AdvertisementService {
 
     EditType getCarEditType(Long carId);
 
+    LocationDTO getCarLocation(Long advId, Long userId) throws IOException, ScriptException;
+
     Boolean canEditCarPartially(Long carId, String jwtToken, String user);
 
     Boolean canDeleteCar(Long carId);
+
+    void listen(String message);
 }
 

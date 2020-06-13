@@ -15,7 +15,6 @@
                     <mat-option value="all" selected>- All -</mat-option>
                     <mat-option value="active">Active</mat-option>
                     <mat-option value="inactive">Inactive</mat-option>
-                    <mat-option value="operation_pending">Operation pending</mat-option>
                 </mat-select>
             </mat-form-field>
         </div>
@@ -38,6 +37,11 @@
                                         *ngIf="element.logicalStatus === 'EXISTING'" matTooltip="View Rent Requests"
                                         (click)="viewRentRequests(element)">
                                         <mat-icon>assignment</mat-icon>
+                                    </button>
+                                    <button mat-icon-button aria-label="Car tracking" color="primary"
+                                        *ngIf="element.car.availableTracking"
+                                        (click)="carTracking(element);$event.stopPropagation()">
+                                        <mat-icon>navigation</mat-icon>
                                     </button>
                                     <button mat-icon-button aria-label="Edit" color="primary"
                                         *ngIf="element.logicalStatus === 'EXISTING'"

@@ -2,11 +2,13 @@ package jvn.Advertisements.serviceImpl;
 
 import jvn.Advertisements.client.CarClient;
 import jvn.Advertisements.client.RentingClient;
+import jvn.Advertisements.config.RabbitMQConfiguration;
 import jvn.Advertisements.dto.message.AdvertisementMessageDTO;
 import jvn.Advertisements.dto.message.OwnerMessageDTO;
 import jvn.Advertisements.dto.request.AdvertisementEditDTO;
 import jvn.Advertisements.dto.request.UserDTO;
 import jvn.Advertisements.dto.response.CarWithAllInformationDTO;
+import jvn.Advertisements.dto.response.LocationDTO;
 import jvn.Advertisements.enumeration.EditType;
 import jvn.Advertisements.enumeration.LogicalStatus;
 import jvn.Advertisements.exceptionHandler.InvalidAdvertisementDataException;
@@ -17,6 +19,7 @@ import jvn.Advertisements.producer.AdvertisementProducer;
 import jvn.Advertisements.repository.AdvertisementRepository;
 import jvn.Advertisements.service.AdvertisementService;
 import jvn.Advertisements.service.PriceListService;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
@@ -28,6 +31,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class AdvertisementServiceImpl implements AdvertisementService {
+
+    public String info = "";
 
     private PriceListService priceListService;
 
@@ -136,6 +141,13 @@ public class AdvertisementServiceImpl implements AdvertisementService {
             return EditType.PARTIAL;
         }
         return EditType.ALL;
+    }
+
+    @Override
+    public LocationDTO getCarLocation(Long advId, Long userId) {
+        Advertisement advertisement = get(advId, LogicalStatus.EXISTING);
+        checkOwner(advertisement, userId);
+        return new LocationDTO(info);
     }
 
     @Override
@@ -253,6 +265,17 @@ public class AdvertisementServiceImpl implements AdvertisementService {
             dbAdvertisement.setCDW(false);
         }
         return dbAdvertisement;
+    }
+
+    @Override
+    @RabbitListener(queues = RabbitMQConfiguration.TRACKING)
+    public void listen(String message) {
+        System.out.println(message);
+        setInfo(message);
+    }
+
+    public void setInfo(String info) {
+        this.info = info;
     }
 
     @Autowired

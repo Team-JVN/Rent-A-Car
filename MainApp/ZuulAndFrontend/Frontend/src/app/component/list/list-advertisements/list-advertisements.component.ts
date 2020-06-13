@@ -36,7 +36,9 @@ export class ListAdvertisementsComponent implements OnInit {
     this.fetchAll('all');
     this.createSuccess = this.advertisementService.createSuccessEmitter.subscribe(
       () => {
-        this.fetchAll(this.status);
+        this.delay(3000).then(any => {
+          this.fetchAll(this.status);
+        });
       }
     );
   }
@@ -131,5 +133,13 @@ export class ListAdvertisementsComponent implements OnInit {
 
   viewRentRequests(element: AdvertisementFromSearch) {
     this.router.navigate(['/rent-requests/' + element.id]);
+  }
+
+  carTracking(element: AdvertisementFromSearch) {
+    this.router.navigate(['/advertisement/' + element.id + '/tracking']);
+  }
+
+  async delay(ms: number) {
+    await new Promise(resolve => setTimeout(() => resolve(), ms));
   }
 }

@@ -7,6 +7,7 @@ import jvn.Advertisements.dto.request.AdvertisementEditDTO;
 import jvn.Advertisements.dto.request.CreateAdvertisementDTO;
 import jvn.Advertisements.dto.request.UserDTO;
 import jvn.Advertisements.dto.response.AdvertisementDTO;
+import jvn.Advertisements.dto.response.LocationDTO;
 import jvn.Advertisements.enumeration.EditType;
 import jvn.Advertisements.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.Advertisements.mapper.AdvertisementDtoMapper;
@@ -20,9 +21,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.script.ScriptException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -85,6 +88,12 @@ public class AdvertisementController {
                                                         @Valid @RequestBody AdvertisementEditDTO advertisementDTO) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
         return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.editPartial(id, advertisementDTO, userDTO.getId())), HttpStatus.OK);
+    }
+
+    @GetMapping("/{advId}/location")
+    public ResponseEntity<LocationDTO> getCarLocation(@PathVariable("advId") Long advId) throws IOException, ScriptException {
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        return new ResponseEntity<>(advertisementService.getCarLocation(advId, userDTO.getId()), HttpStatus.OK);
     }
 
     @GetMapping(value = "/car/{carId}/edit-type", produces = MediaType.APPLICATION_JSON_VALUE)
