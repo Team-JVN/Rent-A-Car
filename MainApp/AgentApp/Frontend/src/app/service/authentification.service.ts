@@ -71,6 +71,7 @@ export class AuthentificationService {
     this.refreshToken = null;
     localStorage.removeItem('rentInfos');
     localStorage.removeItem('UserTokenState');
+    localStorage.removeItem('searchParams');
   }
 
   getUserTokenState(): UserTokenState {

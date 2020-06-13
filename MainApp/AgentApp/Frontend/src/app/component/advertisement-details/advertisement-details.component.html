@@ -7,7 +7,8 @@
             </div>
             <div class="col-3 rating">
                 <star-rating class="rating-style" totalstars="5" checkedcolor="#87C7F3" uncheckedcolor="black"
-                    size="40px" [(value)]="selectedAdWithPictures.car.avgRating" readonly="true">
+                    size="40px" [(value)]="selectedAdWithPictures.car.avgRating" readonly="true"
+                    matTooltip="{{selectedAdWithPictures.car.avgRating}}" matTooltipPosition="above">
                 </star-rating>
             </div>
         </div>
