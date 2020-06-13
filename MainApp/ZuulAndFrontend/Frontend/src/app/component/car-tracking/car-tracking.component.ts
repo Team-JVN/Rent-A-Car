@@ -19,6 +19,7 @@ export class CarTrackingComponent implements OnInit {
   private stompClient;
   advId: number;
   isLoaded: boolean = false;
+  ws;
 
   constructor(private activatedRoute: ActivatedRoute,
     private router: Router, private advertisementService: AdvertisementService,
@@ -28,49 +29,62 @@ export class CarTrackingComponent implements OnInit {
     this.initializeWebSocketConnection();
     this.activatedRoute.params.subscribe((params: Params) => {
       this.advId = params['id'];
-      this.advertisementService.getLocation(this.advId).subscribe(
-        (data: LocationInfo) => {
-          this.toastr.success('Cao je sam jelena', 'Rent Request Details');
-        },
-        (httpErrorResponse: HttpErrorResponse) => {
-          this.toastr.error(httpErrorResponse.error.message, 'Rent Request Details');
-          this.location.back();
-        }
-      )
+      // this.advertisementService.getLocation(this.advId).subscribe(
+      //   (data: LocationInfo) => {
+      //     this.toastr.success('Cao je sam jelena', 'Rent Request Details');
+      //   },
+      //   (httpErrorResponse: HttpErrorResponse) => {
+      //     this.toastr.error(httpErrorResponse.error.message, 'Rent Request Details');
+      //     this.location.back();
+      //   }
+      // )
     });
   }
 
   initializeWebSocketConnection() {
+    var socket = new WebSocket('ws://localhost:8080/advertisements/websocket/socket');
+    this.ws = Stomp.over(socket);
 
-    // otvaranje konekcije sa serverom
-    // serverUrl je vrednost koju smo definisali u registerStompEndpoints() metodi na serveru
-    let ws = new SockJS(this.serverUrl);
-    this.stompClient = Stomp.over(ws);
-    let that = this;
+    this.ws.connect({}, function (frame) {
 
-    this.stompClient.connect({}, function () {
-      that.isLoaded = true;
-      that.openGlobalSocket()
-    });
-
-  }
-
-  openGlobalSocket() {
-    if (this.isLoaded) {
-      this.stompClient.subscribe("/socket-publisher", (message: { body: string; }) => {
-        console.log("1");
-        console.log(message);
-        // console.log(message.body)
-        // this.handleResult(location);
+      this.ws.subscribe("/socket-publisher", function (message) {
+        this.toastr.success(message.body, 'Socet success');
       });
-    }
+    }, function (error) {
+      alert("STOMP error " + error);
+    });
   }
+  // initializeWebSocketConnection() {
 
-  handleResult(location: LocationInfo) {
-    console.log("2")
-    if (location.name) {
-      console.log("3")
-      this.toastr.success(location.name, 'Rent Request Details');
-    }
-  }
+  //   // otvaranje konekcije sa serverom
+  //   // serverUrl je vrednost koju smo definisali u registerStompEndpoints() metodi na serveru
+  //   let ws = new SockJS(this.serverUrl);
+  //   this.stompClient = Stomp.over(ws);
+  //   let that = this;
+
+  //   this.stompClient.connect({}, function () {
+  //     that.isLoaded = true;
+  //     that.openGlobalSocket()
+  //   });
+
+  // }
+
+  // openGlobalSocket() {
+  //   if (this.isLoaded) {
+  //     this.stompClient.subscribe("/socket-publisher", (message: any) => {
+  //       console.log("1");
+  //       console.log(message);
+  //       // console.log(message.body)
+  //       // this.handleResult(location);
+  //     });
+  //   }
+  // }
+
+  // handleResult(location: LocationInfo) {
+  //   console.log("2")
+  //   if (location.name) {
+  //     console.log("3")
+  //     this.toastr.success(location.name, 'Rent Request Details');
+  //   }
+  // }
 }

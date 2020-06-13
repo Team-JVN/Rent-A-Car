@@ -29,7 +29,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
 
                 .authorizeRequests()
-                .antMatchers("/socket", "/socket/**", "/socket**").permitAll()
+                .antMatchers("/socket", "/socket/**", "/socket**", "/websocket", "/websocket/**", "/websocket**").permitAll()
                 .antMatchers("/api/price-list", "/api/price-list/{id}")
                 .hasAuthority("MANAGE_PRICE_LISTS")
 
@@ -59,6 +59,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/socket");
         web.ignoring().antMatchers("/socket/**");
+        web.ignoring().antMatchers(HttpMethod.GET, "/socket/info**");
+        web.ignoring().antMatchers("/websocket");
+        web.ignoring().antMatchers("/websocket/**");
+        web.ignoring().antMatchers(HttpMethod.GET, "/websocket/info**");
     }
 
 }

@@ -1,7 +1,6 @@
 package jvn.Zuul.exceptionHandler;
 
 import com.netflix.client.ClientException;
-import com.netflix.zuul.exception.ZuulException;
 import feign.FeignException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -9,8 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import javax.servlet.http.HttpServletResponse;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
@@ -33,32 +30,17 @@ public class RestExceptionHandler {
     }
 
     @ExceptionHandler(FeignException.NotFound.class)
-    public ResponseEntity<?> handleFeignNotFoundException(FeignException e,
-                                                          HttpServletResponse response) {
+    public ResponseEntity<?> handleFeignNotFoundException(FeignException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(FeignException.Unauthorized.class)
-    public ResponseEntity<?> handleFeignUnauthorizedException(FeignException e,
-                                                              HttpServletResponse response) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
-    }
-
-    @ExceptionHandler(ZuulException.class)
-    public ResponseEntity<?> handleZuulException(ZuulException e,
-                                                 HttpServletResponse response) {
-        return new ResponseEntity<>("Something goes wrong.Please try again.", HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(ClientException.class)
-    public ResponseEntity<?> handleClientException(ClientException e,
-                                                 HttpServletResponse response) {
+    public ResponseEntity<?> handleClientException() {
         return new ResponseEntity<>("Something goes wrong.Please try again.", HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<?> handleIllegalStateException(IllegalStateException e,
-                                                   HttpServletResponse response) {
+    public ResponseEntity<?> handleIllegalStateException() {
         return new ResponseEntity<>("Something goes wrong.Please try again.", HttpStatus.BAD_REQUEST);
     }
 

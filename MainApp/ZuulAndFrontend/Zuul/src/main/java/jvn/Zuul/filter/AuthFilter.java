@@ -1,104 +1,111 @@
 package jvn.Zuul.filter;
 
-import com.netflix.zuul.filters.ZuulFilter;
-import feign.FeignException;
-import jvn.Zuul.client.AuthClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Zuul.dto.UserDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
 
 @Component
-public class AuthFilter extends ZuulFilter {
+public class AuthFilter extends AbstractGatewayFilterFactory<AuthFilter.Config> {
 
-    @Autowired
-    private AuthClient authClient;
-
-    @Override
-    public String filterType() {
-        return "pre";
+    public AuthFilter() {
+        super(Config.class);
     }
 
-    @Override
-    public int filterOrder() {
-        return 1;
+    private Mono<Void> onError(ServerWebExchange exchange, String err, HttpStatus httpStatus) {
+        ServerHttpResponse response = exchange.getResponse();
+        response.setStatusCode(httpStatus);
+
+        return response.setComplete();
     }
 
+
     @Override
-    public boolean shouldFilter() {
-        RequestContext ctx = RequestContext.getCurrentContext();
-        HttpServletRequest request = ctx.getRequest();
-        if (request.getMethod().equals("OPTIONS")) {
+    public GatewayFilter apply(Config config) {
+        return (exchange, chain) -> {
+            ServerHttpRequest request = exchange.getRequest();
+            if (!haveToCheckRequest(request)) {
+                return chain.filter(exchange);
+            }
+            List<String> headers = request.getHeaders().get("Auth");
+            if (headers == null || headers.isEmpty()) {
+                return this.onError(exchange, "Invalid Authorization header", HttpStatus.UNAUTHORIZED);
+            }
+            String header = headers.get(0);
+            if (header == null || header.isEmpty() || !header.startsWith("Bearer ")) {
+                return this.onError(exchange, "Invalid Authorization header", HttpStatus.UNAUTHORIZED);
+            } else {
+                WebClient webClient = createWebClient();
+                UserDTO userDto = webClient.get()
+                        .uri("/users/api/verify")
+                        .header("Auth", header)
+                        .retrieve()
+                        .bodyToMono(UserDTO.class).block();
+                if (userDto == null) {
+                    return this.onError(exchange, "Invalid Authorization header", HttpStatus.UNAUTHORIZED);
+                }
+                ServerHttpRequest modifiedRequest = exchange.getRequest().mutate().header("Auth", header).header("user", jsonToString(userDto)).build();
+
+                return chain.filter(exchange.mutate().request(modifiedRequest).build());
+            }
+        };
+    }
+
+    public static class Config {
+    }
+
+
+    private boolean haveToCheckRequest(ServerHttpRequest request) {
+        if (Objects.equals(request.getMethod(), HttpMethod.OPTIONS)) {
             return false;
         }
-        String url = request.getRequestURL().toString();
-        String method = request.getMethod();
-        if (url.contains("users")) {
+        String url = request.getURI().toString();
+        HttpMethod method = request.getMethod();
+        if (new AntPathMatcher().match("**/api/advertisement/{id}", url) && request.getMethod().equals(HttpMethod.GET)) {
+            return false;
+        }
+        if (url.contains("/advertisements/websocket")) {
             return false;
         }
         if (url.contains("/search/h2")) {
             return false;
         }
-        if (new AntPathMatcher().match("**/api/car/{id}/picture", url) && method.equals("GET")) {
+        if (new AntPathMatcher().match("**/api/car/{id}/picture", url) && Objects.equals(method, HttpMethod.GET)) {
             return false;
         }
-        if (method.equals("GET") && url.contains("/api/body-style")) {
+        if (Objects.equals(method, HttpMethod.GET) && url.contains("/api/body-style")) {
             return false;
         }
-        if (method.equals("GET") && url.contains("/api/fuel-type")) {
+        if (Objects.equals(method, HttpMethod.GET) && url.contains("/api/fuel-type")) {
             return false;
         }
-        if (method.equals("GET") && url.contains("/api/gearbox-type")) {
+        if (Objects.equals(method, HttpMethod.GET) && url.contains("/api/gearbox-type")) {
             return false;
         }
-        if (method.equals("GET") && url.contains("/api/make")) {
+        if (Objects.equals(method, HttpMethod.GET) && url.contains("/api/make")) {
             return false;
         }
-        if (method.equals("GET") && url.contains("/api/make/{makeId}/models")) {
+        if (Objects.equals(method, HttpMethod.GET) && url.contains("/api/make/{makeId}/models")) {
             return false;
         }
-        if (new AntPathMatcher().match("**/api/advertisement/{id}", url) && method.equals("GET")) {
-            return false;
-        }
-        return !method.equals("POST") || !request.getRequestURL().toString().contains("/api/advertisement/search");
+        return !Objects.equals(method, HttpMethod.POST) || !url.contains("/api/advertisement/search");
     }
 
-    private void setFailedRequest(String body, int code) {
-        RequestContext ctx = RequestContext.getCurrentContext();
-        ctx.setResponseStatusCode(code);
-        if (ctx.getResponseBody() == null) {
-            ctx.setResponseBody(body);
-            ctx.setSendZuulResponse(false);
-        }
-    }
-
-    @Override
-    public Object run() {
-        RequestContext ctx = RequestContext.getCurrentContext();
-        HttpServletRequest request = ctx.getRequest();
-        String header = request.getHeader("Auth");
-        if (request.getRequestURL().toString().contains("/advertisements/socket")) {
-            String value = request.getHeader("Connection");
-            ctx.addZuulRequestHeader("Connection", "Upgrade");
-            ctx.addZuulRequestHeader("Upgrade", "websocket");
-            return null;
-        }
-        if (header == null || header.isEmpty() || !header.startsWith("Bearer ")) {
-            ctx.setResponseStatusCode(401);
-            ctx.setSendZuulResponse(false);
-        } else {
-            try {
-                System.out.println("Verifikacija");
-                UserDTO userDTO = authClient.verify(header);
-                ctx.addZuulRequestHeader("user", jsonToString(userDTO));
-                ctx.addZuulRequestHeader("Auth", header);
-            } catch (FeignException.NotFound e) {
-                setFailedRequest("Something goes wrong. Please try again.", 403);
-            }
-        }
-        return null;
+    private WebClient createWebClient() {
+        return WebClient.create("http://localhost:8080");
     }
 
     private String jsonToString(UserDTO userDTO) {
@@ -107,8 +114,7 @@ public class AuthFilter extends ZuulFilter {
         try {
             return Obj.writeValueAsString(userDTO);
         } catch (IOException e) {
-            setFailedRequest("Something is wrong. Please try again.", 403);
+            return null;
         }
-        return null;
     }
 }

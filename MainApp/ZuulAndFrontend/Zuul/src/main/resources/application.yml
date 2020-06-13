@@ -1,0 +1,51 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: zuul
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: advertisements
+          uri: lb://advertisements
+          predicates:
+            - Path=/advertisements/**
+          filters:
+            - name: AuthFilter
+            - RewritePath=/advertisements/(?<path>.*), /$\{path}
+        - id: cars
+          uri: lb://cars
+          predicates:
+            - Path=/cars/**
+          filters:
+            - name: AuthFilter
+            - RewritePath=/cars/(?<path>.*), /$\{path}
+        - id: renting
+          uri: lb://renting
+          predicates:
+            - Path=/renting/**
+          filters:
+            - name: AuthFilter
+            - RewritePath=/renting/(?<path>.*), /$\{path}
+        - id: users
+          uri: lb://users
+          predicates:
+            - Path=/users/**
+          filters:
+            - RewritePath=/users/(?<path>.*), /$\{path}
+        - id: search-service
+          uri: lb://search-service
+          predicates:
+            - Path=/search/**
+          filters:
+            - name: AuthFilter
+            - RewritePath=/search/(?<path>.*), /$\{path}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: hystrix.stream
