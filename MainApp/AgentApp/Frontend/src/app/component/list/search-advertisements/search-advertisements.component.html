@@ -238,96 +238,112 @@
             </div>
         </form>
         <hr />
-        <table mat-table *ngIf="this.advertisementsDataSource && this.advertisementsDataSource.data.length != 0"
-            [dataSource]="advertisementsDataSource" class="advertisement-list-table">
 
-            <ng-container matColumnDef="advertisement">
-                <td mat-cell *matCellDef="let element">
-                    <mat-card class="item-card" (click)="viewDetails(element)">
-                        <div class="image-div">
-                            <img [src]="element.car.image" *ngIf="!element.car.isImageLoading; else noImageFound"
-                                class="image">
-                        </div>
-                        <div class="advertisement-div">
-                            <mat-card-header class="advertisement-card-header">
-                                <mat-card-title class="advertisement-card-title">{{element.car.make.name}}
-                                    {{element.car.model.name}}
-                                </mat-card-title>
-                                <div class="rating">
-                                    <star-rating class="rating-style" totalstars="5" checkedcolor="#87C7F3"
-                                        uncheckedcolor="black" size="30px" [(value)]="element.car.avgRating"
-                                        readonly="true" matTooltip="{{element.car.avgRating}}"
-                                        matTooltipPosition="right">
-                                    </star-rating>
-                                </div>
-                            </mat-card-header>
-                            <mat-card-content>
-                                <table class="table advertisement-table">
-                                    <tbody>
-                                        <tr>
-                                            <th><span class="theader">
-                                                    <mat-icon class="mr-2">today</mat-icon>Available Between:
-                                                </span></th>
-                                            <td>{{element.dateFrom | date:"dd.MM.yyyy."}} —
-                                                <span
-                                                    *ngIf="element.dateTo">{{element.dateTo | date:"dd.MM.yyyy."}}</span>
-                                                <span *ngIf="!element.dateTo">Unlimited</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th><span class="theader">
-                                                    <mat-icon class="mr-2">speed</mat-icon>Kilometres Limit:
-                                                </span></th>
-                                            <td>
-                                                <span *ngIf="element.kilometresLimit">
-                                                    {{element.kilometresLimit}} Km &nbsp;
-                                                    <span class="per-km">
-                                                        ({{element.priceList.pricePerKm | number: '1.2-2'}} € per
-                                                        Km)</span>
-                                                </span>
-                                                <span *ngIf="!element.kilometresLimit">Unlimited</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th><span class="theader">
-                                                    <mat-icon class="mr-2">commute</mat-icon>Collision Damage
-                                                    Waiver:
-                                                </span></th>
-                                            <td>
-                                                <span *ngIf="element.cdw">
-                                                    {{element.priceList.priceForCDW | number: '1.2-2'}} €</span>
-                                                <span *ngIf="!element.cdw">Not Available</span>
-                                            </td>
-                                        </tr>
-                                        <tr *ngIf="element.discount && element.discount > 0">
-                                            <th><span class="theader">
-                                                    <mat-icon class="mr-2">money_off</mat-icon>30+ Days Rent Discount:
-                                                </span></th>
-                                            <td>{{element.discount}} %</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </mat-card-content>
-                        </div>
-                        <table class="price-table">
-                            <tr>
-                                <td class="price-header">Price per day:</td>
-                            </tr>
-                            <tr>
-                                <td class="price-text">
-                                    {{element.priceList.pricePerDay | number: '1.2-2'}} €</td>
-                            </tr>
-                            <tr><button mat-raised-button color="primary" class="rent-btn"
-                                    (click)="rent(element);$event.stopPropagation()"
-                                    *ngIf="this.authService.isLoggedIn() && element.car.owner.email !== this.authService.getLoggedInUserEmail() && checkIfCanRentAdvertisement(element)">
-                                    Rent me!</button></tr>
-                        </table>
-                    </mat-card>
-                </td>
-            </ng-container>
+        <div *ngIf="this.advertisementsDataSource && this.advertisementsDataSource.data.length != 0">
+            <div class="sort-filter">
+                <span class="filter-span">Sort by:</span>
+                <mat-form-field>
+                    <mat-select [(ngModel)]="sortCriteria" (selectionChange)="sortBy(sortCriteria)">
+                        <mat-option value="none" selected>- None -</mat-option>
+                        <mat-option value="minPricePerDay">Minimal Price Per Day</mat-option>
+                        <mat-option value="maxPricePerDay">Maximal Price Per Day</mat-option>
+                        <mat-option value="minAvgRating">Minimal Average Rating</mat-option>
+                        <mat-option value="maxAvgRating">Maximal Average Rating</mat-option>
+                        <mat-option value="minMileageInKm">Minimal Mileage</mat-option>
+                        <mat-option value="maxMileageInKm">Maximal Mileage</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <table mat-table [dataSource]="advertisementsDataSource" class="advertisement-list-table">
+                <ng-container matColumnDef="advertisement">
+                    <td mat-cell *matCellDef="let element">
+                        <mat-card class="item-card" (click)="viewDetails(element)">
+                            <div class="image-div">
+                                <img [src]="element.car.image" *ngIf="!element.car.isImageLoading; else noImageFound"
+                                    class="image">
+                            </div>
+                            <div class="advertisement-div">
+                                <mat-card-header class="advertisement-card-header">
+                                    <mat-card-title class="advertisement-card-title">{{element.car.make.name}}
+                                        {{element.car.model.name}}
+                                    </mat-card-title>
+                                    <div class="rating">
+                                        <star-rating class="rating-style" totalstars="5" checkedcolor="#87C7F3"
+                                            uncheckedcolor="black" size="30px" [(value)]="element.car.avgRating"
+                                            readonly="true" matTooltip="{{element.car.avgRating}}"
+                                            matTooltipPosition="right">
+                                        </star-rating>
+                                    </div>
+                                </mat-card-header>
+                                <mat-card-content>
+                                    <table class="table advertisement-table">
+                                        <tbody>
+                                            <tr>
+                                                <th><span class="theader">
+                                                        <mat-icon class="mr-2">today</mat-icon>Available Between:
+                                                    </span></th>
+                                                <td>{{element.dateFrom | date:"dd.MM.yyyy."}} —
+                                                    <span
+                                                        *ngIf="element.dateTo">{{element.dateTo | date:"dd.MM.yyyy."}}</span>
+                                                    <span *ngIf="!element.dateTo">Unlimited</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th><span class="theader">
+                                                        <mat-icon class="mr-2">speed</mat-icon>Kilometres Limit:
+                                                    </span></th>
+                                                <td>
+                                                    <span *ngIf="element.kilometresLimit">
+                                                        {{element.kilometresLimit}} Km &nbsp;
+                                                        <span class="per-km">
+                                                            ({{element.priceList.pricePerKm | number: '1.2-2'}} € per
+                                                            Km)</span>
+                                                    </span>
+                                                    <span *ngIf="!element.kilometresLimit">Unlimited</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th><span class="theader">
+                                                        <mat-icon class="mr-2">commute</mat-icon>Collision Damage
+                                                        Waiver:
+                                                    </span></th>
+                                                <td>
+                                                    <span *ngIf="element.cdw">
+                                                        {{element.priceList.priceForCDW | number: '1.2-2'}} €</span>
+                                                    <span *ngIf="!element.cdw">Not Available</span>
+                                                </td>
+                                            </tr>
+                                            <tr *ngIf="element.discount && element.discount > 0">
+                                                <th><span class="theader">
+                                                        <mat-icon class="mr-2">money_off</mat-icon>30+ Days Rent
+                                                        Discount:
+                                                    </span></th>
+                                                <td>{{element.discount}} %</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </mat-card-content>
+                            </div>
+                            <table class="price-table">
+                                <tr>
+                                    <td class="price-header">Price per day:</td>
+                                </tr>
+                                <tr>
+                                    <td class="price-text">
+                                        {{element.priceList.pricePerDay | number: '1.2-2'}} €</td>
+                                </tr>
+                                <tr><button mat-raised-button color="primary" class="rent-btn"
+                                        (click)="rent(element);$event.stopPropagation()"
+                                        *ngIf="this.authService.isLoggedIn() && element.car.owner.email !== this.authService.getLoggedInUserEmail() && checkIfCanRentAdvertisement(element)">
+                                        Rent me!</button></tr>
+                            </table>
+                        </mat-card>
+                    </td>
+                </ng-container>
 
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+        </div>
 
         <div *ngIf="!this.advertisementsDataSource || this.advertisementsDataSource.data.length == 0" class="no-ads">
             No advertisements to show.
