@@ -44,6 +44,7 @@ export class SearchAdvertisementsComponent implements OnInit {
 
   displayedColumns: string[] = ['advertisement'];
   advertisementsDataSource: MatTableDataSource<AdvertisementFromSearch>;
+  sortCriteria: string = "none";
   searchForm: FormGroup;
   fuelTypes: FuelType[] = [];
   gearBoxTypes: GearBoxType[] = [];
@@ -68,7 +69,7 @@ export class SearchAdvertisementsComponent implements OnInit {
     public dialog: MatDialog,
     private formBuilder: FormBuilder,
     private searchService: SearchService,
-    private authService: AuthentificationService,
+    private authService: AuthentificationService, // Used in .html !!!
     private carService: CarService,
     private toastr: ToastrService,
     private fuelTypeService: FuelTypeService,
@@ -205,6 +206,38 @@ export class SearchAdvertisementsComponent implements OnInit {
         this.toastr.error(httpErrorResponse.error.message, 'Show Advertisements');
       }
     );
+  }
+
+  sortBy(sortCriteria: string) {
+    let advertisements = this.advertisementsDataSource.data;
+
+    switch (sortCriteria) {
+      case "none":
+        advertisements.sort((a, b) => a.id - b.id);
+        break;
+      case "minPricePerDay":
+        advertisements.sort((a, b) => a.priceList.pricePerDay - b.priceList.pricePerDay);
+        break;
+      case "maxPricePerDay":
+        advertisements.sort((a, b) => b.priceList.pricePerDay - a.priceList.pricePerDay);
+        break;
+      case "minAvgRating":
+        advertisements.sort((a, b) => a.car.avgRating - b.car.avgRating);
+        break;
+      case "maxAvgRating":
+        advertisements.sort((a, b) => b.car.avgRating - a.car.avgRating);
+        break;
+      case "minMileageInKm":
+        advertisements.sort((a, b) => a.car.mileageInKm - b.car.mileageInKm);
+        break;
+      case "maxMileageInKm":
+        advertisements.sort((a, b) => b.car.mileageInKm - a.car.mileageInKm);
+        break;
+      default:
+        advertisements.sort((a, b) => a.id - b.id);
+    }
+
+    this.advertisementsDataSource = new MatTableDataSource(advertisements);
   }
 
   checkIfCanRentAdvertisement(element: AdvertisementFromSearch): boolean {
