@@ -16,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Pattern;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,9 +38,10 @@ public class CommentController {
         return new ResponseEntity<>(commentDtoMapper.toDto(commentService.get(id)), HttpStatus.OK);
     }
 
-    @GetMapping("/{status}")
-    public ResponseEntity<List<CommentDTO>> get(@PathVariable CommentStatus status){
-        List<CommentDTO> list = commentService.getAll(status).stream().map(commentDtoMapper::toDto).
+    @GetMapping("/{status}/status")
+    public ResponseEntity<List<CommentDTO>> getAll(@PathVariable(value = "status") @Pattern(regexp = "(?i)(all|awaiting|approved)$", message = "Status is not valid.") String status){
+        List<CommentDTO> list;
+        list = commentService.getAll(status).stream().map(commentDtoMapper::toDto).
                 collect(Collectors.toList());
         return new ResponseEntity<>(list, HttpStatus.OK);
     }

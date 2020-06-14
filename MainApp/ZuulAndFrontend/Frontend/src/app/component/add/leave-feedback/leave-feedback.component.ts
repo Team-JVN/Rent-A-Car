@@ -43,7 +43,9 @@ export class LeaveFeedbackComponent implements OnInit {
   }
 
   leaveFeedback() {
-    const feedback = new Feedback(this.rating, [new Comment(this.comment)]);
+    const feedback = new Feedback(this.rating, [
+      new Comment(this.comment, this.data.rentInfo),
+    ]);
     console.log(feedback);
     this.rentRequestService
       .leaveFeedback(feedback, this.data.rentInfo.id, this.data.rentRequest.id)

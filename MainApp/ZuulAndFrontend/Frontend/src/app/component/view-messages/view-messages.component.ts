@@ -26,7 +26,7 @@ export class ViewMessagesComponent implements OnInit {
 
   private stompClient;
   // private serverUrl = environment.baseUrl + environment.socket + "socket";
-  private serverUrl = "http://localhost:8083/socket";
+  // private serverUrl = "http://localhost:8083/socket";
   isLoaded: boolean = false;
 
   messagesContainer: ElementRef<HTMLDivElement>;
@@ -41,13 +41,10 @@ export class ViewMessagesComponent implements OnInit {
 
   ngOnInit() {
     this.getMessages();
-    this.initializeWebSocketConnection();
+    // this.initializeWebSocketConnection();
   }
 
   onSendMessage(text: string) {
-    console.log("PORUKA: " + text);
-    console.log("ZAHTEV: " + this.rentRequest.id);
-    console.log(this.rentRequest);
     if (!text) {
       this.toastr.error("Please enter message's text", "Send message");
       return;
@@ -65,22 +62,22 @@ export class ViewMessagesComponent implements OnInit {
     // Primer slanja poruke preko web socketa sa klijenta. URL je
     //  - ApplicationDestinationPrefix definisan u config klasi na serveru (configureMessageBroker() metoda)
     //  - vrednost @MessageMapping anotacije iz kontrolera na serveru
-    this.stompClient.send(
-      "/socket-subscriber/message",
-      {},
-      JSON.stringify(message)
-    );
-
-    // this.messageService.send(message, this.rentRequest.id).subscribe(
-    //   (data: Message) => {
-    //     this.toastr.success("Success!", "Send message");
-    //     this.getMessages();
-    //     this.scrollIntoView();
-    //   },
-    //   (httpErrorResponse: HttpErrorResponse) => {
-    //     this.toastr.error(httpErrorResponse.error.message, "Send message");
-    //   }
+    // this.stompClient.send(
+    //   "/socket-subscriber/message",
+    //   {},
+    //   JSON.stringify(message)
     // );
+
+    this.messageService.send(message, this.rentRequest.id).subscribe(
+      (data: Message) => {
+        this.toastr.success("Success!", "Send message");
+        this.getMessages();
+        this.scrollIntoView();
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        this.toastr.error(httpErrorResponse.error.message, "Send message");
+      }
+    );
   }
 
   getMessages() {
@@ -93,8 +90,6 @@ export class ViewMessagesComponent implements OnInit {
             new Date(a.dateAndTime).getTime() -
             new Date(b.dateAndTime).getTime()
         );
-        console.log("PORUKE: ");
-        console.log(this.messages);
         this.scrollIntoView();
       },
       (httpErrorResponse: HttpErrorResponse) => {
@@ -113,22 +108,20 @@ export class ViewMessagesComponent implements OnInit {
   initializeWebSocketConnection() {
     // otvaranje konekcije sa serverom
     // serverUrl je vrednost koju smo definisali u registerStompEndpoints() metodi na serveru
-    console.log("initializeWebSocketConnection");
-    let ws = new SockJS(this.serverUrl);
-    this.stompClient = Stomp.over(ws);
-    let that = this;
-
-    this.stompClient.connect(
-      {},
-      function () {
-        console.log("connecting");
-        that.isLoaded = true;
-        that.openGlobalSocket();
-      },
-      function () {
-        console.log("error");
-      }
-    );
+    // let ws = new SockJS(this.serverUrl);
+    // this.stompClient = Stomp.over(ws);
+    // let that = this;
+    // this.stompClient.connect(
+    //   {},
+    //   function () {
+    //     console.log("connecting");
+    //     that.isLoaded = true;
+    //     that.openGlobalSocket();
+    //   },
+    //   function () {
+    //     console.log("error");
+    //   }
+    // );
   }
   openGlobalSocket() {
     if (this.isLoaded) {
@@ -145,17 +138,15 @@ export class ViewMessagesComponent implements OnInit {
   }
   // funkcija koja se poziva kada server posalje poruku na topic na koji se klijent pretplatio
   handleResult(message: { body: string }) {
-    console.log(message);
     if (message.body) {
       let messageResult: Message = JSON.parse(message.body);
-      console.log(messageResult);
       this.messages.push(messageResult);
       this.toastr
         .success("New message recieved", null, {
           timeOut: 3000,
         })
         .onTap.subscribe((action) => {
-          this.router.navigate(["/fuel-types"]);
+          this.router.navigate(["/rent-request/" + this.rentRequest.id]);
         });
     }
   }

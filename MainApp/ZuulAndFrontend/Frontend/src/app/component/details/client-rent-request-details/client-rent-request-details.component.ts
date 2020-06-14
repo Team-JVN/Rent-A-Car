@@ -40,6 +40,7 @@ export class ClientRentRequestDetailsComponent implements OnInit {
   rentRequest: RentRequest = new RentRequest(
     new Client("", "", "", ""),
     null,
+    [],
     0,
     ""
   );
@@ -120,11 +121,11 @@ export class ClientRentRequestDetailsComponent implements OnInit {
   pay(rentInfo: RentInfo, rentRequest: RentRequest) {
     this.rentRequestService.pay(rentRequest.id, rentInfo.id).subscribe(
       () => {
-        this.toastr.success("Success", 'Pay Rent Info');
+        this.toastr.success("Success", "Pay Rent Info");
         this.fetchRentRequest();
       },
       (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Pay Rent Info');
+        this.toastr.error(httpErrorResponse.error.message, "Pay Rent Info");
       }
     );
   }
@@ -135,9 +136,12 @@ export class ClientRentRequestDetailsComponent implements OnInit {
         this.rentRequest = data;
       },
       (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Rent Request Details');
+        this.toastr.error(
+          httpErrorResponse.error.message,
+          "Rent Request Details"
+        );
         this.location.back();
       }
-    )
+    );
   }
 }

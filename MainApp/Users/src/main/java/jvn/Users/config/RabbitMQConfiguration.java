@@ -15,6 +15,8 @@ public class RabbitMQConfiguration {
 
     public static final String USERS_FOR_SEARCH = "users-for-search";
 
+    public static final String REJECTED_COMMENT = "rejected-comment";
+
     @Bean
     public Queue queueCanceledReservation() {
         return new Queue(CANCELED_RESERVATION, false);
@@ -34,4 +36,7 @@ public class RabbitMQConfiguration {
     public Queue queueUsersForSearch() {
         return new Queue(USERS_FOR_SEARCH, false);
     }
+
+    @Bean
+    public Queue queueRejectedComment(){ return new Queue(REJECTED_COMMENT, false); }
 }

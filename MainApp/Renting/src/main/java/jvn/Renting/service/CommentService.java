@@ -9,7 +9,7 @@ import java.util.List;
 public interface CommentService {
     Comment get(Long id);
 
-    List<Comment> getAll(CommentStatus status);
+    List<Comment> getAll(String status);
 
     Comment approve(Long id);
 

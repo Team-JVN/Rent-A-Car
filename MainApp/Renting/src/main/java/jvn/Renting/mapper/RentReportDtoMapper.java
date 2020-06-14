@@ -21,7 +21,11 @@ public class RentReportDtoMapper implements MapperInterface<RentReport, RentRepo
 
     @Override
     public RentReport toEntity(RentReportDTO dto) {
-        RentReport entity = modelMapper.map(dto, RentReport.class);
+//        RentReport entity = modelMapper.map(dto, RentReport.class);
+        RentReport entity = new RentReport();
+        entity.setComment(dto.getComment());
+        entity.setMadeMileage(dto.getMadeMileage());
+        entity.setAdditionalCost(dto.getAdditionalCost());
         RentInfoDTO rentInfoDTO = dto.getRentInfo();
         RentInfo rentInfo = new RentInfo();
         rentInfo.setDateTimeFrom(getLocalDateTime(rentInfoDTO.getDateTimeFrom()));

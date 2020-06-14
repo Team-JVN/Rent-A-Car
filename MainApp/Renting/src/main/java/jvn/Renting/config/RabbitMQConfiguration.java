@@ -15,6 +15,8 @@ public class RabbitMQConfiguration {
 
     public static final String REJECT_ALL_REQUESTS = "reject-all-requests";
 
+    public static final String REJECTED_COMMENT = "rejected-comment";
+
     @Bean
     public Queue queueCanceledReservation() {
         return new Queue(CANCELED_RESERVATION, false);
@@ -34,4 +36,7 @@ public class RabbitMQConfiguration {
     public Queue queueDeletedAdvertisement() {
         return new Queue(REJECT_ALL_REQUESTS, false);
     }
+
+    @Bean
+    public Queue queueRejectedComment(){ return new Queue(REJECTED_COMMENT, false); }
 }

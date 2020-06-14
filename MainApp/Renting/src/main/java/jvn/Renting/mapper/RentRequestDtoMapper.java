@@ -1,9 +1,11 @@
 package jvn.Renting.mapper;
 
 import jvn.Renting.dto.both.CommentDTO;
+import jvn.Renting.dto.both.MessageDTO;
 import jvn.Renting.dto.both.RentInfoDTO;
 import jvn.Renting.dto.both.RentRequestDTO;
 import jvn.Renting.model.Comment;
+import jvn.Renting.model.Message;
 import jvn.Renting.model.RentInfo;
 import jvn.Renting.model.RentRequest;
 import org.modelmapper.ModelMapper;
@@ -34,27 +36,25 @@ public class RentRequestDtoMapper implements MapperInterface<RentRequest, RentRe
         }
         entity.setTotalPrice(dto.getTotalPrice());
         entity.setId(dto.getId());
-
         List<RentInfo> entityRentInfos = new ArrayList<>(dto.getRentInfos().size());
-        System.out.println("MAPPER");
         for (RentInfoDTO rentInfoDTO : dto.getRentInfos()) {
-            if(rentInfoDTO.getComments().isEmpty())
-                System.out.println("nema kom");
-            Set<Comment> comments = new HashSet<>(rentInfoDTO.getComments().size());
 
-            for(CommentDTO commentDTO: rentInfoDTO.getComments()){
-                System.out.println("ima kom");
-                Comment comment = commentDtoMapper.toEntity(commentDTO);
-                comments.add(comment);
-                System.out.println(comment.getText());
-            }
+            //TODO: add mapping comments
+//            Set<Comment> comments = new HashSet<>();
+//            if(!rentInfoDTO.getComments().isEmpty() && rentInfoDTO.getComments() != null){
+//                for(CommentDTO commentDTO: rentInfoDTO.getComments()){
+//
+//                    Comment comment = commentDtoMapper.toEntity(commentDTO);
+//                    comments.add(comment);
+//                }
+//            }
             RentInfo rentInfo = new RentInfo();
             rentInfo.setDateTimeFrom(getLocalDateTime(rentInfoDTO.getDateTimeFrom()));
             rentInfo.setDateTimeTo(getLocalDateTime(rentInfoDTO.getDateTimeTo()));
             rentInfo.setAdvertisement(rentInfoDTO.getAdvertisement().getId());
             rentInfo.setOptedForCDW(rentInfoDTO.getOptedForCDW());
             rentInfo.setId(rentInfoDTO.getId());
-            rentInfo.setComments(comments);
+//            rentInfo.setComments(comments);
             entityRentInfos.add(rentInfo);
         }
         entity.setRentInfos(new HashSet<>(entityRentInfos));

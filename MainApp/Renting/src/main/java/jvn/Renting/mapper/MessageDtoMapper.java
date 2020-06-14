@@ -24,7 +24,8 @@ public class MessageDtoMapper implements MapperInterface<Message, MessageDTO>{
 //        Message entity = modelMapper.map(dto, Message.class);
         Message entity = new Message();
         entity.setText(dto.getText());
-        entity.setSender(new Long(1));
+        entity.setSender(dto.getSender().getId());
+        System.out.println(dto.getSender().getId());
         entity.setRentRequest(rentRequestDtoMapper.toEntity(dto.getRentRequest()));
         entity.setDateAndTime(getLocalDateTime(dto.getDateAndTime()));
         return entity;

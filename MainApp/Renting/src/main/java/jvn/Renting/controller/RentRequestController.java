@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Validated
 @RestController
@@ -125,35 +126,29 @@ public class RentRequestController {
     @PostMapping(value="/{id}/rent-info/{rentInfoId}/feedback")
     public ResponseEntity<FeedbackDTO> leaveFeedback(@PathVariable Long id, @PathVariable Long rentInfoId, @Valid @RequestBody FeedbackDTO feedbackDTO){
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(rentRequestService.leaveFeedback(feedbackDTO, id, rentInfoId, new Long(1)),
+        return new ResponseEntity<>(rentRequestService.leaveFeedback(feedbackDTO, id, rentInfoId, userDTO.getId()),
                 HttpStatus.CREATED);
     }
 
     @GetMapping(value="/{id}/rent-info/{rentInfoId}/feedback")
     public ResponseEntity<FeedbackDTO> getFeedback(@PathVariable Long id, @PathVariable Long rentInfoId){
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(rentRequestService.getFeedback(id, rentInfoId, new Long(1)), HttpStatus.OK);
+        return new ResponseEntity<>(rentRequestService.getFeedback(id, rentInfoId, userDTO.getId()), HttpStatus.OK);
     }
 
-    @MessageMapping("/message")
-    public ResponseEntity<MessageDTO> createMessage(String message){
-        System.out.println("SLANJE PORUKE");
-//        System.out.println(messageDTO.getText());
-//        System.out.println(id);
-        MessageDTO messageDTO = parseMessage(message);
-        System.out.println(messageDTO.getText());
-        System.out.println(messageDTO.getDateAndTime());
-        System.out.println(messageDTO.getRentRequest().getId());
-        System.out.println(messageDTO.getSender().getEmail());
-//        UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(messageDtoMapper.toDto(rentRequestService.createMessage(messageDtoMapper.toEntity(messageDTO), messageDTO.getRentRequest().getId(), new Long(1))),
+    @PostMapping("/{id}/message")
+    public ResponseEntity<MessageDTO> createMessage(@PathVariable Long id, @Valid @RequestBody MessageDTO messageDTO){
+        UserDTO userDTO = stringToObject(request.getHeader("user"));
+        messageDTO.setSender(userDTO);
+        return new ResponseEntity<>(messageDtoMapper.toDto(rentRequestService.createMessage(messageDtoMapper.toEntity(messageDTO), id, userDTO.getId())),
                 HttpStatus.CREATED);
     }
 
     @GetMapping(value="/{id}/message")
     public ResponseEntity<List<MessageDTO>> getMessages(@PathVariable Long id){
+        //TODO: need to handle exception when there is no messages
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        List<MessageDTO> list = rentRequestService.getMessages(id, new Long(1)).stream().map(messageDtoMapper::toDto).
+        List<MessageDTO> list = rentRequestService.getMessages(id, userDTO.getId()).stream().map(messageDtoMapper::toDto).
                 collect(Collectors.toList());
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
@@ -169,7 +164,6 @@ public class RentRequestController {
 
     @SuppressWarnings("unchecked")
     private MessageDTO parseMessage(String message) {
-        System.out.println("PARSIRANJE STRINGA");
         ObjectMapper mapper = new ObjectMapper();
         MessageDTO retVal;
 

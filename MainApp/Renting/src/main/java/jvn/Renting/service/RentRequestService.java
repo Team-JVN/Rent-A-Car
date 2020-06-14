@@ -31,7 +31,6 @@ public interface RentRequestService {
 
     Boolean hasRentInfos(List<Long> advIds);
 
-
     RentRequestDTO get(Long id, Long loggedInUserId);
 
     Comment createComment(Comment comment, Long id, Long rentInfoId, Long userId);

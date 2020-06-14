@@ -61,6 +61,7 @@ public class RentRequestServiceImpl implements RentRequestService {
     private CommentRepository commentRepository;
 
     private MessageDtoMapper messageDtoMapper;
+
     private RentRequestProducer rentRequestProducer;
 
     private TaskScheduler scheduler;
@@ -91,6 +92,7 @@ public class RentRequestServiceImpl implements RentRequestService {
         rentRequest.setCreatedBy(loggedInUserId);
         rentRequest.setTotalPrice(0.0);
         rentRequest.setRentInfos(new HashSet<>());
+        rentRequest.setMessages(new HashSet<>());
         RentRequest savedRequest = rentRequestRepository.save(rentRequest);
 
         savedRequest = rentRequestRepository.save(setRentInfosData(savedRequest, rentInfos, advertisementDTOS));
@@ -202,10 +204,12 @@ public class RentRequestServiceImpl implements RentRequestService {
         for(RentInfo rentInfo: rentRequest.getRentInfos()){
             if(rentInfo.getId().equals(rentInfoId)){
                 rentInfo.getComments().add(comment);
+                comment.setRentInfo(rentInfo);
                 rentRequestRepository.save(rentRequest);
                 break;
             }
         }
+
         commentRepository.save(comment);
         return comment;
     }
@@ -221,14 +225,12 @@ public class RentRequestServiceImpl implements RentRequestService {
                 comment.setSender(userId);
                 comment.setStatus(CommentStatus.AWAITING);
                 comment.setRentInfo(rentInfo);
+                commentRepository.save(comment);
                 rentInfo.getComments().add(comment);
                 Integer currRating = rentInfo.getRating();
                 rentInfo.setRating((currRating + feedbackDTO.getRating())/2);
                 rentRequest.setRentInfos(new HashSet<>(rentInfos));
                 rentRequestRepository.save(rentRequest);
-                for(RentInfo ri: rentRequest.getRentInfos()){
-                    System.out.println(ri.getComments().size());
-                }
                 break;
             }
         }
@@ -243,7 +245,6 @@ public class RentRequestServiceImpl implements RentRequestService {
         for(RentInfo rentInfo: rentRequest.getRentInfos()){
             if(rentInfo.getId().equals(rentInfoId)){
                 feedbackDTO.setRating(rentInfo.getRating());
-                System.out.println("SIZE: " + rentInfo.getComments().size());
                 for(Comment comment: rentInfo.getComments()){
                     if(comment.getStatus().equals(CommentStatus.APPROVED))
                         feedbackDTO.getComments().add(commentDtoMapper.toDto(comment));
@@ -255,7 +256,6 @@ public class RentRequestServiceImpl implements RentRequestService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Message createMessage(Message message, Long id, Long userId) {
 
         RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
@@ -264,13 +264,11 @@ public class RentRequestServiceImpl implements RentRequestService {
         message.setSender(userId);
         rentRequest.getMessages().add(message);
 
-//        this.simpMessagingTemplate.convertAndSend("/socket-publisher/" + rentRequest.getCreatedBy(), message);
-
-        try {
-            this.simpMessagingTemplate.convertAndSend("/socket-publisher", messageDtoMapper.toDto(message));
-        } catch (Exception e) {
-            throw new InvalidRentRequestDataException("Socket error", HttpStatus.BAD_REQUEST);
-        }
+//        try {
+//            this.simpMessagingTemplate.convertAndSend("/socket-publisher", messageDtoMapper.toDto(message));
+//        } catch (Exception e) {
+//            throw new InvalidRentRequestDataException("Socket error", HttpStatus.BAD_REQUEST);
+//        }
 
         rentRequestRepository.save(rentRequest);
 
@@ -280,13 +278,15 @@ public class RentRequestServiceImpl implements RentRequestService {
     @Override
     public List<Message> getMessages(Long id, Long userId) {
         RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
-        List<Message> messages = new ArrayList<Message>();
+        List<Message> messages = new ArrayList<>();
         for(Message message: rentRequest.getMessages()){
-            if(message.getSender().equals(userId) || message.getSender().equals(rentRequest.getCreatedBy())){
+            if(message.getSender().equals(userId) || rentRequest.getCreatedBy().equals(userId) || rentRequest.getClient().equals(userId)){
                 messages.add(message);
+
             }
         }
         return messages;
+    }
 
     public RentRequest changeRentRequestStatus(Long id, RentRequestStatusDTO newStatus, Long loggedInUserId) {
         RentRequestStatus rentRequestStatus = getRentRequestStatus(newStatus.getStatus());
@@ -294,7 +294,7 @@ public class RentRequestServiceImpl implements RentRequestService {
 
         if (rentRequestStatus.equals(RentRequestStatus.CANCELED)) {
             if (loggedInUserId.equals(rentRequest.getCreatedBy())) {
-                return cancel(rentRequest, loggedInUserId);
+                return cancel(rentRequest,/**/ loggedInUserId);
             } else {
                 return reject(rentRequest, loggedInUserId);
             }
@@ -328,6 +328,11 @@ public class RentRequestServiceImpl implements RentRequestService {
             }
         }
         return false;
+    }
+
+    @Override
+    public RentRequestDTO get(Long id, Long loggedInUserId) {
+        return null;
     }
 
     private RentRequest cancel(RentRequest rentRequest, Long loggedInUserId) {
@@ -438,6 +443,7 @@ public class RentRequestServiceImpl implements RentRequestService {
             rentInfo.setRating(0);
             rentInfo.setKilometresLimit(advertisementDTO.getKilometresLimit());
             rentInfo.setPricePerKm(advertisementDTO.getPriceList().getPricePerKm());
+            rentInfo.setComments(new HashSet<>());
             totalPrice += countPrice(rentInfo, advertisementDTO);
         }
         rentRequest.setTotalPrice(totalPrice);
@@ -581,7 +587,7 @@ public class RentRequestServiceImpl implements RentRequestService {
     public RentRequestServiceImpl(RentRequestRepository rentRequestRepository, AdvertisementClient advertisementClient, UserClient userClient,
                                   SearchClient searchClient, CommentDtoMapper commentDtoMapper, SimpMessagingTemplate simpMessagingTemplate,
                                   CommentRepository commentRepository, MessageDtoMapper messageDtoMapper,
-                                  SearchClient searchClient, RentRequestProducer rentRequestProducer) {
+                                  RentRequestProducer rentRequestProducer) {
         this.rentRequestRepository = rentRequestRepository;
         this.advertisementClient = advertisementClient;
         this.userClient = userClient;

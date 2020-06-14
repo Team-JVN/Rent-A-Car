@@ -11,7 +11,7 @@
     <div *ngIf="messages && messages[0]; else noMessages" class="messages-container" #scrollMe>
         <ul>
             <li *ngFor="let message of messages" [style.flex-direction]="
-            message.id == 1
+            message.sender == client.id
               ? 'row-reverse'
               : 'row'">
                 <mat-icon style="margin-bottom: 5px;">person</mat-icon>

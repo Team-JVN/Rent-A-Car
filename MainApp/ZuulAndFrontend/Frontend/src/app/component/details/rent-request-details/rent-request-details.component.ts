@@ -19,6 +19,7 @@ import {
 } from "@angular/forms";
 import { Client } from "src/app/model/client";
 import { ReviewFeedbackComponent } from "../../review-feedback/review-feedback.component";
+import { AddRentReportComponent } from "../../add/add-rent-report/add-rent-report.component";
 
 @Component({
   selector: "app-rent-request-details",
@@ -31,6 +32,7 @@ export class RentRequestDetailsComponent implements OnInit {
   rentRequest: RentRequest = new RentRequest(
     new Client("", "", "", ""),
     null,
+    [],
     0,
     ""
   );
@@ -70,19 +72,27 @@ export class RentRequestDetailsComponent implements OnInit {
       );
     });
     this.loggedInUserEmail = this.authentificationService.getLoggedInUserEmail();
-    this.getMessages();
+    // this.getMessages();
 
     //Delete this
     // this.messages = [new Message("Cao sta radi,kako si, da li si dorbo.Kako su tvoji. sta radis", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 1), new Message("Kako si", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 2),
     // new Message("Dobro", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 1), new Message("To?", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 2)];
-    this.rentRequestId = 2;
+    // this.rentRequestId = 2;
   }
 
   advertisementDetails(rentInfo: RentInfo) {
     this.router.navigate(["/advertisement/" + rentInfo.advertisement.id]);
   }
 
-  createRentReport() {}
+  createRentReport(rentInfo: RentInfo) {
+    this.dialog.open(AddRentReportComponent, {
+      data: {
+        rentReport: null,
+        rentInfo: rentInfo,
+        rentRequestId: this.rentRequestId,
+      },
+    });
+  }
 
   reviewFeedback(rentInfo: RentInfo) {
     // this.rentRequestService.getRentInfoFeedback(this.rentInfo.id).subscribe(
@@ -95,11 +105,12 @@ export class RentRequestDetailsComponent implements OnInit {
     //     this.toastr.error(httpErrorResponse.error.message, 'Review feedback');
     //   }
     // );
+    console.log("REVIEW: " + this.rentRequestId);
 
     this.dialog.open(ReviewFeedbackComponent, {
       data: {
         feedback: null,
-        rentInfoId: rentInfo.id,
+        rentInfo: rentInfo,
         rentRequestId: this.rentRequestId,
       },
     });

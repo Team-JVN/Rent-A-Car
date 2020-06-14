@@ -12,10 +12,16 @@ public class CommentDtoMapper implements MapperInterface<Comment, CommentDTO>{
 
     private ModelMapper modelMapper;
 
+    private RentInfoDtoMapper rentInfoDtoMapper;
+
     @Override
     public Comment toEntity(CommentDTO dto) {
-        Comment entity = modelMapper.map(dto, Comment.class);
-
+//        Comment entity = modelMapper.map(dto, Comment.class);
+        Comment entity = new Comment();
+        entity.setStatus(dto.getStatus());
+        entity.setSender(dto.getSender());
+        entity.setText(dto.getText());
+        entity.setRentInfo(rentInfoDtoMapper.toEntity(dto.getRentInfo()));
         return entity;
     }
 
@@ -26,7 +32,8 @@ public class CommentDtoMapper implements MapperInterface<Comment, CommentDTO>{
     }
 
     @Autowired
-    public CommentDtoMapper(ModelMapper modelMapper) {
+    public CommentDtoMapper(ModelMapper modelMapper, RentInfoDtoMapper rentInfoDtoMapper) {
         this.modelMapper = modelMapper;
+        this.rentInfoDtoMapper = rentInfoDtoMapper;
     }
 }
