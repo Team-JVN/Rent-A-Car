@@ -39,6 +39,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     public User getUser(HttpServletRequest request) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
+        if (userDTO == null) {
+            return null;
+        }
         User user = new User();
         user.setId(userDTO.getId());
         user.setEmail(userDTO.getEmail());
@@ -50,6 +53,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     private UserDTO stringToObject(String user) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
+            if (user.isEmpty()) {
+                return null;
+            }
             return objectMapper.readValue(user, UserDTO.class);
         } catch (JsonProcessingException e) {
             //TODO: Add to log and delete return null;

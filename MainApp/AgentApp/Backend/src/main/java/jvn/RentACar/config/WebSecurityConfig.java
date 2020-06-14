@@ -1,5 +1,4 @@
 package jvn.RentACar.config;
-import org.springframework.security.web.csrf.CsrfFilter;
 import jvn.RentACar.security.RestAuthenticationEntryPoint;
 import jvn.RentACar.security.TokenAuthenticationFilter;
 import jvn.RentACar.serviceImpl.UserServiceImpl;
@@ -16,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+
 
 @Configuration
 @EnableWebSecurity
