@@ -15,6 +15,8 @@ public class RabbitMQConfiguration {
 
     public static final String USERS_FOR_SEARCH = "users-for-search";
 
+    public static final String LOGS = "logs";
+
     @Bean
     public Queue queueCanceledReservation() {
         return new Queue(CANCELED_RESERVATION, false);
@@ -33,5 +35,10 @@ public class RabbitMQConfiguration {
     @Bean
     public Queue queueUsersForSearch() {
         return new Queue(USERS_FOR_SEARCH, false);
+    }
+
+    @Bean
+    public Queue queueLogs() {
+        return new Queue(LOGS, false);
     }
 }

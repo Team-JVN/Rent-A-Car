@@ -1,5 +1,6 @@
 package jvn.Users.serviceImpl;
 
+import jvn.Users.dto.message.Log;
 import jvn.Users.dto.request.ChangePasswordDTO;
 import jvn.Users.dto.request.ResetPasswordDTO;
 import jvn.Users.dto.response.CheckPassDTO;
@@ -10,6 +11,7 @@ import jvn.Users.exceptionHandler.BlockedUserException;
 import jvn.Users.exceptionHandler.InvalidTokenException;
 import jvn.Users.exceptionHandler.InvalidUserDataException;
 import jvn.Users.model.*;
+import jvn.Users.producer.LogProducer;
 import jvn.Users.repository.ResetTokenRepository;
 import jvn.Users.repository.UserRepository;
 import jvn.Users.security.JwtAuthenticationRequest;
@@ -38,6 +40,8 @@ import java.time.LocalDateTime;
 @Service
 public class AuthentificationServiceImpl implements AuthentificationService {
 
+    private final String CLASS_LOCATION = this.getClass().getCanonicalName();
+
     public TokenUtils tokenUtils;
 
     private AuthenticationManager authenticationManager;
@@ -54,6 +58,8 @@ public class AuthentificationServiceImpl implements AuthentificationService {
 
     private ChangePasswordAttemptService changePasswordAttemptService;
 
+    private LogProducer logProducer;
+
     @Override
     public UserTokenState login(JwtAuthenticationRequest authenticationRequest) {
         final Authentication authentication = authenticationManager
@@ -68,6 +74,7 @@ public class AuthentificationServiceImpl implements AuthentificationService {
         String refreshJwt = tokenUtils.generateRefreshToken(user.getUsername());
         int expiresIn = tokenUtils.getExpiredIn();
 
+        logProducer.send(new Log(Log.INFO, CLASS_LOCATION, "LGN", String.format("User %s successfully logged in", user.getId())));
         return new UserTokenState(jwt, expiresIn, refreshJwt);
     }
 
@@ -150,7 +157,7 @@ public class AuthentificationServiceImpl implements AuthentificationService {
     @Override
     public boolean userIsNeverLoggedIn(String email) {
         User user = userRepository.findByEmail(email);
-        if(user == null){
+        if (user == null) {
             return false;
         }
         if (user instanceof Agent) {
@@ -194,7 +201,7 @@ public class AuthentificationServiceImpl implements AuthentificationService {
     public AuthentificationServiceImpl(TokenUtils tokenUtils, AuthenticationManager authenticationManager,
                                        UserRepository userRepository, PasswordEncoder passwordEncoder, RestTemplateBuilder restTemplateBuilder,
                                        HttpServletRequest request, ChangePasswordAttemptService changePasswordAttemptService,
-                                       ResetTokenRepository resetTokenRepository) {
+                                       ResetTokenRepository resetTokenRepository, LogProducer logProducer) {
         this.tokenUtils = tokenUtils;
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
@@ -203,5 +210,6 @@ public class AuthentificationServiceImpl implements AuthentificationService {
         this.request = request;
         this.changePasswordAttemptService = changePasswordAttemptService;
         this.resetTokenRepository = resetTokenRepository;
+        this.logProducer = logProducer;
     }
 }

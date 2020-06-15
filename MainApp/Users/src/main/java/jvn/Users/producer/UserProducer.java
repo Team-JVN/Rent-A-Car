@@ -2,6 +2,7 @@ package jvn.Users.producer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jvn.Users.config.RabbitMQConfiguration;
 import jvn.Users.dto.message.OwnerMessageDTO;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,14 +11,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserProducer {
 
-    private static final String USERS_FOR_SEARCH = "users-for-search";
-
     private RabbitTemplate rabbitTemplate;
 
     private ObjectMapper objectMapper;
 
     public void sendMessageForSearch(OwnerMessageDTO ownerMessageDTO) {
-        rabbitTemplate.convertAndSend(USERS_FOR_SEARCH, jsonToString(ownerMessageDTO));
+        rabbitTemplate.convertAndSend(RabbitMQConfiguration.USERS_FOR_SEARCH, jsonToString(ownerMessageDTO));
     }
 
     private String jsonToString(OwnerMessageDTO ownerMessageDTO) {
