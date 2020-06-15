@@ -40,6 +40,10 @@ public class PriceListController {
 
     @GetMapping
     public ResponseEntity<List<PriceListDTO>> getAll() {
+        String uri = request.getRequestURI();
+        System.out.println(uri);
+        String url = request.getRequestURL().toString();
+        System.out.println(url);
         UserDTO userDTO = stringToObject(request.getHeader("user"));
         List<PriceListDTO> list = priceListService.getAll(userDTO.getId()).stream().map(priceListDtoMapper::toDto).
                 collect(Collectors.toList());

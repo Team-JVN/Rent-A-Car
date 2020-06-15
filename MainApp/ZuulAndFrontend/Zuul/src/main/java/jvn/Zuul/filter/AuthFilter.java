@@ -45,7 +45,7 @@ public class AuthFilter extends ZuulFilter {
             return false;
         }
 
-        if (url.contains("/advertisements")) {
+        if (url.contains("/ws")) {
             return false;
         }
         if (new AntPathMatcher().match("**/api/car/{id}/picture", url) && method.equals("GET")) {
