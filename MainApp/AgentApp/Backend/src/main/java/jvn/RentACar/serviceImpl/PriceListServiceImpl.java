@@ -1,6 +1,7 @@
 package jvn.RentACar.serviceImpl;
 
 import jvn.RentACar.client.PriceListClient;
+import jvn.RentACar.dto.soap.pricelist.DeletePriceListDetailsResponse;
 import jvn.RentACar.dto.soap.pricelist.GetPriceListDetailsResponse;
 import jvn.RentACar.dto.soap.pricelist.PriceListDetails;
 import jvn.RentACar.enumeration.LogicalStatus;
@@ -63,7 +64,7 @@ public class PriceListServiceImpl implements PriceListService {
             dbPriceList.setPriceForCDW(priceList.getPriceForCDW());
         }
 
-        GetPriceListDetailsResponse response = priceListClient.createOrEdit(priceList);
+        GetPriceListDetailsResponse response = priceListClient.createOrEdit(dbPriceList);
         PriceListDetails priceListDetails = response.getPriceListDetails();
         if(priceListDetails != null && priceListDetails.getId() != null){
             dbPriceList.setMainAppId(priceListDetails.getId());
@@ -76,7 +77,8 @@ public class PriceListServiceImpl implements PriceListService {
     public void delete(Long id) {
         PriceList priceList = get(id);
 
-        if (priceListRepository.findByIdAndStatusNotAndAdvertisementsLogicalStatusNot(id, LogicalStatus.DELETED, LogicalStatus.DELETED) != null) {
+        DeletePriceListDetailsResponse response = priceListClient.checkAndDeleteIfCan(priceList);
+        if (response == null || !response.isCanDelete()) {
             throw new InvalidPriceListDataException("Price list is used in advertisements, so it can't be deleted.", HttpStatus.BAD_REQUEST);
         }
         priceList.setStatus(LogicalStatus.DELETED);

@@ -1,7 +1,6 @@
 package jvn.Advertisements.serviceImpl;
 
 import jvn.Advertisements.dto.both.PriceListDTO;
-import jvn.Advertisements.dto.request.UserDTO;
 import jvn.Advertisements.enumeration.LogicalStatus;
 import jvn.Advertisements.exceptionHandler.InvalidPriceListDataException;
 import jvn.Advertisements.model.PriceList;
@@ -49,8 +48,8 @@ public class PriceListServiceImpl implements PriceListService {
     }
 
     @Override
-    public PriceList edit(Long id, PriceList priceList,Long loggedInUserId) {
-        PriceList dbPriceList = get(id,loggedInUserId);
+    public PriceList edit(Long id, PriceList priceList, Long loggedInUserId) {
+        PriceList dbPriceList = get(id, loggedInUserId);
         dbPriceList.setPricePerDay(priceList.getPricePerDay());
 
         if (dbPriceList.getPricePerKm() != null) {
@@ -66,7 +65,7 @@ public class PriceListServiceImpl implements PriceListService {
     }
 
     @Override
-    public void delete(Long id,Long loggedInUserId) {
+    public void delete(Long id, Long loggedInUserId) {
         PriceList priceList = get(id, loggedInUserId);
 
         if (priceListRepository.findByIdAndStatusNotAndAdvertisementsLogicalStatusNot(id, LogicalStatus.DELETED, LogicalStatus.DELETED) != null) {
@@ -74,6 +73,17 @@ public class PriceListServiceImpl implements PriceListService {
         }
         priceList.setStatus(LogicalStatus.DELETED);
         priceListRepository.save(priceList);
+    }
+
+    @Override
+    public boolean checkIfCanDeleteAndDelete(Long id, Long loggedInUserId) {
+        PriceList priceList = get(id, loggedInUserId);
+        if (priceListRepository.findByIdAndStatusNotAndAdvertisementsLogicalStatusNot(id, LogicalStatus.DELETED, LogicalStatus.DELETED) != null) {
+            return false;
+        }
+        priceList.setStatus(LogicalStatus.DELETED);
+        priceListRepository.save(priceList);
+        return true;
     }
 
     @Async

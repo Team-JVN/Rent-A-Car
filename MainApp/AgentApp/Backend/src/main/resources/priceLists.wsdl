@@ -5,6 +5,7 @@
             <xs:element name="getPriceListDetailsRequest">
                 <xs:complexType>
                     <xs:sequence>
+                        <xs:element name="email" type="xs:string"/>
                         <xs:element name="priceListDetails" type="tns:priceListDetails"/>
                     </xs:sequence>
                 </xs:complexType>

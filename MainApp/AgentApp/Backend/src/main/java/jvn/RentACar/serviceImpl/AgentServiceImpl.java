@@ -1,5 +1,6 @@
 package jvn.RentACar.serviceImpl;
 
+import jvn.RentACar.client.AgentClient;
 import jvn.RentACar.enumeration.AgentStatus;
 import jvn.RentACar.exceptionHandler.InvalidAgentDataException;
 import jvn.RentACar.model.Agent;
@@ -7,12 +8,15 @@ import jvn.RentACar.repository.AgentRepository;
 import jvn.RentACar.service.AgentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AgentServiceImpl implements AgentService {
 
     private AgentRepository agentRepository;
+
+    private AgentClient agentClient;
 
     @Override
     public Agent edit(Long id, Agent agent) {
@@ -22,6 +26,7 @@ public class AgentServiceImpl implements AgentService {
         dbAgent.setPhoneNumber(agent.getPhoneNumber());
         dbAgent.setTaxIdNumber(agent.getTaxIdNumber());
         dbAgent = agentRepository.save(dbAgent);
+        agentClient.edit(agent);
         return dbAgent;
     }
 
@@ -32,8 +37,15 @@ public class AgentServiceImpl implements AgentService {
         }
         return agent;
     }
+
+    @Async
+    public void sendEditToMainApp(Agent agent){
+        agentClient.edit(agent);
+    }
+
     @Autowired
-    public AgentServiceImpl(AgentRepository agentRepository) {
+    public AgentServiceImpl(AgentRepository agentRepository,AgentClient agentClient) {
         this.agentRepository = agentRepository;
+        this.agentClient =agentClient;
     }
 }

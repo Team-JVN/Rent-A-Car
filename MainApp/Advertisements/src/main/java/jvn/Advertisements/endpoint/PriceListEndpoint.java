@@ -1,8 +1,8 @@
 package jvn.Advertisements.endpoint;
 
-import jvn.Advertisements.dto.soap.pricelist.GetPriceListDetailsRequest;
-import jvn.Advertisements.dto.soap.pricelist.GetPriceListDetailsResponse;
-import jvn.Advertisements.dto.soap.pricelist.PriceListDetails;
+import jvn.Advertisements.client.UserClient;
+import jvn.Advertisements.dto.response.UserInfoDTO;
+import jvn.Advertisements.dto.soap.pricelist.*;
 import jvn.Advertisements.mapper.PriceListDetailsMapper;
 import jvn.Advertisements.service.PriceListService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,21 +19,44 @@ public class PriceListEndpoint {
 
     private PriceListDetailsMapper priceListDetailsMapper;
 
+    private UserClient userClient;
+
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getPriceListDetailsRequest")
     @ResponsePayload
     public GetPriceListDetailsResponse createOrEdit(@RequestPayload GetPriceListDetailsRequest request) {
+        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        if (dto == null) {
+            return null;
+        }
+
         PriceListDetails priceListDetails = request.getPriceListDetails();
         if (priceListDetails.getId() != null) {
-            priceListDetails = priceListDetailsMapper.toDto(priceListService.edit(priceListDetails.getId(), priceListDetailsMapper.toEntity(priceListDetails), 2L));
+            priceListDetails = priceListDetailsMapper.toDto(priceListService.edit(priceListDetails.getId(), priceListDetailsMapper.toEntity(priceListDetails), dto.getId()));
         } else {
-
+            priceListDetails = priceListDetailsMapper.toDto(priceListService.create(priceListDetailsMapper.toEntity(priceListDetails), dto.getId()));
         }
+        GetPriceListDetailsResponse response = new GetPriceListDetailsResponse();
+        response.setPriceListDetails(priceListDetails);
+        return response;
+    }
+
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "deletePriceListDetailsRequest")
+    @ResponsePayload
+    public DeletePriceListDetailsResponse deletePriceList(@RequestPayload DeletePriceListDetailsRequest request) {
+        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        if (dto == null) {
+            return null;
+        }
+        DeletePriceListDetailsResponse response = new DeletePriceListDetailsResponse();
+        response.setCanDelete(priceListService.checkIfCanDeleteAndDelete(request.getId(), dto.getId()));
         return response;
     }
 
     @Autowired
-    public PriceListEndpoint(PriceListService priceListService, PriceListDetailsMapper priceListDetailsMapper) {
+    public PriceListEndpoint(PriceListService priceListService, PriceListDetailsMapper priceListDetailsMapper, UserClient userClient) {
         this.priceListService = priceListService;
-        this.priceListDetailsMapper;
+        this.userClient = userClient;
+        this.priceListDetailsMapper = priceListDetailsMapper;
     }
 }

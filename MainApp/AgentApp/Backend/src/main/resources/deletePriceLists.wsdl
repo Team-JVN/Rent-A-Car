@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:sch="http://www.soap.dto/pricelist" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.pricelist.dto/soap" targetNamespace="http://www.pricelist.dto/soap">
+    <wsdl:types>
+        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.soap.dto/pricelist">
+            <xs:element name="deletePriceListDetailsRequest">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="email" type="xs:string"/>
+                        <xs:element name="id">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:long">
+                                    <xs:minInclusive value="1"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deletePriceListDetailsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="canDelete" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="deletePriceListDetailsResponse">
+        <wsdl:part element="sch:deletePriceListDetailsResponse" name="deletePriceListDetailsResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deletePriceListDetailsRequest">
+        <wsdl:part element="sch:deletePriceListDetailsRequest" name="deletePriceListDetailsRequest">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="PriceListsPort">
+        <wsdl:operation name="deletePriceListDetails">
+            <wsdl:input message="tns:deletePriceListDetailsRequest" name="deletePriceListDetailsRequest">
+            </wsdl:input>
+            <wsdl:output message="tns:deletePriceListDetailsResponse" name="deletePriceListDetailsResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="PriceListsPortSoap11" type="tns:PriceListsPort">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="deletePriceListDetails">
+            <soap:operation soapAction=""/>
+            <wsdl:input name="deletePriceListDetailsRequest">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="deletePriceListDetailsResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="PriceListsPortService">
+        <wsdl:port binding="tns:PriceListsPortSoap11" name="PriceListsPortSoap11">
+            <soap:address location="http://192.168.56.1:8081/pricelist/ws"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

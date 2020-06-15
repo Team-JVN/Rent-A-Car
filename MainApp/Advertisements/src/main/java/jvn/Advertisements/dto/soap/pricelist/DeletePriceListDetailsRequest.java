@@ -8,53 +8,50 @@
 
 package jvn.Advertisements.dto.soap.pricelist;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element name="email" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="priceListDetails" type="{http://www.soap.dto/pricelist}priceListDetails"/>
+ *         &lt;element name="id">
+ *           &lt;simpleType>
+ *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}long">
+ *               &lt;minInclusive value="1"/>
+ *             &lt;/restriction>
+ *           &lt;/simpleType>
+ *         &lt;/element>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "email",
-    "priceListDetails"
+        "email",
+        "id"
 })
-@XmlRootElement(name = "getPriceListDetailsRequest")
-public class GetPriceListDetailsRequest {
+@XmlRootElement(name = "deletePriceListDetailsRequest")
+public class DeletePriceListDetailsRequest {
 
     @XmlElement(required = true)
     protected String email;
-    @XmlElement(required = true)
-    protected PriceListDetails priceListDetails;
+    protected long id;
 
     /**
      * Gets the value of the email property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getEmail() {
         return email;
@@ -62,38 +59,26 @@ public class GetPriceListDetailsRequest {
 
     /**
      * Sets the value of the email property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setEmail(String value) {
         this.email = value;
     }
 
     /**
-     * Gets the value of the priceListDetails property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link PriceListDetails }
-     *     
+     * Gets the value of the id property.
      */
-    public PriceListDetails getPriceListDetails() {
-        return priceListDetails;
+    public long getId() {
+        return id;
     }
 
     /**
-     * Sets the value of the priceListDetails property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link PriceListDetails }
-     *     
+     * Sets the value of the id property.
      */
-    public void setPriceListDetails(PriceListDetails value) {
-        this.priceListDetails = value;
+    public void setId(long value) {
+        this.id = value;
     }
 
 }

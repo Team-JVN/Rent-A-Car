@@ -24,11 +24,6 @@ public class PriceListController {
 
     private PriceListDtoMapper priceListDtoMapper;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<PriceListDTO> get(@PathVariable @Positive(message = "Id must be positive.") Long id) {
-        return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.get(id)), HttpStatus.OK);
-    }
-
     @GetMapping
     public ResponseEntity<List<PriceListDTO>> getAll() {
         List<PriceListDTO> list = priceListService.getAll().stream().map(priceListDtoMapper::toDto).
