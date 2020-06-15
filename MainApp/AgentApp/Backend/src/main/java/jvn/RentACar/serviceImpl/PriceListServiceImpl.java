@@ -1,9 +1,8 @@
 package jvn.RentACar.serviceImpl;
 
 import jvn.RentACar.client.PriceListClient;
-import jvn.RentACar.dto.soap.priceList.GetPriceListDetailsRequest;
-import jvn.RentACar.dto.soap.priceList.GetPriceListDetailsResponse;
-import jvn.RentACar.dto.soap.priceList.PriceListDetails;
+import jvn.RentACar.dto.soap.pricelist.GetPriceListDetailsResponse;
+import jvn.RentACar.dto.soap.pricelist.PriceListDetails;
 import jvn.RentACar.enumeration.LogicalStatus;
 import jvn.RentACar.exceptionHandler.InvalidPriceListDataException;
 import jvn.RentACar.model.PriceList;
@@ -44,8 +43,11 @@ public class PriceListServiceImpl implements PriceListService {
 
     @Override
     public PriceList create(PriceList priceList) {
-        GetPriceListDetailsResponse response = priceListClient.create(priceList);
-        System.out.println(response.getPriceListDetails().getPricePerDay());
+        GetPriceListDetailsResponse response = priceListClient.createOrEdit(priceList);
+        PriceListDetails priceListDetails = response.getPriceListDetails();
+        if(priceListDetails != null && priceListDetails.getId() != null){
+            priceList.setMainAppId(priceListDetails.getId());
+        }
         return priceListRepository.save(priceList);
     }
 
@@ -59,6 +61,12 @@ public class PriceListServiceImpl implements PriceListService {
         }
         if (dbPriceList.getPriceForCDW() != null) {
             dbPriceList.setPriceForCDW(priceList.getPriceForCDW());
+        }
+
+        GetPriceListDetailsResponse response = priceListClient.createOrEdit(priceList);
+        PriceListDetails priceListDetails = response.getPriceListDetails();
+        if(priceListDetails != null && priceListDetails.getId() != null){
+            dbPriceList.setMainAppId(priceListDetails.getId());
         }
 
         return priceListRepository.save(dbPriceList);

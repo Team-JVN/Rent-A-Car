@@ -137,10 +137,10 @@
                 <configuration>
                     <schemaLanguage>WSDL</schemaLanguage>
                     <generateDirectory>${project.basedir}/src/main/java</generateDirectory>
-                    <generatePackage>jvn.RentACar.dto.soap.priceList</generatePackage>
+                    <generatePackage>jvn.RentACar.dto.soap.pricelist</generatePackage>
                     <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>
                     <schemaIncludes>
-                        <include>priceListDetails.wsdl</include>
+                        <include>priceLists.wsdl</include>
                     </schemaIncludes>
                 </configuration>
             </plugin>

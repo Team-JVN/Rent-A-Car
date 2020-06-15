@@ -1,7 +1,6 @@
 package jvn.RentACar.mapper;
 
-
-import jvn.RentACar.dto.soap.priceList.PriceListDetails;
+import jvn.RentACar.dto.soap.pricelist.PriceListDetails;
 import jvn.RentACar.model.PriceList;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
