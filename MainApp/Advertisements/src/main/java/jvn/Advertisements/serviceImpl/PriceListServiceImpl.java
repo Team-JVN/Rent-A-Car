@@ -86,6 +86,11 @@ public class PriceListServiceImpl implements PriceListService {
         return true;
     }
 
+    @Override
+    public List<PriceList> getPriceListsDeletedAndExisting(Long loggedInUserId) {
+        return priceListRepository.findByOwnerId(loggedInUserId);
+    }
+
     @Async
     public void editPriceList(PriceListDTO priceListDTO) {
         advertisementProducer.sendMessageForSearch(priceListDTO);

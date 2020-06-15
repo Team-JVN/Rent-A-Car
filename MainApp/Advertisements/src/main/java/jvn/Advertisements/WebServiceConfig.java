@@ -53,4 +53,20 @@ public class WebServiceConfig {
     public XsdSchema deletePriceListsSchema() {
         return new SimpleXsdSchema(new ClassPathResource("deletePriceLists.xsd"));
     }
+
+    @Bean(name = "listPriceList")
+    public DefaultWsdl11Definition defaultWsdl11DefinitionListPriceList(@Qualifier("listPriceListSchema") XsdSchema listPriceListSchema) {
+        DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
+        wsdl11Definition.setPortTypeName("PriceListsPort");
+        wsdl11Definition.setLocationUri("/pricelist/ws");
+        wsdl11Definition.setTargetNamespace("http://www.pricelist.dto/soap");
+        wsdl11Definition.setSchema(listPriceListSchema);
+        return wsdl11Definition;
+    }
+
+    @Bean
+    @Qualifier("listPriceListSchema")
+    public XsdSchema listPriceListSchema() {
+        return new SimpleXsdSchema(new ClassPathResource("listPriceList.xsd"));
+    }
 }

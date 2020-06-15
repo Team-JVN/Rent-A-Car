@@ -39,6 +39,7 @@ public class PriceListServiceImpl implements PriceListService {
 
     @Override
     public List<PriceList> getAll() {
+
         return priceListRepository.findByStatus(LogicalStatus.EXISTING);
     }
 

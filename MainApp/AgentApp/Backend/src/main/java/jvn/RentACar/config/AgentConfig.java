@@ -15,7 +15,7 @@ public class AgentConfig {
         marshaller.setContextPath("jvn.RentACar.dto.soap.agent");
         return marshaller;
     }
-    
+
     @Bean
     public AgentClient agentClient(Jaxb2Marshaller marshallerAgent) {
         AgentClient client = new AgentClient();

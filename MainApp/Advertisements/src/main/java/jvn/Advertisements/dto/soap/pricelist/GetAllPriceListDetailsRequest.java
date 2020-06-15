@@ -22,13 +22,6 @@ import javax.xml.bind.annotation.*;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element name="email" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="id">
- *           &lt;simpleType>
- *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}long">
- *               &lt;minInclusive value="1"/>
- *             &lt;/restriction>
- *           &lt;/simpleType>
- *         &lt;/element>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -37,15 +30,13 @@ import javax.xml.bind.annotation.*;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-        "email",
-        "id"
+        "email"
 })
-@XmlRootElement(name = "deletePriceListDetailsRequest")
-public class DeletePriceListDetailsRequest {
+@XmlRootElement(name = "getAllPriceListDetailsRequest")
+public class GetAllPriceListDetailsRequest {
 
     @XmlElement(required = true)
     protected String email;
-    protected long id;
 
     /**
      * Gets the value of the email property.
@@ -65,20 +56,6 @@ public class DeletePriceListDetailsRequest {
      */
     public void setEmail(String value) {
         this.email = value;
-    }
-
-    /**
-     * Gets the value of the id property.
-     */
-    public long getId() {
-        return id;
-    }
-
-    /**
-     * Sets the value of the id property.
-     */
-    public void setId(long value) {
-        this.id = value;
     }
 
 }

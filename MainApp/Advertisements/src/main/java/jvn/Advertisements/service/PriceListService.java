@@ -17,4 +17,6 @@ public interface PriceListService {
     void delete(Long id, Long loggedInUserId);
 
     boolean checkIfCanDeleteAndDelete(Long id, Long loggedInUserId);
+
+    List<PriceList> getPriceListsDeletedAndExisting(Long loggedInUserId);
 }

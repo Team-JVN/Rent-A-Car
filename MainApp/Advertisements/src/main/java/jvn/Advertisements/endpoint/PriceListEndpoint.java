@@ -11,6 +11,9 @@ import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Endpoint
 public class PriceListEndpoint {
     private static final String NAMESPACE_URI = "http://www.soap.dto/pricelist";
@@ -50,6 +53,22 @@ public class PriceListEndpoint {
         }
         DeletePriceListDetailsResponse response = new DeletePriceListDetailsResponse();
         response.setCanDelete(priceListService.checkIfCanDeleteAndDelete(request.getId(), dto.getId()));
+        return response;
+    }
+
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getAllPriceListDetailsRequest")
+    @ResponsePayload
+    public GetAllPriceListDetailsResponse createOrEdit(@RequestPayload GetAllPriceListDetailsRequest request) {
+        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        if (dto == null) {
+            return null;
+        }
+
+        List<PriceListDetails> list = priceListService.getPriceListsDeletedAndExisting(dto.getId()).stream().map(priceListDetailsMapper::toDto).
+                collect(Collectors.toList());
+        GetAllPriceListDetailsResponse response = new GetAllPriceListDetailsResponse();
+        response.getPriceListDetails().addAll(list);
         return response;
     }
 

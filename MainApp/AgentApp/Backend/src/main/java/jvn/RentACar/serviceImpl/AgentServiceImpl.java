@@ -38,11 +38,6 @@ public class AgentServiceImpl implements AgentService {
         return agent;
     }
 
-    @Async
-    public void sendEditToMainApp(Agent agent){
-        agentClient.edit(agent);
-    }
-
     @Autowired
     public AgentServiceImpl(AgentRepository agentRepository,AgentClient agentClient) {
         this.agentRepository = agentRepository;
