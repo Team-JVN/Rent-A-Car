@@ -28,6 +28,7 @@ import {
   Validators,
 } from "@angular/forms";
 import { Client } from "src/app/model/client";
+import { CommentService } from "src/app/service/comment.service";
 
 @Component({
   selector: "app-client-rent-request-details",
@@ -46,6 +47,7 @@ export class ClientRentRequestDetailsComponent implements OnInit {
   );
   loggedInUserEmail: string;
   messages: Message[];
+  availibleLeavingFeedback: boolean;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -56,7 +58,8 @@ export class ClientRentRequestDetailsComponent implements OnInit {
     private authentificationService: AuthentificationService,
     private formBuilder: FormBuilder,
     private messageService: MessageService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private commentService: CommentService
   ) {}
 
   ngOnInit() {
@@ -78,13 +81,30 @@ export class ClientRentRequestDetailsComponent implements OnInit {
         }
       );
     });
+    this.fetchComments();
     this.loggedInUserEmail = this.authentificationService.getLoggedInUserEmail();
-    this.getMessages();
+    // this.getMessages();
 
     //Delete this
     // this.messages = [new Message("Cao sta radi,kako si, da li si dorbo.Kako su tvoji. sta radis", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 1), new Message("Kako si", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 2),
     // new Message("Dobro", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 1), new Message("To?", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 2)];
-    this.rentRequestId = 2;
+    // this.rentRequestId = 2;
+  }
+  fetchComments() {
+    this.commentService.getAll("all").subscribe(
+      (data: Comment[]) => {
+        if (data.length > 0) {
+          console.log("postoje komentari");
+          this.availibleLeavingFeedback = false;
+        } else {
+          this.availibleLeavingFeedback = true;
+        }
+      },
+      (httpErrorResponse: HttpErrorResponse) => {
+        console.log("ERROR");
+        // this.location.back();
+      }
+    );
   }
 
   advertisementDetails(rentInfo: RentInfo) {
@@ -92,7 +112,6 @@ export class ClientRentRequestDetailsComponent implements OnInit {
   }
 
   getMessages() {
-    console.log("CLIENT RENT REQUEST DETAILS " + this.rentRequestId);
     this.messageService.getMessages(this.rentRequestId).subscribe(
       (data: Message[]) => {
         this.toastr.success("Success!", "Fetch messages");
@@ -106,7 +125,11 @@ export class ClientRentRequestDetailsComponent implements OnInit {
 
   checkIfCanLeaveFeedback(rentInfo: RentInfo, rentRequest: RentRequest) {
     const dateTimeTo = new Date(rentInfo.dateTimeTo.substring(0, 10));
-    if (rentRequest.rentRequestStatus == "PAID" && dateTimeTo < new Date()) {
+    if (
+      rentRequest.rentRequestStatus == "PAID" &&
+      dateTimeTo < new Date()
+      //TODO: this.availibleLeavingFeedback
+    ) {
       return true;
     }
     return false;
@@ -116,6 +139,7 @@ export class ClientRentRequestDetailsComponent implements OnInit {
     this.dialog.open(LeaveFeedbackComponent, {
       data: { rentInfo: rentInfo, rentRequest: this.rentRequest },
     });
+    console.log("LEAVE FEEDBACK");
   }
 
   pay(rentInfo: RentInfo, rentRequest: RentRequest) {

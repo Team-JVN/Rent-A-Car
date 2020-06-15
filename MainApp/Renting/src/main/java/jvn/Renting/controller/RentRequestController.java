@@ -3,6 +3,7 @@ package jvn.Renting.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Renting.dto.both.*;
+import jvn.Renting.exceptionHandler.InvalidMessageDataException;
 import jvn.Renting.exceptionHandler.InvalidRentRequestDataException;
 import jvn.Renting.mapper.CommentDtoMapper;
 import jvn.Renting.mapper.MessageDtoMapper;
@@ -119,6 +120,7 @@ public class RentRequestController {
     @PostMapping(value="/{id}/rent-info/{rentInfoId}/comment")
     public ResponseEntity<CommentDTO> createComment(@PathVariable Long id, @PathVariable Long rentInfoId, @Valid @RequestBody CommentDTO commentDTO){
         UserDTO userDTO = stringToObject(request.getHeader("user"));
+        commentDTO.setSender(userDTO);
         return new ResponseEntity<>(commentDtoMapper.toDto(rentRequestService.createComment(commentDtoMapper.toEntity(commentDTO),id, rentInfoId, userDTO.getId())),
                 HttpStatus.CREATED);
     }
@@ -148,7 +150,8 @@ public class RentRequestController {
     public ResponseEntity<List<MessageDTO>> getMessages(@PathVariable Long id){
         //TODO: need to handle exception when there is no messages
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        List<MessageDTO> list = rentRequestService.getMessages(id, userDTO.getId()).stream().map(messageDtoMapper::toDto).
+        List<MessageDTO> list;
+        list= rentRequestService.getMessages(id, userDTO.getId()).stream().map(messageDtoMapper::toDto).
                 collect(Collectors.toList());
         return new ResponseEntity<>(list, HttpStatus.OK);
     }

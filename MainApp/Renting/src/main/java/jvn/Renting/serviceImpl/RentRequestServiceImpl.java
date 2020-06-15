@@ -1,5 +1,6 @@
 package jvn.Renting.serviceImpl;
 
+import com.netflix.ribbon.proxy.annotation.Http;
 import jvn.Renting.client.AdvertisementClient;
 import jvn.Renting.client.SearchClient;
 import jvn.Renting.client.UserClient;
@@ -8,6 +9,8 @@ import jvn.Renting.enumeration.CommentStatus;
 import jvn.Renting.dto.request.RentRequestStatusDTO;
 import jvn.Renting.enumeration.EditType;
 import jvn.Renting.enumeration.RentRequestStatus;
+import jvn.Renting.exceptionHandler.InvalidCommentDataException;
+import jvn.Renting.exceptionHandler.InvalidMessageDataException;
 import jvn.Renting.exceptionHandler.InvalidRentRequestDataException;
 import jvn.Renting.mapper.CommentDtoMapper;
 import jvn.Renting.mapper.MessageDtoMapper;
@@ -17,6 +20,7 @@ import jvn.Renting.model.RentInfo;
 import jvn.Renting.model.RentRequest;
 import jvn.Renting.repository.CommentRepository;
 import jvn.Renting.producer.RentRequestProducer;
+import jvn.Renting.repository.RentInfoRepository;
 import jvn.Renting.repository.RentRequestRepository;
 import jvn.Renting.service.RentRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +63,8 @@ public class RentRequestServiceImpl implements RentRequestService {
     private SimpMessagingTemplate simpMessagingTemplate;
 
     private CommentRepository commentRepository;
+
+    private RentInfoRepository rentInfoRepository;
 
     private MessageDtoMapper messageDtoMapper;
 
@@ -199,16 +205,14 @@ public class RentRequestServiceImpl implements RentRequestService {
     @Override
     public Comment createComment(Comment comment, Long id, Long rentInfoId, Long userId) {
         comment.setSender(userId);
+        //TODO: which status has the comment made by agent
         comment.setStatus(CommentStatus.AWAITING);
         RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
-        for(RentInfo rentInfo: rentRequest.getRentInfos()){
-            if(rentInfo.getId().equals(rentInfoId)){
-                rentInfo.getComments().add(comment);
-                comment.setRentInfo(rentInfo);
-                rentRequestRepository.save(rentRequest);
-                break;
-            }
-        }
+        RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
+        rentInfo.getComments().add(comment);
+        comment.setRentInfo(rentInfo);
+        rentRequestRepository.save(rentRequest);
+
 
         commentRepository.save(comment);
         return comment;
@@ -219,21 +223,24 @@ public class RentRequestServiceImpl implements RentRequestService {
 
         RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
         Set<RentInfo> rentInfos = rentRequest.getRentInfos();
-        for(RentInfo rentInfo: rentInfos){
-            if(rentInfo.getId().equals(rentInfoId)){
-                Comment comment = commentDtoMapper.toEntity(feedbackDTO.getComments().iterator().next());
-                comment.setSender(userId);
-                comment.setStatus(CommentStatus.AWAITING);
-                comment.setRentInfo(rentInfo);
-                commentRepository.save(comment);
-                rentInfo.getComments().add(comment);
-                Integer currRating = rentInfo.getRating();
-                rentInfo.setRating((currRating + feedbackDTO.getRating())/2);
-                rentRequest.setRentInfos(new HashSet<>(rentInfos));
-                rentRequestRepository.save(rentRequest);
-                break;
-            }
+//        RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
+        if(commentRepository.findBySenderAndRentInfoId(userId, rentInfoId).isEmpty()){
+            RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
+            Comment comment = commentDtoMapper.toEntity(feedbackDTO.getComments().iterator().next());
+            comment.setSender(userId);
+            comment.setStatus(CommentStatus.AWAITING);
+            comment.setRentInfo(rentInfo);
+            commentRepository.save(comment);
+            rentInfo.getComments().add(comment);
+            Integer currRating = rentInfo.getRating();
+            rentInfo.setRating((currRating + feedbackDTO.getRating()) / 2);
+            rentRequest.setRentInfos(new HashSet<>(rentInfos));
+            rentRequestRepository.save(rentRequest);
+
+        }else{
+            throw new InvalidCommentDataException("There is already comment for this rent info.", HttpStatus.BAD_REQUEST);
         }
+
         return feedbackDTO;
     }
 
@@ -242,16 +249,13 @@ public class RentRequestServiceImpl implements RentRequestService {
 
         FeedbackDTO feedbackDTO = new FeedbackDTO();
         RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
-        for(RentInfo rentInfo: rentRequest.getRentInfos()){
-            if(rentInfo.getId().equals(rentInfoId)){
-                feedbackDTO.setRating(rentInfo.getRating());
-                for(Comment comment: rentInfo.getComments()){
-                    if(comment.getStatus().equals(CommentStatus.APPROVED))
-                        feedbackDTO.getComments().add(commentDtoMapper.toDto(comment));
-                }
-                break;
-            }
+        RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
+        feedbackDTO.setRating(rentInfo.getRating());
+        for(Comment comment: rentInfo.getComments()){
+            if(comment.getStatus().equals(CommentStatus.APPROVED))
+                feedbackDTO.getComments().add(commentDtoMapper.toDto(comment));
         }
+
         return feedbackDTO;
     }
 
@@ -259,7 +263,10 @@ public class RentRequestServiceImpl implements RentRequestService {
     public Message createMessage(Message message, Long id, Long userId) {
 
         RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
-
+        for(Message m: rentRequest.getMessages()){
+            if(m.getSender().equals(userId))
+                throw new InvalidMessageDataException("You can send only one message.", HttpStatus.BAD_REQUEST);
+        }
         message.setRentRequest(rentRequest);
         message.setSender(userId);
         rentRequest.getMessages().add(message);
@@ -282,7 +289,6 @@ public class RentRequestServiceImpl implements RentRequestService {
         for(Message message: rentRequest.getMessages()){
             if(message.getSender().equals(userId) || rentRequest.getCreatedBy().equals(userId) || rentRequest.getClient().equals(userId)){
                 messages.add(message);
-
             }
         }
         return messages;
@@ -587,7 +593,7 @@ public class RentRequestServiceImpl implements RentRequestService {
     public RentRequestServiceImpl(RentRequestRepository rentRequestRepository, AdvertisementClient advertisementClient, UserClient userClient,
                                   SearchClient searchClient, CommentDtoMapper commentDtoMapper, SimpMessagingTemplate simpMessagingTemplate,
                                   CommentRepository commentRepository, MessageDtoMapper messageDtoMapper,
-                                  RentRequestProducer rentRequestProducer) {
+                                  RentRequestProducer rentRequestProducer, RentInfoRepository rentInfoRepository) {
         this.rentRequestRepository = rentRequestRepository;
         this.advertisementClient = advertisementClient;
         this.userClient = userClient;
@@ -597,5 +603,6 @@ public class RentRequestServiceImpl implements RentRequestService {
         this.commentRepository = commentRepository;
         this.messageDtoMapper = messageDtoMapper;
         this.rentRequestProducer = rentRequestProducer;
+        this.rentInfoRepository = rentInfoRepository;
     }
 }

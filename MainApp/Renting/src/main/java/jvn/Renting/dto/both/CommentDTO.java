@@ -19,7 +19,7 @@ public class CommentDTO {
 
     private String text;
 
-    private Long sender;
+    private UserDTO sender;
 
     private CommentStatus status;
 

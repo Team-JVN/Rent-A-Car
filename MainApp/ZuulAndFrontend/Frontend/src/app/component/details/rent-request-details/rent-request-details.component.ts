@@ -105,7 +105,6 @@ export class RentRequestDetailsComponent implements OnInit {
     //     this.toastr.error(httpErrorResponse.error.message, 'Review feedback');
     //   }
     // );
-    console.log("REVIEW: " + this.rentRequestId);
 
     this.dialog.open(ReviewFeedbackComponent, {
       data: {
@@ -138,7 +137,6 @@ export class RentRequestDetailsComponent implements OnInit {
     return false;
   }
   getMessages() {
-    console.log("RENT REQUEST DETAILS " + this.rentRequest.id);
     this.messageService.getMessages(this.rentRequest.id).subscribe(
       (data: Message[]) => {
         this.toastr.success("Success!", "Fetch messages");
