@@ -31,17 +31,18 @@ export class ViewMessagesComponent implements OnInit {
 
   messagesContainer: ElementRef<HTMLDivElement>;
   senderName = "Pera";
-
+  loggedInUser;
   constructor(
     private toastr: ToastrService,
     private messageService: MessageService,
     private router: Router,
     private authentificationService: AuthentificationService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.getMessages();
     // this.initializeWebSocketConnection();
+    this.loggedInUser = this.authentificationService.getLoggedInUserEmail()
   }
 
   onSendMessage(text: string) {
@@ -49,11 +50,11 @@ export class ViewMessagesComponent implements OnInit {
       this.toastr.error("Please enter message's text", "Send message");
       return;
     }
-    const loggedInUser = this.authentificationService.getLoggedInUserEmail();
+
     const dateAndTime = formatDate(new Date(), "yyyy-MM-dd hh:mm", "en-US");
     const message = new Message(
       text,
-      new UserInfo(loggedInUser),
+      new UserInfo(this.loggedInUser),
       dateAndTime,
       this.rentRequest
     );

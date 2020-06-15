@@ -226,14 +226,15 @@ public class RentRequestServiceImpl implements RentRequestService {
 //        RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
         if(commentRepository.findBySenderAndRentInfoId(userId, rentInfoId).isEmpty()){
             RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
-            Comment comment = commentDtoMapper.toEntity(feedbackDTO.getComments().iterator().next());
+            List<CommentDTO> commentDTOS = new ArrayList<>(feedbackDTO.getComments());
+            Comment comment = new Comment();
             comment.setSender(userId);
             comment.setStatus(CommentStatus.AWAITING);
             comment.setRentInfo(rentInfo);
+            comment.setText(commentDTOS.get(0).getText());
             commentRepository.save(comment);
             rentInfo.getComments().add(comment);
-            Integer currRating = rentInfo.getRating();
-            rentInfo.setRating((currRating + feedbackDTO.getRating()) / 2);
+            rentInfo.setRating(feedbackDTO.getRating());
             rentRequest.setRentInfos(new HashSet<>(rentInfos));
             rentRequestRepository.save(rentRequest);
 

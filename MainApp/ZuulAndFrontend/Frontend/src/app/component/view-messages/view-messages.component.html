@@ -11,12 +11,12 @@
     <div *ngIf="messages && messages[0]; else noMessages" class="messages-container" #scrollMe>
         <ul>
             <li *ngFor="let message of messages" [style.flex-direction]="
-            message.sender == client.id
+            message.id == 1
               ? 'row-reverse'
               : 'row'">
                 <mat-icon style="margin-bottom: 5px;">person</mat-icon>
                 <span [ngClass]="
-                message.id == 1
+                message.id != 1
                 ? 'speech-bubble-own'
                 : 'speech-bubble'
             ">{{ message.text }}</span>
