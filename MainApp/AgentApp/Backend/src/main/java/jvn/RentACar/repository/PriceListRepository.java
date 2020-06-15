@@ -12,7 +12,7 @@ public interface PriceListRepository extends JpaRepository<PriceList, Long> {
 
     PriceList findOneByIdAndStatusNot(Long id, LogicalStatus logicalStatus);
 
-    PriceList findOneByMainAppId(Long id);
+    PriceList findByMainAppId(Long id);
 
     List<PriceList> findByStatus(LogicalStatus status);
 

@@ -101,11 +101,12 @@ public class PriceListServiceImpl implements PriceListService {
         List<PriceList> priceLists = priceListDetails.stream().map(priceListDetailsMapper::toEntity).
                 collect(Collectors.toList());
         for (PriceList priceList:priceLists) {
-            PriceList dbPriceList = priceListRepository.findOneByMainAppId(priceList.getMainAppId());
+            PriceList dbPriceList = priceListRepository.findByMainAppId(priceList.getMainAppId());
             if(dbPriceList != null){
                 dbPriceList.setPricePerKm(priceList.getPricePerKm());
                 dbPriceList.setPricePerDay(priceList.getPricePerDay());
                 dbPriceList.setPriceForCDW(priceList.getPriceForCDW());
+                dbPriceList.setStatus(priceList.getStatus());
                 priceListRepository.save(dbPriceList);
             }else{
                 priceListRepository.save(priceList);

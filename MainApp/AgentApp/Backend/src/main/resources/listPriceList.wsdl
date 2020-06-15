@@ -46,6 +46,14 @@
                             </xs:restriction>
                         </xs:simpleType>
                     </xs:element>
+                    <xs:element minOccurs="0" name="status">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                                <xs:enumeration value="EXISTING"/>
+                                <xs:enumeration value="DELETED"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
                 </xs:sequence>
             </xs:complexType>
         </xs:schema>
