@@ -142,6 +142,7 @@
                     <schemaIncludes>
                         <include>priceLists.wsdl</include>
                         <include>deletePriceLists.wsdl</include>
+                        <include>listPriceList.wsdl</include>
                     </schemaIncludes>
                 </configuration>
             </plugin>
