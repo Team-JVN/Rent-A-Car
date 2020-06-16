@@ -16,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,16 +44,21 @@ public class CommentController {
         List<CommentDTO> list;
         list = commentService.getAll(status).stream().map(commentDtoMapper::toDto).
                 collect(Collectors.toList());
+        System.out.println("komentari: ");
+        for(CommentDTO c: list){
+            System.out.println(c.getText());
+        }
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @PutMapping(value="/{id}/approve")
-    public ResponseEntity<CommentDTO> approve(@PathVariable Long id){
+    public ResponseEntity<CommentDTO> approve(@PathVariable Long id, @Valid @RequestBody CommentDTO commentDTO){
+        System.out.println("APPROVAL");
         return new ResponseEntity<>(commentDtoMapper.toDto(commentService.approve(id)), HttpStatus.OK);
     }
 
     @PutMapping(value="/{id}/reject")
-    public ResponseEntity<Void> reject(@PathVariable Long id){
+    public ResponseEntity<Void> reject(@PathVariable Long id, @Valid @RequestBody CommentDTO commentDTO){
         UserDTO userDTO = stringToObject(request.getHeader("user"));
         commentService.reject(id, userDTO.getId());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

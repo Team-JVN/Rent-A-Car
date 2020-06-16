@@ -37,12 +37,12 @@ export class ViewMessagesComponent implements OnInit {
     private messageService: MessageService,
     private router: Router,
     private authentificationService: AuthentificationService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.getMessages();
     // this.initializeWebSocketConnection();
-    this.loggedInUser = this.authentificationService.getLoggedInUserEmail()
+    this.loggedInUser = this.authentificationService.getLoggedInUserEmail();
   }
 
   onSendMessage(text: string) {
@@ -55,8 +55,7 @@ export class ViewMessagesComponent implements OnInit {
     const message = new Message(
       text,
       new UserInfo(this.loggedInUser),
-      dateAndTime,
-      this.rentRequest
+      dateAndTime
     );
     console.log(message);
 

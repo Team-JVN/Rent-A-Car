@@ -5,6 +5,8 @@ import { ToastrService } from "ngx-toastr";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Component, OnInit, Inject } from "@angular/core";
 import { Comment } from "src/app/model/comment";
+import { AuthentificationService } from "src/app/service/authentification.service";
+import { UserInfo } from "src/app/model/userInfo";
 
 @Component({
   selector: "app-leave-feedback",
@@ -15,15 +17,18 @@ export class LeaveFeedbackComponent implements OnInit {
   rating: Number;
   comment: string;
   stars: number[] = [1, 2, 3, 4, 5];
+  loggedInUser;
 
   constructor(
     private dialogRef: MatDialogRef<LeaveFeedbackComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private toastr: ToastrService,
-    private rentRequestService: RentRequestService
+    private rentRequestService: RentRequestService,
+    private authentificationService: AuthentificationService
   ) {}
 
   ngOnInit() {
+    this.loggedInUser = this.authentificationService.getLoggedInUserEmail();
     this.rentRequestService
       .getRentInfoFeedback(this.data.rentInfo.id, this.data.rentRequest.id)
       .subscribe(
@@ -44,7 +49,7 @@ export class LeaveFeedbackComponent implements OnInit {
 
   leaveFeedback() {
     const feedback = new Feedback(this.rating, [
-      new Comment(this.comment, this.data.rentInfo),
+      new Comment(this.comment, new UserInfo(this.loggedInUser)),
     ]);
     console.log(feedback);
     this.rentRequestService

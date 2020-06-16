@@ -21,13 +21,15 @@ public class CommentDtoMapper implements MapperInterface<Comment, CommentDTO>{
         entity.setStatus(dto.getStatus());
         entity.setSender(dto.getSender().getId());
         entity.setText(dto.getText());
-        entity.setRentInfo(rentInfoDtoMapper.toEntity(dto.getRentInfo()));
+//        entity.setRentInfo(rentInfoDtoMapper.toEntity(dto.getRentInfo()));
         return entity;
     }
 
     @Override
     public CommentDTO toDto(Comment entity) {
+        System.out.println("APPROVAL to dto");
         CommentDTO dto = modelMapper.map(entity, CommentDTO.class);
+        System.out.println("APPROVAL to dto2");
         return dto;
     }
 

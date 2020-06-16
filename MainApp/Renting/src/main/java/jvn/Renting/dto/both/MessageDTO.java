@@ -24,6 +24,5 @@ public class MessageDTO {
 
     private String dateAndTime;
 
-    @NotNull(message = "Rent request is null.")
-    private RentRequestDTO rentRequest;
+//    private RentRequestDTO rentRequest;
 }

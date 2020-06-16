@@ -4,13 +4,12 @@ import { RentInfo } from "./rentInfo";
 export class Comment {
   id: number;
   text: string;
-  userInfo: UserInfo;
+  sender: UserInfo;
   status: string;
-  rentInfo: RentInfo;
-  constructor(text: string, rentInfo: RentInfo, status?: string, id?: number) {
+  constructor(text: string, sender: UserInfo, status?: string, id?: number) {
     this.text = text;
     this.status = status;
     this.id = id;
-    this.rentInfo = rentInfo;
+    this.sender = sender;
   }
 }

@@ -84,6 +84,8 @@ export class ManageCommentsComponent implements OnInit {
   }
 
   approve(element: Comment) {
+    console.log(element);
+    console.log("element id: " + element.id);
     this.commentService.approve(element, element.id).subscribe(
       () => {
         this.toastr.success("Success.", "Approve comment");

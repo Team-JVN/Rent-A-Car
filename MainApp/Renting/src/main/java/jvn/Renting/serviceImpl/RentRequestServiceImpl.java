@@ -262,15 +262,14 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     @Override
     public Message createMessage(Message message, Long id, Long userId) {
-
+        System.out.println("message impl: ");
         RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
-        for(Message m: rentRequest.getMessages()){
-            if(m.getSender().equals(userId))
-                throw new InvalidMessageDataException("You can send only one message.", HttpStatus.BAD_REQUEST);
-        }
         message.setRentRequest(rentRequest);
         message.setSender(userId);
+
         rentRequest.getMessages().add(message);
+
+        System.out.println("message text " + message.getText());
 
 //        try {
 //            this.simpMessagingTemplate.convertAndSend("/socket-publisher", messageDtoMapper.toDto(message));

@@ -23,7 +23,6 @@ public class CommentDTO {
 
     private CommentStatus status;
 
-    @NotNull(message = "Rent info is null.")
-    private RentInfoDTO rentInfo;
+//    private RentInfoDTO rentInfo;
 
 }
