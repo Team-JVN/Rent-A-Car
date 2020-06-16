@@ -2,15 +2,14 @@
 <wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:sch="http://www.soap.dto/agent" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.agent.dto/soap" targetNamespace="http://www.agent.dto/soap">
     <wsdl:types>
         <xs:schema xmlns:tns="http://www.soap.dto/agent" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.soap.dto/agent">
-            <xs:element name="getAgentDetailsRequest">
+            <xs:element name="getProfileAgentDetailsRequest">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element name="email" type="xs:string"/>
-                        <xs:element name="agentDetails" type="tns:agentDetails"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="getAgentDetailsResponse">
+            <xs:element name="getProfileAgentDetailsResponse">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element name="agentDetails" type="tns:agentDetails"/>
@@ -28,30 +27,30 @@
             </xs:complexType>
         </xs:schema>
     </wsdl:types>
-    <wsdl:message name="getAgentDetailsResponse">
-        <wsdl:part element="sch:getAgentDetailsResponse" name="getAgentDetailsResponse">
+    <wsdl:message name="getProfileAgentDetailsRequest">
+        <wsdl:part element="sch:getProfileAgentDetailsRequest" name="getProfileAgentDetailsRequest">
         </wsdl:part>
     </wsdl:message>
-    <wsdl:message name="getAgentDetailsRequest">
-        <wsdl:part element="sch:getAgentDetailsRequest" name="getAgentDetailsRequest">
+    <wsdl:message name="getProfileAgentDetailsResponse">
+        <wsdl:part element="sch:getProfileAgentDetailsResponse" name="getProfileAgentDetailsResponse">
         </wsdl:part>
     </wsdl:message>
     <wsdl:portType name="AgentsPort">
-        <wsdl:operation name="getAgentDetails">
-            <wsdl:input message="tns:getAgentDetailsRequest" name="getAgentDetailsRequest">
+        <wsdl:operation name="getProfileAgentDetails">
+            <wsdl:input message="tns:getProfileAgentDetailsRequest" name="getProfileAgentDetailsRequest">
             </wsdl:input>
-            <wsdl:output message="tns:getAgentDetailsResponse" name="getAgentDetailsResponse">
+            <wsdl:output message="tns:getProfileAgentDetailsResponse" name="getProfileAgentDetailsResponse">
             </wsdl:output>
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="AgentsPortSoap11" type="tns:AgentsPort">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-        <wsdl:operation name="getAgentDetails">
+        <wsdl:operation name="getProfileAgentDetails">
             <soap:operation soapAction=""/>
-            <wsdl:input name="getAgentDetailsRequest">
+            <wsdl:input name="getProfileAgentDetailsRequest">
                 <soap:body use="literal"/>
             </wsdl:input>
-            <wsdl:output name="getAgentDetailsResponse">
+            <wsdl:output name="getProfileAgentDetailsResponse">
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>

@@ -26,7 +26,6 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
  *         &lt;element name="email" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *         &lt;element name="agentDetails" type="{http://www.soap.dto/agent}agentDetails"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -37,16 +36,13 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "email",
-    "agentDetails"
+    "email"
 })
-@XmlRootElement(name = "getAgentDetailsRequest")
-public class GetAgentDetailsRequest {
+@XmlRootElement(name = "getProfileAgentDetailsRequest")
+public class GetProfileAgentDetailsRequest {
 
     @XmlElement(required = true)
     protected String email;
-    @XmlElement(required = true)
-    protected AgentDetails agentDetails;
 
     /**
      * Gets the value of the email property.
@@ -70,30 +66,6 @@ public class GetAgentDetailsRequest {
      */
     public void setEmail(String value) {
         this.email = value;
-    }
-
-    /**
-     * Gets the value of the agentDetails property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link AgentDetails }
-     *     
-     */
-    public AgentDetails getAgentDetails() {
-        return agentDetails;
-    }
-
-    /**
-     * Sets the value of the agentDetails property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link AgentDetails }
-     *     
-     */
-    public void setAgentDetails(AgentDetails value) {
-        this.agentDetails = value;
     }
 
 }
