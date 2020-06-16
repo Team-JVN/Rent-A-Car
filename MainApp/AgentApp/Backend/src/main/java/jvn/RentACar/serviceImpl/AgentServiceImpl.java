@@ -8,7 +8,6 @@ import jvn.RentACar.repository.AgentRepository;
 import jvn.RentACar.service.AgentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,7 +25,7 @@ public class AgentServiceImpl implements AgentService {
         dbAgent.setPhoneNumber(agent.getPhoneNumber());
         dbAgent.setTaxIdNumber(agent.getTaxIdNumber());
         dbAgent = agentRepository.save(dbAgent);
-        agentClient.edit(agent);
+        agentClient.edit(dbAgent);
         return dbAgent;
     }
 
@@ -39,8 +38,8 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Autowired
-    public AgentServiceImpl(AgentRepository agentRepository,AgentClient agentClient) {
+    public AgentServiceImpl(AgentRepository agentRepository, AgentClient agentClient) {
         this.agentRepository = agentRepository;
-        this.agentClient =agentClient;
+        this.agentClient = agentClient;
     }
 }

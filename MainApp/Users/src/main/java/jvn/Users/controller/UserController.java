@@ -93,7 +93,7 @@ public class UserController {
         }
         try {
             return new ResponseEntity<>(
-                    clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO))),
+                    clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO), false)),
                     HttpStatus.CREATED);
         } catch (NoSuchAlgorithmException e) {
             throw new InvalidTokenException("Activation token cannot be generated. Please try again.",

@@ -47,7 +47,7 @@ public class ClientServiceImpl implements ClientService {
     private UserProducer userProducer;
 
     @Override
-    public Client create(Client client) throws NoSuchAlgorithmException {
+    public Client create(Client client, boolean fromAgentApp) throws NoSuchAlgorithmException {
         if (clientRepository.findByPhoneNumber(client.getPhoneNumber()) != null) {
             throw new InvalidClientDataException("Client with same phone number already exists.",
                     HttpStatus.BAD_REQUEST);
@@ -71,10 +71,14 @@ public class ClientServiceImpl implements ClientService {
             composeAndSendEmailToChangePassword(client.getEmail(), generatedPassword);
             return clientRepository.save(client);
         } else {
-            client.setPassword(passwordEncoder.encode(client.getPassword()));
-            client.setStatus(ClientStatus.AWAITING);
-            Client savedClient = clientRepository.save(client);
-            return savedClient;
+            if (fromAgentApp) {
+                client.setPassword(client.getPassword());
+                client.setStatus(client.getStatus());
+            } else {
+                client.setPassword(passwordEncoder.encode(client.getPassword()));
+                client.setStatus(ClientStatus.AWAITING);
+            }
+            return clientRepository.save(client);
         }
     }
 

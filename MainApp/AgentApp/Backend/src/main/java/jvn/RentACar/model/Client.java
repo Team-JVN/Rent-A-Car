@@ -24,4 +24,7 @@ public class Client extends User {
 
     @Enumerated(EnumType.STRING)
     private ClientStatus status;
+
+    @Column
+    private Long mainAppId;
 }

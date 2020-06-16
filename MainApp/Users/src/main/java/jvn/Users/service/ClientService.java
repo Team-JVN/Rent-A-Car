@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ClientService {
 
-    Client create(Client client) throws NoSuchAlgorithmException;
+    Client create(Client client, boolean fromAgentApp) throws NoSuchAlgorithmException;
 
     Client get(Long id, ClientStatus status);
 

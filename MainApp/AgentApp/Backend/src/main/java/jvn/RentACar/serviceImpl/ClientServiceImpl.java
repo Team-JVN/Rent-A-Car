@@ -1,5 +1,6 @@
 package jvn.RentACar.serviceImpl;
 
+import jvn.RentACar.client.ClientClient;
 import jvn.RentACar.common.RandomPasswordGenerator;
 import jvn.RentACar.enumeration.ClientStatus;
 import jvn.RentACar.exceptionHandler.InvalidClientDataException;
@@ -39,6 +40,8 @@ public class ClientServiceImpl implements ClientService {
 
     private VerificationTokenRepository verificationTokenRepository;
 
+    private ClientClient clientClient;
+
     @Override
     public Client create(Client client) throws NoSuchAlgorithmException {
         if (clientRepository.findByPhoneNumber(client.getPhoneNumber()) != null) {
@@ -60,7 +63,10 @@ public class ClientServiceImpl implements ClientService {
             client.setStatus(ClientStatus.NEVER_LOGGED_IN);
 
             composeAndSendEmailToChangePassword(client.getEmail(), generatedPassword);
-            return clientRepository.save(client);
+            Client dbClient = clientRepository.save(client);
+            dbClient.setPassword(null);
+            clientClient.createOrEdit(dbClient);
+            return dbClient;
         } else {
             client.setPassword(passwordEncoder.encode(client.getPassword()));
             client.setStatus(ClientStatus.APPROVED);
@@ -78,6 +84,7 @@ public class ClientServiceImpl implements ClientService {
             verificationTokenRepository.save(verificationToken);
 
             composeAndSendEmailToActivate(client.getEmail(), nonHashedToken);
+            clientClient.createOrEdit(savedClient);
             return savedClient;
         }
     }
@@ -107,6 +114,7 @@ public class ClientServiceImpl implements ClientService {
         dbClient.setName(client.getName());
         dbClient.setAddress(client.getAddress());
         dbClient = clientRepository.save(dbClient);
+        clientClient.createOrEdit(dbClient);
         return dbClient;
     }
 
@@ -182,13 +190,14 @@ public class ClientServiceImpl implements ClientService {
     @Autowired
     public ClientServiceImpl(ClientRepository clientRepository, UserService userService,
                              PasswordEncoder passwordEncoder, EmailNotificationService emailNotificationService, Environment environment,
-                             VerificationTokenRepository verificationTokenRepository) {
+                             VerificationTokenRepository verificationTokenRepository, ClientClient clientClient) {
         this.clientRepository = clientRepository;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.emailNotificationService = emailNotificationService;
         this.environment = environment;
         this.verificationTokenRepository = verificationTokenRepository;
+        this.clientClient = clientClient;
     }
 
     private String getLocalhostURL() {
