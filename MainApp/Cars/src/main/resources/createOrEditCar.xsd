@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.soap.dto/car"
+           targetNamespace="http://www.soap.dto/car" elementFormDefault="qualified">
+
+    <xs:element name="createOrEditCarDetailsRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="email" type="xs:string"/>
+                <xs:element name="createCarDetails" type="tns:carDetails"/>
+                <xs:element maxOccurs="unbounded" name="multiPartFile"
+                            type="xs:base64Binary"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="createOrEditCarDetailsResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="createCarDetails" type="tns:carDetails"/>
+                <xs:element maxOccurs="unbounded" minOccurs="0" name="multiPartFile"
+                            type="xs:base64Binary"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="carDetails">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="id">
+                <xs:simpleType>
+                    <xs:restriction base="xs:long">
+                        <xs:minInclusive value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element  name="make" type="xs:string"/>
+            <xs:element  name="model" type="xs:string"/>
+            <xs:element  name="fuelType" type="xs:string"/>
+            <xs:element  name="gearBoxType" type="xs:string"/>
+            <xs:element  name="bodyStyle" type="xs:string"/>
+            <xs:element name="mileageInKm">
+                <xs:simpleType>
+                    <xs:restriction base="xs:int">
+                        <xs:minInclusive value="0"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="kidsSeats">
+                <xs:simpleType>
+                    <xs:restriction base="xs:int">
+                        <xs:minInclusive value="0"/>
+                        <xs:maxInclusive value="3"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="availableTracking" type="xs:boolean"/>
+            <xs:element minOccurs="0" name="status">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="EXISTING"/>
+                        <xs:enumeration value="DELETED"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="avgRating">
+                <xs:simpleType>
+                    <xs:restriction base="xs:double">
+                        <xs:minInclusive value="0"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="commentsCount">
+                <xs:simpleType>
+                    <xs:restriction base="xs:int">
+                        <xs:minInclusive value="0"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

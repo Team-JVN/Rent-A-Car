@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface CarService {
-    Car create(Car car, List<MultipartFile> multipartFiles, UserDTO userDTO);
+    Car create(Car car, List<MultipartFile> multipartFiles,Long userId);
 
     Car get(Long id, Long loggedInUser);
 
@@ -22,7 +22,7 @@ public interface CarService {
 
     List<Car> getStatistics(String filter);
 
-    Car editAll(Long id, Car car, List<MultipartFile> multipartFiles, Long loggedInUserId, String jwtToken, String user, UserDTO userDTO);
+    Car editAll(Long id, Car car, List<MultipartFile> multipartFiles, Long loggedInUserId);
 
     Car editPartial(Long id, CarEditDTO carDTO, List<MultipartFile> multipartFiles, Long loggedInUserId, String jwtToken, String user, UserDTO userDTO);
 

@@ -52,7 +52,7 @@ public class CarServiceImpl implements CarService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Car create(Car car, List<MultipartFile> multipartFiles, UserDTO userDTO) {
+    public Car create(Car car, List<MultipartFile> multipartFiles, Long userId) {
         if (multipartFiles.size() > 5) {
             throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
         }
@@ -62,7 +62,7 @@ public class CarServiceImpl implements CarService {
             }
         }
 
-        car.setOwner(userDTO.getId());
+        car.setOwner(userId);
         car.setMake(makeService.get(car.getMake().getId()));
         car.setModel(modelService.get(car.getModel().getId(), car.getMake().getId()));
         car.setBodyStyle(bodyStyleService.get(car.getBodyStyle().getId()));
@@ -132,8 +132,7 @@ public class CarServiceImpl implements CarService {
 
     @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-    public Car editAll(Long id, Car car, List<MultipartFile> multipartFiles, Long loggedInUserId, String jwtToken, String user,
-                       UserDTO userDTO) {
+    public Car editAll(Long id, Car car, List<MultipartFile> multipartFiles, Long loggedInUserId) {
 
         if (multipartFiles.size() > 5) {
             throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
@@ -141,7 +140,7 @@ public class CarServiceImpl implements CarService {
         Car dbCar = get(id, LogicalStatus.EXISTING);
         checkOwner(dbCar, loggedInUserId);
 
-        if (!advertisementClient.getCarEditType(jwtToken, user, id).equals(EditType.ALL)) {
+        if (!advertisementClient.getCarEditType(id).equals(EditType.ALL)) {
             throw new InvalidCarDataException(
                     "This car is in use and therefore it cannot be edited.", HttpStatus.BAD_REQUEST);
         }

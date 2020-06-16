@@ -27,6 +27,9 @@ public class RentInfo {
     @Column(nullable = false)
     private Long advertisement;
 
+    @Column(nullable = false)
+    private Long car;
+
     @Column
     private Boolean optedForCDW;
 
