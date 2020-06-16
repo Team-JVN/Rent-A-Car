@@ -7,8 +7,8 @@
             <xs:sequence>
                 <xs:element name="email" type="xs:string"/>
                 <xs:element name="createCarDetails" type="tns:carDetails"/>
-                <xs:element maxOccurs="unbounded" name="multiPartFile"
-                            type="xs:base64Binary"/>
+                <xs:element maxOccurs="unbounded" minOccurs="0" name="pictureInfo"
+                            type="tns:pictureInfo"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -16,8 +16,8 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="createCarDetails" type="tns:carDetails"/>
-                <xs:element maxOccurs="unbounded" minOccurs="0" name="multiPartFile"
-                            type="xs:base64Binary"/>
+                <xs:element maxOccurs="unbounded" minOccurs="0" name="pictureInfo"
+                            type="tns:pictureInfo"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -76,4 +76,10 @@
         </xs:sequence>
     </xs:complexType>
 
+    <xs:complexType name="pictureInfo">
+        <xs:sequence>
+            <xs:element name="fileName" type="xs:string"/>
+            <xs:element name="multiPartFile"  type="xs:base64Binary"/>
+        </xs:sequence>
+    </xs:complexType>
 </xs:schema>

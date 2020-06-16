@@ -35,6 +35,11 @@ public class GearboxTypeServiceImpl implements GearboxTypeService {
     }
 
     @Override
+    public GearboxType get(String name) {
+        return gearBoxTypeRepository.findByName(name);
+    }
+
+    @Override
     public List<GearboxType> get() {
         return gearBoxTypeRepository.findAll();
     }

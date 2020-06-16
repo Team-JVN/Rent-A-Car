@@ -21,9 +21,9 @@ public class Make {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "make", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "make", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Model> models = new HashSet<>();
 
-    @OneToMany(mappedBy = "make", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "make", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Car> cars = new HashSet<>();
 }

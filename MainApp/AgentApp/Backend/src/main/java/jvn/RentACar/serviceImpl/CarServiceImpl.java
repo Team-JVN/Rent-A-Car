@@ -1,7 +1,9 @@
 package jvn.RentACar.serviceImpl;
 
+import jvn.RentACar.client.CarClient;
 import jvn.RentACar.dto.both.CarDTO;
 import jvn.RentACar.dto.request.CarEditDTO;
+import jvn.RentACar.dto.soap.car.CreateOrEditCarDetailsResponse;
 import jvn.RentACar.enumeration.EditType;
 import jvn.RentACar.enumeration.LogicalStatus;
 import jvn.RentACar.exceptionHandler.InvalidCarDataException;
@@ -48,6 +50,8 @@ public class CarServiceImpl implements CarService {
 
     private UserService userService;
 
+    private CarClient carClient;
+
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Car create(Car car, List<MultipartFile> multipartFiles) {
@@ -67,6 +71,7 @@ public class CarServiceImpl implements CarService {
         car.setGearBoxType(gearboxTypeService.get(car.getGearBoxType().getId()));
         car.setCommentsCount(0);
         car.setAvgRating(0.0);
+        car.setMainAppId(saveInMainApp(car,multipartFiles));
         Car savedCar = carRepository.saveAndFlush(car);
         pictureService.savePictures(multipartFiles, UPLOADED_PICTURES_PATH, savedCar);
         return savedCar;
@@ -104,6 +109,11 @@ public class CarServiceImpl implements CarService {
         car.setKidsSeats(carDTO.getKidsSeats());
         car.setAvailableTracking(carDTO.getAvailableTracking());
         Car newCar = carRepository.save(car);
+        try {
+            carClient.createOrEdit(car,multipartFiles);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         pictureService.editCarPictures(multipartFiles, UPLOADED_PICTURES_PATH, car);
         return newCar;
     }
@@ -179,6 +189,18 @@ public class CarServiceImpl implements CarService {
 
         return carRepository.findFirst3ByLogicalStatus(LogicalStatus.EXISTING, Sort.by(Sort.Direction.DESC, sortFilter));
     }
+
+    private Long saveInMainApp(Car car,List<MultipartFile> multipartFiles){
+        try{
+            CreateOrEditCarDetailsResponse response= carClient.createOrEdit(car,multipartFiles);
+            car.setMainAppId(response.getCreateCarDetails().getId());
+            carRepository.saveAndFlush(car);
+            return response.getCreateCarDetails().getId();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
     private void checkOwner(Car car) {
         if (!userService.getLoginAgent().getEmail().equals(car.getOwner().getEmail())) {
             throw new InvalidCarDataException("You are not owner of this car.", HttpStatus.BAD_REQUEST);
@@ -189,7 +211,7 @@ public class CarServiceImpl implements CarService {
     public CarServiceImpl(CarRepository carRepository, BodyStyleService bodyStyleService,
                           FuelTypeService fuelTypeService, GearboxTypeService gearboxTypeService,
                           PictureService pictureService, CarDtoMapper carMapper, ModelService modelService, MakeService makeService,
-                          UserService userService) {
+                          UserService userService,CarClient carClient) {
         this.carRepository = carRepository;
         this.bodyStyleService = bodyStyleService;
         this.fuelTypeService = fuelTypeService;
@@ -199,5 +221,6 @@ public class CarServiceImpl implements CarService {
         this.modelService = modelService;
         this.makeService = makeService;
         this.userService = userService;
+        this.carClient = carClient;
     }
 }

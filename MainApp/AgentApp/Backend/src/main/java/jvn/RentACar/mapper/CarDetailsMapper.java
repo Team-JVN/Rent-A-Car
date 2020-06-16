@@ -1,19 +1,15 @@
-package jvn.Cars.mapper;
+package jvn.RentACar.mapper;
 
-import jvn.Cars.dto.request.CreateBodyStyleDTO;
-import jvn.Cars.dto.request.CreateFuelTypeDTO;
-import jvn.Cars.dto.request.CreateGearboxTypeDTO;
-import jvn.Cars.dto.soap.car.CarDetails;
-import jvn.Cars.model.*;
-import jvn.Cars.service.*;
+import jvn.RentACar.dto.request.CreateBodyStyleDTO;
+import jvn.RentACar.dto.request.CreateFuelTypeDTO;
+import jvn.RentACar.dto.request.CreateGearboxTypeDTO;
+import jvn.RentACar.dto.soap.car.CarDetails;
+import jvn.RentACar.model.*;
+import jvn.RentACar.service.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Component
 public class CarDetailsMapper implements MapperInterface<Car, CarDetails> {
@@ -33,7 +29,7 @@ public class CarDetailsMapper implements MapperInterface<Car, CarDetails> {
     @Override
     public Car toEntity(CarDetails dto) {
         Car car = new Car();
-        car.setId(dto.getId());
+        car.setMainAppId(dto.getId());
         car = getMake(dto.getMake(),dto.getModel(),car);
         car.setFuelType(getFuelType(dto.getFuelType()));
         car.setGearBoxType(getGearBoxType(dto.getFuelType()));
@@ -49,7 +45,7 @@ public class CarDetailsMapper implements MapperInterface<Car, CarDetails> {
     @Override
     public CarDetails toDto(Car entity) {
         CarDetails carDTO = new CarDetails();
-        carDTO.setId(entity.getId());
+        carDTO.setId(entity.getMainAppId());
         carDTO.setMake(entity.getMake().getName());
         carDTO.setModel(entity.getModel().getName());
         carDTO.setFuelType(entity.getFuelType().getName());
@@ -64,8 +60,8 @@ public class CarDetailsMapper implements MapperInterface<Car, CarDetails> {
         return carDTO;
     }
 
-    private Car getMake(String makeName,String modelName,Car car){
-        Make make = makeService.get(makeName);
+    private Car getMake(String name,String modelName,Car car){
+        Make make = makeService.get(name);
         if(make != null){
             car.setMake(make);
             Model model = modelService.get(modelName,make.getId());
@@ -78,20 +74,14 @@ public class CarDetailsMapper implements MapperInterface<Car, CarDetails> {
             car.setModel(model);
             return car;
         }
-        make = makeService.get("Other");
-        if(make == null){
-            Make createMake = new Make();
-            createMake.setName("Other");
-            Model createModel = new Model();
-            createModel.setName("Other");
-            createModel.setMake(createMake);
-            createModel = modelService.create(createModel,createMake);
-            car.setModel(createModel);
-            car.setMake(createModel.getMake());
-            return car;
-        }
-        car.setModel(modelService.get("Other",make.getId()));
-        car.setMake(make);
+        Make createMake = new Make();
+        createMake.setName("Other");
+        Model createModel = new Model();
+        createModel.setName("Other");
+        createModel.setMake(createMake);
+        createModel = modelService.create(createModel,createMake);
+        car.setModel(createModel);
+        car.setMake(createModel.getMake());
         return car;
     }
 
@@ -100,13 +90,9 @@ public class CarDetailsMapper implements MapperInterface<Car, CarDetails> {
         if(gearboxType != null){
             return gearboxType;
         }
-        gearboxType = gearboxTypeService.get("Other");
-        if(gearboxType == null){
-            CreateGearboxTypeDTO create = new CreateGearboxTypeDTO();
-            create.setName("Other");
-            return gearboxTypeService.create(create);
-        }
-        return gearboxType;
+        CreateGearboxTypeDTO create = new CreateGearboxTypeDTO();
+        create.setName(name);
+        return gearboxTypeService.create(create);
     }
 
 
@@ -115,13 +101,9 @@ public class CarDetailsMapper implements MapperInterface<Car, CarDetails> {
         if(bodyStyle != null){
             return bodyStyle;
         }
-        bodyStyle = bodyStyleService.get("Other");
-        if(bodyStyle == null){
-            CreateBodyStyleDTO create = new CreateBodyStyleDTO();
-            create.setName("Other");
-            return bodyStyleService.create(create);
-        }
-        return bodyStyle;
+        CreateBodyStyleDTO create = new CreateBodyStyleDTO();
+        create.setName(name);
+        return bodyStyleService.create(create);
     }
 
     private FuelType getFuelType(String name){
@@ -129,15 +111,10 @@ public class CarDetailsMapper implements MapperInterface<Car, CarDetails> {
         if(fuelType != null){
             return fuelType;
         }
-        fuelType = fuelTypeService.get("Other");
-        if(fuelType == null){
-            CreateFuelTypeDTO create = new CreateFuelTypeDTO();
-            create.setName("Other");
-            return fuelTypeService.create(create);
-        }
-        return fuelType;
+        CreateFuelTypeDTO create = new CreateFuelTypeDTO();
+        create.setName(name);
+        return fuelTypeService.create(create);
     }
-
 
     @Autowired
     public CarDetailsMapper(ModelMapper modelMapper, MakeService makeService, ModelService modelService, BodyStyleService bodyStyleService, GearboxTypeService gearboxTypeService, FuelTypeService fuelTypeService) {

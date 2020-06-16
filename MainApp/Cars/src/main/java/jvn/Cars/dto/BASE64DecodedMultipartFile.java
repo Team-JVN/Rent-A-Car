@@ -2,51 +2,49 @@ package jvn.Cars.dto;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 public class BASE64DecodedMultipartFile  implements MultipartFile {
     private final byte[] imgContent;
 
-    public BASE64DecodedMultipartFile(byte[] imgContent) {
+    private final String originalName;
+
+    public BASE64DecodedMultipartFile(byte[] imgContent,String originalName) {
+        this.originalName = originalName;
         this.imgContent = imgContent;
     }
 
     @Override
     public String getName() {
-        return this.getName();
+        return  originalName;
     }
 
     @Override
     public String getOriginalFilename() {
-        return this.getOriginalFilename();
+        return  originalName;
     }
 
     @Override
     public String getContentType() {
-        return this.getContentType();
+        return "Content";
     }
 
     @Override
     public boolean isEmpty() {
-        return this.isEmpty();
+        return imgContent == null || imgContent.length == 0;
     }
 
     @Override
-    public long getSize() {
-        return this.getSize();
-    }
+    public long getSize(){ return imgContent.length;}
 
     @Override
     public byte[] getBytes() throws IOException {
-        return new byte[0];
+        return imgContent;
     }
 
     @Override
     public InputStream getInputStream() throws IOException {
-        return this.getInputStream();
+        return new ByteArrayInputStream(imgContent);
     }
 
     @Override

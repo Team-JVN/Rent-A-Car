@@ -161,11 +161,10 @@
                 <configuration>
                     <schemaLanguage>WSDL</schemaLanguage>
                     <generateDirectory>${project.basedir}/src/main/java</generateDirectory>
-                    <generatePackage>jvn.RentACar.dto.soap.agent</generatePackage>
+                    <generatePackage>jvn.RentACar.dto.soap.car</generatePackage>
                     <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>
                     <schemaIncludes>
-                        <include>agents.wsdl</include>
-                        <include>getProfileAgent.wsdl</include>
+                        <include>createOrEditCar.wsdl</include>
                     </schemaIncludes>
                 </configuration>
             </plugin>

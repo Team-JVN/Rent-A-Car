@@ -6,11 +6,12 @@ import jvn.Cars.dto.response.UserInfoDTO;
 import jvn.Cars.dto.soap.car.CarDetails;
 import jvn.Cars.dto.soap.car.CreateOrEditCarDetailsRequest;
 import jvn.Cars.dto.soap.car.CreateOrEditCarDetailsResponse;
+import jvn.Cars.dto.soap.car.PictureInfo;
 import jvn.Cars.mapper.CarDetailsMapper;
 import jvn.Cars.model.Car;
 import jvn.Cars.service.CarService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
+import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
@@ -20,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Endpoint
-public class CarEndPoint {
+public class CarEndpoint {
 
     private static final String NAMESPACE_URI = "http://www.soap.dto/car";
 
@@ -38,12 +39,12 @@ public class CarEndPoint {
             return null;
         }
         Car car = carDetailsMapper.toEntity(request.getCreateCarDetails());
-        List<byte[]> multipartFiles = request.getMultiPartFile();
+
         CarDetails carDetailsForResponse;
         if (car.getId() != null) {
-            carDetailsForResponse = carDetailsMapper.toDto(carService.editAll(car.getId(),car, getFiles(multipartFiles), dto.getId()));
+            carDetailsForResponse = carDetailsMapper.toDto(carService.editAll(car.getId(),car, getFiles(request.getPictureInfo()), dto.getId()));
         } else {
-            carDetailsForResponse = carDetailsMapper.toDto(carService.create(car, getFiles(multipartFiles),dto.getId()));
+            carDetailsForResponse = carDetailsMapper.toDto(carService.create(car, getFiles(request.getPictureInfo()),dto.getId()));
         }
         CreateOrEditCarDetailsResponse response = new CreateOrEditCarDetailsResponse();
         response.setCreateCarDetails(carDetailsForResponse);
@@ -51,17 +52,17 @@ public class CarEndPoint {
         return response;
     }
 
-    private List<MultipartFile> getFiles(List<byte[]> byteMultipartFiles){
+    private List<MultipartFile> getFiles(List<PictureInfo> pictureInfos){
         List<MultipartFile> multipartFiles = new ArrayList<>();
-        for (byte[] bytes: byteMultipartFiles) {
-            BASE64DecodedMultipartFile  base64DecodedMultipartFile = new BASE64DecodedMultipartFile(bytes);
+        for (PictureInfo pictureInfo: pictureInfos){
+            BASE64DecodedMultipartFile  base64DecodedMultipartFile = new BASE64DecodedMultipartFile(pictureInfo.getMultiPartFile(),pictureInfo.getFileName());
             multipartFiles.add(base64DecodedMultipartFile);
         }
         return multipartFiles;
     }
 
     @Autowired
-    public CarEndPoint(CarService carService, CarDetailsMapper carDetailsMapper, UserClient userClient) {
+    public CarEndpoint(CarService carService, CarDetailsMapper carDetailsMapper, UserClient userClient) {
         this.carService = carService;
         this.carDetailsMapper = carDetailsMapper;
         this.userClient = userClient;
