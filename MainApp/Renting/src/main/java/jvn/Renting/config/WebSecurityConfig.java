@@ -28,6 +28,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
 
                 .authorizeRequests()
+                .antMatchers("/ws**", "/ws/**", "/rentrequest/ws**", "/rentrequest/ws/**", "/rentrequest/ws").permitAll()
+
                 .antMatchers(HttpMethod.POST, "/api/rent-request").hasAuthority("MY_RENT_REQUESTS")
                 .antMatchers(HttpMethod.GET, "/api/rent-request/{status}/mine",
                         "/api/rent-request/{id}")
@@ -64,6 +66,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
+
+        web.ignoring().antMatchers("/ws/**");
+        web.ignoring().antMatchers("/rentrequest/ws/**");
+        web.ignoring().antMatchers("/rentrequest/ws**");
+        web.ignoring().antMatchers("/rentrequest/ws");
 
         web.ignoring().antMatchers(HttpMethod.GET, "/api/car/verify/{userId}/{carId}");
     }

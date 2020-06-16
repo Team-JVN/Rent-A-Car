@@ -147,6 +147,29 @@
 <!--                </configuration>-->
 <!--            </plugin>-->
 
+<!--            <plugin>-->
+<!--                <groupId>org.jvnet.jaxb2.maven2</groupId>-->
+<!--                <artifactId>maven-jaxb2-plugin</artifactId>-->
+<!--                <version>0.14.0</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <goals>-->
+<!--                            <goal>generate</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--                <configuration>-->
+<!--                    <schemaLanguage>WSDL</schemaLanguage>-->
+<!--                    <generateDirectory>${project.basedir}/src/main/java</generateDirectory>-->
+<!--                    <generatePackage>jvn.RentACar.dto.soap.agent</generatePackage>-->
+<!--                    <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>-->
+<!--                    <schemaIncludes>-->
+<!--                        <include>agents.wsdl</include>-->
+<!--                        <include>getProfileAgent.wsdl</include>-->
+<!--                    </schemaIncludes>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
+
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
@@ -161,11 +184,10 @@
                 <configuration>
                     <schemaLanguage>WSDL</schemaLanguage>
                     <generateDirectory>${project.basedir}/src/main/java</generateDirectory>
-                    <generatePackage>jvn.RentACar.dto.soap.agent</generatePackage>
+                    <generatePackage>jvn.RentACar.dto.soap.rentrequest</generatePackage>
                     <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>
                     <schemaIncludes>
-                        <include>agents.wsdl</include>
-                        <include>getProfileAgent.wsdl</include>
+                        <include>rentRequests.wsdl</include>
                     </schemaIncludes>
                 </configuration>
             </plugin>

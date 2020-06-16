@@ -109,6 +109,15 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     }
 
     @Override
+    public Advertisement getByMainAppId(Long mainAppId) {
+        Advertisement advertisement = advertisementRepository.findByMainAppIdAndLogicalStatus(mainAppId, LogicalStatus.EXISTING);
+        if (advertisement == null) {
+            throw new InvalidAdvertisementDataException("Requested advertisement does not exist.", HttpStatus.NOT_FOUND);
+        }
+        return advertisement;
+    }
+
+    @Override
     public List<Advertisement> searchAdvertisements(SearchParamsDTO searchParamsDTO) {
         LocalDateTime dateTimeFrom = getDateConverted(searchParamsDTO.getDateTimeFrom());
         LocalDateTime dateTimeTo = getDateConverted(searchParamsDTO.getDateTimeTo());
@@ -212,6 +221,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
         return searchParamsDTO;
     }
+
     private void checkIfCarIsAvailable(Long carId, LocalDate advertisementDateFrom, LocalDate advertisementDateTo) {
         if (!advertisementRepository.findByCarIdAndLogicalStatusNotAndDateToEquals(carId, LogicalStatus.DELETED, null).isEmpty()) {
             throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
@@ -267,6 +277,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         }
         return dbAdvertisement;
     }
+
     @Autowired
     public AdvertisementServiceImpl(CarService carService, PriceListService priceListService, RentInfoService rentInfoService, UserService userService,
                                     AdvertisementRepository advertisementRepository, AdvertisementDtoMapper advertisementMapper) {

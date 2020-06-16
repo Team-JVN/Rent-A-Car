@@ -18,6 +18,8 @@ public interface AdvertisementService {
 
     Advertisement get(Long id);
 
+    Advertisement getByMainAppId(Long mainAppId);
+
     EditType getEditType(Long id);
 
     List<Advertisement> getAll(String status);

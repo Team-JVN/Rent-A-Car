@@ -1,6 +1,10 @@
 package jvn.RentACar.serviceImpl;
 
+import jvn.RentACar.client.RentRequestClient;
 import jvn.RentACar.dto.request.RentRequestStatusDTO;
+import jvn.RentACar.dto.soap.rentrequest.CreateRentRequestResponse;
+import jvn.RentACar.dto.soap.rentrequest.RentInfoDetails;
+import jvn.RentACar.dto.soap.rentrequest.RentRequestDetails;
 import jvn.RentACar.enumeration.RentRequestStatus;
 import jvn.RentACar.exceptionHandler.InvalidRentRequestDataException;
 import jvn.RentACar.model.*;
@@ -40,6 +44,8 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     private Environment environment;
 
+    private RentRequestClient rentRequestClient;
+
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public RentRequest create(RentRequest rentRequest) {
@@ -59,15 +65,30 @@ public class RentRequestServiceImpl implements RentRequestService {
         }
         rentRequest.setCreatedBy(user);
         rentRequest.setTotalPrice(0.0);
-        Set<RentInfo> rentInfos =  rentRequest.getRentInfos();
+        Set<RentInfo> rentInfos = rentRequest.getRentInfos();
         rentRequest.setRentInfos(new HashSet<>());
         RentRequest savedRequest = rentRequestRepository.save(rentRequest);
-        savedRequest = rentRequestRepository.save(setRentInfosData(savedRequest,rentInfos));
+        savedRequest = rentRequestRepository.save(setRentInfosData(savedRequest, rentInfos));
         if (savedRequest.getRentRequestStatus().equals(RentRequestStatus.PAID)) {
             rejectOtherRequests(savedRequest);
         } else if (savedRequest.getRentRequestStatus().equals(RentRequestStatus.PENDING)) {
             Instant today = (new Date()).toInstant();
             executeRejectTask(savedRequest.getId(), today.plus(24, ChronoUnit.HOURS));
+        }
+
+        CreateRentRequestResponse response = rentRequestClient.createOrEdit(savedRequest);
+        RentRequestDetails rentRequestDetails = response.getRentRequestDetails();
+        if (rentRequestDetails != null && rentRequestDetails.getId() != null) {
+            savedRequest.setMainAppId(rentRequestDetails.getId());
+        }
+
+        List<RentInfoDetails> rentInfoDetailsList = rentRequestDetails.getRentInfo();
+        List<RentInfo> rentInfoList = new ArrayList<>(savedRequest.getRentInfos());
+        for (int i = 0; i < rentInfoDetailsList.size(); i++) {
+            RentInfoDetails rentInfoDetails = rentInfoDetailsList.get(i);
+            if (rentInfoDetails != null && rentInfoDetails.getId() != null) {
+                rentInfoList.get(i).setMainAppId(rentInfoDetails.getId());
+            }
         }
 
         return savedRequest;
@@ -144,7 +165,7 @@ public class RentRequestServiceImpl implements RentRequestService {
             throw new InvalidRentRequestDataException("You aren't owner of rent request's advertisement so you can't reject this request.", HttpStatus.BAD_REQUEST);
         }
         rentRequest.setRentRequestStatus(RentRequestStatus.CANCELED);
-        composeAndSendRejectedRentRequest(rentRequest.getClient().getEmail(),rentRequest.getId());
+        composeAndSendRejectedRentRequest(rentRequest.getClient().getEmail(), rentRequest.getId());
         return rentRequestRepository.save(rentRequest);
     }
 
@@ -181,6 +202,7 @@ public class RentRequestServiceImpl implements RentRequestService {
             }
         }
     }
+
     private RentRequest setRentInfosData(RentRequest rentRequest, Set<RentInfo> rentInfos) {
         double totalPrice = 0;
         for (RentInfo rentInfo : rentInfos) {
@@ -298,6 +320,7 @@ public class RentRequestServiceImpl implements RentRequestService {
         String text = sb.toString();
         emailNotificationService.sendEmail(recipientEmail, subject, text);
     }
+
     private Long getAdvertisementOwnerId(Set<RentInfo> rentInfos) {
         Set<Long> advertisements = new HashSet<>();
         Long ownerId = (new ArrayList<>(rentInfos)).get(0).getAdvertisement().getCar().getOwner().getId();
@@ -364,13 +387,14 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     @Autowired
     public RentRequestServiceImpl(ClientService clientService, AdvertisementService advertisementService, UserService userService,
-                                  RentRequestRepository rentRequestRepository,
-                                  EmailNotificationService emailNotificationService, Environment environment) {
+                                  RentRequestRepository rentRequestRepository, EmailNotificationService emailNotificationService,
+                                  Environment environment, RentRequestClient rentRequestClient) {
         this.clientService = clientService;
         this.advertisementService = advertisementService;
         this.rentRequestRepository = rentRequestRepository;
         this.userService = userService;
         this.emailNotificationService = emailNotificationService;
         this.environment = environment;
+        this.rentRequestClient = rentRequestClient;
     }
 }

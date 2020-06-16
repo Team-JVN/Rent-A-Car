@@ -51,10 +51,9 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public RentRequest create(RentRequest rentRequest, UserDTO loggedInUser, String jwt, String user) throws ParseException {
-        Long loggedInUserId = loggedInUser.getId();
+    public RentRequest create(RentRequest rentRequest, Long loggedInUserId, boolean canCreateRentRequests) throws ParseException {
         List<RentInfo> rentInfos = new ArrayList<>(rentRequest.getRentInfos());
-        List<AdvertisementWithIdsDTO> advertisementDTOS = getAdvertisements(jwt, user, rentInfos);
+        List<AdvertisementWithIdsDTO> advertisementDTOS = getAdvertisements(rentInfos);
         Long ownerId = getAdvertisementOwnerId(advertisementDTOS);
         rentRequest.setAdvertisementOwner(ownerId);
 
@@ -62,10 +61,10 @@ public class RentRequestServiceImpl implements RentRequestService {
             if (rentRequest.getClient() == null || rentRequest.getClient().equals(loggedInUserId)) {
                 throw new InvalidRentRequestDataException("Please choose client for which you create rent request.", HttpStatus.BAD_REQUEST);
             }
-            userClient.verify(jwt, rentRequest.getClient());
+            userClient.verify(rentRequest.getClient());
             rentRequest.setRentRequestStatus(RentRequestStatus.PAID);
         } else {
-            if (!loggedInUser.getCanCreateRentRequests()) {
+            if (!canCreateRentRequests) {
                 throw new InvalidRentRequestDataException("You are not allowed to create rent requests because you canceled your reservations many times. ", HttpStatus.BAD_REQUEST);
             }
             hasDebt(loggedInUserId);
@@ -395,7 +394,7 @@ public class RentRequestServiceImpl implements RentRequestService {
         return LocalDate.parse(date, formatter);
     }
 
-    private List<AdvertisementWithIdsDTO> getAdvertisements(String jwt, String user, List<RentInfo> rentInfos) {
+    private List<AdvertisementWithIdsDTO> getAdvertisements(List<RentInfo> rentInfos) {
         Set<Long> advertisements = new HashSet<>();
         for (RentInfo rentInfo : rentInfos) {
             Long advId = rentInfo.getAdvertisement();
@@ -404,7 +403,7 @@ public class RentRequestServiceImpl implements RentRequestService {
             }
             advertisements.add(rentInfo.getAdvertisement());
         }
-        return advertisementClient.get(jwt, user, new ArrayList<>(advertisements));
+        return advertisementClient.get(new ArrayList<>(advertisements));
     }
 
     private Long getAdvertisementOwnerId(List<AdvertisementWithIdsDTO> advertisementDTOS) {

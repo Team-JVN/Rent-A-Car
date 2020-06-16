@@ -92,6 +92,15 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
+    public Client getByMainAppId(Long mainAppId) {
+        Client client = clientRepository.findByMainAppId(mainAppId);
+        if (client == null) {
+            throw new InvalidClientDataException("This client doesn't exist.", HttpStatus.NOT_FOUND);
+        }
+        return client;
+    }
+
+    @Override
     public List<Client> get() {
         return clientRepository.findAll();
     }
