@@ -1,15 +1,10 @@
 package jvn.RentACar.client;
 
-import jvn.RentACar.dto.soap.agent.AgentDetails;
-import jvn.RentACar.dto.soap.agent.GetAgentDetailsRequest;
-import jvn.RentACar.dto.soap.agent.GetAgentDetailsResponse;
-import jvn.RentACar.dto.soap.pricelist.GetPriceListDetailsRequest;
+import jvn.RentACar.dto.soap.agent.*;
 import jvn.RentACar.mapper.AgentDetailsMapper;
 import jvn.RentACar.model.Agent;
 import jvn.RentACar.model.User;
 import jvn.RentACar.service.UserService;
-import jvn.Users.dto.soap.agent.GetProfileAgentDetailsRequest;
-import jvn.Users.dto.soap.agent.GetProfileAgentDetailsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 

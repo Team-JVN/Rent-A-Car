@@ -1,18 +1,15 @@
 package jvn.RentACar.serviceImpl;
 
 import jvn.RentACar.client.AgentClient;
+import jvn.RentACar.dto.soap.agent.AgentDetails;
+import jvn.RentACar.dto.soap.agent.GetProfileAgentDetailsResponse;
 import jvn.RentACar.enumeration.AgentStatus;
 import jvn.RentACar.exceptionHandler.InvalidAgentDataException;
 import jvn.RentACar.model.Agent;
-import jvn.RentACar.model.User;
 import jvn.RentACar.repository.AgentRepository;
 import jvn.RentACar.service.AgentService;
-import jvn.Users.dto.soap.agent.AgentDetails;
-import jvn.Users.dto.soap.agent.GetProfileAgentDetailsRequest;
-import jvn.Users.dto.soap.agent.GetProfileAgentDetailsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
