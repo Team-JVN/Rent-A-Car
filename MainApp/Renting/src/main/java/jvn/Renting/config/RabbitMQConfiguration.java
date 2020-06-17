@@ -15,6 +15,8 @@ public class RabbitMQConfiguration {
 
     public static final String REJECT_ALL_REQUESTS = "reject-all-requests";
 
+    public static final String LOGS = "logs";
+
     @Bean
     public Queue queueCanceledReservation() {
         return new Queue(CANCELED_RESERVATION, false);
