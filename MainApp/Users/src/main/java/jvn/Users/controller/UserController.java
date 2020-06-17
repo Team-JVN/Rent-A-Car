@@ -37,7 +37,8 @@ import java.security.NoSuchAlgorithmException;
 @RequestMapping(value = "/api/auth", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserController {
 
-    private final String CLASS_LOCATION = this.getClass().getCanonicalName();
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
 
     private UserService userService;
 
@@ -60,7 +61,7 @@ public class UserController {
         try {
             UserTokenState userTokenState = authentificationService.login(authenticationRequest);
             if (userTokenState == null) {
-                logProducer.send(new Log(Log.INFO, CLASS_LOCATION, "LGN", String.format("Invalid email or password provided from the IP address %s", ipAddressProvider.get())));
+                logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "LGN", String.format("Invalid email or password provided from %s", ipAddressProvider.get())));
                 throw new UsernameNotFoundException("Invalid email or password. Please try again.");
             }
             return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(userTokenState);
@@ -69,14 +70,14 @@ public class UserController {
                 return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
             }
             if (e.getMessage().equals("Blocked")) {
-                logProducer.send(new Log(Log.INFO, CLASS_LOCATION, "LGN", String.format("Because of too many attempts to login, user from the IP address %s is blocked.", ipAddressProvider.get())));
+                logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "LGN", String.format("Because of too many attempts to login, user from %s is blocked.", ipAddressProvider.get())));
                 throw new BlockedUserException("You tried to log in too many times. Your account wil be blocked for the next 24 hours.",
                         HttpStatus.BAD_REQUEST);
             }
-            logProducer.send(new Log(Log.INFO, CLASS_LOCATION, "LGN", String.format("Invalid email or password provided from the IP address %s", ipAddressProvider.get())));
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "LGN", String.format("Invalid email or password provided from %s", ipAddressProvider.get())));
             throw new UsernameNotFoundException("Invalid email or password. Please try again.");
         } catch (NullPointerException e) {
-            logProducer.send(new Log(Log.INFO, CLASS_LOCATION, "LGN", String.format("Invalid email or password provided from the IP address %s", ipAddressProvider.get())));
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "LGN", String.format("Invalid email or password provided from %s", ipAddressProvider.get())));
             throw new UsernameNotFoundException("Invalid email or password. Please try again.");
         }
     }
@@ -86,8 +87,10 @@ public class UserController {
         try {
             authentificationService.changePassword(changePasswordDTO);
         } catch (NullPointerException e) {
-            throw new InvalidUserDataException("Invalid email or password.", HttpStatus.BAD_REQUEST);
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CPW", String.format("Invalid email or password provided from %s", ipAddressProvider.get())));
+            throw new InvalidUserDataException("Invalid email or password. Please try again.", HttpStatus.BAD_REQUEST);
         } catch (NoSuchAlgorithmException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CPW", "External password check failed"));
             throw new InvalidUserDataException("Password cannot be checked. Please try again.", HttpStatus.BAD_REQUEST);
         }
         return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(null);
@@ -98,13 +101,13 @@ public class UserController {
         try {
             authentificationService.checkPassword(clientDTO.getPassword());
         } catch (NoSuchAlgorithmException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "REG", "External password check failed"));
             throw new InvalidUserDataException("Password cannot be check. Please try again.", HttpStatus.BAD_REQUEST);
         }
         try {
-            return new ResponseEntity<>(
-                    clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO))),
-                    HttpStatus.CREATED);
+            return new ResponseEntity<>(clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO))), HttpStatus.CREATED);
         } catch (NoSuchAlgorithmException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "REG", "Hash algorithm threw exception"));
             throw new InvalidTokenException("Activation token cannot be generated. Please try again.",
                     HttpStatus.BAD_REQUEST);
         }
@@ -115,6 +118,7 @@ public class UserController {
         try {
             authentificationService.checkPassword(agentDTO.getPassword());
         } catch (NoSuchAlgorithmException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CAG", "External password check failed"));
             throw new InvalidUserDataException("Password cannot be check. Please try again.", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(agentDtoMapper.toDto(agentService.create(agentDtoMapper.toEntity(agentDTO))),
@@ -126,6 +130,7 @@ public class UserController {
         try {
             userService.generateResetToken(requestTokenDTO.getEmail());
         } catch (NoSuchAlgorithmException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "RST", "Hash algorithm threw exception"));
             throw new InvalidTokenException("Reset token cannot be generated. Please try again.",
                     HttpStatus.BAD_REQUEST);
         }
@@ -139,8 +144,10 @@ public class UserController {
         try {
             authentificationService.resetPassword(t, resetPasswordDTO);
         } catch (NullPointerException e) {
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "RPW", String.format("Invalid email or password provided from %s", ipAddressProvider.get())));
             throw new InvalidUserDataException("Invalid email or password.", HttpStatus.BAD_REQUEST);
         } catch (NoSuchAlgorithmException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "RPW", "External password check failed"));
             throw new InvalidUserDataException("Reset token or new password cannot be checked. Please try again.",
                     HttpStatus.BAD_REQUEST);
         }
@@ -155,7 +162,7 @@ public class UserController {
     @Autowired
     public UserController(UserService userService, ClientService clientService, ClientDtoMapper clientDtoMapper,
                           AuthentificationService authentificationService, AgentDtoMapper agentDtoMapper,
-                          AgentService agentService, LogProducer logProducer) {
+                          AgentService agentService, LogProducer logProducer, IPAddressProvider ipAddressProvider) {
 
         this.userService = userService;
         this.clientService = clientService;
@@ -164,5 +171,6 @@ public class UserController {
         this.agentDtoMapper = agentDtoMapper;
         this.agentService = agentService;
         this.logProducer = logProducer;
+        this.ipAddressProvider = ipAddressProvider;
     }
 }

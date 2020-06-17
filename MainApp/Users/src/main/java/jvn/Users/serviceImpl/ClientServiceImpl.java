@@ -1,6 +1,7 @@
 package jvn.Users.serviceImpl;
 
 import jvn.Users.common.RandomPasswordGenerator;
+import jvn.Users.dto.message.Log;
 import jvn.Users.dto.message.OwnerMessageDTO;
 import jvn.Users.enumeration.ClientStatus;
 import jvn.Users.exceptionHandler.InvalidClientDataException;
@@ -8,6 +9,7 @@ import jvn.Users.exceptionHandler.InvalidTokenException;
 import jvn.Users.model.Client;
 import jvn.Users.model.Role;
 import jvn.Users.model.VerificationToken;
+import jvn.Users.producer.LogProducer;
 import jvn.Users.producer.UserProducer;
 import jvn.Users.repository.ClientRepository;
 import jvn.Users.repository.VerificationTokenRepository;
@@ -32,6 +34,9 @@ import java.util.List;
 @Service
 public class ClientServiceImpl implements ClientService {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private ClientRepository clientRepository;
 
     private UserService userService;
@@ -46,8 +51,12 @@ public class ClientServiceImpl implements ClientService {
 
     private UserProducer userProducer;
 
+    private LogProducer logProducer;
+
     @Override
     public Client create(Client client) throws NoSuchAlgorithmException {
+        Long loggedInUserId = userService.getLoginUser().getId();
+
         if (clientRepository.findByPhoneNumber(client.getPhoneNumber()) != null) {
             throw new InvalidClientDataException("Client with same phone number already exists.",
                     HttpStatus.BAD_REQUEST);
@@ -69,11 +78,14 @@ public class ClientServiceImpl implements ClientService {
             client.setPassword(passwordEncoder.encode(generatedPassword));
             client.setStatus(ClientStatus.NEVER_LOGGED_IN);
             composeAndSendEmailToChangePassword(client.getEmail(), generatedPassword);
-            return clientRepository.save(client);
+            Client dbClient = clientRepository.save(client);
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CCL", String.format("User %s successfully created client %s", loggedInUserId, dbClient.getId())));
+            return dbClient;
         } else {
             client.setPassword(passwordEncoder.encode(client.getPassword()));
             client.setStatus(ClientStatus.AWAITING);
             Client savedClient = clientRepository.save(client);
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "REG", String.format("User %s successfully registered", savedClient.getId())));
             return savedClient;
         }
     }
@@ -144,6 +156,9 @@ public class ClientServiceImpl implements ClientService {
         }
         client.setStatus(ClientStatus.DELETED);
         clientRepository.save(client);
+
+        Long loggedInUserId = userService.getLoginUser().getId();
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "DCL", String.format("User %s successfully deleted client %s", loggedInUserId, client.getId())));
     }
 
     @Override
@@ -157,6 +172,7 @@ public class ClientServiceImpl implements ClientService {
         client.setStatus(ClientStatus.ACTIVE);
         verificationTokenRepository.deleteById(verificationToken.getId());
 
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "ACT", String.format("User %s successfully activated account", client.getId())));
         return clientRepository.save(client);
     }
 
@@ -178,9 +194,12 @@ public class ClientServiceImpl implements ClientService {
             verificationTokenRepository.save(verificationToken);
 
             composeAndSendEmailToActivate(client.getEmail(), nonHashedToken);
+
+            Long loggedInUserId = userService.getLoginUser().getId();
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "APR", String.format("User %s approved request made by client %s", loggedInUserId, client.getId())));
             return client;
         }
-        throw new InvalidClientDataException("This client is already approved or rejected.", HttpStatus.BAD_REQUEST);
+        throw new InvalidClientDataException("This client is already approved/rejected.", HttpStatus.BAD_REQUEST);
     }
 
     @Override
@@ -191,6 +210,8 @@ public class ClientServiceImpl implements ClientService {
         clientRepository.deleteById(id);
         composeAndSendRejectionEmail(client.getEmail(), reason);
 
+        Long loggedInUserId = userService.getLoginUser().getId();
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "RJT", String.format("User %s rejected request made by client %s", loggedInUserId, client.getId())));
         return client;
     }
 
@@ -200,6 +221,9 @@ public class ClientServiceImpl implements ClientService {
         dbClient.setStatus(ClientStatus.BLOCKED);
         Client client = clientRepository.save(dbClient);
         composeAndSendBlockEmail(client.getEmail());
+
+        Long loggedInUserId = userService.getLoginUser().getId();
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "BLC", String.format("User %s blocked client %s", loggedInUserId, client.getId())));
         return client;
     }
 
@@ -209,35 +233,47 @@ public class ClientServiceImpl implements ClientService {
         dbClient.setStatus(ClientStatus.ACTIVE);
         Client client = clientRepository.save(dbClient);
         composeAndSendUnblockEmail(client.getEmail());
+
+        Long loggedInUserId = userService.getLoginUser().getId();
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "BLC", String.format("User %s unblocked client %s", loggedInUserId, client.getId())));
         return client;
     }
 
     @Override
     public Client createRentRequests(Long id, String status) {
+        Long loggedInUserId = userService.getLoginUser().getId();
+
         Client dbClient = get(id, ClientStatus.ACTIVE);
         if (status.equals("disable")) {
             dbClient.setCanCreateRentRequests(false);
             dbClient.setCanceledReservationCounter(0);
             composeAndSendDisableCreatingRentRequests(dbClient.getEmail());
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CRR", String.format("User %s disabled client %s", loggedInUserId, dbClient.getId())));
         } else if (status.equals("enable")) {
             dbClient.setCanCreateRentRequests(true);
             composeAndSendEnableCreatingRentRequests(dbClient.getEmail());
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CRR", String.format("User %s enabled client %s", loggedInUserId, dbClient.getId())));
         } else {
-            throw new InvalidTokenException("Status is not valid.Please try again.", HttpStatus.BAD_REQUEST);
+            throw new InvalidTokenException("Status is not valid. Please try again.", HttpStatus.BAD_REQUEST);
         }
+
         return clientRepository.save(dbClient);
     }
 
     @Override
     public Client createComments(Long id, String status) {
+        Long loggedInUserId = userService.getLoginUser().getId();
+
         Client dbClient = get(id, ClientStatus.ACTIVE);
         if (status.equals("disable")) {
             dbClient.setCanCreateComments(false);
             dbClient.setRejectedCommentsCounter(0);
             composeAndSendDisableCreatingComments(dbClient.getEmail());
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CCM", String.format("User %s disabled client %s", loggedInUserId, dbClient.getId())));
         } else if (status.equals("enable")) {
             dbClient.setCanCreateComments(true);
             composeAndSendEnableCreatingComments(dbClient.getEmail());
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CCM", String.format("User %s enabled client %s", loggedInUserId, dbClient.getId())));
         } else {
             throw new InvalidTokenException("Status is not valid. Please try again.", HttpStatus.BAD_REQUEST);
         }
@@ -385,7 +421,7 @@ public class ClientServiceImpl implements ClientService {
     @Autowired
     public ClientServiceImpl(ClientRepository clientRepository, UserService userService,
                              PasswordEncoder passwordEncoder, EmailNotificationService emailNotificationService, Environment environment,
-                             VerificationTokenRepository verificationTokenRepository, UserProducer userProducer) {
+                             VerificationTokenRepository verificationTokenRepository, UserProducer userProducer, LogProducer logProducer) {
         this.clientRepository = clientRepository;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
@@ -393,6 +429,7 @@ public class ClientServiceImpl implements ClientService {
         this.environment = environment;
         this.verificationTokenRepository = verificationTokenRepository;
         this.userProducer = userProducer;
+        this.logProducer = logProducer;
     }
 
     private String getLocalhostURL() {

@@ -40,7 +40,8 @@ import java.time.LocalDateTime;
 @Service
 public class AuthentificationServiceImpl implements AuthentificationService {
 
-    private final String CLASS_LOCATION = this.getClass().getCanonicalName();
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
 
     public TokenUtils tokenUtils;
 
@@ -74,7 +75,7 @@ public class AuthentificationServiceImpl implements AuthentificationService {
         String refreshJwt = tokenUtils.generateRefreshToken(user.getUsername());
         int expiresIn = tokenUtils.getExpiredIn();
 
-        logProducer.send(new Log(Log.INFO, CLASS_LOCATION, "LGN", String.format("User %s successfully logged in", user.getId())));
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "LGN", String.format("User %s successfully logged in", user.getId())));
         return new UserTokenState(jwt, expiresIn, refreshJwt);
     }
 
@@ -83,8 +84,9 @@ public class AuthentificationServiceImpl implements AuthentificationService {
             throws NullPointerException, NoSuchAlgorithmException {
         String ip = getClientIP();
         if (changePasswordAttemptService.isBlocked(ip)) {
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CPW", String.format("User from %s is blocked.", getClientIP())));
             throw new BlockedUserException(
-                    "You tried to log in too many times. Your account wil be blocked for the next 24 hours.",
+                    "You tried to change password too many times. Your account wil be blocked for the next 24 hours.",
                     HttpStatus.BAD_REQUEST);
         }
 
@@ -113,6 +115,7 @@ public class AuthentificationServiceImpl implements AuthentificationService {
         user.setLastPasswordResetDate(new Timestamp(DateTime.now().getMillis()));
         userRepository.save(user);
         changePasswordAttemptService.changePassSucceeded();
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CPW", String.format("User %s successfully changed password", user.getId())));
     }
 
     @Override
@@ -152,6 +155,7 @@ public class AuthentificationServiceImpl implements AuthentificationService {
         userRepository.save(user);
 
         resetTokenRepository.deleteById(resetToken.getId());
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "RPW", String.format("User %s successfully reset password", user.getId())));
     }
 
     @Override

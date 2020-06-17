@@ -8,6 +8,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,8 +38,10 @@ public class LogConsumer {
                 logs.add(Log.parse(logStr));
             }
             repository.writeAll(Paths.get(configuration.getLogStorage()), logs);
+        } catch (IOException e) {
+            System.out.println("Cannot write log messages to a file.");
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 

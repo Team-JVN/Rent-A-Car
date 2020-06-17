@@ -13,21 +13,6 @@ import java.util.stream.Collectors;
 @Repository
 public class LogRepository implements FileRepository<Log> {
 
-//    @Override
-//    public List<Log> readAll(Path file) throws IOException {
-//        return Files.readAllLines(file)
-//                .stream()
-//                .map(log -> {
-//                    try {
-//                        return Log.parse(log);
-//                    } catch (Exception e) {
-//                        return null;
-//                    }
-//                })
-//                .filter(Objects::nonNull)
-//                .collect(Collectors.toList());
-//    }
-
     @Override
     public void write(Path file, Log log) throws IOException {
         Files.write(file, (log.toFile() + "\n").getBytes(), StandardOpenOption.APPEND, StandardOpenOption.CREATE);

@@ -1,4 +1,4 @@
-package jvn.Users.dto.message;
+package jvn.Zuul.dto.message;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

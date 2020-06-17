@@ -1,17 +1,19 @@
 package jvn.Users.serviceImpl;
 
+import jvn.Users.dto.message.Log;
 import jvn.Users.enumeration.AdminStatus;
-import jvn.Users.exceptionHandler.BlockedUserException;
 import jvn.Users.enumeration.AgentStatus;
 import jvn.Users.enumeration.ClientStatus;
 import jvn.Users.exceptionHandler.InvalidUserDataException;
 import jvn.Users.model.*;
+import jvn.Users.producer.LogProducer;
 import jvn.Users.repository.ResetTokenRepository;
 import jvn.Users.repository.RoleRepository;
 import jvn.Users.repository.UserRepository;
 import jvn.Users.security.TokenUtils;
 import jvn.Users.service.EmailNotificationService;
 import jvn.Users.service.UserService;
+import jvn.Users.utils.IPAddressProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
@@ -33,6 +35,9 @@ import java.security.NoSuchAlgorithmException;
 @Service
 public class UserServiceImpl implements UserDetailsService, UserService {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private Environment environment;
 
     private UserRepository userRepository;
@@ -48,6 +53,10 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     private ResetTokenRepository resetTokenRepository;
 
     private EmailNotificationService emailNotificationService;
+
+    private LogProducer logProducer;
+
+    private IPAddressProvider ipAddressProvider;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -94,6 +103,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     public void generateResetToken(String email) throws NoSuchAlgorithmException {
         User user = findByEmail(email);
         if (user == null) {
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "RPW", String.format("User from %s tried to reset password for an unregistered user", ipAddressProvider.get())));
             return;
         }
 
@@ -103,7 +113,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         } else if (user instanceof Agent && ((Agent) user).getStatus() != AgentStatus.ACTIVE) {
             composeAndSendEmail(user.getEmail());
             return;
-        }else if (user instanceof Admin && ((Admin) user).getStatus() != AdminStatus.ACTIVE) {
+        } else if (user instanceof Admin && ((Admin) user).getStatus() != AdminStatus.ACTIVE) {
             composeAndSendEmail(user.getEmail());
             return;
         }
@@ -133,6 +143,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
             int expiresIn = tokenUtils.getExpiredIn();
             return new UserTokenState(newToken, expiresIn, refreshToken);
         } else {
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "REF", String.format("User from %s tried to refresh token manually", ipAddressProvider.get())));
             throw new InvalidUserDataException("Token can not be refreshed", HttpStatus.BAD_REQUEST);
         }
     }
@@ -195,7 +206,8 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     @Autowired
     public UserServiceImpl(UserRepository userRepository, TokenUtils tokenUtils, RoleRepository roleRepository,
                            ResetTokenRepository resetTokenRepository, EmailNotificationService emailNotificationService,
-                           Environment environment, LoginAttemptService loginAttemptService, HttpServletRequest request) {
+                           Environment environment, LoginAttemptService loginAttemptService, HttpServletRequest request,
+                           LogProducer logProducer, IPAddressProvider ipAddressProvider) {
         this.userRepository = userRepository;
         this.tokenUtils = tokenUtils;
         this.roleRepository = roleRepository;
@@ -204,6 +216,8 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         this.environment = environment;
         this.loginAttemptService = loginAttemptService;
         this.request = request;
+        this.logProducer = logProducer;
+        this.ipAddressProvider = ipAddressProvider;
     }
 }
 
