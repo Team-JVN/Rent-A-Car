@@ -1,12 +1,13 @@
 package jvn.RentACar.client;
 
-import jvn.RentACar.dto.soap.car.CreateOrEditCarDetailsRequest;
-import jvn.RentACar.dto.soap.car.CreateOrEditCarDetailsResponse;
-import jvn.RentACar.dto.soap.car.PictureInfo;
+import jvn.RentACar.dto.request.CarEditDTO;
+import jvn.RentACar.dto.soap.car.*;
 import jvn.RentACar.mapper.CarDetailsMapper;
+import jvn.RentACar.mapper.CarEditDetailsMapper;
 import jvn.RentACar.model.Car;
 import jvn.RentACar.model.User;
 import jvn.RentACar.service.UserService;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
@@ -22,6 +23,9 @@ public class CarClient extends WebServiceGatewaySupport {
 
     @Autowired
     private CarDetailsMapper carDetailsMapper;
+
+    @Autowired
+    private CarEditDetailsMapper carEditDetailsMapper;
 
     public CreateOrEditCarDetailsResponse createOrEdit(Car car, List<MultipartFile> multipartFiles) {
 
@@ -54,4 +58,64 @@ public class CarClient extends WebServiceGatewaySupport {
         return pictureInfos;
     }
 
+
+    public DeleteCarDetailsResponse checkAndDeleteIfCan(Car car) {
+        DeleteCarDetailsRequest request = new DeleteCarDetailsRequest();
+        request.setId(car.getMainAppId());
+        User user = userService.getLoginUser();
+        if(user == null){
+            return null;
+        }
+        request.setEmail(user.getEmail());
+        DeleteCarDetailsResponse response = (DeleteCarDetailsResponse) getWebServiceTemplate()
+                .marshalSendAndReceive(request);
+        return response;
+    }
+
+    public GetCarEditTypeResponse getEditType(Car car) {
+        GetCarEditTypeRequest request = new GetCarEditTypeRequest();
+        request.setId(car.getMainAppId());
+        User user = userService.getLoginUser();
+        if(user == null){
+            return null;
+        }
+        request.setEmail(user.getEmail());
+        GetCarEditTypeResponse response = (GetCarEditTypeResponse) getWebServiceTemplate()
+                .marshalSendAndReceive(request);
+        return response;
+    }
+
+
+    public EditPartialCarDetailsResponse editPartial(CarEditDTO carEditDTO, List<MultipartFile> multipartFiles) {
+
+        EditPartialCarDetailsRequest request = new EditPartialCarDetailsRequest();
+        request.setEditPartialCarDetails(carEditDetailsMapper.toDto(carEditDTO));
+        try{
+            request.getPictureInfo().addAll(getPicturesInfo(multipartFiles));
+        } catch (IOException e) {
+            return null;
+        }
+
+        User user = userService.getLoginUser();
+        if(user == null){
+            return null;
+        }
+        request.setEmail(user.getEmail());
+        EditPartialCarDetailsResponse response = (EditPartialCarDetailsResponse) getWebServiceTemplate()
+                .marshalSendAndReceive(request);
+        return response;
+    }
+
+    public GetAllCarDetailsResponse getAll() {
+        GetAllCarDetailsRequest request = new GetAllCarDetailsRequest();
+        User user = userService.getLoginUser();
+        if(user == null){
+            return null;
+        }
+        request.setEmail(user.getEmail());
+
+        GetAllCarDetailsResponse response = (GetAllCarDetailsResponse) getWebServiceTemplate()
+                .marshalSendAndReceive(request);
+        return response;
+    }
 }

@@ -15,9 +15,12 @@ public interface CarRepository extends JpaRepository<Car, Long> {
 
     Car findOneByIdAndLogicalStatusNot(Long id, LogicalStatus logicalStatus);
 
+    Car findByMainAppId(Long id);
+
     Car findByIdAndAdvertisementsLogicalStatusAndAdvertisementsDateToEquals(Long id, LogicalStatus logicalStatus, LocalDate date);
 
     Car findByIdAndAdvertisementsLogicalStatusAndAdvertisementsDateToGreaterThanEqual(Long id, LogicalStatus logicalStatus, LocalDate date);
 
     List<Car> findFirst3ByLogicalStatus(LogicalStatus logicalStatus, Sort sort);
+
 }

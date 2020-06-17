@@ -132,7 +132,7 @@ public class CarController {
         }
 
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(carDtoMapper.toDto(carService.editPartial(id, carEditDTO, multipartFiles, userDTO.getId(), request.getHeader("Auth"), request.getHeader("user"), userDTO)), HttpStatus.OK);
+        return new ResponseEntity<>(carDtoMapper.toDto(carService.editPartial(id, carEditDTO, multipartFiles, userDTO.getId())), HttpStatus.OK);
     }
 
     private void validateCreateCarDTO(CreateCarDTO createCarDTO) {

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:sch="http://www.soap.dto/car" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.car.dto/soap" targetNamespace="http://www.car.dto/soap">
+    <wsdl:types>
+        <xs:schema xmlns:tns="http://www.soap.dto/car" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.soap.dto/car">
+            <xs:element name="getAllCarDetailsRequest">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="email" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllCarDetailsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" name="carWithPictures" type="tns:carWithPictures"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:complexType name="carWithPictures">
+                <xs:sequence>
+                    <xs:element name="createCarDetails" type="tns:carDetails"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="pictureInfo" type="tns:pictureInfo"/>
+                </xs:sequence>
+            </xs:complexType>
+<!--            <xs:complexType name="carDetails">-->
+<!--                <xs:sequence>-->
+<!--                    <xs:element minOccurs="0" name="id">-->
+<!--                        <xs:simpleType>-->
+<!--                            <xs:restriction base="xs:long">-->
+<!--                                <xs:minInclusive value="1"/>-->
+<!--                            </xs:restriction>-->
+<!--                        </xs:simpleType>-->
+<!--                    </xs:element>-->
+<!--                    <xs:element name="make" type="xs:string"/>-->
+<!--                    <xs:element name="model" type="xs:string"/>-->
+<!--                    <xs:element name="fuelType" type="xs:string"/>-->
+<!--                    <xs:element name="gearBoxType" type="xs:string"/>-->
+<!--                    <xs:element name="bodyStyle" type="xs:string"/>-->
+<!--                    <xs:element name="mileageInKm">-->
+<!--                        <xs:simpleType>-->
+<!--                            <xs:restriction base="xs:int">-->
+<!--                                <xs:minInclusive value="0"/>-->
+<!--                            </xs:restriction>-->
+<!--                        </xs:simpleType>-->
+<!--                    </xs:element>-->
+<!--                    <xs:element name="kidsSeats">-->
+<!--                        <xs:simpleType>-->
+<!--                            <xs:restriction base="xs:int">-->
+<!--                                <xs:minInclusive value="0"/>-->
+<!--                                <xs:maxInclusive value="3"/>-->
+<!--                            </xs:restriction>-->
+<!--                        </xs:simpleType>-->
+<!--                    </xs:element>-->
+<!--                    <xs:element name="availableTracking" type="xs:boolean"/>-->
+<!--                    <xs:element minOccurs="0" name="status">-->
+<!--                        <xs:simpleType>-->
+<!--                            <xs:restriction base="xs:string">-->
+<!--                                <xs:enumeration value="EXISTING"/>-->
+<!--                                <xs:enumeration value="DELETED"/>-->
+<!--                            </xs:restriction>-->
+<!--                        </xs:simpleType>-->
+<!--                    </xs:element>-->
+<!--                    <xs:element name="avgRating">-->
+<!--                        <xs:simpleType>-->
+<!--                            <xs:restriction base="xs:double">-->
+<!--                                <xs:minInclusive value="0"/>-->
+<!--                            </xs:restriction>-->
+<!--                        </xs:simpleType>-->
+<!--                    </xs:element>-->
+<!--                    <xs:element name="commentsCount">-->
+<!--                        <xs:simpleType>-->
+<!--                            <xs:restriction base="xs:int">-->
+<!--                                <xs:minInclusive value="0"/>-->
+<!--                            </xs:restriction>-->
+<!--                        </xs:simpleType>-->
+<!--                    </xs:element>-->
+<!--                </xs:sequence>-->
+<!--            </xs:complexType>-->
+<!--            <xs:complexType name="pictureInfo">-->
+<!--                <xs:sequence>-->
+<!--                    <xs:element name="fileName" type="xs:string"/>-->
+<!--                    <xs:element name="multiPartFile" type="xs:base64Binary"/>-->
+<!--                </xs:sequence>-->
+<!--            </xs:complexType>-->
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="getAllCarDetailsResponse">
+        <wsdl:part element="sch:getAllCarDetailsResponse" name="getAllCarDetailsResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllCarDetailsRequest">
+        <wsdl:part element="sch:getAllCarDetailsRequest" name="getAllCarDetailsRequest">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="CarsPort">
+        <wsdl:operation name="getAllCarDetails">
+            <wsdl:input message="tns:getAllCarDetailsRequest" name="getAllCarDetailsRequest">
+            </wsdl:input>
+            <wsdl:output message="tns:getAllCarDetailsResponse" name="getAllCarDetailsResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="CarsPortSoap11" type="tns:CarsPort">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="getAllCarDetails">
+            <soap:operation soapAction=""/>
+            <wsdl:input name="getAllCarDetailsRequest">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="getAllCarDetailsResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="CarsPortService">
+        <wsdl:port binding="tns:CarsPortSoap11" name="CarsPortSoap11">
+            <soap:address location="http://192.168.56.1:8082/car/ws"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

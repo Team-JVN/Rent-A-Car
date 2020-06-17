@@ -32,8 +32,8 @@ public class CarDetailsMapper implements MapperInterface<Car, CarDetails> {
         car.setMainAppId(dto.getId());
         car = getMake(dto.getMake(),dto.getModel(),car);
         car.setFuelType(getFuelType(dto.getFuelType()));
-        car.setGearBoxType(getGearBoxType(dto.getFuelType()));
-        car.setBodyStyle(getBodyStyle(dto.getFuelType()));
+        car.setGearBoxType(getGearBoxType(dto.getGearBoxType()));
+        car.setBodyStyle(getBodyStyle(dto.getBodyStyle()));
         car.setMileageInKm(dto.getMileageInKm());
         car.setKidsSeats(dto.getKidsSeats());
         car.setAvailableTracking(dto.isAvailableTracking());
@@ -75,9 +75,9 @@ public class CarDetailsMapper implements MapperInterface<Car, CarDetails> {
             return car;
         }
         Make createMake = new Make();
-        createMake.setName("Other");
+        createMake.setName(name);
         Model createModel = new Model();
-        createModel.setName("Other");
+        createModel.setName(modelName);
         createModel.setMake(createMake);
         createModel = modelService.create(createModel,createMake);
         car.setModel(createModel);

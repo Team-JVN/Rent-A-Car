@@ -86,6 +86,11 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
+    public List<Car> getAll(Long loggedInUser) {
+        return carRepository.findAllByOwner(loggedInUser);
+    }
+
+    @Override
     public List<Car> getStatistics(String filter) {
         String sortFilter = "";
         switch (filter) {
@@ -122,12 +127,25 @@ public class CarServiceImpl implements CarService {
         Car dbCar = get(id, LogicalStatus.EXISTING);
         checkOwner(dbCar, loggedInUserId);
 
-        if (advertisementClient.canDeleteCar(jwtToken, user, id)) {
+        if (advertisementClient.canDeleteCar(id)) {
             dbCar.setLogicalStatus(LogicalStatus.DELETED);
             carRepository.save(dbCar);
         } else {
             throw new InvalidCarDataException("This car is in use and therefore it cannot be deleted.", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @Override
+    public boolean checkIfCanDeleteAndDelete(Long id, Long loggedInUser) {
+        Car dbCar =  get(id, LogicalStatus.EXISTING);
+        checkOwner(dbCar, loggedInUser);
+        if (advertisementClient.canDeleteCar(id)) {
+            dbCar.setLogicalStatus(LogicalStatus.DELETED);
+            carRepository.save(dbCar);
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -161,15 +179,14 @@ public class CarServiceImpl implements CarService {
 
     @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-    public Car editPartial(Long id, CarEditDTO carDTO, List<MultipartFile> multipartFiles, Long loggedInUserId, String jwtToken,
-                           String user, UserDTO userDTO) {
+    public Car editPartial(Long id, CarEditDTO carDTO, List<MultipartFile> multipartFiles, Long loggedInUserId) {
         if (multipartFiles.size() > 5) {
             throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
         }
         Car dbCar = get(id, LogicalStatus.EXISTING);
         checkOwner(dbCar, loggedInUserId);
 
-        if (advertisementClient.canEditCarPartially(jwtToken, user, id)) {
+        if (advertisementClient.canEditCarPartially(id)) {
             dbCar.setMileageInKm(carDTO.getMileageInKm());
             dbCar.setKidsSeats(carDTO.getKidsSeats());
             dbCar.setAvailableTracking(carDTO.getAvailableTracking());
@@ -185,6 +202,13 @@ public class CarServiceImpl implements CarService {
         }
     }
 
+    @Override
+    public String getCarEditType(Long id,Long loggedInUser){
+        if (advertisementClient.getCarEditType(id).equals(EditType.ALL)) {
+            return "ALL";
+        }
+        return "PARTIAL";
+    }
     @Async
     public void editCar(CarEditDTO carEditDTO) {
         carProducer.sendMessageForSearch(carEditDTO);

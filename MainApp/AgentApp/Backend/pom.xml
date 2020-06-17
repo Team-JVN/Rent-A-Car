@@ -165,6 +165,10 @@
                     <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>
                     <schemaIncludes>
                         <include>createOrEditCar.wsdl</include>
+                        <include>deleteCar.wsdl</include>
+                        <include>getCarEditType.wsdl</include>
+                        <include>editPartialCar.wsdl</include>
+                        <include>listCar.wsdl</include>
                     </schemaIncludes>
                 </configuration>
             </plugin>
