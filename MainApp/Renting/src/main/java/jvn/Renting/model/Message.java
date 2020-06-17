@@ -21,7 +21,10 @@ public class Message {
     private String text;
 
     @Column(nullable = false)
-    private Long sender;
+    private Long senderId;
+
+    @Column(nullable = false)
+    private String senderEmail;
 
     @Column(nullable = false)
     private LocalDateTime dateAndTime;

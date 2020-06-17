@@ -45,9 +45,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comment approve(Long id) {
-        System.out.println("approval imp");
         Comment comment = commentRepository.findOneById(id);
-        System.out.println("nadjen kom");
         if(comment.getStatus().equals(CommentStatus.APPROVED)){
             throw new InvalidCommentDataException("Comment is already approved.",
                     HttpStatus.NOT_FOUND);
@@ -58,7 +56,6 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void reject(Long id, Long userId) {
-        System.out.println("rejection impl");
         commentRepository.deleteById(id);
         //TODO:increase the number of rejected comments of User
         sendRejectedComment(userId);
@@ -76,9 +73,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Async
     public void sendRejectedComment(Long clientId) {
-        System.out.println("rejection sending");
         commentProducer.sendRejectedComment(clientId);
-        System.out.println("rejection sent");
     }
 
     @Autowired

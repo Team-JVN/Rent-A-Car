@@ -44,16 +44,13 @@ public class CommentController {
         List<CommentDTO> list;
         list = commentService.getAll(status).stream().map(commentDtoMapper::toDto).
                 collect(Collectors.toList());
-        System.out.println("komentari: ");
-        for(CommentDTO c: list){
-            System.out.println(c.getText());
-        }
+
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @PutMapping(value="/{id}/approve")
     public ResponseEntity<CommentDTO> approve(@PathVariable Long id, @Valid @RequestBody CommentDTO commentDTO){
-        System.out.println("APPROVAL");
+
         return new ResponseEntity<>(commentDtoMapper.toDto(commentService.approve(id)), HttpStatus.OK);
     }
 

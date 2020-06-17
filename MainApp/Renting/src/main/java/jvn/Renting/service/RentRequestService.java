@@ -35,11 +35,11 @@ public interface RentRequestService {
 
     Comment createComment(Comment comment, Long id, Long rentInfoId, Long userId);
 
-    FeedbackDTO leaveFeedback(FeedbackDTO feedbackDTO, Long id, Long rentInfoId, Long userId);
+    FeedbackDTO leaveFeedback(FeedbackDTO feedbackDTO, Long id, Long rentInfoId, Long userId, String userName);
 
     FeedbackDTO getFeedback(Long id, Long rentInfoId, Long userId);
 
-    Message createMessage(Message message, Long id, Long userId);
+    Message createMessage(Message message, Long id, Long userId, String userEmail);
 
     List<Message> getMessages(Long id, Long userId);
 }

@@ -10,6 +10,7 @@ import { Message } from "./../../../model/message";
 import { AuthentificationService } from "./../../../service/authentification.service";
 import { LoggedInUser } from "./../../../model/loggedInUser";
 import { RentInfo } from "./../../../model/rentInfo";
+import { Comment } from "./../../../model/comment";
 import { Advertisement } from "./../../../model/advertisement";
 import { Car } from "src/app/model/car";
 import { Model } from "./../../../model/model";
@@ -91,20 +92,18 @@ export class ClientRentRequestDetailsComponent implements OnInit {
     // this.rentRequestId = 2;
   }
   fetchComments() {
-    this.commentService.getAll("all").subscribe(
-      (data: Comment[]) => {
-        if (data.length > 0) {
-          console.log("postoje komentari");
-          this.availibleLeavingFeedback = false;
-        } else {
-          this.availibleLeavingFeedback = true;
-        }
-      },
-      (httpErrorResponse: HttpErrorResponse) => {
-        console.log("ERROR");
-        // this.location.back();
-      }
-    );
+    // this.rentRequestService
+    //   .getRentInfoFeedback(this.data.rentInfo.id, this.data.rentRequest.id)
+    //   .subscribe(
+    //     (data: Feedback) => {
+    //       console.log("FEEDBACK");
+    //       console.log(data);
+    //       this.toastr.success("Success!", "Fetch feedback");
+    //     },
+    //     (httpErrorResponse: HttpErrorResponse) => {
+    //       this.toastr.error(httpErrorResponse.error.message, "Fetch feedback");
+    //     }
+    //   );
   }
 
   advertisementDetails(rentInfo: RentInfo) {
@@ -124,11 +123,14 @@ export class ClientRentRequestDetailsComponent implements OnInit {
   }
 
   checkIfCanLeaveFeedback(rentInfo: RentInfo, rentRequest: RentRequest) {
+    console.log("rentInfo*****");
+    console.log(rentInfo);
+
     const dateTimeTo = new Date(rentInfo.dateTimeTo.substring(0, 10));
     if (
       rentRequest.rentRequestStatus == "PAID" &&
-      dateTimeTo < new Date()
-      //TODO: this.availibleLeavingFeedback
+      dateTimeTo < new Date() &&
+      rentInfo.comments.length < 1
     ) {
       return true;
     }

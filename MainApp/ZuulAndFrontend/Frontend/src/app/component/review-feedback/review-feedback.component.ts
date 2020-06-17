@@ -13,6 +13,7 @@ import {
   FormGroup,
 } from "@angular/forms";
 import { runInThisContext } from "vm";
+import { AuthentificationService } from "src/app/service/authentification.service";
 
 @Component({
   selector: "app-review-feedback",
@@ -21,7 +22,7 @@ import { runInThisContext } from "vm";
 })
 export class ReviewFeedbackComponent implements OnInit {
   setUpComment: Comment;
-  loggedInUser: LoggedInUser;
+  loggedInUser;
   loggedInUserComment: Comment;
   commentForm: FormGroup;
   comments: [];
@@ -32,27 +33,35 @@ export class ReviewFeedbackComponent implements OnInit {
     private formBuilder: FormBuilder,
     private toastr: ToastrService,
     private rentRequestService: RentRequestService,
+    private authentificationService: AuthentificationService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {}
 
   ngOnInit() {
     // const comments = [new Comment("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")];
     // this.data.feedback = new Feedback(4, comments);
-
+    this.loggedInUser = this.authentificationService.getLoggedInUserEmail();
     console.log(this.data.rentInfo.id);
     console.log(this.data.rentInfo);
 
+    this.fetchFeedback();
+
+    this.commentForm = this.formBuilder.group({
+      comment: new FormControl(null, Validators.required),
+    });
+  }
+
+  fetchFeedback() {
     this.rentRequestService
       .getRentInfoFeedback(this.data.rentInfo.id, this.data.rentRequestId)
       .subscribe(
         (data: Feedback) => {
           this.feedback = data;
           console.log(data);
-          this.data.feedback.comments.forEach((comment) => {
-            if (comment.userInfo.email != this.loggedInUser.email) {
+          this.feedback.comments.forEach((comment) => {
+            console.log(comment);
+            if (comment.sender.name != this.loggedInUser.name) {
               this.setUpComment = comment;
-            } else {
-              this.loggedInUserComment = comment;
             }
           });
           this.toastr.success("Success!", "Fetch feedback");
@@ -61,10 +70,6 @@ export class ReviewFeedbackComponent implements OnInit {
           this.toastr.error(httpErrorResponse.error.message, "Fetch feedback");
         }
       );
-
-    this.commentForm = this.formBuilder.group({
-      comment: new FormControl(null, Validators.required),
-    });
   }
 
   createComment() {

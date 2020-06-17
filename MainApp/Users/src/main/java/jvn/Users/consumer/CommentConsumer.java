@@ -24,13 +24,17 @@ public class CommentConsumer {
     private Environment environment;
 
     @RabbitListener(queues = RabbitMQConfiguration.REJECTED_COMMENT)
-    public void listenRejectedReservation(String message) {
-        Long clientId = stringToObject(message);
+    public void listenRejectedComment(Long clientId) {
+//        Long clientId = stringToObject(message);
+        System.out.println("listenRejectedComment");
         if (clientId != null) {
             Client client = clientRepository.findOneByIdAndStatusNot(clientId, ClientStatus.DELETED);
-            Integer currCount = client.getRejectedCommentsCounter();
-            client.setRejectedCommentsCounter(++currCount);
-            clientRepository.save(client);
+            if(client != null){
+                Integer count = client.getRejectedCommentsCounter() + 1;
+                client.setRejectedCommentsCounter(count);
+                clientRepository.save(client);
+            }
+
         }
     }
 

@@ -7,9 +7,15 @@
           <label class="labelRaiting page-title">Rating</label>
         </div>
         <div class="col-9">
-          <!-- <star-rating class="rating-style" totalstars="5" checkedcolor="#87C7F3" uncheckedcolor="black"
-                        size="35px" [value]="this.feedback.rating">
-                    </star-rating> -->
+          <star-rating
+            class="rating-style"
+            totalstars="5"
+            checkedcolor="#87C7F3"
+            uncheckedcolor="black"
+            size="35px"
+            [value]="feedback.rating"
+          >
+          </star-rating>
         </div>
       </div>
       <div class="row" *ngIf="setUpComment">

@@ -85,11 +85,7 @@ export class ViewMessagesComponent implements OnInit {
     this.messageService.getMessages(this.rentRequest.id).subscribe(
       (data: Message[]) => {
         this.toastr.success("Success!", "Fetch messages");
-        this.messages = data.sort(
-          (a, b) =>
-            new Date(a.dateAndTime).getTime() -
-            new Date(b.dateAndTime).getTime()
-        );
+        this.messages = data.sort((a, b) => a.id - b.id);
         this.scrollIntoView();
       },
       (httpErrorResponse: HttpErrorResponse) => {

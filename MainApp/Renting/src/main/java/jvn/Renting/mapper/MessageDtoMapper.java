@@ -24,8 +24,8 @@ public class MessageDtoMapper implements MapperInterface<Message, MessageDTO>{
 //        Message entity = modelMapper.map(dto, Message.class);
         Message entity = new Message();
         entity.setText(dto.getText());
-        entity.setSender(dto.getSender().getId());
-        System.out.println(dto.getSender().getId());
+        entity.setSenderId(dto.getSender().getId());
+        entity.setSenderEmail(dto.getSender().getEmail());
 //        entity.setRentRequest(rentRequestDtoMapper.toEntity(dto.getRentRequest()));
         entity.setDateAndTime(getLocalDateTime(dto.getDateAndTime()));
         return entity;
@@ -34,8 +34,6 @@ public class MessageDtoMapper implements MapperInterface<Message, MessageDTO>{
     @Override
     public MessageDTO toDto(Message entity) {
         MessageDTO dto = modelMapper.map(entity, MessageDTO.class);
-//        System.out.println("sender email: "+ dto.getSender().getEmail());
-//        System.out.println("sender id: "+ dto.getSender().getId());
         return dto;
     }
     private LocalDateTime getLocalDateTime(String date) throws DateTimeParseException {

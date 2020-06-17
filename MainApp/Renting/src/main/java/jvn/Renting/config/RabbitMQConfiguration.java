@@ -17,6 +17,8 @@ public class RabbitMQConfiguration {
 
     public static final String REJECTED_COMMENT = "rejected-comment";
 
+    public static final String MILEAGE = "mileage";
+
     @Bean
     public Queue queueCanceledReservation() {
         return new Queue(CANCELED_RESERVATION, false);
@@ -39,4 +41,8 @@ public class RabbitMQConfiguration {
 
     @Bean
     public Queue queueRejectedComment(){ return new Queue(REJECTED_COMMENT, false); }
+
+    @Bean
+    public Queue queueMileage(){ return new Queue(MILEAGE, false); }
+
 }

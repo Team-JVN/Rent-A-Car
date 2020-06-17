@@ -26,14 +26,14 @@ public class RentReportDtoMapper implements MapperInterface<RentReport, RentRepo
         entity.setComment(dto.getComment());
         entity.setMadeMileage(dto.getMadeMileage());
         entity.setAdditionalCost(dto.getAdditionalCost());
-        RentInfoDTO rentInfoDTO = dto.getRentInfo();
-        RentInfo rentInfo = new RentInfo();
-        rentInfo.setDateTimeFrom(getLocalDateTime(rentInfoDTO.getDateTimeFrom()));
-        rentInfo.setDateTimeTo(getLocalDateTime(rentInfoDTO.getDateTimeTo()));
-        rentInfo.setAdvertisement(rentInfoDTO.getAdvertisement().getId());
-        rentInfo.setOptedForCDW(rentInfoDTO.getOptedForCDW());
-        rentInfo.setId(rentInfoDTO.getId());
-        entity.setRentInfo(rentInfo);
+//        RentInfoDTO rentInfoDTO = dto.getRentInfo();
+//        RentInfo rentInfo = new RentInfo();
+//        rentInfo.setDateTimeFrom(getLocalDateTime(rentInfoDTO.getDateTimeFrom()));
+//        rentInfo.setDateTimeTo(getLocalDateTime(rentInfoDTO.getDateTimeTo()));
+//        rentInfo.setAdvertisement(rentInfoDTO.getAdvertisement().getId());
+//        rentInfo.setOptedForCDW(rentInfoDTO.getOptedForCDW());
+//        rentInfo.setId(rentInfoDTO.getId());
+//        entity.setRentInfo(rentInfo);
         return entity;
     }
 

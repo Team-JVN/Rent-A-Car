@@ -68,12 +68,12 @@ export class AddRentReportComponent implements OnInit {
 
   create() {
     const rentReport = new RentReport(
-      this.data.rentInfo,
+      // this.data.rentInfo,
       this.createForm.value.mileage,
       this.createForm.value.comment
     );
     console.log(rentReport);
-    this.rentReportService.create(rentReport).subscribe(
+    this.rentReportService.create(rentReport, this.data.rentInfo.id).subscribe(
       (data: RentReport) => {
         this.createForm.reset();
         this.dialogRef.close();

@@ -14,8 +14,8 @@ export class RentReportService {
 
   constructor(private httpClient: HttpClient) {}
 
-  public create(rentReport: RentReport): any {
-    return this.httpClient.post(this.url, rentReport);
+  public create(rentReport: RentReport, rentInfoId: number): any {
+    return this.httpClient.post(this.url + "/" + rentInfoId, rentReport);
   }
 
   public edit(rentReport: RentReport): any {

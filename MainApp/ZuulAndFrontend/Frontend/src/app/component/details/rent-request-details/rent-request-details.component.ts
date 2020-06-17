@@ -20,6 +20,7 @@ import {
 import { Client } from "src/app/model/client";
 import { ReviewFeedbackComponent } from "../../review-feedback/review-feedback.component";
 import { AddRentReportComponent } from "../../add/add-rent-report/add-rent-report.component";
+import { Comment } from "./../../../model/comment";
 
 @Component({
   selector: "app-rent-request-details",
@@ -72,6 +73,8 @@ export class RentRequestDetailsComponent implements OnInit {
       );
     });
     this.loggedInUserEmail = this.authentificationService.getLoggedInUserEmail();
+
+    
     // this.getMessages();
 
     //Delete this
@@ -117,9 +120,16 @@ export class RentRequestDetailsComponent implements OnInit {
 
   checkIfCanCreateComment(rentInfo: RentInfo) {
     const dateTimeTo = new Date(rentInfo.dateTimeTo.substring(0, 10));
+    let comment = new Comment("", new UserInfo(this.loggedInUserEmail));
+    let comm = rentInfo.comments[0] as Comment;
+    if (rentInfo.comments.length < 1) {
+      return false;
+    }
     if (
       this.rentRequest.rentRequestStatus == "PAID" &&
-      dateTimeTo < new Date()
+      dateTimeTo < new Date() &&
+      rentInfo.comments.length > 0 &&
+      comm.status == "APPROVED"
     ) {
       return true;
     }
@@ -130,7 +140,8 @@ export class RentRequestDetailsComponent implements OnInit {
     const dateTimeTo = new Date(rentInfo.dateTimeTo.substring(0, 10));
     if (
       this.rentRequest.rentRequestStatus == "PAID" &&
-      dateTimeTo < new Date()
+      dateTimeTo < new Date() &&
+      rentInfo.rentReport == null
     ) {
       return true;
     }

@@ -16,6 +16,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     List<Comment> findAllByStatus(CommentStatus status);
 
-    List<Comment> findBySenderAndRentInfoId(Long userId, Long rentInfoId);
+    List<Comment> findBySenderIdAndRentInfoId(Long userId, Long rentInfoId);
 
 }

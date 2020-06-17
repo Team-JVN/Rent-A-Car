@@ -128,13 +128,15 @@ public class RentRequestController {
     @PostMapping(value="/{id}/rent-info/{rentInfoId}/feedback")
     public ResponseEntity<FeedbackDTO> leaveFeedback(@PathVariable Long id, @PathVariable Long rentInfoId, @Valid @RequestBody FeedbackDTO feedbackDTO){
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(rentRequestService.leaveFeedback(feedbackDTO, id, rentInfoId, userDTO.getId()),
+        return new ResponseEntity<>(rentRequestService.leaveFeedback(feedbackDTO, id, rentInfoId, userDTO.getId(), userDTO.getName()),
                 HttpStatus.CREATED);
     }
 
     @GetMapping(value="/{id}/rent-info/{rentInfoId}/feedback")
     public ResponseEntity<FeedbackDTO> getFeedback(@PathVariable Long id, @PathVariable Long rentInfoId){
+
         UserDTO userDTO = stringToObject(request.getHeader("user"));
+
         return new ResponseEntity<>(rentRequestService.getFeedback(id, rentInfoId, userDTO.getId()), HttpStatus.OK);
     }
 
@@ -142,7 +144,7 @@ public class RentRequestController {
     public ResponseEntity<MessageDTO> createMessage(@PathVariable Long id, @Valid @RequestBody MessageDTO messageDTO){
         UserDTO userDTO = stringToObject(request.getHeader("user"));
         messageDTO.setSender(userDTO);
-        return new ResponseEntity<>(messageDtoMapper.toDto(rentRequestService.createMessage(messageDtoMapper.toEntity(messageDTO), id, userDTO.getId())),
+        return new ResponseEntity<>(messageDtoMapper.toDto(rentRequestService.createMessage(messageDtoMapper.toEntity(messageDTO), id, userDTO.getId(), userDTO.getEmail())),
                 HttpStatus.CREATED);
     }
 

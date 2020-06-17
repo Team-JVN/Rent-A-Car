@@ -4,5 +4,5 @@ import jvn.Renting.model.RentReport;
 
 public interface RentReportService {
 
-    RentReport create(RentReport toEntity);
+    RentReport create(RentReport toEntity, Long rentInfoId);
 }

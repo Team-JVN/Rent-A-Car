@@ -4,10 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Advertisements.dto.both.PriceListDTO;
 import jvn.Advertisements.dto.message.AdvertisementMessageDTO;
+import jvn.Advertisements.dto.message.RentReportMessageDTO;
+import jvn.Advertisements.dto.message.UpdateCarMileageDTO;
 import jvn.Advertisements.dto.request.AdvertisementEditDTO;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sun.awt.image.ImageDecoder;
 
 @Service
 public class AdvertisementProducer {
@@ -21,6 +24,8 @@ public class AdvertisementProducer {
     private static final String EDIT_PARTIAL_ADVERTISEMENT = "advertisements-for-search-edit-partial-adv";
 
     private static final String EDIT_PRICE_LIST_ADVERTISEMENT = "advertisements-for-search-edit-price-list";
+
+    private static final String UPDATE_CAR_MILEAGE = "update-car-mileage";
 
     private RabbitTemplate rabbitTemplate;
 
@@ -46,6 +51,10 @@ public class AdvertisementProducer {
         rabbitTemplate.convertAndSend(REJECT_ALL_REQUESTS, advId);
     }
 
+    public void sendUpdateCarMileage(Long carId, Integer madeMileage){
+        rabbitTemplate.convertAndSend(UPDATE_CAR_MILEAGE, jsonToString(new UpdateCarMileageDTO(carId, madeMileage)));
+    }
+
     private String jsonToString(AdvertisementMessageDTO advertisementMessageDTO) {
         try {
             return objectMapper.writeValueAsString(advertisementMessageDTO);
@@ -67,6 +76,15 @@ public class AdvertisementProducer {
     private String jsonToString(PriceListDTO priceListDTO) {
         try {
             return objectMapper.writeValueAsString(priceListDTO);
+        } catch (JsonProcessingException e) {
+            //TODO: Add to log and delete return null;
+            return null;
+        }
+    }
+
+    private String jsonToString(UpdateCarMileageDTO updateCarMileageDTO) {
+        try {
+            return objectMapper.writeValueAsString(updateCarMileageDTO);
         } catch (JsonProcessingException e) {
             //TODO: Add to log and delete return null;
             return null;

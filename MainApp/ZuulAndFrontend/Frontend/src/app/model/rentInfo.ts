@@ -1,4 +1,6 @@
 import { AdvertisementFromSearch } from "./advertisementFromSearch";
+import { RentReport } from "./rentReport";
+import { Comment } from "./comment";
 
 export class RentInfo {
   id: number;
@@ -11,6 +13,7 @@ export class RentInfo {
   additionalCost: number;
   paid: boolean;
   comments: Comment[];
+  rentReport: RentReport;
 
   constructor(
     dateTimeFrom: string,
@@ -20,7 +23,8 @@ export class RentInfo {
     comments?: Comment[],
     id?: number,
     additionalCost?: number,
-    paid?: boolean
+    paid?: boolean,
+    rentReport?: RentReport
   ) {
     this.dateTimeFrom = dateTimeFrom;
     this.dateTimeTo = dateTimeTo;
@@ -31,5 +35,6 @@ export class RentInfo {
     this.inBundle = false;
     this.additionalCost = additionalCost;
     this.paid = paid;
+    this.rentReport = rentReport;
   }
 }

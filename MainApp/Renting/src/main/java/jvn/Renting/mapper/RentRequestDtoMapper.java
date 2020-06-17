@@ -28,6 +28,8 @@ public class RentRequestDtoMapper implements MapperInterface<RentRequest, RentRe
 
     private CommentDtoMapper commentDtoMapper;
 
+    private RentInfoDtoMapper rentInfoDtoMapper;
+
     @Override
     public RentRequest toEntity(RentRequestDTO dto) {
         RentRequest entity = new RentRequest();
@@ -55,6 +57,11 @@ public class RentRequestDtoMapper implements MapperInterface<RentRequest, RentRe
             rentInfo.setOptedForCDW(rentInfoDTO.getOptedForCDW());
             rentInfo.setId(rentInfoDTO.getId());
 //            rentInfo.setComments(comments);
+            Set<Comment> comments = new HashSet<Comment>();
+            for(CommentDTO commentDTO: rentInfoDTO.getComments()){
+                comments.add(commentDtoMapper.toEntity(commentDTO));
+            }
+            rentInfo.setComments(comments);
             entityRentInfos.add(rentInfo);
         }
         entity.setRentInfos(new HashSet<>(entityRentInfos));
@@ -64,6 +71,14 @@ public class RentRequestDtoMapper implements MapperInterface<RentRequest, RentRe
     @Override
     public RentRequestDTO toDto(RentRequest entity) {
         RentRequestDTO dto = modelMapper.map(entity, RentRequestDTO.class);
+        Set<RentInfoDTO> rentInfos = new HashSet<RentInfoDTO>();
+
+        for(RentInfo rentInfo: entity.getRentInfos()){
+
+            rentInfos.add(rentInfoDtoMapper.toDto(rentInfo));
+
+        }
+        dto.setRentInfos(rentInfos);
         return dto;
     }
 
@@ -75,8 +90,9 @@ public class RentRequestDtoMapper implements MapperInterface<RentRequest, RentRe
     }
 
     @Autowired
-    public RentRequestDtoMapper(ModelMapper modelMapper, CommentDtoMapper commentDtoMapper) {
+    public RentRequestDtoMapper(ModelMapper modelMapper, CommentDtoMapper commentDtoMapper, RentInfoDtoMapper rentInfoDtoMapper) {
         this.modelMapper = modelMapper;
         this.commentDtoMapper = commentDtoMapper;
+        this.rentInfoDtoMapper = rentInfoDtoMapper;
     }
 }

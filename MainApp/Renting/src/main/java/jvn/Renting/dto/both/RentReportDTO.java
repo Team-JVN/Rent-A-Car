@@ -19,9 +19,6 @@ public class RentReportDTO {
     @NotBlank(message = "Comment is empty.")
     private String comment;
 
-    @NotBlank(message = "Rent info is empty.")
-    private RentInfoDTO rentInfo;
-
     private Double additionalCost;
 
     @Positive(message = "Made mileage is not a positive number.")

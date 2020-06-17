@@ -1,11 +1,16 @@
 package jvn.Renting.serviceImpl;
 
+import jvn.Renting.enumeration.RentRequestStatus;
 import jvn.Renting.exceptionHandler.InvalidRentReportDataException;
+import jvn.Renting.model.RentInfo;
 import jvn.Renting.model.RentReport;
+import jvn.Renting.producer.RentReportProducer;
+import jvn.Renting.repository.RentInfoRepository;
 import jvn.Renting.repository.RentReportRepository;
 import jvn.Renting.service.RentReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,29 +20,51 @@ public class RentReportServiceImpl implements RentReportService {
 
     private RentReportRepository rentReportRepository;
 
+    private RentInfoRepository rentInfoRepository;
+
+    private RentReportProducer rentReportProducer;
+
     @Override
-    public RentReport create(RentReport toEntity) {
-        if (rentReportRepository.findByRentInfoId(toEntity.getRentInfo().getId()) != null) {
+    public RentReport create(RentReport toEntity, Long rentInfoId) {
+
+        if (rentReportRepository.findByRentInfoId(rentInfoId) != null) {
             throw new InvalidRentReportDataException("Rent report for this rent info already exist.", HttpStatus.BAD_REQUEST);
         }
         //TODO:change mileage to the car and additional cost
-        return rentReportRepository.save(toEntity);
+        RentInfo rentInfo = rentInfoRepository.findById(rentInfoId).orElse(null);
+        checkIfCreatingRentReportIsPossible(rentInfo);
+        toEntity.setRentInfo(rentInfo);
+        rentInfo.setRentReport(toEntity);
+
+        //TODO:update addtional cost
+//        toEntity.setAdditionalCost(calculateAdditionalCost(rentReport));
+        RentReport rentReport = rentReportRepository.save(toEntity);
+
+        sendUpdatesCar(rentReport);
+        return rentReport;
     }
 
-//    public void checkIfCreatingRentReportIsPossible(RentInfo rentInfo) {
-//        if (!rentInfo.getRentRequest().getRentRequestStatus().equals(RentRequestStatus.PAID)) {
-//            throw new InvalidAdvertisementDataException("Cannot create rent report if rent request is not paid!", HttpStatus.BAD_REQUEST);
-//        }
-//        LocalDateTime date1 = rentInfo.getDateTimeTo();
-//        LocalDateTime date2 = LocalDateTime.now();
-//
-//        if ((date2).isBefore(date1)) {
-//            throw new InvalidAdvertisementDataException("Cannot create rent report yet! Wait until " + date1.toLocalDate() + "!", HttpStatus.BAD_REQUEST);
-//        }
-//        if (rentInfo.getRentReport() != null) {
-//            throw new InvalidAdvertisementDataException("There is already rent report linked to this rent info!", HttpStatus.BAD_REQUEST);
-//        }
-//    }
+    @Async
+    public void sendUpdatesCar(RentReport rentReport) {
+
+        rentReportProducer.sendMileage(rentReport);
+
+    }
+
+    public void checkIfCreatingRentReportIsPossible(RentInfo rentInfo) {
+        if (!rentInfo.getRentRequest().getRentRequestStatus().equals(RentRequestStatus.PAID)) {
+            throw new InvalidRentReportDataException("Cannot create rent report if rent request is not paid!", HttpStatus.BAD_REQUEST);
+        }
+        LocalDateTime date1 = rentInfo.getDateTimeTo();
+        LocalDateTime date2 = LocalDateTime.now();
+
+        if ((date2).isBefore(date1)) {
+            throw new InvalidRentReportDataException("Cannot create rent report yet! Wait until " + date1.toLocalDate() + "!", HttpStatus.BAD_REQUEST);
+        }
+        if (rentInfo.getRentReport() != null) {
+            throw new InvalidRentReportDataException("There is already rent report linked to this rent info!", HttpStatus.BAD_REQUEST);
+        }
+    }
 //
 //    public void calculateMileageInKm(RentReport rentReport) {
 //        Car car = rentReport.getRentInfo().getAdvertisement().getCar();
@@ -61,7 +88,10 @@ public class RentReportServiceImpl implements RentReportService {
 //    }
 
     @Autowired
-    public RentReportServiceImpl(RentReportRepository rentReportRepository) {
+    public RentReportServiceImpl(RentReportRepository rentReportRepository, RentInfoRepository rentInfoRepository,
+                                 RentReportProducer rentReportProducer) {
         this.rentReportRepository = rentReportRepository;
+        this.rentInfoRepository = rentInfoRepository;
+        this.rentReportProducer = rentReportProducer;
     }
 }

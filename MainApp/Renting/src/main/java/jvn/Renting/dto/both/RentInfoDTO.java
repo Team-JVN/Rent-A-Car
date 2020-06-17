@@ -35,4 +35,6 @@ public class RentInfoDTO {
     private Double additionalCost;
 
     private Boolean paid;
+
+    private RentReportDTO rentReport;
 }
