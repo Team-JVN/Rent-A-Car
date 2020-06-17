@@ -2,6 +2,7 @@ package jvn.Users.controller;
 
 import jvn.Users.dto.both.AgentDTO;
 import jvn.Users.dto.both.ClientDTO;
+import jvn.Users.dto.message.Log;
 import jvn.Users.dto.request.ChangePasswordDTO;
 import jvn.Users.dto.request.RequestTokenDTO;
 import jvn.Users.dto.request.ResetPasswordDTO;
@@ -10,13 +11,14 @@ import jvn.Users.exceptionHandler.InvalidTokenException;
 import jvn.Users.exceptionHandler.InvalidUserDataException;
 import jvn.Users.mapper.AgentDtoMapper;
 import jvn.Users.mapper.ClientDtoMapper;
-import jvn.Users.mapper.UserDtoMapper;
 import jvn.Users.model.UserTokenState;
+import jvn.Users.producer.LogProducer;
 import jvn.Users.security.JwtAuthenticationRequest;
 import jvn.Users.service.AgentService;
 import jvn.Users.service.AuthentificationService;
 import jvn.Users.service.ClientService;
 import jvn.Users.service.UserService;
+import jvn.Users.utils.IPAddressProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
@@ -35,6 +37,9 @@ import java.security.NoSuchAlgorithmException;
 @RequestMapping(value = "/api/auth", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserController {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private UserService userService;
 
     private ClientService clientService;
@@ -47,14 +52,17 @@ public class UserController {
 
     private AuthentificationService authentificationService;
 
-    private UserDtoMapper userDtoMapper;
+    private LogProducer logProducer;
+
+    private IPAddressProvider ipAddressProvider;
 
     @PostMapping(value = "/login")
     public ResponseEntity<UserTokenState> login(@RequestBody JwtAuthenticationRequest authenticationRequest) {
         try {
             UserTokenState userTokenState = authentificationService.login(authenticationRequest);
             if (userTokenState == null) {
-                throw new UsernameNotFoundException(String.format("Invalid email or password. Please try again."));
+                logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "LGN", String.format("Invalid email or password provided from %s", ipAddressProvider.get())));
+                throw new UsernameNotFoundException("Invalid email or password. Please try again.");
             }
             return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(userTokenState);
         } catch (AuthenticationException e) {
@@ -62,12 +70,14 @@ public class UserController {
                 return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
             }
             if (e.getMessage().equals("Blocked")) {
-                throw new BlockedUserException(
-                        "You tried to log in too many times. Your account wil be blocked for the next 24 hours.",
+                logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "LGN", String.format("Because of too many attempts to login, user from %s is blocked.", ipAddressProvider.get())));
+                throw new BlockedUserException("You tried to log in too many times. Your account wil be blocked for the next 24 hours.",
                         HttpStatus.BAD_REQUEST);
             }
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "LGN", String.format("Invalid email or password provided from %s", ipAddressProvider.get())));
             throw new UsernameNotFoundException("Invalid email or password. Please try again.");
         } catch (NullPointerException e) {
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "LGN", String.format("Invalid email or password provided from %s", ipAddressProvider.get())));
             throw new UsernameNotFoundException("Invalid email or password. Please try again.");
         }
     }
@@ -77,8 +87,10 @@ public class UserController {
         try {
             authentificationService.changePassword(changePasswordDTO);
         } catch (NullPointerException e) {
-            throw new InvalidUserDataException("Invalid email or password.", HttpStatus.BAD_REQUEST);
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CPW", String.format("Invalid email or password provided from %s", ipAddressProvider.get())));
+            throw new InvalidUserDataException("Invalid email or password. Please try again.", HttpStatus.BAD_REQUEST);
         } catch (NoSuchAlgorithmException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CPW", "External password check failed"));
             throw new InvalidUserDataException("Password cannot be checked. Please try again.", HttpStatus.BAD_REQUEST);
         }
         return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(null);
@@ -89,13 +101,13 @@ public class UserController {
         try {
             authentificationService.checkPassword(clientDTO.getPassword());
         } catch (NoSuchAlgorithmException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "REG", "External password check failed"));
             throw new InvalidUserDataException("Password cannot be check. Please try again.", HttpStatus.BAD_REQUEST);
         }
         try {
-            return new ResponseEntity<>(
-                    clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO))),
-                    HttpStatus.CREATED);
+            return new ResponseEntity<>(clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO))), HttpStatus.CREATED);
         } catch (NoSuchAlgorithmException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "REG", "Hash algorithm threw exception"));
             throw new InvalidTokenException("Activation token cannot be generated. Please try again.",
                     HttpStatus.BAD_REQUEST);
         }
@@ -106,6 +118,7 @@ public class UserController {
         try {
             authentificationService.checkPassword(agentDTO.getPassword());
         } catch (NoSuchAlgorithmException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CAG", "External password check failed"));
             throw new InvalidUserDataException("Password cannot be check. Please try again.", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(agentDtoMapper.toDto(agentService.create(agentDtoMapper.toEntity(agentDTO))),
@@ -117,6 +130,7 @@ public class UserController {
         try {
             userService.generateResetToken(requestTokenDTO.getEmail());
         } catch (NoSuchAlgorithmException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "RST", "Hash algorithm threw exception"));
             throw new InvalidTokenException("Reset token cannot be generated. Please try again.",
                     HttpStatus.BAD_REQUEST);
         }
@@ -130,8 +144,10 @@ public class UserController {
         try {
             authentificationService.resetPassword(t, resetPasswordDTO);
         } catch (NullPointerException e) {
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "RPW", String.format("Invalid email or password provided from %s", ipAddressProvider.get())));
             throw new InvalidUserDataException("Invalid email or password.", HttpStatus.BAD_REQUEST);
         } catch (NoSuchAlgorithmException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "RPW", "External password check failed"));
             throw new InvalidUserDataException("Reset token or new password cannot be checked. Please try again.",
                     HttpStatus.BAD_REQUEST);
         }
@@ -145,15 +161,16 @@ public class UserController {
 
     @Autowired
     public UserController(UserService userService, ClientService clientService, ClientDtoMapper clientDtoMapper,
-                          AuthentificationService authentificationService, UserDtoMapper userDtoMapper,
-                          AgentDtoMapper agentDtoMapper, AgentService agentService) {
+                          AuthentificationService authentificationService, AgentDtoMapper agentDtoMapper,
+                          AgentService agentService, LogProducer logProducer, IPAddressProvider ipAddressProvider) {
 
         this.userService = userService;
         this.clientService = clientService;
         this.clientDtoMapper = clientDtoMapper;
         this.authentificationService = authentificationService;
-        this.userDtoMapper = userDtoMapper;
         this.agentDtoMapper = agentDtoMapper;
         this.agentService = agentService;
+        this.logProducer = logProducer;
+        this.ipAddressProvider = ipAddressProvider;
     }
 }

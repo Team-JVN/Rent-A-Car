@@ -1,0 +1,23 @@
+APP|Aplication startup/shutdown
+LGN|Login
+REG|Client registration
+CPW|Change password
+RPW|Reset password
+ACT|Activate account
+REF|Refresh token
+ATZ|Autorization exception
+FGN|Feign client exception
+OMP|Object mapper exception
+RST|Reset token exception
+EPM|Edit permissions
+CCL|Create client by agent or another client
+CAG|Create agent by administrator
+CAD|Create administrator by another administrator
+DCL|Delete client by agent or administrator
+DAG|Delete agent by administrator
+DAD|Delete administrator by another administrator
+APR|Approve client's request to register
+RJT|Reject client's request to register
+BLC|Block/unblock client by administrator
+CRR|Disable/enable client to create rent requests by administrator
+CCM|Disable/enable client to post comments by administrator
