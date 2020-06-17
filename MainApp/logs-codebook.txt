@@ -24,3 +24,24 @@ RJT|Reject client's request to register
 BLC|Block/unblock client by administrator
 CRR|Disable/enable client to create rent requests by administrator
 CCM|Disable/enable client to post comments by administrator
+CCA|Create car
+ECA|Edit car
+DCA|Delete car
+CBS|Create body style
+EBS|Edit body style
+DBS|Delete body style
+CFT|Create fuel type
+EFT|Edit fuel type
+DFT|Delete fuel type
+CGT|Create gearbox type
+EGT|Edit gearbox type
+DGT|Delete gearbox type
+CMK|Create make
+EMK|Edit make
+DMK|Delete make
+CML|Create model
+EML|Edit model
+DML|Delete model
+PEX|Picture exception
+PDB|Picture in database
+PSV|Picture on server

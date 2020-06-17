@@ -1,4 +1,6 @@
 package jvn.Cars.endpoint;
+
+import jvn.Cars.producer.LogProducer;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import jvn.Cars.client.UserClient;
@@ -32,6 +34,9 @@ import java.util.Set;
 @Endpoint
 public class CarEndpoint {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     @Value("${UPLOADED_PICTURES_PATH:uploadedPictures/}")
     private String UPLOADED_PICTURES_PATH;
 
@@ -50,6 +55,8 @@ public class CarEndpoint {
     @Autowired
     private PictureService pictureService;
 
+    private LogProducer logProducer;
+
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "createOrEditCarDetailsRequest")
     @ResponsePayload
     public CreateOrEditCarDetailsResponse createOrEdit(@RequestPayload CreateOrEditCarDetailsRequest request) {
@@ -62,9 +69,9 @@ public class CarEndpoint {
 
         CarDetails carDetailsForResponse;
         if (car.getId() != null) {
-            carDetailsForResponse = carDetailsMapper.toDto(carService.editAll(car.getId(),car, getFiles(request.getPictureInfo()), dto.getId()));
+            carDetailsForResponse = carDetailsMapper.toDto(carService.editAll(car.getId(), car, getFiles(request.getPictureInfo()), dto.getId()));
         } else {
-            carDetailsForResponse = carDetailsMapper.toDto(carService.create(car, getFiles(request.getPictureInfo()),dto.getId()));
+            carDetailsForResponse = carDetailsMapper.toDto(carService.create(car, getFiles(request.getPictureInfo()), dto.getId()));
         }
         CreateOrEditCarDetailsResponse response = new CreateOrEditCarDetailsResponse();
         response.setCreateCarDetails(carDetailsForResponse);
@@ -96,10 +103,10 @@ public class CarEndpoint {
         return response;
     }
 
-    private List<MultipartFile> getFiles(List<PictureInfo> pictureInfos){
+    private List<MultipartFile> getFiles(List<PictureInfo> pictureInfos) {
         List<MultipartFile> multipartFiles = new ArrayList<>();
-        for (PictureInfo pictureInfo: pictureInfos){
-            BASE64DecodedMultipartFile  base64DecodedMultipartFile = new BASE64DecodedMultipartFile(pictureInfo.getMultiPartFile(),pictureInfo.getFileName());
+        for (PictureInfo pictureInfo : pictureInfos) {
+            BASE64DecodedMultipartFile base64DecodedMultipartFile = new BASE64DecodedMultipartFile(pictureInfo.getMultiPartFile(), pictureInfo.getFileName());
             multipartFiles.add(base64DecodedMultipartFile);
         }
         return multipartFiles;
@@ -114,7 +121,7 @@ public class CarEndpoint {
         }
 
         CarEditDTO carEditDTO = editPartialCarDetailsmapper.toEntity(request.getEditPartialCarDetails());
-        Car car = carService.editPartial(carEditDTO.getId(),carEditDTO, getFiles(request.getPictureInfo()), dto.getId());
+        Car car = carService.editPartial(carEditDTO.getId(), carEditDTO, getFiles(request.getPictureInfo()), dto.getId());
 
         EditPartialCarDetailsResponse response = new EditPartialCarDetailsResponse();
         response.setEditPartialCarDetails(editPartialCarDetailsAndCarMapper.toDto(car));
@@ -130,13 +137,13 @@ public class CarEndpoint {
             return null;
         }
 
-        List<Car> cars= carService.getAll(dto.getId());
-        List<CarWithPictures> carWithPictures =new ArrayList<>();
-        for (Car car: cars) {
+        List<Car> cars = carService.getAll(dto.getId());
+        List<CarWithPictures> carWithPictures = new ArrayList<>();
+        for (Car car : cars) {
             CarWithPictures carWithPicture = new CarWithPictures();
             carWithPicture.setCreateCarDetails(carDetailsMapper.toDto(car));
             List<PictureInfo> pictureInfos = getAllPictures(car.getPictures());
-            if(!pictureInfos.isEmpty()){
+            if (!pictureInfos.isEmpty()) {
                 carWithPicture.getPictureInfo().addAll(pictureInfos);
             }
             carWithPictures.add(carWithPicture);
@@ -147,13 +154,13 @@ public class CarEndpoint {
         return response;
     }
 
-    private List<PictureInfo> getAllPictures(Set<Picture> pictures){
-        List<PictureInfo> pictureInfos  =new ArrayList<>();
-        for (Picture picture:pictures){
+    private List<PictureInfo> getAllPictures(Set<Picture> pictures) {
+        List<PictureInfo> pictureInfos = new ArrayList<>();
+        for (Picture picture : pictures) {
             PictureInfo pictureInfo = new PictureInfo();
-            String name =picture.getData().split("_")[1];
+            String name = picture.getData().split("_")[1];
             pictureInfo.setFileName(name);
-            pictureInfo.setMultiPartFile(loadImage(picture.getData(),UPLOADED_PICTURES_PATH));
+            pictureInfo.setMultiPartFile(loadImage(picture.getData(), UPLOADED_PICTURES_PATH));
             pictureInfos.add(pictureInfo);
         }
         return pictureInfos;
@@ -170,13 +177,16 @@ public class CarEndpoint {
         }
         return null;
     }
+
     @Autowired
     public CarEndpoint(CarService carService, CarDetailsMapper carDetailsMapper, UserClient userClient,
-                       EditPartialCarDetailsMapper editPartialCarDetailsmapper,EditPartialCarDetailsAndCarMapper editPartialCarDetailsAndCarMapper) {
+                       EditPartialCarDetailsMapper editPartialCarDetailsmapper,
+                       EditPartialCarDetailsAndCarMapper editPartialCarDetailsAndCarMapper, LogProducer logProducer) {
         this.carService = carService;
         this.carDetailsMapper = carDetailsMapper;
         this.userClient = userClient;
         this.editPartialCarDetailsmapper = editPartialCarDetailsmapper;
         this.editPartialCarDetailsmapper = editPartialCarDetailsmapper;
+        this.logProducer = logProducer;
     }
 }

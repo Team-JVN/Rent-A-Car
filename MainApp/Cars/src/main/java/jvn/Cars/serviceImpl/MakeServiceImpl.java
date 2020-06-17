@@ -1,9 +1,11 @@
 package jvn.Cars.serviceImpl;
 
 import jvn.Cars.dto.both.MakeDTO;
+import jvn.Cars.dto.message.Log;
 import jvn.Cars.exceptionHandler.InvalidMakeDataException;
 import jvn.Cars.model.Make;
 import jvn.Cars.model.Model;
+import jvn.Cars.producer.LogProducer;
 import jvn.Cars.repository.MakeRepository;
 import jvn.Cars.service.MakeService;
 import jvn.Cars.service.ModelService;
@@ -17,9 +19,14 @@ import java.util.Set;
 @Service
 public class MakeServiceImpl implements MakeService {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private MakeRepository makeRepository;
 
     private ModelService modelService;
+
+    private LogProducer logProducer;
 
     @Override
     public Make create(Make make) {
@@ -65,6 +72,7 @@ public class MakeServiceImpl implements MakeService {
         make.setModels(null);
         for (Model model : models) {
             modelService.delete(model.getId(), make.getId());
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "DMK", String.format("Successfully deleted model %s of make %s", model.getId(), make.getId())));
         }
         makeRepository.deleteById(id);
     }
@@ -74,12 +82,13 @@ public class MakeServiceImpl implements MakeService {
         if (make.getCars().isEmpty()) {
             return make;
         }
-        throw new InvalidMakeDataException("There's at least one car with this make so you can not edit it.", HttpStatus.BAD_REQUEST);
+        throw new InvalidMakeDataException("There's at least one car of this make, therefore you cannot edit it.", HttpStatus.BAD_REQUEST);
     }
 
     @Autowired
-    public MakeServiceImpl(MakeRepository makeRepository, ModelService modelService) {
+    public MakeServiceImpl(MakeRepository makeRepository, ModelService modelService, LogProducer logProducer) {
         this.makeRepository = makeRepository;
         this.modelService = modelService;
+        this.logProducer = logProducer;
     }
 }
