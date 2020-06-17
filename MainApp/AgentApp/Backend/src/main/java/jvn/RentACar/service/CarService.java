@@ -16,6 +16,8 @@ public interface CarService {
 
     Car get(Long id);
 
+    Car getByMainAppId(Long id);
+
     Resource get(String fileName);
 
     List<Car> get();

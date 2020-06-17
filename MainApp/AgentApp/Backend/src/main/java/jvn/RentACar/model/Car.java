@@ -64,4 +64,5 @@ public class Car {
 
     @Column
     private Integer commentsCount;
+
 }

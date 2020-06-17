@@ -16,4 +16,6 @@ public interface PriceListService {
 
     void delete(Long id);
 
+    PriceList getByMainAppId(Long mainAppId);
+
 }

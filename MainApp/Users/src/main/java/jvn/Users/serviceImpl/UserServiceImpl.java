@@ -149,7 +149,13 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         if (user == null) {
             return null;
         }
-        return new UserInfoDTO(user.getId(), user.getEmail());
+        if (user instanceof Client) {
+            Client client = (Client) user;
+            return new UserInfoDTO(user.getId(), user.getName(), user.getEmail(), user.getRole().getName(), client.getCanCreateRentRequests(), client.getCanCreateComments());
+        } else {
+            return new UserInfoDTO(user.getId(), user.getName(), user.getEmail(), user.getRole().getName(), null, null);
+        }
+
     }
 
     private String getClientIP() {
