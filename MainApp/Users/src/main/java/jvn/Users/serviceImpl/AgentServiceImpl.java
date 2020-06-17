@@ -111,6 +111,8 @@ public class AgentServiceImpl implements AgentService {
         dbAgent.setTaxIdNumber(agent.getTaxIdNumber());
         dbAgent = agentRepository.save(dbAgent);
         sendMessageForSearch(new OwnerMessageDTO(id, dbAgent.getName(), dbAgent.getEmail()));
+
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EAG", String.format("User %s successfully edited profile", id)));
         return dbAgent;
     }
 

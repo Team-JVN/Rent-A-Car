@@ -52,7 +52,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(user, UserDTO.class);
         } catch (JsonProcessingException e) {
-            //TODO: Add to log and delete return null;
             return null;
         }
     }

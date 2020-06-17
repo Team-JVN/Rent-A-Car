@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Advertisements.dto.both.PriceListDTO;
 import jvn.Advertisements.dto.message.AdvertisementMessageDTO;
+import jvn.Advertisements.dto.message.Log;
 import jvn.Advertisements.dto.request.AdvertisementEditDTO;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AdvertisementProducer {
+
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
 
     private static final String ADVERTISEMENT_FOR_SEARCH = "advertisements-for-search";
 
@@ -25,6 +29,8 @@ public class AdvertisementProducer {
     private RabbitTemplate rabbitTemplate;
 
     private ObjectMapper objectMapper;
+
+    private LogProducer logProducer;
 
     public void sendMessageForSearch(AdvertisementMessageDTO advertisementMessageDTO) {
         rabbitTemplate.convertAndSend(ADVERTISEMENT_FOR_SEARCH, jsonToString(advertisementMessageDTO));
@@ -50,7 +56,7 @@ public class AdvertisementProducer {
         try {
             return objectMapper.writeValueAsString(advertisementMessageDTO);
         } catch (JsonProcessingException e) {
-            //TODO: Add to log and delete return null;
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping %s instance to string failed", AdvertisementMessageDTO.class.getSimpleName())));
             return null;
         }
     }
@@ -59,7 +65,7 @@ public class AdvertisementProducer {
         try {
             return objectMapper.writeValueAsString(advertisementEditDTO);
         } catch (JsonProcessingException e) {
-            //TODO: Add to log and delete return null;
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping %s instance to string failed", AdvertisementEditDTO.class.getSimpleName())));
             return null;
         }
     }
@@ -68,14 +74,15 @@ public class AdvertisementProducer {
         try {
             return objectMapper.writeValueAsString(priceListDTO);
         } catch (JsonProcessingException e) {
-            //TODO: Add to log and delete return null;
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping %s instance to string failed", PriceListDTO.class.getSimpleName())));
             return null;
         }
     }
 
     @Autowired
-    public AdvertisementProducer(RabbitTemplate rabbitTemplate, ObjectMapper objectMapper) {
+    public AdvertisementProducer(RabbitTemplate rabbitTemplate, ObjectMapper objectMapper, LogProducer logProducer) {
         this.rabbitTemplate = rabbitTemplate;
         this.objectMapper = objectMapper;
+        this.logProducer = logProducer;
     }
 }

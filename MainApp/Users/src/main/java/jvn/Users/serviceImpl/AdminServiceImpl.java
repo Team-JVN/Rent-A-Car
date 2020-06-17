@@ -95,6 +95,8 @@ public class AdminServiceImpl implements AdminService {
     public Admin edit(Long id, Admin admin) {
         Admin dbAdmin = get(id);
         dbAdmin.setName(admin.getName());
+
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EAD", String.format("User %s successfully edited profile", id)));
         return adminRepository.save(dbAdmin);
     }
 

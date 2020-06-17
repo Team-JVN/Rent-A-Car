@@ -13,6 +13,9 @@ EPM|Edit permissions
 CCL|Create client by agent or another client
 CAG|Create agent by administrator
 CAD|Create administrator by another administrator
+ECL|Edit client profile
+EAG|Edit agent profile
+EAD|Edit administrator profile
 DCL|Delete client by agent or administrator
 DAG|Delete agent by administrator
 DAD|Delete administrator by another administrator

@@ -144,6 +144,8 @@ public class ClientServiceImpl implements ClientService {
         dbClient.setAddress(client.getAddress());
         dbClient = clientRepository.save(dbClient);
         sendMessageForSearch(new OwnerMessageDTO(id, dbClient.getName(), dbClient.getEmail()));
+
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "ECL", String.format("User %s successfully edited profile", id)));
         return dbClient;
     }
 
