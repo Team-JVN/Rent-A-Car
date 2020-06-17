@@ -59,7 +59,7 @@ public class PictureServiceImpl implements PictureService {
             String fileName = StringUtils.cleanPath(picture.getOriginalFilename());
             if (!uniquePictures.contains(fileName)) {
                 uniquePictures.add(fileName);
-                pictureRepository.save(new Picture(savePictureOnDisk(picture, path, car.getId()), car));
+                pictureRepository.saveAndFlush(new Picture(savePictureOnDisk(picture, path, car.getId()), car));
             }
         }
     }
@@ -71,7 +71,7 @@ public class PictureServiceImpl implements PictureService {
             String fileName = StringUtils.cleanPath(picture.getFileName());
             if (!uniquePictures.contains(fileName)) {
                 uniquePictures.add(fileName);
-                pictureRepository.save(new Picture(savePictureOnDiskSynchronize(picture.getMultiPartFile(), path, car.getId(), picture.getFileName()), car));
+                pictureRepository.saveAndFlush(new Picture(savePictureOnDiskSynchronize(picture.getMultiPartFile(), path, car.getId(), picture.getFileName()), car));
             }
         }
     }
@@ -106,7 +106,7 @@ public class PictureServiceImpl implements PictureService {
                     if (!uniquePictures.contains(fileName)) {
                         uniquePictures.add(fileName);
                         pictureData = new Picture(savePictureOnDisk(picture, path, carId), car);
-                        pictureRepository.save(pictureData);
+                        pictureRepository.saveAndFlush(pictureData);
                     }
                 }
             } else {

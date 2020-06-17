@@ -23,4 +23,5 @@ public interface AdvertisementService {
     List<Advertisement> getAll(String status);
 
     List<Advertisement> searchAdvertisements(SearchParamsDTO searchParamsDTO);
+
 }

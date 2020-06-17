@@ -28,7 +28,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
 
                 .authorizeRequests()
-                .antMatchers("/ws**", "/ws/**", "/pricelist/ws**", "/pricelist/ws/**", "/pricelist/ws").permitAll()
+                .antMatchers("/ws**", "/ws/**").permitAll()
                 .antMatchers("/api/price-list", "/api/price-list/{id}")
                 .hasAuthority("MANAGE_PRICE_LISTS")
 
@@ -50,9 +50,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/ws/**");
-        web.ignoring().antMatchers("/pricelist/ws/**");
-        web.ignoring().antMatchers("/pricelist/ws**");
-        web.ignoring().antMatchers("/pricelist/ws");
         web.ignoring().antMatchers("/api/advertisement/car/{carId}/edit-type");
         web.ignoring().antMatchers("/api/advertisement/car/{carId}/check-for-delete");
         web.ignoring().antMatchers("/api/advertisement/car/{carId}/check-for-partial-edit");

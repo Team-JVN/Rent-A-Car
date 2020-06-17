@@ -47,8 +47,7 @@ public class AdvertisementController {
     public ResponseEntity<AdvertisementDTO> create(@Valid @RequestBody CreateAdvertisementDTO createAdvertisementDTO) {
         try {
             UserDTO userDTO = stringToObject(request.getHeader("user"));
-            String jwtToken = request.getHeader("Auth");
-            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.create(createAdvertisementDtoMapper.toEntity(createAdvertisementDTO), userDTO, jwtToken, request.getHeader("user"))),
+            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.create(createAdvertisementDtoMapper.toEntity(createAdvertisementDTO), userDTO)),
                     HttpStatus.CREATED);
         } catch (ParseException e) {
             throw new InvalidAdvertisementDataException("Please choose valid date.", HttpStatus.BAD_REQUEST);
@@ -65,7 +64,7 @@ public class AdvertisementController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") @Positive(message = "Id must be positive.") Long id) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        advertisementService.delete(id, userDTO.getId(), request.getHeader("Auth"), request.getHeader("user"));
+        advertisementService.delete(id, userDTO.getId());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -74,7 +73,7 @@ public class AdvertisementController {
                                                  @Valid @RequestBody AdvertisementEditAllInfoDTO advertisementDTO) {
         try {
             UserDTO userDTO = stringToObject(request.getHeader("user"));
-            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.edit(id, advertisementEditAllInfoDtoMapper.toEntity(advertisementDTO), userDTO.getId(), request.getHeader("Auth"), request.getHeader("user"), userDTO)), HttpStatus.OK);
+            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.edit(id, advertisementEditAllInfoDtoMapper.toEntity(advertisementDTO), userDTO)), HttpStatus.OK);
         } catch (ParseException e) {
             throw new InvalidAdvertisementDataException("Please choose valid date.", HttpStatus.BAD_REQUEST);
         }
@@ -94,7 +93,7 @@ public class AdvertisementController {
 
     @GetMapping(value = "/car/{carId}/check-for-partial-edit", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Boolean> canEditCarPartially(@PathVariable("carId") @Positive(message = "Id must be positive.") Long carId) {
-        return new ResponseEntity<>(advertisementService.canEditCarPartially(carId, request.getHeader("Auth"), request.getHeader("user")), HttpStatus.OK);
+        return new ResponseEntity<>(advertisementService.canEditCarPartially(carId), HttpStatus.OK);
     }
 
     @GetMapping(value = "/car/{carId}/check-for-delete", produces = MediaType.APPLICATION_JSON_VALUE)

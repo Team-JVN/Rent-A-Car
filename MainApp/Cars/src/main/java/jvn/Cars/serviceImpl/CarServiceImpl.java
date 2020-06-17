@@ -137,7 +137,7 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public boolean checkIfCanDeleteAndDelete(Long id, Long loggedInUser) {
-        Car dbCar =  get(id, LogicalStatus.EXISTING);
+        Car dbCar = get(id, LogicalStatus.EXISTING);
         checkOwner(dbCar, loggedInUser);
         if (advertisementClient.canDeleteCar(id)) {
             dbCar.setLogicalStatus(LogicalStatus.DELETED);
@@ -203,12 +203,13 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public String getCarEditType(Long id,Long loggedInUser){
+    public String getCarEditType(Long id, Long loggedInUser) {
         if (advertisementClient.getCarEditType(id).equals(EditType.ALL)) {
             return "ALL";
         }
         return "PARTIAL";
     }
+
     @Async
     public void editCar(CarEditDTO carEditDTO) {
         carProducer.sendMessageForSearch(carEditDTO);
