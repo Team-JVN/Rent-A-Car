@@ -29,6 +29,8 @@ public class RentReportConsumer {
         if (rentReportMessageDTO.getAdvertisementId() != null) {
             Advertisement advertisement = advertisementRepository.findById(rentReportMessageDTO.getAdvertisementId()).orElse(null);
             if (advertisement != null) {
+                System.out.println("sending car mileage rent report consumer");
+
                 sendCarUpdates(advertisement.getCar(), rentReportMessageDTO.getMadeMileage());
             }
         }

@@ -14,6 +14,7 @@ import {
 } from "@angular/forms";
 import { runInThisContext } from "vm";
 import { AuthentificationService } from "src/app/service/authentification.service";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "app-review-feedback",
@@ -34,6 +35,7 @@ export class ReviewFeedbackComponent implements OnInit {
     private toastr: ToastrService,
     private rentRequestService: RentRequestService,
     private authentificationService: AuthentificationService,
+    public router: Router,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {}
 
@@ -84,7 +86,8 @@ export class ReviewFeedbackComponent implements OnInit {
       .subscribe(
         (data: Comment) => {
           this.toastr.success("Success!", "Create comment");
-          this.dialogRef.close();
+          this.dialogRef.close(true);
+          this.router.navigate(["/rent-request/" + this.data.rentInfo.id]);
         },
         (httpErrorResponse: HttpErrorResponse) => {
           this.toastr.error(httpErrorResponse.error.message, "Create comment");

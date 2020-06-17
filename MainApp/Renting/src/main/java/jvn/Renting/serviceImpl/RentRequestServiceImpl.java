@@ -216,7 +216,7 @@ public class RentRequestServiceImpl implements RentRequestService {
         rentRequestRepository.save(rentRequest);
 
 
-        commentRepository.save(comment);
+//        commentRepository.save(comment);
         return comment;
     }
 
@@ -425,7 +425,9 @@ public class RentRequestServiceImpl implements RentRequestService {
                 commentsDTO.add(commentDtoMapper.toDto(comment));
             }
             rentInfoDTO.setComments(commentsDTO);
-            rentInfoDTO.setRentReport(rentReportDtoMapper.toDto(rentInfo.getRentReport()));
+            if(rentInfo.getRentReport() != null ){
+                rentInfoDTO.setRentReport(rentReportDtoMapper.toDto(rentInfo.getRentReport()));
+            }
             rentInfoDTOS.add(rentInfoDTO);
             if (!rentInfoDTO.getAdvertisement().getOwner().getId().equals(loggedInUserId) && !rentRequest.getClient().equals(loggedInUserId)) {
                 throw new InvalidRentRequestDataException("You are not allowed to see rent requests of this advertisement.",

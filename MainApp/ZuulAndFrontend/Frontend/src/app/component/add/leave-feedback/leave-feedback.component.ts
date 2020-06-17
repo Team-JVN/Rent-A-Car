@@ -57,7 +57,7 @@ export class LeaveFeedbackComponent implements OnInit {
       .subscribe(
         (data: Feedback) => {
           this.toastr.success("Success!", "Leave feedback");
-          this.dialogRef.close();
+          this.dialogRef.close(true);
         },
         (httpErrorResponse: HttpErrorResponse) => {
           this.toastr.error(httpErrorResponse.error.message, "Leave feedback");

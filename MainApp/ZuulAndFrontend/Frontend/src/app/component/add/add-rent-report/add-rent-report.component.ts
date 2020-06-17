@@ -76,7 +76,7 @@ export class AddRentReportComponent implements OnInit {
     this.rentReportService.create(rentReport, this.data.rentInfo.id).subscribe(
       (data: RentReport) => {
         this.createForm.reset();
-        this.dialogRef.close();
+        this.dialogRef.close(true);
         this.toastr.success("Success!", "Create Rent Report");
         this.rentReportService.createSuccessEmitter.next(data);
       },

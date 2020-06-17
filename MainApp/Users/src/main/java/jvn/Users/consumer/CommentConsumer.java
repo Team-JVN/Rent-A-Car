@@ -32,7 +32,9 @@ public class CommentConsumer {
             if(client != null){
                 Integer count = client.getRejectedCommentsCounter() + 1;
                 client.setRejectedCommentsCounter(count);
+                System.out.println("UPDATING REJECTED COMMENTS COUNTER>>>");
                 clientRepository.save(client);
+                System.out.println("UPDATED REJECTED COMMENTS COUNTER<<<<");
             }
 
         }

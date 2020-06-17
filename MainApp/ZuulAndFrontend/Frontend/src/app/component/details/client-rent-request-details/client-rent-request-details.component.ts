@@ -130,7 +130,8 @@ export class ClientRentRequestDetailsComponent implements OnInit {
     if (
       rentRequest.rentRequestStatus == "PAID" &&
       dateTimeTo < new Date() &&
-      rentInfo.comments.length < 1
+      rentInfo.comments.length < 1 &&
+      this.availibleLeavingFeedback != false
     ) {
       return true;
     }
@@ -138,10 +139,15 @@ export class ClientRentRequestDetailsComponent implements OnInit {
   }
 
   leaveFeedback(rentInfo: RentInfo) {
-    this.dialog.open(LeaveFeedbackComponent, {
+    this.availibleLeavingFeedback = true;
+    let dialogRef = this.dialog.open(LeaveFeedbackComponent, {
       data: { rentInfo: rentInfo, rentRequest: this.rentRequest },
     });
-    console.log("LEAVE FEEDBACK");
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result == true) {
+        this.availibleLeavingFeedback = false;
+      }
+    });
   }
 
   pay(rentInfo: RentInfo, rentRequest: RentRequest) {

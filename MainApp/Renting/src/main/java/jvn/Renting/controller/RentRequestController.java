@@ -84,6 +84,7 @@ public class RentRequestController {
 
     @GetMapping("/{status}/mine")
     public ResponseEntity<List<RentRequestDTO>> getMine(@PathVariable(value = "status") @Pattern(regexp = "(?i)(all|pending|reserved|paid|canceled)$", message = "Status is not valid.") String status) {
+        System.out.println("get MINE");
         UserDTO userDTO = stringToObject(request.getHeader("user"));
         return new ResponseEntity<>(rentRequestService.getMine(status, userDTO.getId(), request.getHeader("Auth"), request.getHeader("user")), HttpStatus.OK);
     }

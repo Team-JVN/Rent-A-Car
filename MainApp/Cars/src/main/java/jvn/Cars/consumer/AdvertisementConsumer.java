@@ -20,12 +20,15 @@ public class AdvertisementConsumer {
 
     @RabbitListener(queues = RabbitMQConfiguration.UPDATE_CAR_MILEAGE)
     public void listenUpdateCarMileage(String message) {
+        System.out.println("listen update car mileage");
         UpdateCarMileageDTO updateCarMileageDTO = stringToObject(message);
         Car car = carRepository.findById(updateCarMileageDTO.getCarId()).orElse(null);
         if (car != null) {
             int mileage = car.getMileageInKm() + updateCarMileageDTO.getMadeMileage();
             car.setMileageInKm(mileage);
+            System.out.println("UPDATING>>>");
             carRepository.save(car);
+            System.out.println("UPDATED>>>>");
         }
     }
 
