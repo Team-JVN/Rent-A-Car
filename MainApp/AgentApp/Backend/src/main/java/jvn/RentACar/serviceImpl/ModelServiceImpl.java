@@ -23,7 +23,7 @@ public class ModelServiceImpl implements ModelService {
             throw new InvalidModelDataException("This Model already exist.", HttpStatus.BAD_REQUEST);
         }
         model.setMake(make);
-        return modelRepository.save(model);
+        return modelRepository.saveAndFlush(model);
     }
 
     @Override
@@ -33,6 +33,11 @@ public class ModelServiceImpl implements ModelService {
             throw new InvalidModelDataException("This Model doesn't exist.", HttpStatus.NOT_FOUND);
         }
         return model;
+    }
+
+    @Override
+    public Model get(String name, Long makeId) {
+        return modelRepository.findByNameAndMakeId(name,makeId);
     }
 
     @Override

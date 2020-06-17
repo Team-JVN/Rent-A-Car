@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:sch="http://www.soap.dto/pricelist" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.pricelist.dto/soap" targetNamespace="http://www.pricelist.dto/soap">
+    <wsdl:types>
+        <xs:schema xmlns:tns="http://www.soap.dto/pricelist" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.soap.dto/pricelist">
+            <xs:element name="getAllPriceListDetailsRequest">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="email" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllPriceListDetailsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" name="priceListDetails" type="tns:priceListDetails"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:complexType name="priceListDetails">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="id">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:long">
+                                <xs:minInclusive value="1"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="pricePerDay">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:double">
+                                <xs:minInclusive value="0"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="pricePerKm">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:double">
+                                <xs:minInclusive value="0"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="pricePerCDW">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:double">
+                                <xs:minInclusive value="0"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="status">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                                <xs:enumeration value="EXISTING"/>
+                                <xs:enumeration value="DELETED"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="getAllPriceListDetailsRequest">
+        <wsdl:part element="sch:getAllPriceListDetailsRequest" name="getAllPriceListDetailsRequest">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllPriceListDetailsResponse">
+        <wsdl:part element="sch:getAllPriceListDetailsResponse" name="getAllPriceListDetailsResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="PriceListsPort">
+        <wsdl:operation name="getAllPriceListDetails">
+            <wsdl:input message="tns:getAllPriceListDetailsRequest" name="getAllPriceListDetailsRequest">
+            </wsdl:input>
+            <wsdl:output message="tns:getAllPriceListDetailsResponse" name="getAllPriceListDetailsResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="PriceListsPortSoap11" type="tns:PriceListsPort">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="getAllPriceListDetails">
+            <soap:operation soapAction=""/>
+            <wsdl:input name="getAllPriceListDetailsRequest">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="getAllPriceListDetailsResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="PriceListsPortService">
+        <wsdl:port binding="tns:PriceListsPortSoap11" name="PriceListsPortSoap11">
+            <soap:address location="http://192.168.56.1:8081/pricelist/ws"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

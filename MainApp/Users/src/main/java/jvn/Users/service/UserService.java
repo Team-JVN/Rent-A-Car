@@ -1,5 +1,6 @@
 package jvn.Users.service;
 
+import jvn.Users.dto.response.UserInfoDTO;
 import jvn.Users.model.Agent;
 import jvn.Users.model.Role;
 import jvn.Users.model.User;
@@ -23,5 +24,7 @@ public interface UserService {
     UserTokenState refreshAuthenticationToken(HttpServletRequest request);
 
     User verify();
+
+    UserInfoDTO getByEmail(String email);
 }
 

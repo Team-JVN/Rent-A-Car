@@ -13,6 +13,8 @@ public interface GearboxTypeService {
 
     GearboxType get(Long id);
 
+    GearboxType get(String name);
+
     List<GearboxType> get() throws InvalidGearBoxTypeDataException;
 
     GearboxType edit(Long id, GearboxTypeDTO gearBoxTypeDTO) throws InvalidGearBoxTypeDataException;

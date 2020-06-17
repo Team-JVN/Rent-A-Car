@@ -24,6 +24,6 @@ public class Model {
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Make make;
 
-    @OneToMany(mappedBy = "model", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "model", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Car> cars = new HashSet<>();
 }

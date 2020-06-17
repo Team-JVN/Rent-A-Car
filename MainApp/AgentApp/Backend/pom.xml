@@ -108,12 +108,69 @@
             <artifactId>dependency-check-maven</artifactId>
             <version>5.3.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web-services</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>wsdl4j</groupId>
+            <artifactId>wsdl4j</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
+<!--            <plugin>-->
+<!--                <groupId>org.springframework.boot</groupId>-->
+<!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
+<!--            </plugin>-->
+<!--            <plugin>-->
+<!--                <groupId>org.jvnet.jaxb2.maven2</groupId>-->
+<!--                <artifactId>maven-jaxb2-plugin</artifactId>-->
+<!--                <version>0.14.0</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <goals>-->
+<!--                            <goal>generate</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--                <configuration>-->
+<!--                    <schemaLanguage>WSDL</schemaLanguage>-->
+<!--                    <generateDirectory>${project.basedir}/src/main/java</generateDirectory>-->
+<!--                    <generatePackage>jvn.RentACar.dto.soap.pricelist</generatePackage>-->
+<!--                    <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>-->
+<!--                    <schemaIncludes>-->
+<!--                        <include>priceLists.wsdl</include>-->
+<!--                        <include>deletePriceLists.wsdl</include>-->
+<!--                        <include>listPriceList.wsdl</include>-->
+<!--                    </schemaIncludes>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
+
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.14.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <schemaLanguage>WSDL</schemaLanguage>
+                    <generateDirectory>${project.basedir}/src/main/java</generateDirectory>
+                    <generatePackage>jvn.RentACar.dto.soap.car</generatePackage>
+                    <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>
+                    <schemaIncludes>
+                        <include>createOrEditCar.wsdl</include>
+                        <include>deleteCar.wsdl</include>
+                        <include>getCarEditType.wsdl</include>
+                        <include>editPartialCar.wsdl</include>
+                        <include>listCar.wsdl</include>
+                    </schemaIncludes>
+                </configuration>
             </plugin>
         </plugins>
     </build>

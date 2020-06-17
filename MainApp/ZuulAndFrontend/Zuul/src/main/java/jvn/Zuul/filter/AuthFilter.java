@@ -36,6 +36,7 @@ public class AuthFilter extends ZuulFilter {
         if (request.getMethod().equals("OPTIONS")) {
             return false;
         }
+
         String url = request.getRequestURL().toString();
         String method = request.getMethod();
         if (url.contains("users")) {
@@ -44,12 +45,19 @@ public class AuthFilter extends ZuulFilter {
         if (url.contains("/search/h2")) {
             return false;
         }
+
+        if (url.contains("/ws")) {
+            return false;
+        }
+
         if (new AntPathMatcher().match("**/api/car/{id}/picture", url) && method.equals("GET")) {
             return false;
         }
+
         if (method.equals("GET") && url.contains("/api/body-style")) {
             return false;
         }
+
         if (method.equals("GET") && url.contains("/api/fuel-type")) {
             return false;
         }

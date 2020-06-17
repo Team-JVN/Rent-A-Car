@@ -70,7 +70,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         String generatedPassword = randomPasswordGenerator.generatePassword();
 
         Agent agent = new Agent("Rent a Car Agency", "rentacar@maildrop.cc",
-                passwordEncoder.encode(generatedPassword), "Beograd", "100000012","0623546165");
+                passwordEncoder.encode(generatedPassword), "Beograd", "500000014","0627564136");
         if (userRepository.findByEmail(agent.getEmail()) != null) {
             return;
         }

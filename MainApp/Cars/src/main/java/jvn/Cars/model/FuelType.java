@@ -21,7 +21,7 @@ public class FuelType {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "fuelType", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "fuelType", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Car> cars = new HashSet<>();
 
     public FuelType(String name) {

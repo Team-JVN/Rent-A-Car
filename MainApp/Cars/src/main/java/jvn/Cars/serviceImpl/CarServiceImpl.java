@@ -52,7 +52,7 @@ public class CarServiceImpl implements CarService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Car create(Car car, List<MultipartFile> multipartFiles, UserDTO userDTO) {
+    public Car create(Car car, List<MultipartFile> multipartFiles, Long userId) {
         if (multipartFiles.size() > 5) {
             throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
         }
@@ -62,7 +62,7 @@ public class CarServiceImpl implements CarService {
             }
         }
 
-        car.setOwner(userDTO.getId());
+        car.setOwner(userId);
         car.setMake(makeService.get(car.getMake().getId()));
         car.setModel(modelService.get(car.getModel().getId(), car.getMake().getId()));
         car.setBodyStyle(bodyStyleService.get(car.getBodyStyle().getId()));
@@ -83,6 +83,11 @@ public class CarServiceImpl implements CarService {
     @Override
     public List<Car> get(UserDTO userDTO) {
         return carRepository.findAllByLogicalStatusNotAndOwner(LogicalStatus.DELETED, userDTO.getId());
+    }
+
+    @Override
+    public List<Car> getAll(Long loggedInUser) {
+        return carRepository.findAllByOwner(loggedInUser);
     }
 
     @Override
@@ -122,7 +127,7 @@ public class CarServiceImpl implements CarService {
         Car dbCar = get(id, LogicalStatus.EXISTING);
         checkOwner(dbCar, loggedInUserId);
 
-        if (advertisementClient.canDeleteCar(jwtToken, user, id)) {
+        if (advertisementClient.canDeleteCar(id)) {
             dbCar.setLogicalStatus(LogicalStatus.DELETED);
             carRepository.save(dbCar);
         } else {
@@ -131,9 +136,21 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
+    public boolean checkIfCanDeleteAndDelete(Long id, Long loggedInUser) {
+        Car dbCar =  get(id, LogicalStatus.EXISTING);
+        checkOwner(dbCar, loggedInUser);
+        if (advertisementClient.canDeleteCar(id)) {
+            dbCar.setLogicalStatus(LogicalStatus.DELETED);
+            carRepository.save(dbCar);
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-    public Car editAll(Long id, Car car, List<MultipartFile> multipartFiles, Long loggedInUserId, String jwtToken, String user,
-                       UserDTO userDTO) {
+    public Car editAll(Long id, Car car, List<MultipartFile> multipartFiles, Long loggedInUserId) {
 
         if (multipartFiles.size() > 5) {
             throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
@@ -141,7 +158,7 @@ public class CarServiceImpl implements CarService {
         Car dbCar = get(id, LogicalStatus.EXISTING);
         checkOwner(dbCar, loggedInUserId);
 
-        if (!advertisementClient.getCarEditType(jwtToken, user, id).equals(EditType.ALL)) {
+        if (!advertisementClient.getCarEditType(id).equals(EditType.ALL)) {
             throw new InvalidCarDataException(
                     "This car is in use and therefore it cannot be edited.", HttpStatus.BAD_REQUEST);
         }
@@ -162,15 +179,14 @@ public class CarServiceImpl implements CarService {
 
     @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-    public Car editPartial(Long id, CarEditDTO carDTO, List<MultipartFile> multipartFiles, Long loggedInUserId, String jwtToken,
-                           String user, UserDTO userDTO) {
+    public Car editPartial(Long id, CarEditDTO carDTO, List<MultipartFile> multipartFiles, Long loggedInUserId) {
         if (multipartFiles.size() > 5) {
             throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
         }
         Car dbCar = get(id, LogicalStatus.EXISTING);
         checkOwner(dbCar, loggedInUserId);
 
-        if (advertisementClient.canEditCarPartially(jwtToken, user, id)) {
+        if (advertisementClient.canEditCarPartially(id)) {
             dbCar.setMileageInKm(carDTO.getMileageInKm());
             dbCar.setKidsSeats(carDTO.getKidsSeats());
             dbCar.setAvailableTracking(carDTO.getAvailableTracking());
@@ -186,6 +202,13 @@ public class CarServiceImpl implements CarService {
         }
     }
 
+    @Override
+    public String getCarEditType(Long id,Long loggedInUser){
+        if (advertisementClient.getCarEditType(id).equals(EditType.ALL)) {
+            return "ALL";
+        }
+        return "PARTIAL";
+    }
     @Async
     public void editCar(CarEditDTO carEditDTO) {
         carProducer.sendMessageForSearch(carEditDTO);

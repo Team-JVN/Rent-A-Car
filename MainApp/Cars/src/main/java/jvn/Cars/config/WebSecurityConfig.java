@@ -27,7 +27,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
                 .authorizeRequests()
-
+                .antMatchers("/ws**", "/ws/**", "/car/ws**", "/car/ws/**", "/car/ws").permitAll()
                 .antMatchers("/api/car", "/api/car/{id}", "/api/car/{id}/partial")
                 .hasAuthority("MANAGE_CARS")
 
@@ -57,6 +57,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/ws/**");
+        web.ignoring().antMatchers("/car/ws/**");
+        web.ignoring().antMatchers("/car/ws/**");
+        web.ignoring().antMatchers("/car/ws**");
+        web.ignoring().antMatchers("/car/ws");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/car/{id}/picture");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/body-style");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/fuel-type");

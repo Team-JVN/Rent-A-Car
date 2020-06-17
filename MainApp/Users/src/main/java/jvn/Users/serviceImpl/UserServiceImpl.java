@@ -1,7 +1,7 @@
 package jvn.Users.serviceImpl;
 
+import jvn.Users.dto.response.UserInfoDTO;
 import jvn.Users.enumeration.AdminStatus;
-import jvn.Users.exceptionHandler.BlockedUserException;
 import jvn.Users.enumeration.AgentStatus;
 import jvn.Users.enumeration.ClientStatus;
 import jvn.Users.exceptionHandler.InvalidUserDataException;
@@ -103,7 +103,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         } else if (user instanceof Agent && ((Agent) user).getStatus() != AgentStatus.ACTIVE) {
             composeAndSendEmail(user.getEmail());
             return;
-        }else if (user instanceof Admin && ((Admin) user).getStatus() != AdminStatus.ACTIVE) {
+        } else if (user instanceof Admin && ((Admin) user).getStatus() != AdminStatus.ACTIVE) {
             composeAndSendEmail(user.getEmail());
             return;
         }
@@ -141,6 +141,15 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     public User verify() {
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findByEmail(currentUser.getName());
+    }
+
+    @Override
+    public UserInfoDTO getByEmail(String email) {
+        User user = findByEmail(email);
+        if (user == null) {
+            return null;
+        }
+        return new UserInfoDTO(user.getId(), user.getEmail());
     }
 
     private String getClientIP() {

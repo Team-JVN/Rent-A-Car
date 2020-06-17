@@ -1,7 +1,6 @@
 package jvn.Advertisements.serviceImpl;
 
 import jvn.Advertisements.dto.both.PriceListDTO;
-import jvn.Advertisements.dto.request.UserDTO;
 import jvn.Advertisements.enumeration.LogicalStatus;
 import jvn.Advertisements.exceptionHandler.InvalidPriceListDataException;
 import jvn.Advertisements.model.PriceList;
@@ -38,19 +37,19 @@ public class PriceListServiceImpl implements PriceListService {
     }
 
     @Override
-    public List<PriceList> getAll(UserDTO userDTO) {
-        return priceListRepository.findByStatusAndOwnerId(LogicalStatus.EXISTING, userDTO.getId());
+    public List<PriceList> getAll(Long loggedInUserId) {
+        return priceListRepository.findByStatusAndOwnerId(LogicalStatus.EXISTING, loggedInUserId);
     }
 
     @Override
-    public PriceList create(PriceList priceList, UserDTO userDTO) {
-        priceList.setOwnerId(userDTO.getId());
+    public PriceList create(PriceList priceList, Long loggedInUserId) {
+        priceList.setOwnerId(loggedInUserId);
         return priceListRepository.save(priceList);
     }
 
     @Override
-    public PriceList edit(Long id, PriceList priceList, UserDTO userDTO) {
-        PriceList dbPriceList = get(id, userDTO.getId());
+    public PriceList edit(Long id, PriceList priceList, Long loggedInUserId) {
+        PriceList dbPriceList = get(id, loggedInUserId);
         dbPriceList.setPricePerDay(priceList.getPricePerDay());
 
         if (dbPriceList.getPricePerKm() != null) {
@@ -66,14 +65,30 @@ public class PriceListServiceImpl implements PriceListService {
     }
 
     @Override
-    public void delete(Long id, UserDTO userDTO) {
-        PriceList priceList = get(id, userDTO.getId());
+    public void delete(Long id, Long loggedInUserId) {
+        PriceList priceList = get(id, loggedInUserId);
 
         if (priceListRepository.findByIdAndStatusNotAndAdvertisementsLogicalStatusNot(id, LogicalStatus.DELETED, LogicalStatus.DELETED) != null) {
             throw new InvalidPriceListDataException("Price list is used in advertisements, so it can't be deleted.", HttpStatus.BAD_REQUEST);
         }
         priceList.setStatus(LogicalStatus.DELETED);
         priceListRepository.save(priceList);
+    }
+
+    @Override
+    public boolean checkIfCanDeleteAndDelete(Long id, Long loggedInUserId) {
+        PriceList priceList = get(id, loggedInUserId);
+        if (priceListRepository.findByIdAndStatusNotAndAdvertisementsLogicalStatusNot(id, LogicalStatus.DELETED, LogicalStatus.DELETED) != null) {
+            return false;
+        }
+        priceList.setStatus(LogicalStatus.DELETED);
+        priceListRepository.save(priceList);
+        return true;
+    }
+
+    @Override
+    public List<PriceList> getPriceListsDeletedAndExisting(Long loggedInUserId) {
+        return priceListRepository.findByOwnerId(loggedInUserId);
     }
 
     @Async

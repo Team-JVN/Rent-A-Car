@@ -41,7 +41,7 @@ public class AgentController {
     public ResponseEntity<AgentDTO> getProfile() {
         User user = userService.getLoginUser();
         if (user instanceof Agent) {
-            return new ResponseEntity<>(agentDtoMapper.toDto((Agent) userService.getLoginUser()), HttpStatus.OK);
+            return new ResponseEntity<>(agentDtoMapper.toDto(agentService.get(user.getId())), HttpStatus.OK);
         }
         throw new InvalidAgentDataException("As a non-authorized user, you are not allowed to enter this page.", HttpStatus.FORBIDDEN);
     }
