@@ -258,6 +258,7 @@ public class CarServiceImpl implements CarService {
         car.setOwner(userService.getLoginUser());
         Car savedCar = carRepository.saveAndFlush(car);
         pictureService.savePicturesSynchronize(pictureInfos, UPLOADED_PICTURES_PATH, savedCar);
+        carRepository.saveAndFlush(savedCar);
     }
 
     public void editCarSynchronize(Car car, Car dbCar, List<PictureInfo> pictureInfos) {
@@ -285,7 +286,7 @@ public class CarServiceImpl implements CarService {
         if (pictureInfos != null && !pictureInfos.isEmpty()) {
             pictureService.editCarPicturesSynchronize(pictureInfos, UPLOADED_PICTURES_PATH, newCar);
         }
-
+        carRepository.saveAndFlush(dbCar);
     }
 
 
