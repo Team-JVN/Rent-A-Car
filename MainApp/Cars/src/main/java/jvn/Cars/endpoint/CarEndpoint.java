@@ -14,9 +14,7 @@ import jvn.Cars.mapper.EditPartialCarDetailsMapper;
 import jvn.Cars.model.Car;
 import jvn.Cars.model.Picture;
 import jvn.Cars.service.CarService;
-import jvn.Cars.service.PictureService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
@@ -51,9 +49,6 @@ public class CarEndpoint {
     private EditPartialCarDetailsMapper editPartialCarDetailsmapper;
 
     private EditPartialCarDetailsAndCarMapper editPartialCarDetailsAndCarMapper;
-
-    @Autowired
-    private PictureService pictureService;
 
     private LogProducer logProducer;
 
@@ -186,7 +181,7 @@ public class CarEndpoint {
         this.carDetailsMapper = carDetailsMapper;
         this.userClient = userClient;
         this.editPartialCarDetailsmapper = editPartialCarDetailsmapper;
-        this.editPartialCarDetailsmapper = editPartialCarDetailsmapper;
+        this.editPartialCarDetailsAndCarMapper = editPartialCarDetailsAndCarMapper;
         this.logProducer = logProducer;
     }
 }

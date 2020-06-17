@@ -12,13 +12,13 @@ RST|Reset token exception
 EPM|Edit permissions
 CCL|Create client by agent or another client
 CAG|Create agent by administrator
-CAD|Create administrator by another administrator
+CAM|Create administrator by another administrator
 ECL|Edit client profile
 EAG|Edit agent profile
-EAD|Edit administrator profile
+EAM|Edit administrator profile
 DCL|Delete client by agent or administrator
 DAG|Delete agent by administrator
-DAD|Delete administrator by another administrator
+DAM|Delete administrator by another administrator
 APR|Approve client's request to register
 RJT|Reject client's request to register
 BLC|Block/unblock client by administrator
@@ -44,4 +44,9 @@ EML|Edit model
 DML|Delete model
 PEX|Picture exception
 PDB|Picture in database
-PSV|Picture on server
+PDI|Picture on disk
+COW|Check owner
+EOW|Edit owner
+CAD|Create advertisement
+EAD|Edit advertisement
+DAD|Delete advertisement

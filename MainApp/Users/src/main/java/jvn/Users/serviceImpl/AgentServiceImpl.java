@@ -97,9 +97,9 @@ public class AgentServiceImpl implements AgentService {
         }
         agent.setStatus(AgentStatus.DELETED);
 
-        Long loggedInUserId = userService.getLoginUser().getId();
-        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CAD", String.format("User %s successfully deleted agent %s", loggedInUserId, agent.getId())));
         agentRepository.save(agent);
+        Long loggedInUserId = userService.getLoginUser().getId();
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "DAG", String.format("User %s successfully deleted agent %s", loggedInUserId, agent.getId())));
     }
 
     @Override

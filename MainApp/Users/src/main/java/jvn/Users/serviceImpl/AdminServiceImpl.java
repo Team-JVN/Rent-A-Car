@@ -57,7 +57,7 @@ public class AdminServiceImpl implements AdminService {
         Admin dbAdmin = adminRepository.save(admin);
 
         Long loggedInUserId = userService.getLoginUser().getId();
-        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CAG", String.format("User %s successfully created agent %s", loggedInUserId, dbAdmin.getId())));
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CAM", String.format("User %s successfully created agent %s", loggedInUserId, dbAdmin.getId())));
         return dbAdmin;
     }
 
@@ -87,8 +87,8 @@ public class AdminServiceImpl implements AdminService {
         admin.setRole(null);
 
         Long loggedInUserId = userService.getLoginUser().getId();
-        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CAD", String.format("User %s successfully deleted admin %s", loggedInUserId, admin.getId())));
         adminRepository.deleteById(id);
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "DAM", String.format("User %s successfully deleted admin %s", loggedInUserId, admin.getId())));
     }
 
     @Override
@@ -96,8 +96,9 @@ public class AdminServiceImpl implements AdminService {
         Admin dbAdmin = get(id);
         dbAdmin.setName(admin.getName());
 
-        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EAD", String.format("User %s successfully edited profile", id)));
-        return adminRepository.save(dbAdmin);
+        Admin savedAdmin = adminRepository.save(dbAdmin);
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EAM", String.format("User %s successfully edited profile", savedAdmin.getId())));
+        return savedAdmin;
     }
 
     private void composeAndSendEmailToChangePassword(String recipientEmail, String generatedPassword) {
