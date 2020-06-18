@@ -26,8 +26,8 @@ public class Agent extends User {
     @Enumerated(EnumType.STRING)
     private AgentStatus status;
 
-    public Agent(String name, String email, String password, String address, String taxIdNumber,String phoneNumber) {
-        super(null, name, email, password, address, true, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(), null, new Timestamp(DateTime.now().getMillis()));
+    public Agent(Long mainAppId, String name, String email, String password, String address, String taxIdNumber, String phoneNumber) {
+        super(mainAppId, name, email, password, address, true);
         this.taxIdNumber = taxIdNumber;
         this.status = AgentStatus.INACTIVE;
         this.phoneNumber = phoneNumber;

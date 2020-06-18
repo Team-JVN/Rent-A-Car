@@ -18,4 +18,6 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     List<Client> findAll();
 
     Client findOneById(Long id);
+
+    List<Client> findAllByStatusNot(ClientStatus status);
 }

@@ -60,17 +60,17 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         Permission clientEditProfile = createPermissionIfNotFound("CLIENT_EDIT_PROFILE");
 
         Set<Permission> agentPermissions = new HashSet<>(Arrays.asList(manageAdvertisements, manageCodeBooks, manageCars, manageClients,
-                managePriceLists, manageRentReports, manageRoles,agentEditProfile,getStatistics));
+                managePriceLists, manageRentReports, manageRoles, agentEditProfile, getStatistics));
         createRoleIfNotFound("ROLE_AGENT", agentPermissions);
 
-        Set<Permission> clientPermissions = new HashSet<>(Arrays.asList(clientEditProfile, myRentRequests,manageClients));
+        Set<Permission> clientPermissions = new HashSet<>(Arrays.asList(clientEditProfile, myRentRequests));
         createRoleIfNotFound("ROLE_CLIENT", clientPermissions);
 
         RandomPasswordGenerator randomPasswordGenerator = new RandomPasswordGenerator();
         String generatedPassword = randomPasswordGenerator.generatePassword();
 
-        Agent agent = new Agent("Rent a Car Agency", "rentacar@maildrop.cc",
-                passwordEncoder.encode(generatedPassword), "Beograd", "500000014","0627564136");
+        Agent agent = new Agent(2L, "Rent a Car Agency", "rentacar@maildrop.cc",
+                passwordEncoder.encode(generatedPassword), "Beograd", "500000014", "0627564136");
         if (userRepository.findByEmail(agent.getEmail()) != null) {
             return;
         }
@@ -132,12 +132,12 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     @Autowired
     public SetupDataLoader(RoleRepository roleRepository, PermissionRepository permissionRepository, UserRepository userRepository,
-                           PasswordEncoder passwordEncoder, EmailNotificationService emailNotificationService,Environment environment) {
+                           PasswordEncoder passwordEncoder, EmailNotificationService emailNotificationService, Environment environment) {
         this.roleRepository = roleRepository;
         this.permissionRepository = permissionRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailNotificationService = emailNotificationService;
-        this.environment=environment;
+        this.environment = environment;
     }
 }

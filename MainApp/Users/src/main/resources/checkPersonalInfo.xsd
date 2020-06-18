@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.soap.dto/client"
+           targetNamespace="http://www.soap.dto/client" elementFormDefault="qualified">
+
+    <xs:element name="checkClientPersonalInfoRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="clientEmail" minOccurs="0" type="xs:string"/>
+                <xs:element name="phoneNumber" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="checkClientPersonalInfoResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="dataValid">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="ALL"/>
+                            <xs:enumeration value="EMAIL_NOT_VALID"/>
+                            <xs:enumeration value="PHONE_NUMBER_NOT_VALID"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

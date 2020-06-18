@@ -1,4 +1,5 @@
 package jvn.Users.model;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jvn.Users.enumeration.AdminStatus;
 import jvn.Users.enumeration.AgentStatus;
@@ -44,7 +45,7 @@ public abstract class User implements UserDetails {
     @Column
     private boolean enabled;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Role role;
 
     @Column
@@ -99,7 +100,7 @@ public abstract class User implements UserDetails {
             return ((Client) this).getStatus() == ClientStatus.ACTIVE;
         } else if (this instanceof Agent) {
             return ((Agent) this).getStatus() == AgentStatus.ACTIVE;
-        }else if (this instanceof Admin) {
+        } else if (this instanceof Admin) {
             return ((Admin) this).getStatus() == AdminStatus.ACTIVE;
         }
 
