@@ -1,11 +1,12 @@
 package jvn.Renting.endpoint;
 
 import jvn.Renting.client.UserClient;
+import jvn.Renting.dto.request.RentRequestStatusDTO;
 import jvn.Renting.dto.response.UserInfoDTO;
-import jvn.Renting.dto.soap.rentrequest.CreateRentRequestRequest;
-import jvn.Renting.dto.soap.rentrequest.CreateRentRequestResponse;
-import jvn.Renting.dto.soap.rentrequest.RentRequestDetails;
+import jvn.Renting.dto.soap.rentrequest.*;
+import jvn.Renting.exceptionHandler.InvalidRentRequestDataException;
 import jvn.Renting.mapper.RentRequestDetailsMapper;
+import jvn.Renting.model.RentRequest;
 import jvn.Renting.service.RentRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
@@ -13,8 +14,13 @@ import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Endpoint
 public class RentRequestEndpoint {
@@ -48,35 +54,126 @@ public class RentRequestEndpoint {
         return response;
     }
 
-/*
-    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "deletePriceListDetailsRequest")
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "changeRentRequestStatusRequest")
     @ResponsePayload
-    public DeletePriceListDetailsResponse deletePriceList(@RequestPayload DeletePriceListDetailsRequest request) {
+    public ChangeRentRequestStatusResponse changeRentRequestStatus(@RequestPayload ChangeRentRequestStatusRequest request) {
         UserInfoDTO dto = userClient.getUser(request.getEmail());
         if (dto == null) {
             return null;
         }
-        DeletePriceListDetailsResponse response = new DeletePriceListDetailsResponse();
-        response.setCanDelete(priceListService.checkIfCanDeleteAndDelete(request.getId(), dto.getId()));
+        String status = "SUCCESS";
+        try {
+            RentRequestStatusDTO rentRequestStatusDTO = new RentRequestStatusDTO();
+            rentRequestStatusDTO.setStatus(request.getStatus());
+            rentRequestService.changeRentRequestStatus(request.getRentRequestId(), rentRequestStatusDTO, dto.getId());
+        } catch (InvalidRentRequestDataException e) {
+            status = "ERROR";
+        }
+
+        ChangeRentRequestStatusResponse response = new ChangeRentRequestStatusResponse();
+        response.setStatus(status);
         return response;
     }
 
-
-    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getAllPriceListDetailsRequest")
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "checkDate")
     @ResponsePayload
-    public GetAllPriceListDetailsResponse createOrEdit(@RequestPayload GetAllPriceListDetailsRequest request) {
+    public CheckDateResponse checkDate(@RequestPayload CheckDateRequest request) {
+        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        if (dto == null) {
+            return null;
+        }
+        boolean status = true;
+        try {
+
+            LocalDate dateTo = null;
+            if (request.getAdvDateTo() != null) {
+                dateTo = getLocalDate(request.getAdvDateTo());
+            }
+            rentRequestService.checkDate(request.getAdvId(), getLocalDate(request.getAdvDateFrom()), dateTo, getLocalDateTime(request.getDateTimeFrom()).toLocalDate(),
+                    getLocalDateTime(request.getDateTimeTo()).toLocalDate());
+        } catch (InvalidRentRequestDataException e) {
+            status = false;
+        }
+
+        CheckDateResponse response = new CheckDateResponse();
+        response.setValue(status);
+        return response;
+    }
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "checkIfCanAcceptRentRequest")
+    @ResponsePayload
+    public CheckIfCanAcceptResponse checkIfCanAcceptRentRequest(@RequestPayload CheckIfCanAcceptRequest request) {
+        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        if (dto == null) {
+            return null;
+        }
+        boolean status = true;
+        try {
+
+            RentRequest rentRequest = rentRequestService.getRentRequest(request.getRentRequestId());
+            if (rentRequest == null) {
+                status = false;
+
+            } else {
+                rentRequestService.checkIfCanAcceptRentRequest(rentRequest);
+            }
+
+        } catch (InvalidRentRequestDataException e) {
+            status = false;
+        }
+
+        CheckIfCanAcceptResponse response = new CheckIfCanAcceptResponse();
+        response.setValue(status);
+        return response;
+    }
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "hasDebtRequest")
+    @ResponsePayload
+    public HasDebtResponse hasDebt(@RequestPayload HasDebtRequest request) {
+        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        if (dto == null) {
+            return null;
+        }
+        boolean status = true;
+        try {
+            rentRequestService.hasDebt(request.getId());
+
+        } catch (InvalidRentRequestDataException e) {
+            status = false;
+        }
+
+        HasDebtResponse response = new HasDebtResponse();
+        response.setValue(status);
+        return response;
+    }
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getAllRentRequestDetailsRequest")
+    @ResponsePayload
+    public GetAllRentRequestDetailsResponse getAll(@RequestPayload GetAllRentRequestDetailsRequest request) {
         UserInfoDTO dto = userClient.getUser(request.getEmail());
         if (dto == null) {
             return null;
         }
 
-        List<PriceListDetails> list = priceListService.getPriceListsDeletedAndExisting(dto.getId()).stream().map(priceListDetailsMapper::toDto).
+        List<RentRequestDetails> list = rentRequestService.getAll(dto.getId()).stream().map(rentRequestDetailsMapper::toDto).
                 collect(Collectors.toList());
-        GetAllPriceListDetailsResponse response = new GetAllPriceListDetailsResponse();
-        response.getPriceListDetails().addAll(list);
+        GetAllRentRequestDetailsResponse response = new GetAllRentRequestDetailsResponse();
+        response.getRentRequestDetails().addAll(list);
         return response;
     }
- */
+
+    private LocalDate getLocalDate(XMLGregorianCalendar xmlGregorianCalendar) {
+        LocalDate localDate = LocalDate.of(
+                xmlGregorianCalendar.getYear(),
+                xmlGregorianCalendar.getMonth(),
+                xmlGregorianCalendar.getDay());
+        return localDate;
+    }
+
+    private LocalDateTime getLocalDateTime(XMLGregorianCalendar xmlGregorianCalendar) {
+        return xmlGregorianCalendar.toGregorianCalendar().toZonedDateTime().toLocalDateTime();
+    }
 
     @Autowired
     public RentRequestEndpoint(RentRequestService rentRequestService, RentRequestDetailsMapper rentRequestDetailsMapper, UserClient userClient) {

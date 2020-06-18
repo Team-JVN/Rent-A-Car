@@ -2,9 +2,7 @@ package jvn.RentACar.serviceImpl;
 
 import jvn.RentACar.client.RentRequestClient;
 import jvn.RentACar.dto.request.RentRequestStatusDTO;
-import jvn.RentACar.dto.soap.rentrequest.CreateRentRequestResponse;
-import jvn.RentACar.dto.soap.rentrequest.RentInfoDetails;
-import jvn.RentACar.dto.soap.rentrequest.RentRequestDetails;
+import jvn.RentACar.dto.soap.rentrequest.*;
 import jvn.RentACar.enumeration.RentRequestStatus;
 import jvn.RentACar.exceptionHandler.InvalidRentRequestDataException;
 import jvn.RentACar.model.*;
@@ -53,13 +51,16 @@ public class RentRequestServiceImpl implements RentRequestService {
         Advertisement dbAvd = advertisementService.get((new ArrayList<>(rentRequest.getRentInfos())).get(0).getAdvertisement().getId());
         Long ownerId = dbAvd.getCar().getOwner().getId();
         if (ownerId.equals(user.getId())) {
-            if (rentRequest.getClient() == null || rentRequest.getClient().equals(user.getId())) {
+            if (rentRequest.getClient() == null || rentRequest.getClient().getId().equals(user.getId())) {
                 throw new InvalidRentRequestDataException("Please choose client for which you create rent request.", HttpStatus.BAD_REQUEST);
             }
             rentRequest.setClient(clientService.get(rentRequest.getClient().getId()));
             rentRequest.setRentRequestStatus(RentRequestStatus.PAID);
         } else {
-            hasDebt(user.getId());
+            HasDebtResponse response = rentRequestClient.hasDebt(user.getId());
+            if (response == null || !response.isValue()) {
+                throw new InvalidRentRequestDataException("You are not allowed to create rent requests because you have outstanding debts. ", HttpStatus.BAD_REQUEST);
+            }
             rentRequest.setClient((Client) user);
             rentRequest.setRentRequestStatus(RentRequestStatus.PENDING);
         }
@@ -131,6 +132,10 @@ public class RentRequestServiceImpl implements RentRequestService {
         if (!rentRequest.getRentRequestStatus().equals(RentRequestStatus.PENDING)) {
             throw new InvalidRentRequestDataException("Your request is already expected, therefore you can not cancel/accept/reject it.", HttpStatus.BAD_REQUEST);
         }
+        ChangeRentRequestStatusResponse response = rentRequestClient.changeRentRequestStatus(id, rentRequestStatus);
+        if (response.equals("ERROR")) {
+            throw new InvalidRentRequestDataException("You can't change status of this request.", HttpStatus.BAD_REQUEST);
+        }
         if (rentRequestStatus.equals(RentRequestStatus.CANCELED)) {
             if (userService.getLoginUser().getId().equals(rentRequest.getCreatedBy().getId())) {
                 return cancel(rentRequest);
@@ -175,7 +180,11 @@ public class RentRequestServiceImpl implements RentRequestService {
         if (!userService.getLoginUser().getId().equals(advertisementsOwner.getId())) {
             throw new InvalidRentRequestDataException("You aren't owner of rent request's advertisement so you can't accept this request.", HttpStatus.BAD_REQUEST);
         }
-        checkIfCanAcceptRentRequest(rentRequest);
+        CheckIfCanAcceptResponse response = rentRequestClient.checkIfCanAccept(rentRequest.getId());
+        if (response == null || !response.isValue()) {
+            throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
+                    HttpStatus.BAD_REQUEST);
+        }
         rentRequest.setRentRequestStatus(RentRequestStatus.PAID);
         RentRequest paidRentRequest = rentRequestRepository.save(rentRequest);
         rejectOtherRequests(rentRequest);
@@ -208,7 +217,13 @@ public class RentRequestServiceImpl implements RentRequestService {
         for (RentInfo rentInfo : rentInfos) {
             rentInfo.setRentRequest(rentRequest);
             Advertisement advertisement = advertisementService.get(rentInfo.getAdvertisement().getId());
-            checkDate(advertisement, rentInfo.getDateTimeFrom().toLocalDate(), rentInfo.getDateTimeTo().toLocalDate(), rentInfo.getDateTimeFrom(), rentInfo.getDateTimeTo());
+
+            CheckDateResponse response = rentRequestClient.checkDate(advertisement.getId(), advertisement.getDateFrom(),
+                    advertisement.getDateTo(), rentInfo.getDateTimeFrom(), rentInfo.getDateTimeTo());
+            if (response == null || !response.isValue()) {
+                throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
+                        HttpStatus.BAD_REQUEST);
+            }
             rentInfo.setAdvertisement(advertisement);
             if (!advertisement.getCDW()) {
                 rentInfo.setOptedForCDW(null);

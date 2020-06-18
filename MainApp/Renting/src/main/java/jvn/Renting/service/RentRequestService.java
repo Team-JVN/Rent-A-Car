@@ -6,6 +6,7 @@ import jvn.Renting.enumeration.EditType;
 import jvn.Renting.model.RentRequest;
 
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface RentRequestService {
@@ -26,5 +27,13 @@ public interface RentRequestService {
 
     Boolean hasRentInfos(List<Long> advIds);
 
+    void checkDate(Long id, LocalDate advertisementDateFrom, LocalDate advertisementDateTo, LocalDate rentInfoDateFrom, LocalDate rentInfoDateTo);
 
+    void checkIfCanAcceptRentRequest(RentRequest rentRequest);
+
+    RentRequest getRentRequest(Long id);
+
+    void hasDebt(Long loggedInUserId);
+
+    List<RentRequest> getAll(Long loggedInUserId);
 }

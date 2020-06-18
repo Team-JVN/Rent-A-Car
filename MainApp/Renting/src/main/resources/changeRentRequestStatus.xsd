@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+           targetNamespace="http://www.soap.dto/rentrequest" xmlns:tns="http://www.soap.dto/rentrequest">
+
+    <xs:element name="changeRentRequestStatusRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="email" type="xs:string"/>
+                <xs:element name="rentRequestId">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:long">
+                            <xs:minInclusive value="1"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="status">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="PENDING"/>
+                            <xs:enumeration value="RESERVED"/>
+                            <xs:enumeration value="PAID"/>
+                            <xs:enumeration value="CANCELED"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="changeRentRequestStatusResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="status">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="SUCCESS"/>
+                            <xs:enumeration value="ERROR"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

@@ -1,5 +1,6 @@
 package jvn.Renting;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -36,37 +37,87 @@ public class WebServiceConfig {
     public XsdSchema rentRequestsSchema() {
         return new SimpleXsdSchema(new ClassPathResource("rentRequests.xsd"));
     }
-/*
-    @Bean(name = "deletePriceLists")
-    public DefaultWsdl11Definition defaultWsdl11DefinitionDeletePriceLists(@Qualifier("deletePriceListsSchema") XsdSchema deletePriceLists) {
+
+    @Bean(name = "changeRentRequestStatus")
+    public DefaultWsdl11Definition defaultWsdl11DefinitionChangeRentRequestStatus(@Qualifier("changeRentRequestStatus") XsdSchema changeRentRequestStatus) {
         DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
-        wsdl11Definition.setPortTypeName("PriceListsPort");
-        wsdl11Definition.setLocationUri("/pricelist/ws");
-        wsdl11Definition.setTargetNamespace("http://www.pricelist.dto/soap");
-        wsdl11Definition.setSchema(deletePriceLists);
+        wsdl11Definition.setPortTypeName("RentRequestsPort");
+        wsdl11Definition.setLocationUri("/rentrequest/ws");
+        wsdl11Definition.setTargetNamespace("http://www.rentrequest.dto/soap");
+        wsdl11Definition.setSchema(changeRentRequestStatus);
         return wsdl11Definition;
     }
 
     @Bean
-    @Qualifier("deletePriceListsSchema")
-    public XsdSchema deletePriceListsSchema() {
-        return new SimpleXsdSchema(new ClassPathResource("deletePriceLists.xsd"));
+    @Qualifier("changeRentRequestStatus")
+    public XsdSchema changeRentRequestStatusSchema() {
+        return new SimpleXsdSchema(new ClassPathResource("changeRentRequestStatus.xsd"));
     }
 
-    @Bean(name = "listPriceList")
-    public DefaultWsdl11Definition defaultWsdl11DefinitionListPriceList(@Qualifier("listPriceListSchema") XsdSchema listPriceListSchema) {
+
+    @Bean(name = "checkDate")
+    public DefaultWsdl11Definition defaultWsdl11DefinitionCheckDate(@Qualifier("checkDate") XsdSchema checkDate) {
         DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
-        wsdl11Definition.setPortTypeName("PriceListsPort");
-        wsdl11Definition.setLocationUri("/pricelist/ws");
-        wsdl11Definition.setTargetNamespace("http://www.pricelist.dto/soap");
-        wsdl11Definition.setSchema(listPriceListSchema);
+        wsdl11Definition.setPortTypeName("RentRequestsPort");
+        wsdl11Definition.setLocationUri("/rentrequest/ws");
+        wsdl11Definition.setTargetNamespace("http://www.rentrequest.dto/soap");
+        wsdl11Definition.setSchema(checkDate);
         return wsdl11Definition;
     }
 
     @Bean
-    @Qualifier("listPriceListSchema")
-    public XsdSchema listPriceListSchema() {
-        return new SimpleXsdSchema(new ClassPathResource("listPriceList.xsd"));
+    @Qualifier("checkDate")
+    public XsdSchema checkDateSchema() {
+        return new SimpleXsdSchema(new ClassPathResource("checkDate.xsd"));
     }
- */
+
+    @Bean(name = "checkIfCanAcceptRentRequest")
+    public DefaultWsdl11Definition defaultWsdl11DefinitionCheckIfCanAcceptRentRequest(@Qualifier("checkIfCanAcceptRentRequest") XsdSchema checkIfCanAcceptRentRequest) {
+        DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
+        wsdl11Definition.setPortTypeName("RentRequestsPort");
+        wsdl11Definition.setLocationUri("/rentrequest/ws");
+        wsdl11Definition.setTargetNamespace("http://www.rentrequest.dto/soap");
+        wsdl11Definition.setSchema(checkIfCanAcceptRentRequest);
+        return wsdl11Definition;
+    }
+
+    @Bean
+    @Qualifier("checkIfCanAcceptRentRequest")
+    public XsdSchema checkIfCanAcceptRentRequestSchema() {
+        return new SimpleXsdSchema(new ClassPathResource("checkIfCanAcceptRentRequest.xsd"));
+    }
+
+
+    @Bean(name = "hasDebt")
+    public DefaultWsdl11Definition defaultWsdl11DefinitionHasDebt(@Qualifier("hasDebt") XsdSchema hasDebt) {
+        DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
+        wsdl11Definition.setPortTypeName("RentRequestsPort");
+        wsdl11Definition.setLocationUri("/rentrequest/ws");
+        wsdl11Definition.setTargetNamespace("http://www.rentrequest.dto/soap");
+        wsdl11Definition.setSchema(hasDebt);
+        return wsdl11Definition;
+    }
+
+    @Bean
+    @Qualifier("hasDebt")
+    public XsdSchema hasDebtSchema() {
+        return new SimpleXsdSchema(new ClassPathResource("hasDebt.xsd"));
+    }
+
+
+    @Bean(name = "listRentRequest")
+    public DefaultWsdl11Definition defaultWsdl11DefinitionListRentRequest(@Qualifier("listRentRequest") XsdSchema listRentRequest) {
+        DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
+        wsdl11Definition.setPortTypeName("RentRequestsPort");
+        wsdl11Definition.setLocationUri("/rentrequest/ws");
+        wsdl11Definition.setTargetNamespace("http://www.rentrequest.dto/soap");
+        wsdl11Definition.setSchema(listRentRequest);
+        return wsdl11Definition;
+    }
+
+    @Bean
+    @Qualifier("listRentRequest")
+    public XsdSchema listRentRequestSchema() {
+        return new SimpleXsdSchema(new ClassPathResource("listRentRequest.xsd"));
+    }
 }

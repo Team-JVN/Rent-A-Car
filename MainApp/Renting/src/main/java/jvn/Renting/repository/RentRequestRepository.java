@@ -41,4 +41,6 @@ public interface RentRequestRepository extends JpaRepository<RentRequest, Long> 
 
     List<RentRequest> findByRentRequestStatusAndRentInfosRentReportPaidAndClient(RentRequestStatus status, Boolean paid, Long clientId);
 
+    List<RentRequest> findAllByAdvertisementOwner(Long advOwner);
+
 }

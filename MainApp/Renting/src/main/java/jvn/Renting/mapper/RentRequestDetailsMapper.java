@@ -19,7 +19,7 @@ public class RentRequestDetailsMapper implements MapperInterface<RentRequest, Re
     public RentRequest toEntity(RentRequestDetails dto) {
         RentRequest entity = new RentRequest();
         entity.setId(dto.getId());
-        entity.setRentRequestStatus(RentRequestStatus.valueOf(dto.getRentRequestStatus()));
+        entity.setRentRequestStatus(getStatus(dto.getStatus()));
         entity.setClient(dto.getClient());
         entity.setTotalPrice(dto.getTotalPrice());
         entity.setRentInfos(dto.getRentInfo().stream().map(rentInfoDetailsMapper::toEntity).collect(Collectors.toSet()));
@@ -33,7 +33,7 @@ public class RentRequestDetailsMapper implements MapperInterface<RentRequest, Re
     public RentRequestDetails toDto(RentRequest entity) {
         RentRequestDetails dto = new RentRequestDetails();
         dto.setId(entity.getId());
-        dto.setRentRequestStatus(entity.getRentRequestStatus().toString());
+        dto.setStatus(entity.getRentRequestStatus().toString());
         dto.setClient(entity.getClient());
         dto.setTotalPrice(entity.getTotalPrice());
         dto.getRentInfo().addAll(entity.getRentInfos().stream().map(rentInfoDetailsMapper::toDto).collect(Collectors.toList()));
@@ -41,6 +41,14 @@ public class RentRequestDetailsMapper implements MapperInterface<RentRequest, Re
         dto.setCreatedBy(entity.getCreatedBy());
         dto.setAdvertisementOwner(entity.getAdvertisementOwner());
         return dto;
+    }
+
+    private RentRequestStatus getStatus(String status) {
+        try {
+            return RentRequestStatus.valueOf(status.toUpperCase());
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Autowired

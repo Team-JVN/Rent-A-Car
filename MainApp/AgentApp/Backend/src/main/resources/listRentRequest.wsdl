@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:sch="http://www.soap.dto/rentrequest"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.rentrequest.dto/soap"
+                  targetNamespace="http://www.rentrequest.dto/soap">
+    <wsdl:types>
+        <xs:schema xmlns:tns="http://www.soap.dto/rentrequest" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   elementFormDefault="qualified" targetNamespace="http://www.soap.dto/rentrequest">
+            <xs:element name="getAllRentRequestDetailsRequest">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="email" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllRentRequestDetailsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" name="rentRequestDetails" type="tns:rentRequestDetails"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <!--            <xs:complexType name="rentRequestDetails">-->
+            <!--                <xs:sequence>-->
+            <!--                    <xs:element minOccurs="0" name="id">-->
+            <!--                        <xs:simpleType>-->
+            <!--                            <xs:restriction base="xs:long">-->
+            <!--                                <xs:minInclusive value="1"/>-->
+            <!--                            </xs:restriction>-->
+            <!--                        </xs:simpleType>-->
+            <!--                    </xs:element>-->
+            <!--                    <xs:element name="status">-->
+            <!--                        <xs:simpleType>-->
+            <!--                            <xs:restriction base="xs:string">-->
+            <!--                                <xs:enumeration value="PENDING"/>-->
+            <!--                                <xs:enumeration value="RESERVED"/>-->
+            <!--                                <xs:enumeration value="PAID"/>-->
+            <!--                                <xs:enumeration value="CANCELED"/>-->
+            <!--                            </xs:restriction>-->
+            <!--                        </xs:simpleType>-->
+            <!--                    </xs:element>-->
+            <!--                    <xs:element name="client">-->
+            <!--                        <xs:simpleType>-->
+            <!--                            <xs:restriction base="xs:long">-->
+            <!--                                <xs:minInclusive value="1"/>-->
+            <!--                            </xs:restriction>-->
+            <!--                        </xs:simpleType>-->
+            <!--                    </xs:element>-->
+            <!--                    <xs:element name="totalPrice">-->
+            <!--                        <xs:simpleType>-->
+            <!--                            <xs:restriction base="xs:double">-->
+            <!--                                <xs:minInclusive value="0.0"/>-->
+            <!--                            </xs:restriction>-->
+            <!--                        </xs:simpleType>-->
+            <!--                    </xs:element>-->
+            <!--                    <xs:element maxOccurs="unbounded" name="rentInfo" type="tns:rentInfoDetails"/>-->
+            <!--                    <xs:element maxOccurs="unbounded" minOccurs="0" name="message" type="tns:messageDetails"/>-->
+            <!--                    <xs:element minOccurs="0" name="createdBy">-->
+            <!--                        <xs:simpleType>-->
+            <!--                            <xs:restriction base="xs:long">-->
+            <!--                                <xs:minInclusive value="1"/>-->
+            <!--                            </xs:restriction>-->
+            <!--                        </xs:simpleType>-->
+            <!--                    </xs:element>-->
+            <!--                    <xs:element name="advertisementOwner">-->
+            <!--                        <xs:simpleType>-->
+            <!--                            <xs:restriction base="xs:long">-->
+            <!--                                <xs:minInclusive value="1"/>-->
+            <!--                            </xs:restriction>-->
+            <!--                        </xs:simpleType>-->
+            <!--                    </xs:element>-->
+            <!--                </xs:sequence>-->
+            <!--            </xs:complexType>-->
+            <!--            <xs:complexType name="rentInfoDetails">-->
+            <!--                <xs:sequence>-->
+            <!--                    <xs:element minOccurs="0" name="id">-->
+            <!--                        <xs:simpleType>-->
+            <!--                            <xs:restriction base="xs:long">-->
+            <!--                                <xs:minInclusive value="1"/>-->
+            <!--                            </xs:restriction>-->
+            <!--                        </xs:simpleType>-->
+            <!--                    </xs:element>-->
+            <!--                    <xs:element name="dateTimeFrom" type="xs:dateTime"/>-->
+            <!--                    <xs:element name="dateTimeTo" type="xs:dateTime"/>-->
+            <!--                    <xs:element name="advertisement">-->
+            <!--                        <xs:simpleType>-->
+            <!--                            <xs:restriction base="xs:long">-->
+            <!--                                <xs:minInclusive value="1"/>-->
+            <!--                            </xs:restriction>-->
+            <!--                        </xs:simpleType>-->
+            <!--                    </xs:element>-->
+            <!--                    <xs:element name="car">-->
+            <!--                        <xs:simpleType>-->
+            <!--                            <xs:restriction base="xs:long">-->
+            <!--                                <xs:minInclusive value="1"/>-->
+            <!--                            </xs:restriction>-->
+            <!--                        </xs:simpleType>-->
+            <!--                    </xs:element>-->
+            <!--                    <xs:element minOccurs="0" name="optedForCDW" type="xs:boolean"/>-->
+            <!--                    <xs:element minOccurs="0" name="additionalCost">-->
+            <!--                        <xs:simpleType>-->
+            <!--                            <xs:restriction base="xs:double">-->
+            <!--                                <xs:minInclusive value="0.0"/>-->
+            <!--                            </xs:restriction>-->
+            <!--                        </xs:simpleType>-->
+            <!--                    </xs:element>-->
+            <!--                    <xs:element minOccurs="0" name="paid" type="xs:boolean"/>-->
+            <!--                    <xs:element minOccurs="0" name="rating">-->
+            <!--                        <xs:simpleType>-->
+            <!--                            <xs:restriction base="xs:integer">-->
+            <!--                                <xs:minInclusive value="0"/>-->
+            <!--                            </xs:restriction>-->
+            <!--                        </xs:simpleType>-->
+            <!--                    </xs:element>-->
+            <!--                    <xs:element maxOccurs="unbounded" minOccurs="0" name="commentDetails" type="tns:commentDetails"/>-->
+            <!--                    <xs:element minOccurs="0" name="kilometersLimit" nillable="false">-->
+            <!--                        <xs:simpleType>-->
+            <!--                            <xs:restriction base="xs:integer">-->
+            <!--                                <xs:minInclusive value="0"/>-->
+            <!--                            </xs:restriction>-->
+            <!--                        </xs:simpleType>-->
+            <!--                    </xs:element>-->
+            <!--                    <xs:element minOccurs="0" name="pricePerKm" nillable="false">-->
+            <!--                        <xs:simpleType>-->
+            <!--                            <xs:restriction base="xs:double">-->
+            <!--                                <xs:minInclusive value="0.0"/>-->
+            <!--                            </xs:restriction>-->
+            <!--                        </xs:simpleType>-->
+            <!--                    </xs:element>-->
+            <!--                </xs:sequence>-->
+            <!--            </xs:complexType>-->
+            <!--            <xs:complexType name="messageDetails">-->
+            <!--                <xs:sequence>-->
+            <!--                    <xs:element minOccurs="0" name="id">-->
+            <!--                        <xs:simpleType>-->
+            <!--                            <xs:restriction base="xs:long">-->
+            <!--                                <xs:minInclusive value="1"/>-->
+            <!--                            </xs:restriction>-->
+            <!--                        </xs:simpleType>-->
+            <!--                    </xs:element>-->
+            <!--                    <xs:element name="text" type="xs:string"/>-->
+            <!--                    <xs:element minOccurs="1" name="sender">-->
+            <!--                        <xs:simpleType>-->
+            <!--                            <xs:restriction base="xs:long">-->
+            <!--                                <xs:minInclusive value="1"/>-->
+            <!--                            </xs:restriction>-->
+            <!--                        </xs:simpleType>-->
+            <!--                    </xs:element>-->
+            <!--                    <xs:element name="dateAndTime" type="xs:dateTime"/>-->
+            <!--                </xs:sequence>-->
+            <!--            </xs:complexType>-->
+            <!--            <xs:complexType name="commentDetails">-->
+            <!--                <xs:sequence>-->
+            <!--                    <xs:element minOccurs="0" name="id">-->
+            <!--                        <xs:simpleType>-->
+            <!--                            <xs:restriction base="xs:long">-->
+            <!--                                <xs:minInclusive value="1"/>-->
+            <!--                            </xs:restriction>-->
+            <!--                        </xs:simpleType>-->
+            <!--                    </xs:element>-->
+            <!--                    <xs:element name="text" type="xs:string"/>-->
+            <!--                    <xs:element name="sender">-->
+            <!--                        <xs:simpleType>-->
+            <!--                            <xs:restriction base="xs:long">-->
+            <!--                                <xs:minInclusive value="1"/>-->
+            <!--                            </xs:restriction>-->
+            <!--                        </xs:simpleType>-->
+            <!--                    </xs:element>-->
+            <!--                    <xs:element name="status" type="xs:string"/>-->
+            <!--                </xs:sequence>-->
+            <!--            </xs:complexType>-->
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="getAllRentRequestDetailsRequest">
+        <wsdl:part element="sch:getAllRentRequestDetailsRequest" name="getAllRentRequestDetailsRequest">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllRentRequestDetailsResponse">
+        <wsdl:part element="sch:getAllRentRequestDetailsResponse" name="getAllRentRequestDetailsResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="RentRequestsPort">
+        <wsdl:operation name="getAllRentRequestDetails">
+            <wsdl:input message="tns:getAllRentRequestDetailsRequest" name="getAllRentRequestDetailsRequest">
+            </wsdl:input>
+            <wsdl:output message="tns:getAllRentRequestDetailsResponse" name="getAllRentRequestDetailsResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="RentRequestsPortSoap11" type="tns:RentRequestsPort">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="getAllRentRequestDetails">
+            <soap:operation soapAction=""/>
+            <wsdl:input name="getAllRentRequestDetailsRequest">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="getAllRentRequestDetailsResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="RentRequestsPortService">
+        <wsdl:port binding="tns:RentRequestsPortSoap11" name="RentRequestsPortSoap11">
+            <soap:address location="http://192.168.56.1:8083/rentrequest/ws"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

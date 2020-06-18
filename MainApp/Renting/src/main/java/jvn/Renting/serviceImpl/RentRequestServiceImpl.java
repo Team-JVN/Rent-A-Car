@@ -321,7 +321,11 @@ public class RentRequestServiceImpl implements RentRequestService {
         for (RentInfo rentInfo : rentInfos) {
             rentInfo.setRentRequest(rentRequest);
             AdvertisementWithIdsDTO advertisementDTO = advertisementsMap.get(rentInfo.getAdvertisement());
-            checkDate(advertisementDTO, rentInfo.getDateTimeFrom().toLocalDate(), rentInfo.getDateTimeTo().toLocalDate());
+            LocalDate dateTo = null;
+            if (advertisementDTO.getDateTo() != null && !advertisementDTO.getDateTo().isEmpty()) {
+                dateTo = getDateConverted(advertisementDTO.getDateTo());
+            }
+            checkDate(advertisementDTO.getId(), getDateConverted(advertisementDTO.getDateFrom()), dateTo, rentInfo.getDateTimeFrom().toLocalDate(), rentInfo.getDateTimeTo().toLocalDate());
             if (!advertisementDTO.getCDW()) {
                 rentInfo.setOptedForCDW(null);
             }
@@ -335,9 +339,8 @@ public class RentRequestServiceImpl implements RentRequestService {
         return rentRequest;
     }
 
-
-    private void checkDate(AdvertisementWithIdsDTO advertisement, LocalDate rentInfoDateFrom, LocalDate rentInfoDateTo) throws ParseException {
-        LocalDate advertisementDateFrom = getDateConverted(advertisement.getDateFrom());
+    @Override
+    public void checkDate(Long id, LocalDate advertisementDateFrom, LocalDate advertisementDateTo, LocalDate rentInfoDateFrom, LocalDate rentInfoDateTo) {
         if (rentInfoDateFrom.isBefore(LocalDate.now()) || rentInfoDateTo.isBefore(LocalDate.now())) {
             throw new InvalidRentRequestDataException("Invalid date from/to.", HttpStatus.NOT_FOUND);
         }
@@ -348,23 +351,22 @@ public class RentRequestServiceImpl implements RentRequestService {
             throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.", HttpStatus.BAD_REQUEST);
         }
 
-        if (advertisement.getDateTo() != null && !advertisement.getDateTo().isEmpty()) {
-            LocalDate advertisementDateTo = getDateConverted(advertisement.getDateTo());
+        if (advertisementDateTo != null) {
             if (rentInfoDateFrom.isAfter(advertisementDateTo) || rentInfoDateTo.isAfter(advertisementDateTo)) {
                 throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.", HttpStatus.BAD_REQUEST);
             }
         }
         LocalDateTime rentInfoDateTimeFrom = LocalDateTime.of(rentInfoDateFrom.minusDays(1), LocalTime.of(23, 59));
         LocalDateTime rentInfoDateTimeTo = LocalDateTime.of(rentInfoDateTo.plusDays(1), LocalTime.of(0, 0));
-        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanAndRentInfosAdvertisement(RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeFrom, advertisement.getId()).isEmpty()) {
+        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanAndRentInfosAdvertisement(RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeFrom, id).isEmpty()) {
             throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
                     HttpStatus.BAD_REQUEST);
         }
-        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanAndRentInfosAdvertisement(RentRequestStatus.PAID, rentInfoDateTimeTo, rentInfoDateTimeTo, advertisement.getId()).isEmpty()) {
+        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanAndRentInfosAdvertisement(RentRequestStatus.PAID, rentInfoDateTimeTo, rentInfoDateTimeTo, id).isEmpty()) {
             throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
                     HttpStatus.BAD_REQUEST);
         }
-        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanAndRentInfosAdvertisement(RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeTo, advertisement.getId()).isEmpty()) {
+        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanAndRentInfosAdvertisement(RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeTo, id).isEmpty()) {
             throw new InvalidRentRequestDataException("Chosen car is not available at specified date and time.",
                     HttpStatus.BAD_REQUEST);
         }
@@ -442,7 +444,8 @@ public class RentRequestServiceImpl implements RentRequestService {
         return rentRequest;
     }
 
-    private void checkIfCanAcceptRentRequest(RentRequest rentRequest) {
+    @Override
+    public void checkIfCanAcceptRentRequest(RentRequest rentRequest) {
         for (RentInfo rentInfo : rentRequest.getRentInfos()) {
             LocalDateTime rentInfoDateTimeFrom = LocalDateTime.of(rentInfo.getDateTimeFrom().toLocalDate().minusDays(1), LocalTime.of(23, 59));
             LocalDateTime rentInfoDateTimeTo = LocalDateTime.of(rentInfo.getDateTimeTo().toLocalDate().plusDays(1), LocalTime.of(0, 0));
@@ -461,10 +464,21 @@ public class RentRequestServiceImpl implements RentRequestService {
         }
     }
 
-    private void hasDebt(Long loggedInUserId) {
+    @Override
+    public RentRequest getRentRequest(Long id) {
+        return rentRequestRepository.findOneById(id);
+    }
+
+    @Override
+    public void hasDebt(Long loggedInUserId) {
         if (!rentRequestRepository.findByRentRequestStatusAndRentInfosRentReportPaidAndClient(RentRequestStatus.PAID, false, loggedInUserId).isEmpty()) {
             throw new InvalidRentRequestDataException("You are not allowed to create rent requests because you have outstanding debts. ", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @Override
+    public List<RentRequest> getAll(Long loggedInUserId) {
+        return rentRequestRepository.findAllByAdvertisementOwner(loggedInUserId);
     }
 
     @Autowired

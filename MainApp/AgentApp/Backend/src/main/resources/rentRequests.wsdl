@@ -29,7 +29,16 @@
                             </xs:restriction>
                         </xs:simpleType>
                     </xs:element>
-                    <xs:element name="rentRequestStatus" type="xs:string"/>
+                    <xs:element name="status">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                                <xs:enumeration value="PENDING"/>
+                                <xs:enumeration value="RESERVED"/>
+                                <xs:enumeration value="PAID"/>
+                                <xs:enumeration value="CANCELED"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
                     <xs:element name="client">
                         <xs:simpleType>
                             <xs:restriction base="xs:long">
@@ -71,7 +80,7 @@
                             </xs:restriction>
                         </xs:simpleType>
                     </xs:element>
-                    <xs:element maxOccurs="1" name="dateTimeFrom" type="xs:dateTime"/>
+                    <xs:element name="dateTimeFrom" type="xs:dateTime"/>
                     <xs:element name="dateTimeTo" type="xs:dateTime"/>
                     <xs:element name="advertisement">
                         <xs:simpleType>
@@ -192,7 +201,7 @@
     </wsdl:binding>
     <wsdl:service name="RentRequestsPortService">
         <wsdl:port binding="tns:RentRequestsPortSoap11" name="RentRequestsPortSoap11">
-            <soap:address location="http://192.168.1.18:8083/rentrequest/ws"/>
+            <soap:address location="http://192.168.56.1:8083/rentrequest/ws"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

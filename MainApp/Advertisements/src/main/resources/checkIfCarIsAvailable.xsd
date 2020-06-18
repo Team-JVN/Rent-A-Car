@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.soap.dto/advertisement"
+           targetNamespace="http://www.soap.dto/advertisement" elementFormDefault="qualified">
+
+    <xs:element name="checkIfCarIsAvailableRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="email" type="xs:string"/>
+                <xs:element name="carId">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:long">
+                            <xs:minInclusive value="1"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="dateFrom" type="xs:date"/>
+                <xs:element name="dateTo" type="xs:date" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="checkIfCarIsAvailableResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="available" type="xs:boolean"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

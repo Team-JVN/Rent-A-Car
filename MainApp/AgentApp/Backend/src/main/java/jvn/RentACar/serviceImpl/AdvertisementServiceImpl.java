@@ -53,7 +53,11 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         checkDate(createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
         createAdvertisementDTO.setCar(carService.get(createAdvertisementDTO.getCar().getId()));
         checkOwner(createAdvertisementDTO.getCar());
-        checkIfCarIsAvailable(createAdvertisementDTO.getCar().getId(), createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
+        CheckIfCarIsAvailableResponse response = advertisementClient.checkIfCarIsAvailable(createAdvertisementDTO.getCar().getId(),
+                createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
+        if (!response.isAvailable()) {
+            throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
+        }
         createAdvertisementDTO.setPriceList(priceListService.get(createAdvertisementDTO.getPriceList().getId()));
         createAdvertisementDTO = setPriceList(createAdvertisementDTO, createAdvertisementDTO.getKilometresLimit());
         createAdvertisementDTO.setMainAppId(saveInMainApp(createAdvertisementDTO));
@@ -70,7 +74,12 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         }
         if (!dbAdvertisement.getCar().getId().equals(advertisement.getCar().getId())) {
             dbAdvertisement.setCar(advertisement.getCar());
-            checkIfCarIsAvailable(dbAdvertisement.getCar().getId(), dbAdvertisement.getDateFrom(), dbAdvertisement.getDateTo());
+
+            CheckIfCarIsAvailableResponse response = advertisementClient.checkIfCarIsAvailable(dbAdvertisement.getCar().getId(),
+                    dbAdvertisement.getDateFrom(), dbAdvertisement.getDateTo());
+            if (!response.isAvailable()) {
+                throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
+            }
         }
         dbAdvertisement.setDateFrom(advertisement.getDateFrom());
         dbAdvertisement.setCar(carService.get(advertisement.getCar().getId()));
@@ -243,23 +252,6 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
         return searchParamsDTO;
     }
-
-    private void checkIfCarIsAvailable(Long carId, LocalDate advertisementDateFrom, LocalDate advertisementDateTo) {
-        if (!advertisementRepository.findByCarIdAndLogicalStatusNotAndDateToEquals(carId, LogicalStatus.DELETED, null).isEmpty()) {
-            throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
-        }
-
-        if (advertisementDateTo == null) {
-            if (!advertisementRepository.findByCarIdAndLogicalStatusNotAndDateToGreaterThanEqual(carId, LogicalStatus.DELETED, advertisementDateFrom).isEmpty()) {
-                throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
-            }
-        } else {
-            if (!advertisementRepository.findByCarIdAndLogicalStatusNotAndDateFromLessThanEqualAndDateToGreaterThanEqual(carId, LogicalStatus.DELETED, advertisementDateTo, advertisementDateFrom).isEmpty()) {
-                throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
-            }
-        }
-    }
-
 
     private void checkDate(LocalDate dateFrom, LocalDate dateTo) {
         if (dateFrom.isBefore(LocalDate.now()) || (dateTo != null && dateTo.isBefore(LocalDate.now()))) {
