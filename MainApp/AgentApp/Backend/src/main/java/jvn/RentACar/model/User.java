@@ -31,6 +31,9 @@ public abstract class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column
+    private Long mainAppId;
+
     @Column(nullable = false)
     private String name;
 
@@ -63,6 +66,15 @@ public abstract class User implements UserDetails {
 
     @Column
     private Timestamp lastPasswordResetDate = new Timestamp(DateTime.now().getMillis());
+
+    public User(Long mainAppId, String name, String email, String password, String address, boolean enabled) {
+        this.mainAppId = mainAppId;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.address = address;
+        this.enabled = enabled;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

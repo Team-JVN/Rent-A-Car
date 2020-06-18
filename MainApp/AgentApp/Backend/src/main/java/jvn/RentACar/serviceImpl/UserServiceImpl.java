@@ -1,6 +1,5 @@
 package jvn.RentACar.serviceImpl;
 
-import jvn.RentACar.exceptionHandler.BlockedUserException;
 import jvn.RentACar.enumeration.AgentStatus;
 import jvn.RentACar.enumeration.ClientStatus;
 import jvn.RentACar.exceptionHandler.InvalidUserDataException;
@@ -87,6 +86,9 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     @Override
     public User getLoginUser() {
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
+        if (currentUser == null) {
+            return null;
+        }
         return userRepository.findByEmail(currentUser.getName());
     }
 
@@ -140,6 +142,11 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         }
     }
 
+    @Override
+    public User findByMainAppId(Long mainAppId) {
+        return userRepository.findByMainAppId(mainAppId);
+    }
+
     private String getClientIP() {
         String xfHeader = request.getHeader("X-Forwarded-For");
         if (xfHeader == null) {
@@ -191,8 +198,8 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, TokenUtils tokenUtils, RoleRepository roleRepository,
-            ResetTokenRepository resetTokenRepository, EmailNotificationService emailNotificationService,
-            Environment environment, LoginAttemptService loginAttemptService, HttpServletRequest request) {
+                           ResetTokenRepository resetTokenRepository, EmailNotificationService emailNotificationService,
+                           Environment environment, LoginAttemptService loginAttemptService, HttpServletRequest request) {
         this.userRepository = userRepository;
         this.tokenUtils = tokenUtils;
         this.roleRepository = roleRepository;

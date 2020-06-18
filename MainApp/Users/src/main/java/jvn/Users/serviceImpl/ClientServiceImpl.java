@@ -54,8 +54,9 @@ public class ClientServiceImpl implements ClientService {
     private LogProducer logProducer;
 
     @Override
-    public Client create(Client client) throws NoSuchAlgorithmException {
-        Long loggedInUserId = userService.getLoginUser().getId();
+
+    public Client create(Client client, boolean fromAgentApp) throws NoSuchAlgorithmException {
+
 
         if (clientRepository.findByPhoneNumber(client.getPhoneNumber()) != null) {
             throw new InvalidClientDataException("Client with same phone number already exists.",
@@ -79,11 +80,30 @@ public class ClientServiceImpl implements ClientService {
             client.setStatus(ClientStatus.NEVER_LOGGED_IN);
             composeAndSendEmailToChangePassword(client.getEmail(), generatedPassword);
             Client dbClient = clientRepository.save(client);
+            Long loggedInUserId = userService.getLoginUser().getId();
             logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CCL", String.format("User %s successfully created client %s", loggedInUserId, dbClient.getId())));
             return dbClient;
         } else {
-            client.setPassword(passwordEncoder.encode(client.getPassword()));
-            client.setStatus(ClientStatus.AWAITING);
+
+            if (fromAgentApp) {
+                client.setPassword(client.getPassword());
+                client.setStatus(client.getStatus());
+                client = clientRepository.save(client);
+                VerificationToken verificationToken = new VerificationToken(client);
+                String nonHashedToken = verificationToken.getToken();
+                verificationToken.setToken(getTokenHash(nonHashedToken));
+
+                VerificationToken dbToken = verificationTokenRepository.findByToken(verificationToken.getToken());
+                while (dbToken != null) {
+                    verificationToken = new VerificationToken(client);
+                    dbToken = verificationTokenRepository.findByToken(verificationToken.getToken());
+                }
+                verificationTokenRepository.save(verificationToken);
+                composeAndSendEmailToActivate(client.getEmail(), nonHashedToken);
+            } else {
+                client.setPassword(passwordEncoder.encode(client.getPassword()));
+                client.setStatus(ClientStatus.AWAITING);
+            }
             Client savedClient = clientRepository.save(client);
             logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "REG", String.format("User %s successfully registered", savedClient.getId())));
             return savedClient;
@@ -283,6 +303,42 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public List<Client> getClientsById(List<Long> clients) {
         return clientRepository.findByIdIn(clients);
+    }
+
+    @Override
+    public String checkClientPersonalInfo(String email, String phoneNumber) {
+        if (clientRepository.findByPhoneNumber(phoneNumber) != null) {
+            return "PHONE_NUMBER_NOT_VALID";
+        }
+        if (!email.isEmpty()) {
+            if (userService.findByEmail(email) != null) {
+                return "EMAIL_NOT_VALID";
+            }
+        }
+        return "ALL";
+    }
+
+    @Override
+    public boolean checkIfCanDeleteAndDelete(Long id, Long loggedInUser) {
+        Client client = clientRepository.findOneByIdAndStatusNot(id, ClientStatus.DELETED);
+        if (client == null) {
+            return false;
+        }
+        client.setStatus(ClientStatus.DELETED);
+        clientRepository.save(client);
+
+//        Long loggedInUserId = userService.getLoginUser().getId();
+        return true;
+    }
+
+    @Override
+    public List<Client> getAll(Long id) {
+        Collection<ClientStatus> statuses = new ArrayList<>();
+        statuses.add(ClientStatus.NEVER_LOGGED_IN);
+        statuses.add(ClientStatus.ACTIVE);
+        statuses.add(ClientStatus.APPROVED);
+        statuses.add(ClientStatus.DELETED);
+        return clientRepository.findAllByStatusIn(statuses);
     }
 
     @Async

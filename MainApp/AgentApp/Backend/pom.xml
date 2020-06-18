@@ -123,6 +123,29 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <!--            <plugin>-->
+            <!--                <groupId>org.jvnet.jaxb2.maven2</groupId>-->
+            <!--                <artifactId>maven-jaxb2-plugin</artifactId>-->
+            <!--                <version>0.14.0</version>-->
+            <!--                <executions>-->
+            <!--                    <execution>-->
+            <!--                        <goals>-->
+            <!--                            <goal>generate</goal>-->
+            <!--                        </goals>-->
+            <!--                    </execution>-->
+            <!--                </executions>-->
+            <!--                <configuration>-->
+            <!--                    <schemaLanguage>WSDL</schemaLanguage>-->
+            <!--                    <generateDirectory>${project.basedir}/src/main/java</generateDirectory>-->
+            <!--                    <generatePackage>jvn.RentACar.dto.soap.pricelist</generatePackage>-->
+            <!--                    <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>-->
+            <!--                    <schemaIncludes>-->
+            <!--                        <include>priceLists.wsdl</include>-->
+            <!--                        <include>deletePriceLists.wsdl</include>-->
+            <!--                        <include>listPriceList.wsdl</include>-->
+            <!--                    </schemaIncludes>-->
+            <!--                </configuration>-->
+            <!--            </plugin>-->
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
@@ -137,16 +160,16 @@
                 <configuration>
                     <schemaLanguage>WSDL</schemaLanguage>
                     <generateDirectory>${project.basedir}/src/main/java</generateDirectory>
-                    <generatePackage>jvn.RentACar.dto.soap.pricelist</generatePackage>
+                    <generatePackage>jvn.RentACar.dto.soap.client</generatePackage>
                     <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>
                     <schemaIncludes>
-                        <include>priceLists.wsdl</include>
-                        <include>deletePriceLists.wsdl</include>
-                        <include>listPriceList.wsdl</include>
+                        <include>clients.wsdl</include>
+                        <include>deleteClient.wsdl</include>
+                        <include>checkPersonalInfo.wsdl</include>
+                        <include>listClient.wsdl</include>
                     </schemaIncludes>
                 </configuration>
             </plugin>
-
             <!--            <plugin>-->
             <!--                <groupId>org.jvnet.jaxb2.maven2</groupId>-->
             <!--                <artifactId>maven-jaxb2-plugin</artifactId>-->
