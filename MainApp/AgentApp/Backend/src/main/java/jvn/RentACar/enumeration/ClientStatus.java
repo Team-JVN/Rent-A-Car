@@ -4,4 +4,5 @@ public enum ClientStatus {
     NEVER_LOGGED_IN,
     APPROVED,
     ACTIVE,
+    DELETED
 }

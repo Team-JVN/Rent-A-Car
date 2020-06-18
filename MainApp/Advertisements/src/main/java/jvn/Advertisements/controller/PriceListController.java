@@ -41,7 +41,7 @@ public class PriceListController {
     @GetMapping
     public ResponseEntity<List<PriceListDTO>> getAll() {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        List<PriceListDTO> list = priceListService.getAll(userDTO).stream().map(priceListDtoMapper::toDto).
+        List<PriceListDTO> list = priceListService.getAll(userDTO.getId()).stream().map(priceListDtoMapper::toDto).
                 collect(Collectors.toList());
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
@@ -49,19 +49,19 @@ public class PriceListController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PriceListDTO> create(@Valid @RequestBody PriceListDTO priceListDTO) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.create(priceListDtoMapper.toEntity(priceListDTO), userDTO)), HttpStatus.CREATED);
+        return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.create(priceListDtoMapper.toEntity(priceListDTO), userDTO.getId())), HttpStatus.CREATED);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PriceListDTO> edit(@PathVariable @Positive(message = "Id must be positive.") Long id, @Valid @RequestBody PriceListDTO priceListDTO) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.edit(id, priceListDtoMapper.toEntity(priceListDTO), userDTO)), HttpStatus.OK);
+        return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.edit(id, priceListDtoMapper.toEntity(priceListDTO), userDTO.getId())), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable @Positive(message = "Id must be positive.") Long id) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        priceListService.delete(id, userDTO);
+        priceListService.delete(id, userDTO.getId());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

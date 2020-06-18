@@ -1,5 +1,6 @@
 package jvn.Users.serviceImpl;
 
+import jvn.Users.dto.message.Log;
 import jvn.Users.dto.request.ChangePasswordDTO;
 import jvn.Users.dto.request.ResetPasswordDTO;
 import jvn.Users.dto.response.CheckPassDTO;
@@ -10,6 +11,7 @@ import jvn.Users.exceptionHandler.BlockedUserException;
 import jvn.Users.exceptionHandler.InvalidTokenException;
 import jvn.Users.exceptionHandler.InvalidUserDataException;
 import jvn.Users.model.*;
+import jvn.Users.producer.LogProducer;
 import jvn.Users.repository.ResetTokenRepository;
 import jvn.Users.repository.UserRepository;
 import jvn.Users.security.JwtAuthenticationRequest;
@@ -38,6 +40,9 @@ import java.time.LocalDateTime;
 @Service
 public class AuthentificationServiceImpl implements AuthentificationService {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     public TokenUtils tokenUtils;
 
     private AuthenticationManager authenticationManager;
@@ -54,6 +59,8 @@ public class AuthentificationServiceImpl implements AuthentificationService {
 
     private ChangePasswordAttemptService changePasswordAttemptService;
 
+    private LogProducer logProducer;
+
     @Override
     public UserTokenState login(JwtAuthenticationRequest authenticationRequest) {
         final Authentication authentication = authenticationManager
@@ -68,6 +75,7 @@ public class AuthentificationServiceImpl implements AuthentificationService {
         String refreshJwt = tokenUtils.generateRefreshToken(user.getUsername());
         int expiresIn = tokenUtils.getExpiredIn();
 
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "LGN", String.format("User %s successfully logged in", user.getId())));
         return new UserTokenState(jwt, expiresIn, refreshJwt);
     }
 
@@ -76,8 +84,9 @@ public class AuthentificationServiceImpl implements AuthentificationService {
             throws NullPointerException, NoSuchAlgorithmException {
         String ip = getClientIP();
         if (changePasswordAttemptService.isBlocked(ip)) {
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CPW", String.format("User from %s is blocked.", getClientIP())));
             throw new BlockedUserException(
-                    "You tried to log in too many times. Your account wil be blocked for the next 24 hours.",
+                    "You tried to change password too many times. Your account wil be blocked for the next 24 hours.",
                     HttpStatus.BAD_REQUEST);
         }
 
@@ -106,6 +115,7 @@ public class AuthentificationServiceImpl implements AuthentificationService {
         user.setLastPasswordResetDate(new Timestamp(DateTime.now().getMillis()));
         userRepository.save(user);
         changePasswordAttemptService.changePassSucceeded();
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CPW", String.format("User %s successfully changed password", user.getId())));
     }
 
     @Override
@@ -145,12 +155,13 @@ public class AuthentificationServiceImpl implements AuthentificationService {
         userRepository.save(user);
 
         resetTokenRepository.deleteById(resetToken.getId());
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "RPW", String.format("User %s successfully reset password", user.getId())));
     }
 
     @Override
     public boolean userIsNeverLoggedIn(String email) {
         User user = userRepository.findByEmail(email);
-        if(user == null){
+        if (user == null) {
             return false;
         }
         if (user instanceof Agent) {
@@ -194,7 +205,7 @@ public class AuthentificationServiceImpl implements AuthentificationService {
     public AuthentificationServiceImpl(TokenUtils tokenUtils, AuthenticationManager authenticationManager,
                                        UserRepository userRepository, PasswordEncoder passwordEncoder, RestTemplateBuilder restTemplateBuilder,
                                        HttpServletRequest request, ChangePasswordAttemptService changePasswordAttemptService,
-                                       ResetTokenRepository resetTokenRepository) {
+                                       ResetTokenRepository resetTokenRepository, LogProducer logProducer) {
         this.tokenUtils = tokenUtils;
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
@@ -203,5 +214,6 @@ public class AuthentificationServiceImpl implements AuthentificationService {
         this.request = request;
         this.changePasswordAttemptService = changePasswordAttemptService;
         this.resetTokenRepository = resetTokenRepository;
+        this.logProducer = logProducer;
     }
 }

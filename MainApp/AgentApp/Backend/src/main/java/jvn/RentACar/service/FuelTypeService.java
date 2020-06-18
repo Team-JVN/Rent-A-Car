@@ -12,6 +12,8 @@ public interface FuelTypeService {
 
     FuelType get(Long id);
 
+    FuelType get(String name);
+
     List<FuelType> get();
 
     FuelType edit(Long id, FuelTypeDTO fuelTypeDTO);

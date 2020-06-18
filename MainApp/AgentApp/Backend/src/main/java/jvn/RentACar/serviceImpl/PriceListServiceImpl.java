@@ -1,7 +1,13 @@
 package jvn.RentACar.serviceImpl;
 
+import jvn.RentACar.client.PriceListClient;
+import jvn.RentACar.dto.soap.pricelist.DeletePriceListDetailsResponse;
+import jvn.RentACar.dto.soap.pricelist.GetAllPriceListDetailsResponse;
+import jvn.RentACar.dto.soap.pricelist.GetPriceListDetailsResponse;
+import jvn.RentACar.dto.soap.pricelist.PriceListDetails;
 import jvn.RentACar.enumeration.LogicalStatus;
 import jvn.RentACar.exceptionHandler.InvalidPriceListDataException;
+import jvn.RentACar.mapper.PriceListDetailsMapper;
 import jvn.RentACar.model.PriceList;
 import jvn.RentACar.repository.PriceListRepository;
 import jvn.RentACar.service.PriceListService;
@@ -10,15 +16,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PriceListServiceImpl implements PriceListService {
 
     private PriceListRepository priceListRepository;
 
+    private PriceListClient priceListClient;
+
+    private PriceListDetailsMapper priceListDetailsMapper;
+
     @Autowired
-    public PriceListServiceImpl(PriceListRepository priceListRepository) {
+    public PriceListServiceImpl(PriceListRepository priceListRepository, PriceListClient priceListClient, PriceListDetailsMapper priceListDetailsMapper) {
         this.priceListRepository = priceListRepository;
+        this.priceListClient = priceListClient;
+        this.priceListDetailsMapper = priceListDetailsMapper;
     }
 
     @Override
@@ -32,11 +45,17 @@ public class PriceListServiceImpl implements PriceListService {
 
     @Override
     public List<PriceList> getAll() {
+        synchronizePriceLists();
         return priceListRepository.findByStatus(LogicalStatus.EXISTING);
     }
 
     @Override
     public PriceList create(PriceList priceList) {
+        GetPriceListDetailsResponse response = priceListClient.createOrEdit(priceList);
+        PriceListDetails priceListDetails = response.getPriceListDetails();
+        if (priceListDetails != null && priceListDetails.getId() != null) {
+            priceList.setMainAppId(priceListDetails.getId());
+        }
         return priceListRepository.save(priceList);
     }
 
@@ -52,6 +71,12 @@ public class PriceListServiceImpl implements PriceListService {
             dbPriceList.setPriceForCDW(priceList.getPriceForCDW());
         }
 
+        GetPriceListDetailsResponse response = priceListClient.createOrEdit(dbPriceList);
+        PriceListDetails priceListDetails = response.getPriceListDetails();
+        if (priceListDetails != null && priceListDetails.getId() != null) {
+            dbPriceList.setMainAppId(priceListDetails.getId());
+        }
+
         return priceListRepository.save(dbPriceList);
     }
 
@@ -59,10 +84,38 @@ public class PriceListServiceImpl implements PriceListService {
     public void delete(Long id) {
         PriceList priceList = get(id);
 
-        if (priceListRepository.findByIdAndStatusNotAndAdvertisementsLogicalStatusNot(id, LogicalStatus.DELETED, LogicalStatus.DELETED) != null) {
+        DeletePriceListDetailsResponse response = priceListClient.checkAndDeleteIfCan(priceList);
+        if (response == null || !response.isCanDelete()) {
             throw new InvalidPriceListDataException("Price list is used in advertisements, so it can't be deleted.", HttpStatus.BAD_REQUEST);
         }
         priceList.setStatus(LogicalStatus.DELETED);
         priceListRepository.save(priceList);
+    }
+
+    @Override
+    public PriceList getByMainAppId(Long mainAppId) {
+        return priceListRepository.findByMainAppId(mainAppId);
+    }
+
+    private void synchronizePriceLists() {
+        GetAllPriceListDetailsResponse response = priceListClient.getAll();
+        List<PriceListDetails> priceListDetails = response.getPriceListDetails();
+        if (priceListDetails == null) {
+            return;
+        }
+        List<PriceList> priceLists = priceListDetails.stream().map(priceListDetailsMapper::toEntity).
+                collect(Collectors.toList());
+        for (PriceList priceList : priceLists) {
+            PriceList dbPriceList = priceListRepository.findByMainAppId(priceList.getMainAppId());
+            if (dbPriceList != null) {
+                dbPriceList.setPricePerKm(priceList.getPricePerKm());
+                dbPriceList.setPricePerDay(priceList.getPricePerDay());
+                dbPriceList.setPriceForCDW(priceList.getPriceForCDW());
+                dbPriceList.setStatus(priceList.getStatus());
+                priceListRepository.save(dbPriceList);
+            } else {
+                priceListRepository.save(priceList);
+            }
+        }
     }
 }

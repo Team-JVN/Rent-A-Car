@@ -5,6 +5,7 @@ import jvn.Cars.exceptionHandler.InvalidModelDataException;
 import jvn.Cars.model.Make;
 import jvn.Cars.model.Model;
 import jvn.Cars.repository.ModelRepository;
+import jvn.Cars.service.MakeService;
 import jvn.Cars.service.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,8 @@ import java.util.List;
 public class ModelServiceImpl implements ModelService {
 
     private ModelRepository modelRepository;
+
+    private MakeService makeService;
 
     @Override
     public Model create(Model model, Make make) {
@@ -33,6 +36,11 @@ public class ModelServiceImpl implements ModelService {
             throw new InvalidModelDataException("This Model doesn't exist.", HttpStatus.NOT_FOUND);
         }
         return model;
+    }
+
+    @Override
+    public Model get(String model, Long makeId) {
+        return modelRepository.findByNameAndMakeId(model,makeId);
     }
 
     @Override

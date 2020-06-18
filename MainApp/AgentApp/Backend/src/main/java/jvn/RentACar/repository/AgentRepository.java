@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface AgentRepository extends JpaRepository<Agent, Long> {
 
     Agent findOneByIdAndStatusNot(Long id, AgentStatus agentStatus);
+
+    Agent findByEmail(String email);
 }

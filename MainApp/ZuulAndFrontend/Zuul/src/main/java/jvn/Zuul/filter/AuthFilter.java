@@ -6,6 +6,9 @@ import com.netflix.zuul.context.RequestContext;
 import feign.FeignException;
 import jvn.Zuul.client.AuthClient;
 import jvn.Zuul.dto.UserDTO;
+import jvn.Zuul.dto.message.Log;
+import jvn.Zuul.producer.LogProducer;
+import jvn.Zuul.utils.IPAddressProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
@@ -16,8 +19,17 @@ import java.io.IOException;
 @Component
 public class AuthFilter extends ZuulFilter {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     @Autowired
     private AuthClient authClient;
+
+    @Autowired
+    private LogProducer logProducer;
+
+    @Autowired
+    private IPAddressProvider ipAddressProvider;
 
     @Override
     public String filterType() {
@@ -36,6 +48,7 @@ public class AuthFilter extends ZuulFilter {
         if (request.getMethod().equals("OPTIONS")) {
             return false;
         }
+
         String url = request.getRequestURL().toString();
         String method = request.getMethod();
         if (url.contains("users")) {
@@ -44,12 +57,19 @@ public class AuthFilter extends ZuulFilter {
         if (url.contains("/search/h2")) {
             return false;
         }
+
+        if (url.contains("/ws")) {
+            return false;
+        }
+
         if (new AntPathMatcher().match("**/api/car/{id}/picture", url) && method.equals("GET")) {
             return false;
         }
+
         if (method.equals("GET") && url.contains("/api/body-style")) {
             return false;
         }
+
         if (method.equals("GET") && url.contains("/api/fuel-type")) {
             return false;
         }
@@ -83,16 +103,17 @@ public class AuthFilter extends ZuulFilter {
         HttpServletRequest request = ctx.getRequest();
         String header = request.getHeader("Auth");
         if (header == null || header.isEmpty() || !header.startsWith("Bearer ")) {
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "ATZ", String.format("User from %s tried to access %s API", ipAddressProvider.get(), request.getRequestURI())));
             ctx.setResponseStatusCode(401);
             ctx.setSendZuulResponse(false);
         } else {
             try {
-                System.out.println("Verifikacija");
                 UserDTO userDTO = authClient.verify(header);
                 ctx.addZuulRequestHeader("user", jsonToString(userDTO));
                 ctx.addZuulRequestHeader("Auth", header);
             } catch (FeignException.NotFound e) {
-                setFailedRequest("Something goes wrong. Please try again.", 403);
+                logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "FGN", "Users service is not responding"));
+                setFailedRequest("Something went wrong. Please try again.", 403);
             }
         }
         return null;
@@ -104,7 +125,8 @@ public class AuthFilter extends ZuulFilter {
         try {
             return Obj.writeValueAsString(userDTO);
         } catch (IOException e) {
-            setFailedRequest("Something is wrong. Please try again.", 403);
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping %s instance to string failed", UserDTO.class.getSimpleName())));
+            setFailedRequest("Something went wrong. Please try again.", 403);
         }
         return null;
     }

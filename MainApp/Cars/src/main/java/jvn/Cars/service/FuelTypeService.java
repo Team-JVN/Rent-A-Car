@@ -17,4 +17,6 @@ public interface FuelTypeService {
     FuelType edit(Long id, FuelTypeDTO fuelTypeDTO);
 
     void delete(Long id);
+
+    FuelType get(String name);
 }

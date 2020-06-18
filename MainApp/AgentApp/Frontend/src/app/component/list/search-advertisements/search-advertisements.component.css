@@ -31,6 +31,15 @@ mat-panel-title {
     width: 200px;
 }
 
+.sort-filter {    
+    font-size: 110%;
+    text-align: right;
+}
+
+.filter-span {
+    margin-right: 20px;
+}
+
 td.mat-cell{
     border-bottom-style: none;
 }

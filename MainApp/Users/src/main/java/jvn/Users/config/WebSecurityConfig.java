@@ -44,8 +44,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 
                 .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
-
-                .authorizeRequests().antMatchers("/api/auth/**").permitAll()
+                .authorizeRequests()
+                .antMatchers("/api/auth/**", "/api/verify/user**", "/ws**", "/ws/**", "/ws")
+                .permitAll()
                 .antMatchers(HttpMethod.PUT, "/api/admin")
                 .hasAuthority("ADMIN_EDIT_PROFILE")
                 .antMatchers(HttpMethod.GET, "/api/admin/profile")
@@ -100,6 +101,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers(HttpMethod.PUT, "/api/auth");
         web.ignoring().antMatchers(HttpMethod.PUT, "/api/client/activate**");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/client/for-rent-request");
+        web.ignoring().antMatchers(HttpMethod.GET, "/api/verify/user**");
+
+        web.ignoring().antMatchers("/ws/**");
+        web.ignoring().antMatchers("/ws**");
+        web.ignoring().antMatchers("/ws");
     }
 
 }

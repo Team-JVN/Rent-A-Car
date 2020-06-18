@@ -36,18 +36,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .hasAuthority("MY_RENT_REQUESTS")
 
                 .antMatchers(HttpMethod.GET,
-                        "/api/rent-request/{status}/advertisement/{advertisementId}",
-                        "/api/rent-request/advertisement/{advId}/check-for-delete",
-                        "/api/rent-request/advertisement/{advId}/edit-type")
+                        "/api/rent-request/{status}/advertisement/{advertisementId}")
                 .hasAuthority("MANAGE_ADVERTISEMENTS")
                 .antMatchers(HttpMethod.GET,
                         "/api/rent-request/{id}")
                 .hasAuthority("MANAGE_ADVERTISEMENTS")
                 .antMatchers(HttpMethod.POST, "/api/rent-request")
                 .hasAuthority("MANAGE_ADVERTISEMENTS")
-
-                .antMatchers(HttpMethod.GET, "/api/rent-request/advertisement/{advIds}/check-rent-infos")
-                .hasAuthority("MANAGE_CARS")
 
                 .antMatchers(HttpMethod.PUT, "/api/rent-request/{id}")
                 .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
@@ -66,6 +61,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
 
         web.ignoring().antMatchers(HttpMethod.GET, "/api/car/verify/{userId}/{carId}");
+        web.ignoring().antMatchers(HttpMethod.GET, "/api/rent-request/advertisement/{advId}/check-for-delete");
+        web.ignoring().antMatchers(HttpMethod.GET, "/api/rent-request/advertisement/{advId}/edit-type");
+        web.ignoring().antMatchers(HttpMethod.GET, "/api/rent-request/advertisement/{advIds}/check-rent-infos");
     }
 
 }

@@ -12,6 +12,8 @@ public interface BodyStyleService {
 
     BodyStyle get(Long id);
 
+    BodyStyle get(String name);
+
     List<BodyStyle> get();
 
     BodyStyle edit(Long id, BodyStyleDTO bodyStyleDTO);

@@ -35,6 +35,11 @@ public class FuelTypeServiceImpl implements FuelTypeService {
     }
 
     @Override
+    public FuelType get(String name) {
+        return fuelTypeRepository.findByName(name);
+    }
+
+    @Override
     public List<FuelType> get() {
         return fuelTypeRepository.findAll();
     }

@@ -8,22 +8,28 @@ import jvn.Advertisements.model.Advertisement;
 import java.util.List;
 
 public interface AdvertisementService {
-    Advertisement create(Advertisement createAdvertisementDTO, UserDTO userDTO, String jwtToken, String user);
+    Advertisement create(Advertisement createAdvertisementDTO, UserDTO userDTO);
 
     List<Advertisement> get(List<Long> advertisements);
 
     Advertisement getOne (Long advertisementId);
 
-    void delete(Long id, Long loggedInUserId, String jwtToken, String user);
+    void delete(Long id, Long loggedInUserId);
 
-    Advertisement edit(Long id, Advertisement advertisement, Long loggedInUserId, String jwtToken, String user, UserDTO userDTO);
+    Advertisement edit(Long id, Advertisement advertisement, UserDTO userDTO);
 
     Advertisement editPartial(Long id, AdvertisementEditDTO advertisement, Long loggedInUserId);
 
     EditType getCarEditType(Long carId);
 
-    Boolean canEditCarPartially(Long carId, String jwtToken, String user);
+    Boolean canEditCarPartially(Long carId);
 
     Boolean canDeleteCar(Long carId);
+
+    boolean checkIfCanDeleteAndDelete(Long id, Long loggedInUser);
+
+    String getAdvertisementEditType(Long id, Long loggedInUser);
+
+    List<Advertisement> getAll(Long loggedInUser);
 }
 

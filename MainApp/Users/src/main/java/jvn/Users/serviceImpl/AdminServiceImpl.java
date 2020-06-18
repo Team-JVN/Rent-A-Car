@@ -1,12 +1,12 @@
 package jvn.Users.serviceImpl;
 
 import jvn.Users.common.RandomPasswordGenerator;
+import jvn.Users.dto.message.Log;
 import jvn.Users.enumeration.AdminStatus;
-import jvn.Users.enumeration.ClientStatus;
 import jvn.Users.exceptionHandler.InvalidAdminDataException;
-import jvn.Users.exceptionHandler.InvalidClientDataException;
 import jvn.Users.model.Admin;
 import jvn.Users.model.Role;
+import jvn.Users.producer.LogProducer;
 import jvn.Users.repository.AdminRepository;
 import jvn.Users.service.AdminService;
 import jvn.Users.service.EmailNotificationService;
@@ -18,8 +18,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @Service
 public class AdminServiceImpl implements AdminService {
+
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
 
     private AdminRepository adminRepository;
 
@@ -31,6 +35,7 @@ public class AdminServiceImpl implements AdminService {
 
     private Environment environment;
 
+    private LogProducer logProducer;
 
     @Override
     public Admin create(Admin admin) {
@@ -49,7 +54,11 @@ public class AdminServiceImpl implements AdminService {
         admin.setPassword(passwordEncoder.encode(generatedPassword));
 
         composeAndSendEmailToChangePassword(admin.getEmail(), generatedPassword);
-        return adminRepository.save(admin);
+        Admin dbAdmin = adminRepository.save(admin);
+
+        Long loggedInUserId = userService.getLoginUser().getId();
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CAG", String.format("User %s successfully created agent %s", loggedInUserId, dbAdmin.getId())));
+        return dbAdmin;
     }
 
     @Override
@@ -62,12 +71,12 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<Admin> getAll(String status,Long id) {
+    public List<Admin> getAll(String status, Long id) {
         List<Admin> admins;
-        if(status.equals("all")){
+        if (status.equals("all")) {
             admins = adminRepository.findAllByIdNot(id);
-        }else {
-            admins = adminRepository.findByStatusAndIdNot(getAdminStatus(status),id);
+        } else {
+            admins = adminRepository.findByStatusAndIdNot(getAdminStatus(status), id);
         }
         return admins;
     }
@@ -76,6 +85,9 @@ public class AdminServiceImpl implements AdminService {
     public void delete(Long id) {
         Admin admin = get(id);
         admin.setRole(null);
+
+        Long loggedInUserId = userService.getLoginUser().getId();
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CAD", String.format("User %s successfully deleted admin %s", loggedInUserId, admin.getId())));
         adminRepository.deleteById(id);
     }
 
@@ -119,12 +131,15 @@ public class AdminServiceImpl implements AdminService {
             throw new InvalidAdminDataException("Please choose valid admin's status", HttpStatus.NOT_FOUND);
         }
     }
+
     @Autowired
-    public AdminServiceImpl(AdminRepository adminRepository, UserService userService, PasswordEncoder passwordEncoder, EmailNotificationService emailNotificationService, Environment environment) {
+    public AdminServiceImpl(AdminRepository adminRepository, UserService userService, PasswordEncoder passwordEncoder,
+                            EmailNotificationService emailNotificationService, Environment environment, LogProducer logProducer) {
         this.adminRepository = adminRepository;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.emailNotificationService = emailNotificationService;
         this.environment = environment;
+        this.logProducer = logProducer;
     }
 }

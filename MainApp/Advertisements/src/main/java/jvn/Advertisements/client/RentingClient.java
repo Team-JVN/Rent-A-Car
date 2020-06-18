@@ -13,11 +13,11 @@ import java.util.List;
 public interface RentingClient {
 
     @RequestMapping(method = RequestMethod.GET, path = "/api/rent-request/advertisement/{advId}/check-for-delete")
-    boolean canDeleteAdvertisement(@RequestHeader("Auth") String token, @RequestHeader("user") String user, @PathVariable("advId") Long advId);
+    boolean canDeleteAdvertisement(@PathVariable("advId") Long advId);
 
     @RequestMapping(method = RequestMethod.GET, path = "/api/rent-request/advertisement/{advIds}/check-rent-infos")
-    boolean hasRentInfos(@RequestHeader("Auth") String token, @RequestHeader("user") String user, @PathVariable("advIds") List<Long> advIds);
+    boolean hasRentInfos(@PathVariable("advIds") List<Long> advIds);
 
     @RequestMapping(method = RequestMethod.GET, path = "/api/rent-request/advertisement/{advId}/edit-type")
-    EditType getAdvertisementEditType(@RequestHeader("Auth") String token, @RequestHeader("user") String user, @PathVariable("advId") Long advId);
+    EditType getAdvertisementEditType(@PathVariable("advId") Long advId);
 }

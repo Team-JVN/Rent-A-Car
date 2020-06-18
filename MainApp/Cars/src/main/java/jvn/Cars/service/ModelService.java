@@ -11,6 +11,8 @@ public interface ModelService {
 
     Model get(Long modelId, Long makeId);
 
+    Model get(String make,Long makeId);
+
     List<Model> getAll(Long makeId);
 
     Model edit(Long modelId, ModelDTO modelDTO, Long makeId);

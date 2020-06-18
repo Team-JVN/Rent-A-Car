@@ -32,7 +32,7 @@ public class PriceList {
     @Column
     private Long ownerId;
 
-    @OneToMany(mappedBy = "priceList", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "priceList", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Advertisement> advertisements = new HashSet<>();
 
     @Column(nullable = false)

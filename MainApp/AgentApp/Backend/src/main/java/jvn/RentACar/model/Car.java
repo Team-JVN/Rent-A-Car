@@ -19,6 +19,9 @@ public class Car {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
+    private Long mainAppId;
+
     @Column(nullable = false)
     private LogicalStatus logicalStatus = LogicalStatus.EXISTING;
 
@@ -61,4 +64,5 @@ public class Car {
 
     @Column
     private Integer commentsCount;
+
 }

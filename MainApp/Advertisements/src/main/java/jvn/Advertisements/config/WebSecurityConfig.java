@@ -1,6 +1,5 @@
 package jvn.Advertisements.config;
 
-
 import jvn.Advertisements.security.RestAuthenticationEntryPoint;
 import jvn.Advertisements.security.TokenAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +28,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
 
                 .authorizeRequests()
+                .antMatchers("/ws**", "/ws/**").permitAll()
                 .antMatchers("/api/price-list", "/api/price-list/{id}")
                 .hasAuthority("MANAGE_PRICE_LISTS")
 
@@ -37,10 +37,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .antMatchers("/api/advertisement/by-ids/{advIds}")
                 .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
-
-                .antMatchers(HttpMethod.GET, "/api/advertisement/car/{carId}/check-for-delete", "/api/advertisement/car/{carId}/edit-type",
-                        "/api/advertisement/car/{carId}/check-for-partial-edit")
-                .hasAnyAuthority("MANAGE_CARS")
 
                 .anyRequest().authenticated().and()
 
@@ -53,7 +49,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-//        web.ignoring().antMatchers(HttpMethod.GET, "/api/advertisement/by-ids/{advIds}");
+        web.ignoring().antMatchers("/ws/**");
+        web.ignoring().antMatchers("/api/advertisement/car/{carId}/edit-type");
+        web.ignoring().antMatchers("/api/advertisement/car/{carId}/check-for-delete");
+        web.ignoring().antMatchers("/api/advertisement/car/{carId}/check-for-partial-edit");
     }
 
 }
