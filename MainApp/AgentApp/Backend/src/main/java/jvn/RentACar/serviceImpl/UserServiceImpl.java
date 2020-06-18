@@ -9,7 +9,9 @@ import jvn.RentACar.repository.RoleRepository;
 import jvn.RentACar.repository.UserRepository;
 import jvn.RentACar.security.TokenUtils;
 import jvn.RentACar.service.EmailNotificationService;
+import jvn.RentACar.service.LogService;
 import jvn.RentACar.service.UserService;
+import jvn.RentACar.utils.IPAddressProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
@@ -31,6 +33,9 @@ import java.security.NoSuchAlgorithmException;
 @Service
 public class UserServiceImpl implements UserDetailsService, UserService {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private Environment environment;
 
     private UserRepository userRepository;
@@ -46,6 +51,10 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     private ResetTokenRepository resetTokenRepository;
 
     private EmailNotificationService emailNotificationService;
+
+    private LogService logService;
+
+    private IPAddressProvider ipAddressProvider;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -102,6 +111,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     public void generateResetToken(String email) throws NoSuchAlgorithmException {
         User user = findByEmail(email);
         if (user == null) {
+            logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "RPW", String.format("User from %s tried to reset password for an unregistered user", ipAddressProvider.get())));
             return;
         }
 
@@ -138,6 +148,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
             int expiresIn = tokenUtils.getExpiredIn();
             return new UserTokenState(newToken, expiresIn, refreshToken);
         } else {
+            logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "REF", String.format("User from %s tried to refresh token manually", ipAddressProvider.get())));
             throw new InvalidUserDataException("Token can not be refreshed", HttpStatus.BAD_REQUEST);
         }
     }
@@ -199,7 +210,8 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     @Autowired
     public UserServiceImpl(UserRepository userRepository, TokenUtils tokenUtils, RoleRepository roleRepository,
                            ResetTokenRepository resetTokenRepository, EmailNotificationService emailNotificationService,
-                           Environment environment, LoginAttemptService loginAttemptService, HttpServletRequest request) {
+                           Environment environment, LoginAttemptService loginAttemptService, HttpServletRequest request,
+                           LogService logService, IPAddressProvider ipAddressProvider) {
         this.userRepository = userRepository;
         this.tokenUtils = tokenUtils;
         this.roleRepository = roleRepository;
@@ -208,5 +220,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         this.environment = environment;
         this.loginAttemptService = loginAttemptService;
         this.request = request;
+        this.logService = logService;
+        this.ipAddressProvider = ipAddressProvider;
     }
 }

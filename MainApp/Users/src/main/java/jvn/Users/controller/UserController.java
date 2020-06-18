@@ -70,7 +70,7 @@ public class UserController {
                 return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
             }
             if (e.getMessage().equals("Blocked")) {
-                logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "LGN", String.format("Because of too many attempts to login, user from %s is blocked.", ipAddressProvider.get())));
+                logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "LGN", String.format("User from %s is blocked.", ipAddressProvider.get())));
                 throw new BlockedUserException("You tried to log in too many times. Your account wil be blocked for the next 24 hours.",
                         HttpStatus.BAD_REQUEST);
             }
