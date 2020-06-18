@@ -1,5 +1,7 @@
 package jvn.Cars.endpoint;
 
+import jvn.Cars.dto.message.Log;
+import jvn.Cars.producer.LogProducer;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import jvn.Cars.client.UserClient;
@@ -13,9 +15,7 @@ import jvn.Cars.mapper.EditPartialCarDetailsMapper;
 import jvn.Cars.model.Car;
 import jvn.Cars.model.Picture;
 import jvn.Cars.service.CarService;
-import jvn.Cars.service.PictureService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
@@ -33,6 +33,9 @@ import java.util.Set;
 @Endpoint
 public class CarEndpoint {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     @Value("${UPLOADED_PICTURES_PATH:uploadedPictures/}")
     private String UPLOADED_PICTURES_PATH;
 
@@ -48,8 +51,7 @@ public class CarEndpoint {
 
     private EditPartialCarDetailsAndCarMapper editPartialCarDetailsAndCarMapper;
 
-    @Autowired
-    private PictureService pictureService;
+    private LogProducer logProducer;
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "createOrEditCarDetailsRequest")
     @ResponsePayload
@@ -63,9 +65,13 @@ public class CarEndpoint {
 
         CarDetails carDetailsForResponse;
         if (car.getId() != null) {
-            carDetailsForResponse = carDetailsMapper.toDto(carService.editAll(car.getId(), car, getFiles(request.getPictureInfo()), dto.getId()));
+            carDetailsForResponse = carDetailsMapper
+                    .toDto(carService.editAll(car.getId(), car, getFiles(request.getPictureInfo()), dto.getId()));
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "ECA", String.format("[SOAP] User %s successfully edited car %s", dto.getId(), carDetailsForResponse.getId())));
         } else {
-            carDetailsForResponse = carDetailsMapper.toDto(carService.create(car, getFiles(request.getPictureInfo()), dto.getId()));
+            carDetailsForResponse = carDetailsMapper
+                    .toDto(carService.create(car, getFiles(request.getPictureInfo()), dto.getId()));
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CCA", String.format("[SOAP] User %s successfully created car %s", dto.getId(), carDetailsForResponse.getId())));
         }
         CreateOrEditCarDetailsResponse response = new CreateOrEditCarDetailsResponse();
         response.setCreateCarDetails(carDetailsForResponse);
@@ -81,7 +87,11 @@ public class CarEndpoint {
             return null;
         }
         DeleteCarDetailsResponse response = new DeleteCarDetailsResponse();
-        response.setCanDelete(carService.checkIfCanDeleteAndDelete(request.getId(), dto.getId()));
+        boolean isDeleted = carService.checkIfCanDeleteAndDelete(request.getId(), dto.getId());
+        response.setCanDelete(isDeleted);
+        if (isDeleted) {
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "DCA", String.format("[SOAP] User %s successfully deleted car %s", dto.getId(), request.getId())));
+        }
         return response;
     }
 
@@ -100,7 +110,8 @@ public class CarEndpoint {
     private List<MultipartFile> getFiles(List<PictureInfo> pictureInfos) {
         List<MultipartFile> multipartFiles = new ArrayList<>();
         for (PictureInfo pictureInfo : pictureInfos) {
-            BASE64DecodedMultipartFile base64DecodedMultipartFile = new BASE64DecodedMultipartFile(pictureInfo.getMultiPartFile(), pictureInfo.getFileName());
+            BASE64DecodedMultipartFile base64DecodedMultipartFile = new BASE64DecodedMultipartFile(
+                    pictureInfo.getMultiPartFile(), pictureInfo.getFileName());
             multipartFiles.add(base64DecodedMultipartFile);
         }
         return multipartFiles;
@@ -108,17 +119,20 @@ public class CarEndpoint {
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "editPartialCarDetailsRequest")
     @ResponsePayload
-    public EditPartialCarDetailsResponse editPartialCarDetailsRequest(@RequestPayload EditPartialCarDetailsRequest request) {
+    public EditPartialCarDetailsResponse editPartialCarDetailsRequest(
+            @RequestPayload EditPartialCarDetailsRequest request) {
         UserInfoDTO dto = userClient.getUser(request.getEmail());
         if (dto == null) {
             return null;
         }
 
         CarEditDTO carEditDTO = editPartialCarDetailsmapper.toEntity(request.getEditPartialCarDetails());
-        Car car = carService.editPartial(carEditDTO.getId(), carEditDTO, getFiles(request.getPictureInfo()), dto.getId());
+        Car car = carService.editPartial(carEditDTO.getId(), carEditDTO, getFiles(request.getPictureInfo()),
+                dto.getId());
 
         EditPartialCarDetailsResponse response = new EditPartialCarDetailsResponse();
         response.setEditPartialCarDetails(editPartialCarDetailsAndCarMapper.toDto(car));
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "ECA", String.format("[SOAP] User %s successfully edited car %s", dto.getId(), car.getId())));
 
         return response;
     }
@@ -167,18 +181,20 @@ public class CarEndpoint {
             byte[] fileContent = FileUtils.readFileToByteArray(new File(String.valueOf(filePath)));
             return fileContent;
         } catch (IOException ex) {
-
+            logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PEX", String.format("[SOAP] Picture \"%s\" not found on server", fileName)));
         }
         return null;
     }
 
     @Autowired
     public CarEndpoint(CarService carService, CarDetailsMapper carDetailsMapper, UserClient userClient,
-                       EditPartialCarDetailsMapper editPartialCarDetailsmapper, EditPartialCarDetailsAndCarMapper editPartialCarDetailsAndCarMapper) {
+                       EditPartialCarDetailsMapper editPartialCarDetailsmapper,
+                       EditPartialCarDetailsAndCarMapper editPartialCarDetailsAndCarMapper, LogProducer logProducer) {
         this.carService = carService;
         this.carDetailsMapper = carDetailsMapper;
         this.userClient = userClient;
         this.editPartialCarDetailsmapper = editPartialCarDetailsmapper;
         this.editPartialCarDetailsAndCarMapper = editPartialCarDetailsAndCarMapper;
+        this.logProducer = logProducer;
     }
 }

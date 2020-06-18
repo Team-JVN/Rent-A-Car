@@ -102,9 +102,12 @@ public class AdvertisementServiceImpl implements AdvertisementService {
             );
         }
 
-        searchedAdsList.stream().filter(ad -> ad.getKilometresLimit() == null || ad.getKilometresLimit() >= newSearchParamsDTO.getKilometresLimit()).collect(Collectors.toList());
+        List<Advertisement> result = searchedAdsList.stream()
+                .filter(ad -> ad.getKilometresLimit() == null ||
+                        ad.getKilometresLimit() >= newSearchParamsDTO.getKilometresLimit())
+                .collect(Collectors.toList());
 
-        return searchedAdsList;
+        return result;
     }
 
     private LocalDateTime getDateConverted(String dateTime) throws DateTimeParseException {

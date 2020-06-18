@@ -1,6 +1,9 @@
 package jvn.Advertisements.exceptionHandler;
 
 import feign.FeignException;
+import jvn.Advertisements.dto.message.Log;
+import jvn.Advertisements.producer.LogProducer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +24,12 @@ import java.util.List;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
+    @Autowired
+    private LogProducer logProducer;
 
     @ExceptionHandler(InvalidPriceListDataException.class)
     protected ResponseEntity<Object> handleInvalidPriceListDataException(InvalidPriceListDataException ex) {
@@ -77,6 +86,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(FeignException.NotFound.class)
     public ResponseEntity<?> handleFeignNotFoundException(FeignException e,
                                                           HttpServletResponse response) {
+        logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "FGN", "Feign client is not responding"));
         return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 

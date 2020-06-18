@@ -3,6 +3,7 @@ package jvn.Cars.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Cars.dto.both.CarDTO;
+import jvn.Cars.dto.message.Log;
 import jvn.Cars.dto.request.CarEditDTO;
 import jvn.Cars.dto.request.CreateCarDTO;
 import jvn.Cars.dto.request.UserDTO;
@@ -13,6 +14,8 @@ import jvn.Cars.mapper.CarDtoMapper;
 import jvn.Cars.mapper.CarWithAllInformationDtoMapper;
 import jvn.Cars.mapper.CarWithPicturesDtoMapper;
 import jvn.Cars.mapper.CreateCarDtoMapper;
+import jvn.Cars.model.Car;
+import jvn.Cars.producer.LogProducer;
 import jvn.Cars.service.CarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -41,6 +44,9 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/api/car")
 public class CarController {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private CarService carService;
 
     private CarDtoMapper carDtoMapper;
@@ -52,9 +58,10 @@ public class CarController {
 
     private ObjectMapper objectMapper;
 
+    private LogProducer logProducer;
+
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CarDTO> create(@RequestParam("carData") String jsonString, @RequestParam("files") List<MultipartFile> multipartFiles) {
-
         ObjectMapper mapper = new ObjectMapper();
         CreateCarDTO createCarDTO;
         try {
@@ -63,9 +70,11 @@ public class CarController {
         } catch (IOException e) {
             throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
+
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        CarDTO carDTO = carDtoMapper.toDto(carService.create(createCarDtoMapper.toEntity(createCarDTO), multipartFiles, userDTO.getId()));
-        return new ResponseEntity<>(carDTO, HttpStatus.CREATED);
+        Car car = carService.create(createCarDtoMapper.toEntity(createCarDTO), multipartFiles, userDTO.getId());
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CCA", String.format("User %s successfully created car %s", userDTO.getId(), car.getId())));
+        return new ResponseEntity<>(carDtoMapper.toDto(car), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -99,6 +108,7 @@ public class CarController {
     public ResponseEntity<Void> delete(@PathVariable("id") @Positive(message = "Id must be positive.") Long id) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
         carService.delete(id, userDTO.getId(), request.getHeader("Auth"), request.getHeader("user"));
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "DCA", String.format("User %s successfully deleted car %s", userDTO.getId(), id)));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -116,7 +126,9 @@ public class CarController {
         }
 
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(carDtoMapper.toDto(carService.editAll(id, carDtoMapper.toEntity(carDTO), multipartFiles, userDTO.getId())), HttpStatus.OK);
+        Car car = carService.editAll(id, carDtoMapper.toEntity(carDTO), multipartFiles, userDTO.getId());
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "ECA", String.format("User %s successfully edited car %s", userDTO.getId(), car.getId())));
+        return new ResponseEntity<>(carDtoMapper.toDto(car), HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}/partial", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -132,7 +144,9 @@ public class CarController {
         }
 
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(carDtoMapper.toDto(carService.editPartial(id, carEditDTO, multipartFiles, userDTO.getId())), HttpStatus.OK);
+        Car car = carService.editPartial(id, carEditDTO, multipartFiles, userDTO.getId());
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "ECA", String.format("User %s successfully edited car %s", userDTO.getId(), car.getId())));
+        return new ResponseEntity<>(carDtoMapper.toDto(car), HttpStatus.OK);
     }
 
     private void validateCreateCarDTO(CreateCarDTO createCarDTO) {
@@ -166,7 +180,6 @@ public class CarController {
         try {
             return objectMapper.readValue(user, UserDTO.class);
         } catch (JsonProcessingException e) {
-            //TODO: Add to log and delete return null;
             return null;
         }
     }
@@ -174,7 +187,7 @@ public class CarController {
     @Autowired
     public CarController(CarService carService, CarDtoMapper carDtoMapper, CreateCarDtoMapper createCarDtoMapper, HttpServletRequest request,
                          CarWithPicturesDtoMapper carWithPicturesDtoMapper, CarWithAllInformationDtoMapper carWithAllInformationDtoMapper,
-                         ObjectMapper objectMapper) {
+                         ObjectMapper objectMapper, LogProducer logProducer) {
         this.carService = carService;
         this.carDtoMapper = carDtoMapper;
         this.createCarDtoMapper = createCarDtoMapper;
@@ -182,5 +195,6 @@ public class CarController {
         this.carWithAllInformationDtoMapper = carWithAllInformationDtoMapper;
         this.request = request;
         this.objectMapper = objectMapper;
+        this.logProducer = logProducer;
     }
 }

@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.SearchService.config.RabbitMQConfiguration;
 import jvn.SearchService.dto.message.CarMessageDTO;
+import jvn.SearchService.dto.message.Log;
 import jvn.SearchService.model.Car;
+import jvn.SearchService.producer.LogProducer;
 import jvn.SearchService.repository.CarRepository;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +15,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class CarConsumer {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private ObjectMapper objectMapper;
 
     private CarRepository carRepository;
+
+    private LogProducer logProducer;
 
     @RabbitListener(queues = RabbitMQConfiguration.EDIT_PARTIAL_CAR)
     public void listenEditPartialCar(String carMessageStr) {
@@ -27,20 +34,21 @@ public class CarConsumer {
         car.setAvailableTracking(carMessageDTO.getAvailableTracking());
 
         carRepository.save(car);
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "ECA", String.format("Successfully edited car %s", car.getId())));
     }
 
     private CarMessageDTO stringToObject(String carMessageStr) {
         try {
             return objectMapper.readValue(carMessageStr, CarMessageDTO.class);
         } catch (JsonProcessingException e) {
-            //TODO: Add to log and delete return null;
             return null;
         }
     }
 
     @Autowired
-    public CarConsumer(ObjectMapper objectMapper, CarRepository carRepository) {
+    public CarConsumer(ObjectMapper objectMapper, CarRepository carRepository, LogProducer logProducer) {
         this.objectMapper = objectMapper;
         this.carRepository = carRepository;
+        this.logProducer = logProducer;
     }
 }

@@ -2,7 +2,11 @@ package jvn.RentACar.controller;
 
 import jvn.RentACar.dto.both.PriceListDTO;
 import jvn.RentACar.mapper.PriceListDtoMapper;
+import jvn.RentACar.model.Log;
+import jvn.RentACar.model.PriceList;
+import jvn.RentACar.service.LogService;
 import jvn.RentACar.service.PriceListService;
+import jvn.RentACar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,9 +24,16 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/api/price-list", produces = MediaType.APPLICATION_JSON_VALUE)
 public class PriceListController {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private PriceListService priceListService;
 
     private PriceListDtoMapper priceListDtoMapper;
+
+    private LogService logService;
+
+    private UserService userService;
 
     @GetMapping
     public ResponseEntity<List<PriceListDTO>> getAll() {
@@ -33,25 +44,33 @@ public class PriceListController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PriceListDTO> create(@Valid @RequestBody PriceListDTO priceListDTO) {
-        return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.create(priceListDtoMapper.toEntity(priceListDTO))), HttpStatus.CREATED);
+        PriceList priceList = priceListService.create(priceListDtoMapper.toEntity(priceListDTO));
+        logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CPL", String.format("User %s successfully created price list %s", userService.getLoginUser().getId(), priceList.getId())));
+        return new ResponseEntity<>(priceListDtoMapper.toDto(priceList), HttpStatus.CREATED);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PriceListDTO> edit(@PathVariable @Positive(message = "Id must be positive.") Long id,
                                              @Valid @RequestBody PriceListDTO priceListDTO) {
-        return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.edit(id, priceListDtoMapper.toEntity(priceListDTO))), HttpStatus.OK);
+        PriceList priceList = priceListService.edit(id, priceListDtoMapper.toEntity(priceListDTO));
+        logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EPL", String.format("User %s successfully edited price list %s", userService.getLoginUser().getId(), priceList.getId())));
+        return new ResponseEntity<>(priceListDtoMapper.toDto(priceList), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable @Positive(message = "Id must be positive.") Long id) {
         priceListService.delete(id);
+        logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "DPL", String.format("User %s successfully deleted price list %s", userService.getLoginUser().getId(), id)));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Autowired
-    public PriceListController(PriceListService priceListService, PriceListDtoMapper priceListDtoMapper) {
+    public PriceListController(PriceListService priceListService, PriceListDtoMapper priceListDtoMapper, LogService logService,
+                               UserService userService) {
         this.priceListService = priceListService;
         this.priceListDtoMapper = priceListDtoMapper;
+        this.logService = logService;
+        this.userService = userService;
     }
 
 }

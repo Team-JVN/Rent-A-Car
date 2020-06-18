@@ -3,6 +3,9 @@ package jvn.Zuul.exceptionHandler;
 import com.netflix.client.ClientException;
 import com.netflix.zuul.exception.ZuulException;
 import feign.FeignException;
+import jvn.Zuul.dto.message.Log;
+import jvn.Zuul.producer.LogProducer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -15,6 +18,12 @@ import javax.servlet.http.HttpServletResponse;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 public class RestExceptionHandler {
+
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
+    @Autowired
+    private LogProducer logProducer;
 
     @ExceptionHandler(InvalidUserDataException.class)
     protected ResponseEntity<Object> handleInvalidUserDataException(InvalidUserDataException ex) {
@@ -35,6 +44,7 @@ public class RestExceptionHandler {
     @ExceptionHandler(FeignException.NotFound.class)
     public ResponseEntity<?> handleFeignNotFoundException(FeignException e,
                                                           HttpServletResponse response) {
+        logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "FGN", "Feign client is not responding"));
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
@@ -52,13 +62,13 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(ClientException.class)
     public ResponseEntity<?> handleClientException(ClientException e,
-                                                 HttpServletResponse response) {
+                                                   HttpServletResponse response) {
         return new ResponseEntity<>("Something goes wrong.Please try again.", HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<?> handleIllegalStateException(IllegalStateException e,
-                                                   HttpServletResponse response) {
+                                                         HttpServletResponse response) {
         return new ResponseEntity<>("Something goes wrong.Please try again.", HttpStatus.BAD_REQUEST);
     }
 

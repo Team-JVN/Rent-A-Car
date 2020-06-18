@@ -6,6 +6,7 @@ import jvn.Renting.client.SearchClient;
 import jvn.Renting.client.UserClient;
 import jvn.Renting.dto.both.*;
 import jvn.Renting.enumeration.CommentStatus;
+import jvn.Renting.dto.message.Log;
 import jvn.Renting.dto.request.RentRequestStatusDTO;
 import jvn.Renting.enumeration.EditType;
 import jvn.Renting.enumeration.RentRequestStatus;
@@ -20,6 +21,7 @@ import jvn.Renting.model.Message;
 import jvn.Renting.model.RentInfo;
 import jvn.Renting.model.RentRequest;
 import jvn.Renting.repository.CommentRepository;
+import jvn.Renting.producer.LogProducer;
 import jvn.Renting.producer.RentRequestProducer;
 import jvn.Renting.repository.RentInfoRepository;
 import jvn.Renting.repository.RentRequestRepository;
@@ -51,6 +53,9 @@ import java.util.stream.Collectors;
 @Service
 public class RentRequestServiceImpl implements RentRequestService {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private RentRequestRepository rentRequestRepository;
 
     private AdvertisementClient advertisementClient;
@@ -73,7 +78,7 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     private RentRequestProducer rentRequestProducer;
 
-    private TaskScheduler scheduler;
+    private LogProducer logProducer;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -121,6 +126,7 @@ public class RentRequestServiceImpl implements RentRequestService {
                 rentRequest.setRentRequestStatus(RentRequestStatus.CANCELED);
                 rentRequestRepository.save(rentRequest);
                 sendRejectedReservation(rentRequest.getClient(), rentRequest.getId());
+                logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SRQ", String.format("Because 24h from creation have passed, rent request %s is automatically CANCELED", rentRequest.getId())));
             }
         };
     }
@@ -128,7 +134,7 @@ public class RentRequestServiceImpl implements RentRequestService {
     @Async
     public void executeRejectTask(Long rentReqId, Instant executionMoment) {
         ScheduledExecutorService localExecutor = Executors.newSingleThreadScheduledExecutor();
-        scheduler = new ConcurrentTaskScheduler(localExecutor);
+        TaskScheduler scheduler = new ConcurrentTaskScheduler(localExecutor);
         scheduler.schedule(createRunnable(rentReqId), executionMoment);
     }
 
@@ -564,12 +570,17 @@ public class RentRequestServiceImpl implements RentRequestService {
             List<RentRequest> rentRequests = rentRequestRepository.findByRentRequestStatusNotAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualAndRentInfosAdvertisementOrRentRequestStatusNotAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualAndRentInfosAdvertisementOrRentRequestStatusNotAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanEqualAndRentInfosAdvertisement(
                     RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeFrom, rentInfo.getAdvertisement(), RentRequestStatus.PAID, rentInfoDateTimeTo, rentInfoDateTimeTo, rentInfo.getAdvertisement(),
                     RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeTo, rentInfo.getAdvertisement());
+
+            StringBuilder sb = new StringBuilder();
             for (RentRequest rentRequest1 : rentRequests) {
                 rentRequest1.setRentRequestStatus(RentRequestStatus.CANCELED);
                 sendRejectedReservation(rentRequest.getClient(), rentRequest.getId());
+                sb.append(rentRequest1.getId());
+                sb.append(", ");
             }
             if (!rentRequests.isEmpty()) {
                 rentRequestRepository.saveAll(rentRequests);
+                logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SRQ", String.format("Because rent request %s is PAID, rent requests %s are REJECTED", rentRequest.getId(), sb.toString())));
             }
         }
     }
@@ -624,7 +635,8 @@ public class RentRequestServiceImpl implements RentRequestService {
                                   SearchClient searchClient, CommentDtoMapper commentDtoMapper, SimpMessagingTemplate simpMessagingTemplate,
                                   CommentRepository commentRepository, MessageDtoMapper messageDtoMapper,
                                   RentRequestProducer rentRequestProducer, RentInfoRepository rentInfoRepository,
-                                  RentReportDtoMapper rentReportDtoMapper) {
+                                  RentReportDtoMapper rentReportDtoMapper,
+                                  SearchClient searchClient, RentRequestProducer rentRequestProducer, LogProducer logProducer) {
         this.rentRequestRepository = rentRequestRepository;
         this.advertisementClient = advertisementClient;
         this.userClient = userClient;
@@ -636,5 +648,6 @@ public class RentRequestServiceImpl implements RentRequestService {
         this.rentRequestProducer = rentRequestProducer;
         this.rentInfoRepository = rentInfoRepository;
         this.rentReportDtoMapper = rentReportDtoMapper;
+        this.logProducer = logProducer;
     }
 }

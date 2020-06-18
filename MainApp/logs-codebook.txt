@@ -1,4 +1,5 @@
 APP|Aplication startup/shutdown
+SYN|Data synchronization with Main application using SOAP protocol
 LGN|Login
 REG|Client registration
 CPW|Change password
@@ -12,12 +13,49 @@ RST|Reset token exception
 EPM|Edit permissions
 CCL|Create client by agent or another client
 CAG|Create agent by administrator
-CAD|Create administrator by another administrator
+CAM|Create administrator by another administrator
+ECL|Edit client profile
+EAG|Edit agent profile
+EAM|Edit administrator profile
 DCL|Delete client by agent or administrator
 DAG|Delete agent by administrator
-DAD|Delete administrator by another administrator
+DAM|Delete administrator by another administrator
 APR|Approve client's request to register
 RJT|Reject client's request to register
 BLC|Block/unblock client by administrator
 CRR|Disable/enable client to create rent requests by administrator
 CCM|Disable/enable client to post comments by administrator
+CCA|Create car
+ECA|Edit car
+DCA|Delete car
+CBS|Create body style
+EBS|Edit body style
+DBS|Delete body style
+CFT|Create fuel type
+EFT|Edit fuel type
+DFT|Delete fuel type
+CGT|Create gearbox type
+EGT|Edit gearbox type
+DGT|Delete gearbox type
+CMK|Create make
+EMK|Edit make
+DMK|Delete make
+CML|Create model
+EML|Edit model
+DML|Delete model
+PEX|Picture exception
+PDB|Picture in database
+PDI|Picture on disk
+COW|Create owner
+CHO|Check owner
+EOW|Edit owner
+CAD|Create advertisement
+EAD|Edit advertisement
+DAD|Delete advertisement
+CPL|Create price list
+EPL|Edit price list
+DPL|Delete price list
+CRQ|Create rent request
+SRQ|Change rent request status
+CRI|Create rent info
+PAY|Pay for made mileage over limit

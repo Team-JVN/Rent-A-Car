@@ -3,6 +3,7 @@ package jvn.Advertisements.serviceImpl;
 import jvn.Advertisements.client.CarClient;
 import jvn.Advertisements.client.RentingClient;
 import jvn.Advertisements.dto.message.AdvertisementMessageDTO;
+import jvn.Advertisements.dto.message.Log;
 import jvn.Advertisements.dto.message.OwnerMessageDTO;
 import jvn.Advertisements.dto.request.AdvertisementEditDTO;
 import jvn.Advertisements.dto.request.UserDTO;
@@ -14,6 +15,7 @@ import jvn.Advertisements.mapper.AdvertisementMessageDtoMapper;
 import jvn.Advertisements.model.Advertisement;
 import jvn.Advertisements.model.PriceList;
 import jvn.Advertisements.producer.AdvertisementProducer;
+import jvn.Advertisements.producer.LogProducer;
 import jvn.Advertisements.repository.AdvertisementRepository;
 import jvn.Advertisements.service.AdvertisementService;
 import jvn.Advertisements.service.PriceListService;
@@ -30,6 +32,9 @@ import java.util.stream.Collectors;
 @Service
 public class AdvertisementServiceImpl implements AdvertisementService {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private PriceListService priceListService;
 
     private AdvertisementRepository advertisementRepository;
@@ -41,6 +46,8 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     private CarClient carClient;
 
     private RentingClient rentingClient;
+
+    private LogProducer logProducer;
 
     @Override
     @Transactional
@@ -236,6 +243,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     private void checkOwner(Advertisement advertisement, Long loggedInUserId) {
         if (!advertisement.getOwner().equals(loggedInUserId)) {
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CHO", String.format("User %s is not the owner of advertisement %s", loggedInUserId, advertisement.getId())));
             throw new InvalidAdvertisementDataException(
                     "You are not the owner of this advertisement, therefore you cannot edit or delete it.",
                     HttpStatus.BAD_REQUEST);
@@ -312,12 +320,13 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     @Autowired
     public AdvertisementServiceImpl(PriceListService priceListService, CarClient carClient,
                                     AdvertisementRepository advertisementRepository, AdvertisementMessageDtoMapper advertisementMessageMapper,
-                                    AdvertisementProducer advertisementProducer, RentingClient rentingClient) {
+                                    AdvertisementProducer advertisementProducer, RentingClient rentingClient, LogProducer logProducer) {
         this.priceListService = priceListService;
         this.carClient = carClient;
         this.advertisementRepository = advertisementRepository;
         this.advertisementMessageMapper = advertisementMessageMapper;
         this.advertisementProducer = advertisementProducer;
         this.rentingClient = rentingClient;
+        this.logProducer = logProducer;
     }
 }

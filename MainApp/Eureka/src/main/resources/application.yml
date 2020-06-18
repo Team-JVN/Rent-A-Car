@@ -2,6 +2,11 @@ spring:
   application:
     # sets the name in Eureka
     name: ${springboot.app.name:eureka-serviceregistry}
+  rabbitmq:
+    host: ${RMQ_HOST:localhost}
+    port: ${RMQ_PORT:5672}
+    username: ${RMQ_USERNAME:guest}
+    password: ${RMQ_PASSWORD:guest}
 
 server:
   port: 8761

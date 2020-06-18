@@ -21,6 +21,7 @@ public class RabbitMQConfiguration {
 
     public static final String UPDATE_CAR_MILEAGE = "update-car-mileage";
 
+    public static final String LOGS = "logs";
 
     @Bean
     public Queue queueCreatedAdvertisement() {
@@ -50,8 +51,11 @@ public class RabbitMQConfiguration {
     @Bean
     public Queue queueMileage(){ return new Queue(MILEAGE, false); }
 
-//    @Bean
-//    public Queue queueUpdateCarMileage(){ return new Queue(UPDATE_CAR_MILEAGE, false); }
+   @Bean
+   public Queue queueUpdateCarMileage(){ return new Queue(UPDATE_CAR_MILEAGE, false); }
 
+    public Queue queueLogs() {
+        return new Queue(LOGS, false);
+    }
 }
 

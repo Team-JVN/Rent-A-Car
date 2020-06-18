@@ -34,8 +34,6 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Role editPermissions(Long id, RoleDTO roleDTO) {
-        Long loggedInUserId = userService.getLoginUser().getId();
-
         Role role = get(id);
 
         StringBuilder sb = new StringBuilder("Before: ");
@@ -53,6 +51,7 @@ public class RoleServiceImpl implements RoleService {
         }
         role.setPermissions(permissions);
 
+        Long loggedInUserId = userService.getLoginUser().getId();
         logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EPM", String.format("User %s successfully changed permissions for role %s [%s]", loggedInUserId, role.getId(), sb.toString())));
         return roleRepository.save(role);
     }

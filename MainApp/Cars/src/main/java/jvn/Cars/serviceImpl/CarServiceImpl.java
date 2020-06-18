@@ -1,14 +1,15 @@
 package jvn.Cars.serviceImpl;
 
 import jvn.Cars.client.AdvertisementClient;
+import jvn.Cars.dto.message.Log;
 import jvn.Cars.dto.request.CarEditDTO;
 import jvn.Cars.dto.request.UserDTO;
 import jvn.Cars.enumeration.EditType;
 import jvn.Cars.enumeration.LogicalStatus;
 import jvn.Cars.exceptionHandler.InvalidCarDataException;
-import jvn.Cars.mapper.CarDtoMapper;
 import jvn.Cars.model.Car;
 import jvn.Cars.producer.CarProducer;
+import jvn.Cars.producer.LogProducer;
 import jvn.Cars.repository.CarRepository;
 import jvn.Cars.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class CarServiceImpl implements CarService {
     @Value("${UPLOADED_PICTURES_PATH:uploadedPictures/}")
     private String UPLOADED_PICTURES_PATH;
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private CarRepository carRepository;
 
     private BodyStyleService bodyStyleService;
@@ -40,8 +44,6 @@ public class CarServiceImpl implements CarService {
 
     private PictureService pictureService;
 
-    private CarDtoMapper carMapper;
-
     private ModelService modelService;
 
     private MakeService makeService;
@@ -49,6 +51,8 @@ public class CarServiceImpl implements CarService {
     private AdvertisementClient advertisementClient;
 
     private CarProducer carProducer;
+
+    private LogProducer logProducer;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -217,24 +221,25 @@ public class CarServiceImpl implements CarService {
 
     private void checkOwner(Car car, Long loggedInUserId) {
         if (!car.getOwner().equals(loggedInUserId)) {
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CHO", String.format("User %s is not the owner of car %s", loggedInUserId, car.getId())));
             throw new InvalidCarDataException("You are not the owner of this car, therefore you cannot edit or delete it.", HttpStatus.BAD_REQUEST);
         }
     }
 
     @Autowired
     public CarServiceImpl(CarRepository carRepository, BodyStyleService bodyStyleService, FuelTypeService fuelTypeService,
-                          GearboxTypeService gearboxTypeService, PictureService pictureService, CarDtoMapper carMapper,
+                          GearboxTypeService gearboxTypeService, PictureService pictureService,
                           ModelService modelService, MakeService makeService, AdvertisementClient advertisementClient,
-                          CarProducer carProducer) {
+                          CarProducer carProducer, LogProducer logProducer) {
         this.carRepository = carRepository;
         this.bodyStyleService = bodyStyleService;
         this.fuelTypeService = fuelTypeService;
         this.gearboxTypeService = gearboxTypeService;
         this.pictureService = pictureService;
-        this.carMapper = carMapper;
         this.modelService = modelService;
         this.makeService = makeService;
         this.advertisementClient = advertisementClient;
         this.carProducer = carProducer;
+        this.logProducer = logProducer;
     }
 }

@@ -19,6 +19,8 @@ public class RabbitMQConfiguration {
 
     public static final String EDIT_PARTIAL_CAR = "edit-partial-car";
 
+    public static final String LOGS = "logs";
+
     @Bean
     public Queue queueCreatedAdvertisement() {
         return new Queue(ADVERTISEMENT_FOR_SEARCH, false);
@@ -47,6 +49,11 @@ public class RabbitMQConfiguration {
     @Bean
     public Queue queueEditPartialCar() {
         return new Queue(EDIT_PARTIAL_CAR, false);
+    }
+
+    @Bean
+    public Queue queueLogs() {
+        return new Queue(LOGS, false);
     }
 }
 

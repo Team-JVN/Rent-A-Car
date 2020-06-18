@@ -18,6 +18,8 @@ public class RabbitMQConfiguration {
     public static final String REJECTED_COMMENT = "rejected-comment";
 
     public static final String MILEAGE = "mileage";
+    
+    public static final String LOGS = "logs";
 
     @Bean
     public Queue queueCanceledReservation() {

@@ -12,4 +12,10 @@ public class RabbitMQConfiguration {
     @Bean
     public Queue queueUpdateCarMileage(){ return new Queue(UPDATE_CAR_MILEAGE, false); }
 
+    public static final String LOGS = "logs";
+
+    @Bean
+    public Queue queueLogs() {
+        return new Queue(LOGS, false);
+    }
 }

@@ -12,6 +12,7 @@ import jvn.RentACar.repository.ClientRepository;
 import jvn.RentACar.repository.VerificationTokenRepository;
 import jvn.RentACar.service.ClientService;
 import jvn.RentACar.service.EmailNotificationService;
+import jvn.RentACar.service.LogService;
 import jvn.RentACar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -29,6 +30,9 @@ import java.util.List;
 @Service
 public class ClientServiceImpl implements ClientService {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private ClientRepository clientRepository;
 
     private UserService userService;
@@ -45,9 +49,12 @@ public class ClientServiceImpl implements ClientService {
 
     private ClientDetailsMapper clientDetailsMapper;
 
+    private LogService logService;
+
     @Override
     public Client create(Client client) throws NoSuchAlgorithmException {
-        CheckClientPersonalInfoResponse response = clientClient.checkClientPersonalInfo(client.getEmail(), client.getPhoneNumber());
+        CheckClientPersonalInfoResponse response = clientClient.checkClientPersonalInfo(client.getEmail(),
+                client.getPhoneNumber());
         String dataValid = response.getDataValid();
         if (dataValid.equals("EMAIL_NOT_VALID")) {
             throw new InvalidClientDataException("Client with same email address already exists.",
@@ -72,8 +79,7 @@ public class ClientServiceImpl implements ClientService {
             dbClient.setPassword(null);
             CreateOrEditClientResponse responseSave = clientClient.createOrEdit(dbClient);
             dbClient.setMainAppId(responseSave.getClientDetails().getId());
-            dbClient = clientRepository.save(dbClient);
-            return dbClient;
+            return clientRepository.save(dbClient);
         } else {
             client.setPassword(passwordEncoder.encode(client.getPassword()));
             client.setStatus(ClientStatus.APPROVED);
@@ -93,8 +99,7 @@ public class ClientServiceImpl implements ClientService {
             composeAndSendEmailToActivate(client.getEmail(), nonHashedToken);
             CreateOrEditClientResponse responseSave = clientClient.createOrEdit(savedClient);
             savedClient.setMainAppId(responseSave.getClientDetails().getId());
-            savedClient = clientRepository.save(savedClient);
-            return savedClient;
+            return clientRepository.save(savedClient);
         }
     }
 
@@ -127,7 +132,8 @@ public class ClientServiceImpl implements ClientService {
         synchronize();
         Client dbClient = get(id);
         if (!dbClient.getPhoneNumber().equals(client.getPhoneNumber())) {
-            CheckClientPersonalInfoResponse response = clientClient.checkClientPersonalInfo(client.getEmail(), client.getPhoneNumber());
+            CheckClientPersonalInfoResponse response = clientClient.checkClientPersonalInfo(client.getEmail(),
+                    client.getPhoneNumber());
             String dataValid = response.getDataValid();
             if (dataValid.equals("PHONE_NUMBER_NOT_VALID")) {
                 throw new InvalidClientDataException("Client with same phone number already exists.",
@@ -151,8 +157,7 @@ public class ClientServiceImpl implements ClientService {
         Client dbClient = get(id);
         DeleteClientDetailsResponse response = clientClient.checkAndDeleteIfCan(dbClient);
         if (response == null || !response.isCanDelete()) {
-            throw new InvalidClientDataException(
-                    "You can not delete this client.", HttpStatus.BAD_REQUEST);
+            throw new InvalidClientDataException("You can not delete this client.", HttpStatus.BAD_REQUEST);
         }
         dbClient.setRole(null);
         clientRepository.deleteById(id);
@@ -241,10 +246,11 @@ public class ClientServiceImpl implements ClientService {
                 }
 
             }
+            logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SYN",
+                    "[SOAP] Clients are successfully synchronized"));
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     private void createSynchronize(Client client) {
@@ -263,9 +269,9 @@ public class ClientServiceImpl implements ClientService {
 
     @Autowired
     public ClientServiceImpl(ClientRepository clientRepository, UserService userService,
-                             PasswordEncoder passwordEncoder, EmailNotificationService emailNotificationService, Environment environment,
-                             VerificationTokenRepository verificationTokenRepository, ClientClient clientClient,
-                             ClientDetailsMapper clientDetailsMapper) {
+            PasswordEncoder passwordEncoder, EmailNotificationService emailNotificationService, Environment environment,
+            VerificationTokenRepository verificationTokenRepository, ClientClient clientClient,
+            ClientDetailsMapper clientDetailsMapper, LogService logService) {
         this.clientRepository = clientRepository;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
@@ -274,6 +280,7 @@ public class ClientServiceImpl implements ClientService {
         this.verificationTokenRepository = verificationTokenRepository;
         this.clientClient = clientClient;
         this.clientDetailsMapper = clientDetailsMapper;
+        this.logService = logService;
     }
 
     private String getLocalhostURL() {
