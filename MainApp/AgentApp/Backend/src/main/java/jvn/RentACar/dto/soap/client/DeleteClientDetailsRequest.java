@@ -25,7 +25,14 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="clientDetails" type="{http://www.soap.dto/client}clientDetails"/&gt;
+ *         &lt;element name="email" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element name="id"&gt;
+ *           &lt;simpleType&gt;
+ *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}long"&gt;
+ *               &lt;minInclusive value="1"/&gt;
+ *             &lt;/restriction&gt;
+ *           &lt;/simpleType&gt;
+ *         &lt;/element&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -36,36 +43,54 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "clientDetails"
+    "email",
+    "id"
 })
-@XmlRootElement(name = "createOrEditClientResponse")
-public class CreateOrEditClientResponse {
+@XmlRootElement(name = "deleteClientDetailsRequest")
+public class DeleteClientDetailsRequest {
 
     @XmlElement(required = true)
-    protected ClientDetails clientDetails;
+    protected String email;
+    protected long id;
 
     /**
-     * Gets the value of the clientDetails property.
+     * Gets the value of the email property.
      * 
      * @return
      *     possible object is
-     *     {@link ClientDetails }
+     *     {@link String }
      *     
      */
-    public ClientDetails getClientDetails() {
-        return clientDetails;
+    public String getEmail() {
+        return email;
     }
 
     /**
-     * Sets the value of the clientDetails property.
+     * Sets the value of the email property.
      * 
      * @param value
      *     allowed object is
-     *     {@link ClientDetails }
+     *     {@link String }
      *     
      */
-    public void setClientDetails(ClientDetails value) {
-        this.clientDetails = value;
+    public void setEmail(String value) {
+        this.email = value;
+    }
+
+    /**
+     * Gets the value of the id property.
+     * 
+     */
+    public long getId() {
+        return id;
+    }
+
+    /**
+     * Sets the value of the id property.
+     * 
+     */
+    public void setId(long value) {
+        this.id = value;
     }
 
 }

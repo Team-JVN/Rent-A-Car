@@ -164,6 +164,9 @@
                     <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>
                     <schemaIncludes>
                         <include>clients.wsdl</include>
+                        <include>deleteClient.wsdl</include>
+                        <include>checkPersonalInfo.wsdl</include>
+                        <include>listClient.wsdl</include>
                     </schemaIncludes>
                 </configuration>
             </plugin>

@@ -37,4 +37,10 @@ public interface ClientService {
     Client createComments(Long id, String status);
 
     List<Client> getClientsById(List<Long> clients);
+
+    String checkClientPersonalInfo(String email, String phoneNumber);
+
+    boolean checkIfCanDeleteAndDelete(Long id, Long loggedInUser);
+
+    List<Client> getAll(Long id);
 }

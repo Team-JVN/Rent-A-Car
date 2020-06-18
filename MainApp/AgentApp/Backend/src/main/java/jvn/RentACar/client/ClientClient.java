@@ -1,7 +1,6 @@
 package jvn.RentACar.client;
 
-import jvn.RentACar.dto.soap.client.CreateOrEditClientRequest;
-import jvn.RentACar.dto.soap.client.CreateOrEditClientResponse;
+import jvn.RentACar.dto.soap.client.*;
 import jvn.RentACar.mapper.ClientDetailsMapper;
 import jvn.RentACar.model.Client;
 import jvn.RentACar.model.User;
@@ -29,6 +28,41 @@ public class ClientClient extends WebServiceGatewaySupport {
         }
 
         CreateOrEditClientResponse response = (CreateOrEditClientResponse) getWebServiceTemplate()
+                .marshalSendAndReceive(request);
+        return response;
+    }
+
+    public DeleteClientDetailsResponse checkAndDeleteIfCan(Client client) {
+        DeleteClientDetailsRequest request = new DeleteClientDetailsRequest();
+        request.setId(client.getMainAppId());
+        User user = userService.getLoginUser();
+        if (user == null) {
+            return null;
+        }
+        request.setEmail(user.getEmail());
+        DeleteClientDetailsResponse response = (DeleteClientDetailsResponse) getWebServiceTemplate()
+                .marshalSendAndReceive(request);
+        return response;
+    }
+
+    public CheckClientPersonalInfoResponse checkClientPersonalInfo(String clientEmail, String phoneNumber) {
+        CheckClientPersonalInfoRequest request = new CheckClientPersonalInfoRequest();
+        request.setClientEmail(clientEmail);
+        request.setPhoneNumber(phoneNumber);
+        CheckClientPersonalInfoResponse response = (CheckClientPersonalInfoResponse) getWebServiceTemplate()
+                .marshalSendAndReceive(request);
+        return response;
+    }
+
+    public GetAllClientDetailsResponse getAll() {
+        GetAllClientDetailsRequest request = new GetAllClientDetailsRequest();
+        User user = userService.getLoginUser();
+        if (user == null) {
+            return null;
+        }
+        request.setEmail(user.getEmail());
+
+        GetAllClientDetailsResponse response = (GetAllClientDetailsResponse) getWebServiceTemplate()
                 .marshalSendAndReceive(request);
         return response;
     }

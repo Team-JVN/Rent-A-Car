@@ -10,7 +10,6 @@ package jvn.RentACar.dto.soap.client;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -25,7 +24,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="clientDetails" type="{http://www.soap.dto/client}clientDetails"/&gt;
+ *         &lt;element name="canDelete" type="{http://www.w3.org/2001/XMLSchema}boolean"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -36,36 +35,27 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "clientDetails"
+    "canDelete"
 })
-@XmlRootElement(name = "createOrEditClientResponse")
-public class CreateOrEditClientResponse {
+@XmlRootElement(name = "deleteClientDetailsResponse")
+public class DeleteClientDetailsResponse {
 
-    @XmlElement(required = true)
-    protected ClientDetails clientDetails;
+    protected boolean canDelete;
 
     /**
-     * Gets the value of the clientDetails property.
+     * Gets the value of the canDelete property.
      * 
-     * @return
-     *     possible object is
-     *     {@link ClientDetails }
-     *     
      */
-    public ClientDetails getClientDetails() {
-        return clientDetails;
+    public boolean isCanDelete() {
+        return canDelete;
     }
 
     /**
-     * Sets the value of the clientDetails property.
+     * Sets the value of the canDelete property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link ClientDetails }
-     *     
      */
-    public void setClientDetails(ClientDetails value) {
-        this.clientDetails = value;
+    public void setCanDelete(boolean value) {
+        this.canDelete = value;
     }
 
 }

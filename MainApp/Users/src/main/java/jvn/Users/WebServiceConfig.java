@@ -73,4 +73,51 @@ public class WebServiceConfig {
         return new SimpleXsdSchema(new ClassPathResource("clients.xsd"));
     }
 
+    @Bean(name = "checkPersonalInfo")
+    public DefaultWsdl11Definition defaultWsdl11DefinitionCheckPersonalInfo(@Qualifier("checkPersonalInfoSchema") XsdSchema checkPersonalInfoSchema) {
+        DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
+        wsdl11Definition.setPortTypeName("ClientsPort");
+        wsdl11Definition.setLocationUri("/ws");
+        wsdl11Definition.setTargetNamespace("http://www.client.dto/soap");
+        wsdl11Definition.setSchema(checkPersonalInfoSchema);
+        return wsdl11Definition;
+    }
+
+    @Bean
+    @Qualifier("checkPersonalInfoSchema")
+    public XsdSchema checkPersonalInfoSchema() {
+        return new SimpleXsdSchema(new ClassPathResource("checkPersonalInfo.xsd"));
+    }
+
+    @Bean(name = "deleteClient")
+    public DefaultWsdl11Definition defaultWsdl11DefinitionDeleteClientSchema(@Qualifier("deleteClientSchema") XsdSchema deleteClientSchema) {
+        DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
+        wsdl11Definition.setPortTypeName("ClientsPort");
+        wsdl11Definition.setLocationUri("/ws");
+        wsdl11Definition.setTargetNamespace("http://www.client.dto/soap");
+        wsdl11Definition.setSchema(deleteClientSchema);
+        return wsdl11Definition;
+    }
+
+    @Bean
+    @Qualifier("deleteClientSchema")
+    public XsdSchema deleteClientSchema() {
+        return new SimpleXsdSchema(new ClassPathResource("deleteClient.xsd"));
+    }
+
+    @Bean(name = "listClient")
+    public DefaultWsdl11Definition defaultWsdl11DefinitionListClientSchema(@Qualifier("listClientSchema") XsdSchema listClientSchema) {
+        DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
+        wsdl11Definition.setPortTypeName("ClientsPort");
+        wsdl11Definition.setLocationUri("/ws");
+        wsdl11Definition.setTargetNamespace("http://www.client.dto/soap");
+        wsdl11Definition.setSchema(listClientSchema);
+        return wsdl11Definition;
+    }
+
+    @Bean
+    @Qualifier("listClientSchema")
+    public XsdSchema listClientSchema() {
+        return new SimpleXsdSchema(new ClassPathResource("listClient.xsd"));
+    }
 }

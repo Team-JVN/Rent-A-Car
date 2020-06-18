@@ -142,6 +142,11 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         }
     }
 
+    @Override
+    public User findByMainAppId(Long mainAppId) {
+        return userRepository.findByMainAppId(mainAppId);
+    }
+
     private String getClientIP() {
         String xfHeader = request.getHeader("X-Forwarded-For");
         if (xfHeader == null) {

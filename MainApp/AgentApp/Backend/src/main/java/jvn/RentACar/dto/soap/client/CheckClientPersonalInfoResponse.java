@@ -25,7 +25,15 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="clientDetails" type="{http://www.soap.dto/client}clientDetails"/&gt;
+ *         &lt;element name="dataValid"&gt;
+ *           &lt;simpleType&gt;
+ *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *               &lt;enumeration value="ALL"/&gt;
+ *               &lt;enumeration value="EMAIL_NOT_VALID"/&gt;
+ *               &lt;enumeration value="PHONE_NUMBER_NOT_VALID"/&gt;
+ *             &lt;/restriction&gt;
+ *           &lt;/simpleType&gt;
+ *         &lt;/element&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -36,36 +44,36 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "clientDetails"
+    "dataValid"
 })
-@XmlRootElement(name = "createOrEditClientResponse")
-public class CreateOrEditClientResponse {
+@XmlRootElement(name = "checkClientPersonalInfoResponse")
+public class CheckClientPersonalInfoResponse {
 
     @XmlElement(required = true)
-    protected ClientDetails clientDetails;
+    protected String dataValid;
 
     /**
-     * Gets the value of the clientDetails property.
+     * Gets the value of the dataValid property.
      * 
      * @return
      *     possible object is
-     *     {@link ClientDetails }
+     *     {@link String }
      *     
      */
-    public ClientDetails getClientDetails() {
-        return clientDetails;
+    public String getDataValid() {
+        return dataValid;
     }
 
     /**
-     * Sets the value of the clientDetails property.
+     * Sets the value of the dataValid property.
      * 
      * @param value
      *     allowed object is
-     *     {@link ClientDetails }
+     *     {@link String }
      *     
      */
-    public void setClientDetails(ClientDetails value) {
-        this.clientDetails = value;
+    public void setDataValid(String value) {
+        this.dataValid = value;
     }
 
 }

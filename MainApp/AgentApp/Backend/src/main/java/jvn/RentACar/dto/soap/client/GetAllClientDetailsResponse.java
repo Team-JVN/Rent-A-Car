@@ -8,6 +8,8 @@
 
 package jvn.RentACar.dto.soap.client;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -25,7 +27,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="clientDetails" type="{http://www.soap.dto/client}clientDetails"/&gt;
+ *         &lt;element name="clientDetails" type="{http://www.soap.dto/client}clientDetails" maxOccurs="unbounded"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -38,34 +40,39 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "", propOrder = {
     "clientDetails"
 })
-@XmlRootElement(name = "createOrEditClientResponse")
-public class CreateOrEditClientResponse {
+@XmlRootElement(name = "getAllClientDetailsResponse")
+public class GetAllClientDetailsResponse {
 
     @XmlElement(required = true)
-    protected ClientDetails clientDetails;
+    protected List<ClientDetails> clientDetails;
 
     /**
      * Gets the value of the clientDetails property.
      * 
-     * @return
-     *     possible object is
-     *     {@link ClientDetails }
-     *     
-     */
-    public ClientDetails getClientDetails() {
-        return clientDetails;
-    }
-
-    /**
-     * Sets the value of the clientDetails property.
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the clientDetails property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link ClientDetails }
-     *     
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getClientDetails().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link ClientDetails }
+     * 
+     * 
      */
-    public void setClientDetails(ClientDetails value) {
-        this.clientDetails = value;
+    public List<ClientDetails> getClientDetails() {
+        if (clientDetails == null) {
+            clientDetails = new ArrayList<ClientDetails>();
+        }
+        return this.clientDetails;
     }
 
 }

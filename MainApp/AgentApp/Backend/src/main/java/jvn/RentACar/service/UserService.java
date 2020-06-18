@@ -20,4 +20,6 @@ public interface UserService {
     void generateResetToken(String email) throws NoSuchAlgorithmException;
 
     UserTokenState refreshAuthenticationToken(HttpServletRequest request);
+
+    User findByMainAppId(Long mainAppId);
 }
