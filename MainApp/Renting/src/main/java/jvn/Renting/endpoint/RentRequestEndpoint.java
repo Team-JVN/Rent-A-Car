@@ -1,12 +1,15 @@
 package jvn.Renting.endpoint;
 
 import jvn.Renting.client.UserClient;
+import jvn.Renting.dto.message.Log;
 import jvn.Renting.dto.request.RentRequestStatusDTO;
 import jvn.Renting.dto.response.UserInfoDTO;
 import jvn.Renting.dto.soap.rentrequest.*;
 import jvn.Renting.exceptionHandler.InvalidRentRequestDataException;
 import jvn.Renting.mapper.RentRequestDetailsMapper;
+import jvn.Renting.model.RentInfo;
 import jvn.Renting.model.RentRequest;
+import jvn.Renting.producer.LogProducer;
 import jvn.Renting.service.RentRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
@@ -24,6 +27,10 @@ import java.util.stream.Collectors;
 
 @Endpoint
 public class RentRequestEndpoint {
+
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private static final String NAMESPACE_URI = "http://www.soap.dto/rentrequest";
 
     private RentRequestService rentRequestService;
@@ -31,6 +38,8 @@ public class RentRequestEndpoint {
     private RentRequestDetailsMapper rentRequestDetailsMapper;
 
     private UserClient userClient;
+
+    private LogProducer logProducer;
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "createRentRequestRequest")
     @ResponsePayload
@@ -43,8 +52,12 @@ public class RentRequestEndpoint {
         RentRequestDetails rentRequestDetails = request.getRentRequestDetails();
         rentRequestDetails.setId(null);
         try {
-            rentRequestDetails = rentRequestDetailsMapper.toDto(rentRequestService.create(rentRequestDetailsMapper.toEntity(rentRequestDetails),
-                    dto.getId(), true));
+            RentRequest rentRequest = rentRequestService.create(rentRequestDetailsMapper.toEntity(rentRequestDetails), dto.getId(), true);
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CRQ", String.format("[SOAP] User %s successfully created rent request %s", dto.getId(), rentRequest.getId())));
+            for (RentInfo rentInfo : rentRequest.getRentInfos()) {
+                logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CRI", String.format("[SOAP] User %s successfully created rent info %s", dto.getId(), rentInfo.getId())));
+            }
+            rentRequestDetails = rentRequestDetailsMapper.toDto(rentRequest);
         } catch (DateTimeParseException | ParseException e) {
             return null;
         }
@@ -66,7 +79,8 @@ public class RentRequestEndpoint {
         try {
             RentRequestStatusDTO rentRequestStatusDTO = new RentRequestStatusDTO();
             rentRequestStatusDTO.setStatus(request.getStatus());
-            rentRequestService.changeRentRequestStatus(request.getRentRequestId(), rentRequestStatusDTO, dto.getId());
+            RentRequest rentRequest = rentRequestService.changeRentRequestStatus(request.getRentRequestId(), rentRequestStatusDTO, dto.getId());
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SRQ", String.format("User %s successfully changed rent request %s status to %s", dto.getId(), rentRequest.getId(), rentRequest.getRentRequestStatus().toString())));
         } catch (InvalidRentRequestDataException e) {
             status = "ERROR";
         }
@@ -85,7 +99,6 @@ public class RentRequestEndpoint {
         }
         boolean status = true;
         try {
-
             LocalDate dateTo = null;
             if (request.getAdvDateTo() != null) {
                 dateTo = getLocalDate(request.getAdvDateTo());
@@ -110,15 +123,12 @@ public class RentRequestEndpoint {
         }
         boolean status = true;
         try {
-
             RentRequest rentRequest = rentRequestService.getRentRequest(request.getRentRequestId());
             if (rentRequest == null) {
                 status = false;
-
             } else {
                 rentRequestService.checkIfCanAcceptRentRequest(rentRequest);
             }
-
         } catch (InvalidRentRequestDataException e) {
             status = false;
         }
@@ -176,9 +186,11 @@ public class RentRequestEndpoint {
     }
 
     @Autowired
-    public RentRequestEndpoint(RentRequestService rentRequestService, RentRequestDetailsMapper rentRequestDetailsMapper, UserClient userClient) {
+    public RentRequestEndpoint(RentRequestService rentRequestService, RentRequestDetailsMapper rentRequestDetailsMapper,
+                               UserClient userClient, LogProducer logProducer) {
         this.rentRequestService = rentRequestService;
         this.userClient = userClient;
         this.rentRequestDetailsMapper = rentRequestDetailsMapper;
+        this.logProducer = logProducer;
     }
 }

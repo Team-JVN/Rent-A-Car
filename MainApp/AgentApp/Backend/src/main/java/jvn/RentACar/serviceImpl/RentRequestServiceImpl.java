@@ -31,6 +31,9 @@ import java.util.concurrent.ScheduledExecutorService;
 @Service
 public class RentRequestServiceImpl implements RentRequestService {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private ClientService clientService;
 
     private AdvertisementService advertisementService;
@@ -46,6 +49,8 @@ public class RentRequestServiceImpl implements RentRequestService {
     private RentRequestClient rentRequestClient;
 
     private RentRequestDetailsMapper rentRequestDetailsMapper;
+
+    private LogService logService;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -140,20 +145,20 @@ public class RentRequestServiceImpl implements RentRequestService {
         RentRequest rentRequest1 = null;
         if (rentRequestStatus.equals(RentRequestStatus.CANCELED)) {
             if (userService.getLoginUser().getId().equals(rentRequest.getCreatedBy().getId())) {
-                rentRequest1 =  cancel(rentRequest);
+                rentRequest1 = cancel(rentRequest);
             } else {
                 rentRequest1 = reject(rentRequest);
             }
         } else if (rentRequestStatus.equals(RentRequestStatus.PAID)) {
             rentRequest1 = accept(rentRequest);
-        }else {
+        } else {
             throw new InvalidRentRequestDataException("This rent request's status doesn't exist.", HttpStatus.BAD_REQUEST);
         }
         ChangeRentRequestStatusResponse response = rentRequestClient.changeRentRequestStatus(rentRequest.getMainAppId(), rentRequestStatus);
-        if (response.equals("ERROR")) {
+        if (response.getStatus().equals("ERROR")) {
             throw new InvalidRentRequestDataException("You can't change status of this request.", HttpStatus.BAD_REQUEST);
         }
-       return rentRequest1;
+        return rentRequest1;
     }
 
     @Override
@@ -369,12 +374,17 @@ public class RentRequestServiceImpl implements RentRequestService {
             List<RentRequest> rentRequests = rentRequestRepository.findByRentRequestStatusNotAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualAndRentInfosAdvertisementIdOrRentRequestStatusNotAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualAndRentInfosAdvertisementIdOrRentRequestStatusNotAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanEqualAndRentInfosAdvertisementId(
                     RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeFrom, advId, RentRequestStatus.PAID, rentInfoDateTimeTo, rentInfoDateTimeTo, advId,
                     RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeTo, advId);
+
+            StringBuilder sb = new StringBuilder();
             for (RentRequest rentRequest1 : rentRequests) {
                 rentRequest1.setRentRequestStatus(RentRequestStatus.CANCELED);
                 composeAndSendRejectedRentRequest(rentRequest.getClient().getEmail(), rentRequest.getId());
+                sb.append(rentRequest1.getId());
+                sb.append(", ");
             }
             if (!rentRequests.isEmpty()) {
                 rentRequestRepository.saveAll(rentRequests);
+                logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SRQ", String.format("Because rent request %s is PAID, rent requests %s are REJECTED", rentRequest.getId(), sb.toString())));
             }
         }
     }
@@ -393,6 +403,7 @@ public class RentRequestServiceImpl implements RentRequestService {
                 rentRequest.setRentRequestStatus(RentRequestStatus.CANCELED);
                 rentRequestRepository.save(rentRequest);
                 composeAndSendRejectedRentRequest(rentRequest.getClient().getEmail(), rentRequest.getId());
+                logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SRQ", String.format("Because 24h from creation have passed, rent request %s is automatically CANCELED", rentRequest.getId())));
             }
         };
     }
@@ -422,8 +433,8 @@ public class RentRequestServiceImpl implements RentRequestService {
                 } else {
                     editSynchronize(rentRequest, dbRentRequest);
                 }
-
             }
+            logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SYN", "[SOAP] Rent requests are successfully synchronized"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -436,9 +447,9 @@ public class RentRequestServiceImpl implements RentRequestService {
         }
         Set<RentInfo> rentInfos = rentRequest.getRentInfos();
         rentRequest.setRentInfos(null);
-       rentRequest= rentRequestRepository.saveAndFlush(rentRequest);
-        for (RentInfo rentInfo :rentInfos) {
-            if(rentInfo.getAdvertisement() == null){
+        rentRequest = rentRequestRepository.saveAndFlush(rentRequest);
+        for (RentInfo rentInfo : rentInfos) {
+            if (rentInfo.getAdvertisement() == null) {
                 return;
             }
             rentInfo.setRentRequest(rentRequest);
@@ -454,6 +465,7 @@ public class RentRequestServiceImpl implements RentRequestService {
         dbRentRequest.setRentRequestStatus(rentRequest.getRentRequestStatus());
         rentRequestRepository.saveAndFlush(dbRentRequest);
     }
+
     private String getLocalhostURL() {
         return environment.getProperty("LOCALHOST_URL");
     }
@@ -461,7 +473,8 @@ public class RentRequestServiceImpl implements RentRequestService {
     @Autowired
     public RentRequestServiceImpl(ClientService clientService, AdvertisementService advertisementService, UserService userService,
                                   RentRequestRepository rentRequestRepository, EmailNotificationService emailNotificationService,
-                                  Environment environment, RentRequestClient rentRequestClient,RentRequestDetailsMapper rentRequestDetailsMapper) {
+                                  Environment environment, RentRequestClient rentRequestClient, RentRequestDetailsMapper rentRequestDetailsMapper,
+                                  LogService logService) {
         this.clientService = clientService;
         this.advertisementService = advertisementService;
         this.rentRequestRepository = rentRequestRepository;
@@ -470,5 +483,6 @@ public class RentRequestServiceImpl implements RentRequestService {
         this.environment = environment;
         this.rentRequestClient = rentRequestClient;
         this.rentRequestDetailsMapper = rentRequestDetailsMapper;
+        this.logService = logService;
     }
 }

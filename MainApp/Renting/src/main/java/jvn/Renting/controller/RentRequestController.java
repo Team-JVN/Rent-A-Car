@@ -57,13 +57,10 @@ public class RentRequestController {
     public ResponseEntity<RentRequestDTO> create(@Valid @RequestBody RentRequestDTO rentRequestDTO) {
         try {
             UserDTO userDTO = stringToObject(request.getHeader("user"));
-            RentRequest rentRequest = rentRequestService.create(rentRequestDtoMapper.toEntity(rentRequestDTO), userDTO,
-                    request.getHeader("Auth"), request.getHeader("user"));
-            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CRQ", String
-                    .format("User %s successfully created rent request %s", userDTO.getId(), rentRequest.getId())));
+            RentRequest rentRequest = rentRequestService.create(rentRequestDtoMapper.toEntity(rentRequestDTO), userDTO.getId(), userDTO.getCanCreateRentRequests());
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CRQ", String.format("User %s successfully created rent request %s", userDTO.getId(), rentRequest.getId())));
             for (RentInfo rentInfo : rentRequest.getRentInfos()) {
-                logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CRI",
-                        String.format("User %s successfully created rent info %s", userDTO.getId(), rentInfo.getId())));
+                logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CRI", String.format("User %s successfully created rent info %s", userDTO.getId(), rentInfo.getId())));
             }
             return new ResponseEntity<>(rentRequestDtoMapper.toDto(rentRequest), HttpStatus.CREATED);
         } catch (DateTimeParseException | ParseException e) {
@@ -71,29 +68,26 @@ public class RentRequestController {
         }
     }
 
+
     @GetMapping("/{status}/advertisement/{advertisementId}")
     public ResponseEntity<List<RentRequestDTO>> getRentRequests(
             @PathVariable(value = "advertisementId", required = false) @Positive(message = "Id must be positive.") Long advertisementId,
             @PathVariable(value = "status", required = false) @Pattern(regexp = "(?i)(all|pending|reserved|paid|canceled)$", message = "Status is not valid.") String status) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(rentRequestService.get(advertisementId, status, userDTO.getId(),
-                request.getHeader("Auth"), request.getHeader("user")), HttpStatus.OK);
+        return new ResponseEntity<>(rentRequestService.get(advertisementId, status, userDTO.getId(), request.getHeader("Auth"), request.getHeader("user")), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<RentRequestDTO> get(@PathVariable @Positive(message = "Id must be positive.") Long id) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(
-                rentRequestService.get(id, userDTO.getId(), request.getHeader("Auth"), request.getHeader("user")),
-                HttpStatus.OK);
+        return new ResponseEntity<>(rentRequestService.get(id, userDTO.getId(), request.getHeader("Auth"), request.getHeader("user")), HttpStatus.OK);
     }
 
     @GetMapping("/{status}/mine")
     public ResponseEntity<List<RentRequestDTO>> getMine(
             @PathVariable(value = "status") @Pattern(regexp = "(?i)(all|pending|reserved|paid|canceled)$", message = "Status is not valid.") String status) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(rentRequestService.getMine(status, userDTO.getId(), request.getHeader("Auth"),
-                request.getHeader("user")), HttpStatus.OK);
+        return new ResponseEntity<>(rentRequestService.getMine(status, userDTO.getId(), request.getHeader("Auth"), request.getHeader("user")), HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -102,9 +96,7 @@ public class RentRequestController {
             @Valid @RequestBody RentRequestStatusDTO status) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
         RentRequest rentRequest = rentRequestService.changeRentRequestStatus(id, status, userDTO.getId());
-        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SRQ",
-                String.format("User %s successfully changed rent request %s status to %s", userDTO.getId(),
-                        rentRequest.getId(), rentRequest.getRentRequestStatus().toString())));
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SRQ", String.format("User %s successfully changed rent request %s status to %s", userDTO.getId(), rentRequest.getId(), rentRequest.getRentRequestStatus().toString())));
         return new ResponseEntity<>(rentRequestDtoMapper.toDto(rentRequest), HttpStatus.OK);
     }
 
@@ -131,12 +123,8 @@ public class RentRequestController {
             @PathVariable("rentInfoId") @Positive(message = "Id must be positive.") Long rentInfoId) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
         rentInfoService.pay(rentRequestId, rentInfoId, userDTO.getId());
-        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PAY",
-                String.format("User %s successfully paid for rent info %s from rent request %s", userDTO.getId(),
-                        rentInfoId, rentRequestId)));
-        return new ResponseEntity<>(
-                rentInfoDtoMapper.toDto(rentInfoService.pay(rentRequestId, rentInfoId, userDTO.getId())),
-                HttpStatus.OK);
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PAY", String.format("User %s successfully paid for rent info %s from rent request %s", userDTO.getId(), rentInfoId, rentRequestId)));
+        return new ResponseEntity<>(rentInfoDtoMapper.toDto(rentInfoService.pay(rentRequestId, rentInfoId, userDTO.getId())), HttpStatus.OK);
     }
 
     private UserDTO stringToObject(String user) {
@@ -149,8 +137,8 @@ public class RentRequestController {
 
     @Autowired
     public RentRequestController(RentRequestService rentRequestService, RentRequestDtoMapper rentRequestDtoMapper,
-            ObjectMapper objectMapper, HttpServletRequest request, RentInfoService rentInfoService,
-            RentInfoDtoMapper rentInfoDtoMapper, LogProducer logProducer) {
+                                 ObjectMapper objectMapper, HttpServletRequest request, RentInfoService rentInfoService,
+                                 RentInfoDtoMapper rentInfoDtoMapper, LogProducer logProducer) {
         this.rentRequestService = rentRequestService;
         this.rentRequestDtoMapper = rentRequestDtoMapper;
         this.objectMapper = objectMapper;

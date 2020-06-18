@@ -52,8 +52,6 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     private RentRequestProducer rentRequestProducer;
 
-    private TaskScheduler scheduler;
-
     private LogProducer logProducer;
 
     @Override
@@ -109,7 +107,7 @@ public class RentRequestServiceImpl implements RentRequestService {
     @Async
     public void executeRejectTask(Long rentReqId, Instant executionMoment) {
         ScheduledExecutorService localExecutor = Executors.newSingleThreadScheduledExecutor();
-        scheduler = new ConcurrentTaskScheduler(localExecutor);
+        TaskScheduler scheduler = new ConcurrentTaskScheduler(localExecutor);
         scheduler.schedule(createRunnable(rentReqId), executionMoment);
     }
 
@@ -434,6 +432,7 @@ public class RentRequestServiceImpl implements RentRequestService {
             List<RentRequest> rentRequests = rentRequestRepository.findByRentRequestStatusNotAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualAndRentInfosAdvertisementOrRentRequestStatusNotAndRentInfosDateTimeFromLessThanEqualAndRentInfosDateTimeToGreaterThanEqualAndRentInfosAdvertisementOrRentRequestStatusNotAndRentInfosDateTimeFromGreaterThanEqualAndRentInfosDateTimeToLessThanEqualAndRentInfosAdvertisement(
                     RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeFrom, rentInfo.getAdvertisement(), RentRequestStatus.PAID, rentInfoDateTimeTo, rentInfoDateTimeTo, rentInfo.getAdvertisement(),
                     RentRequestStatus.PAID, rentInfoDateTimeFrom, rentInfoDateTimeTo, rentInfo.getAdvertisement());
+
             StringBuilder sb = new StringBuilder();
             for (RentRequest rentRequest1 : rentRequests) {
                 rentRequest1.setRentRequestStatus(RentRequestStatus.CANCELED);

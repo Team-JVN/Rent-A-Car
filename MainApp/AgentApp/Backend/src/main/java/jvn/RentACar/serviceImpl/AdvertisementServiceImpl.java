@@ -205,12 +205,12 @@ public class AdvertisementServiceImpl implements AdvertisementService {
                             newSearchParamsDTO.getMaxPricePerDay());
         }
 
-        searchedAdsList.stream()
+        List<Advertisement> result = searchedAdsList.stream()
                 .filter(ad -> ad.getKilometresLimit() == null
                         || ad.getKilometresLimit() >= newSearchParamsDTO.getKilometresLimit())
                 .collect(Collectors.toList());
 
-        return searchedAdsList;
+        return result;
     }
 
     @Override
@@ -222,9 +222,8 @@ public class AdvertisementServiceImpl implements AdvertisementService {
                 ads = advertisementRepository.findAllByLogicalStatusNot(LogicalStatus.DELETED);
                 break;
             case "active":
-                ads = advertisementRepository
-                        .findAllByLogicalStatusNotAndDateToEqualsOrLogicalStatusNotAndDateToGreaterThan(
-                                LogicalStatus.DELETED, null, LogicalStatus.DELETED, LocalDate.now());
+                ads = advertisementRepository.findAllByLogicalStatusNotAndDateToEqualsOrLogicalStatusNotAndDateToGreaterThan(
+                        LogicalStatus.DELETED, null, LogicalStatus.DELETED, LocalDate.now());
                 break;
             default:
                 ads = advertisementRepository.findAllByLogicalStatusNotAndDateToLessThanEqual(LogicalStatus.DELETED,
@@ -289,15 +288,13 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     private void isEditable(Advertisement advertisement) {
         if (advertisementRepository.findByIdAndRentInfosRentRequestRentRequestStatusNotAndLogicalStatus(
                 advertisement.getId(), RentRequestStatus.CANCELED, LogicalStatus.EXISTING) != null) {
-            throw new InvalidAdvertisementDataException(
-                    "This advertisement is in use and therefore can not be edited/deleted.", HttpStatus.BAD_REQUEST);
+            throw new InvalidAdvertisementDataException("This advertisement is in use and therefore can not be edited/deleted.", HttpStatus.BAD_REQUEST);
         }
     }
 
     private void checkOwner(Car car) {
         if (!userService.getLoginAgent().getEmail().equals(car.getOwner().getEmail())) {
-            logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CHO", String.format(
-                    "User %s is not the owner of advertisement %s", userService.getLoginUser().getId(), car.getId())));
+            logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CHO", String.format("User %s is not the owner of advertisement %s", userService.getLoginUser().getId(), car.getId())));
             throw new InvalidCarDataException("You are not owner of this car.", HttpStatus.BAD_REQUEST);
         }
     }
@@ -350,8 +347,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
                     editSynchronize(advertisement, dbAdvertisement);
                 }
             }
-            logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SYN",
-                    "[SOAP] Advertisements are successfully synchronized"));
+            logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SYN", "[SOAP] Advertisements are successfully synchronized"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -382,8 +378,8 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     @Autowired
     public AdvertisementServiceImpl(CarService carService, PriceListService priceListService, UserService userService,
-            AdvertisementRepository advertisementRepository, AdvertisementClient advertisementClient,
-            AdvertisementDetailsMapper advertisementDetailsMapper, LogService logService) {
+                                    AdvertisementRepository advertisementRepository, AdvertisementClient advertisementClient,
+                                    AdvertisementDetailsMapper advertisementDetailsMapper, LogService logService) {
         this.carService = carService;
         this.priceListService = priceListService;
         this.advertisementRepository = advertisementRepository;
