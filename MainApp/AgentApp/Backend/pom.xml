@@ -160,6 +160,84 @@
                 <configuration>
                     <schemaLanguage>WSDL</schemaLanguage>
                     <generateDirectory>${project.basedir}/src/main/java</generateDirectory>
+                    <generatePackage>jvn.RentACar.dto.soap.rentrequest</generatePackage>
+                    <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>
+                    <schemaIncludes>
+                        <include>rentRequests.wsdl</include>
+                        <include>changeRentRequestStatus.wsdl</include>
+                        <include>checkDate.wsdl</include>
+                        <include>checkIfCanAcceptRentRequest.wsdl</include>
+                        <include>hasDebt.wsdl</include>
+                        <include>listRentRequest.wsdl</include>
+                    </schemaIncludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.14.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <schemaLanguage>WSDL</schemaLanguage>
+                    <generateDirectory>${project.basedir}/src/main/java</generateDirectory>
+                    <generatePackage>jvn.RentACar.dto.soap.car</generatePackage>
+                    <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>
+                    <schemaIncludes>
+                        <include>createOrEditCar.wsdl</include>
+                        <include>deleteCar.wsdl</include>
+                        <include>getCarEditType.wsdl</include>
+                        <include>editPartialCar.wsdl</include>
+                        <include>listCar.wsdl</include>
+                    </schemaIncludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.14.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <schemaLanguage>WSDL</schemaLanguage>
+                    <generateDirectory>${project.basedir}/src/main/java</generateDirectory>
+                    <generatePackage>jvn.RentACar.dto.soap.advertisement</generatePackage>
+                    <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>
+                    <schemaIncludes>
+                        <include>createOrEditAdvertisement.wsdl</include>
+                        <include>deleteAdvertisement.wsdl</include>
+                        <include>editPartialAdvertisement.wsdl</include>
+                        <include>getAdvertisementEditType.wsdl</include>
+                        <include>listAdvertisement.wsdl</include>
+                        <include>checkIfCarIsAvailable.wsdl</include>
+                    </schemaIncludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.14.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <schemaLanguage>WSDL</schemaLanguage>
+                    <generateDirectory>${project.basedir}/src/main/java</generateDirectory>
                     <generatePackage>jvn.RentACar.dto.soap.client</generatePackage>
                     <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>
                     <schemaIncludes>
@@ -170,58 +248,8 @@
                     </schemaIncludes>
                 </configuration>
             </plugin>
-            <!--            <plugin>-->
-            <!--                <groupId>org.jvnet.jaxb2.maven2</groupId>-->
-            <!--                <artifactId>maven-jaxb2-plugin</artifactId>-->
-            <!--                <version>0.14.0</version>-->
-            <!--                <executions>-->
-            <!--                    <execution>-->
-            <!--                        <goals>-->
-            <!--                            <goal>generate</goal>-->
-            <!--                        </goals>-->
-            <!--                    </execution>-->
-            <!--                </executions>-->
-            <!--                <configuration>-->
-            <!--                    <schemaLanguage>WSDL</schemaLanguage>-->
-            <!--                    <generateDirectory>${project.basedir}/src/main/java</generateDirectory>-->
-            <!--                    <generatePackage>jvn.RentACar.dto.soap.car</generatePackage>-->
-            <!--                    <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>-->
-            <!--                    <schemaIncludes>-->
-            <!--                        <include>createOrEditCar.wsdl</include>-->
-            <!--                        <include>deleteCar.wsdl</include>-->
-            <!--                        <include>getCarEditType.wsdl</include>-->
-            <!--                        <include>editPartialCar.wsdl</include>-->
-            <!--                        <include>listCar.wsdl</include>-->
-            <!--                    </schemaIncludes>-->
-            <!--                </configuration>-->
-            <!--            </plugin>-->
-
-            <!--            <plugin>-->
-            <!--                <groupId>org.jvnet.jaxb2.maven2</groupId>-->
-            <!--                <artifactId>maven-jaxb2-plugin</artifactId>-->
-            <!--                <version>0.14.0</version>-->
-            <!--                <executions>-->
-            <!--                    <execution>-->
-            <!--                        <goals>-->
-            <!--                            <goal>generate</goal>-->
-            <!--                        </goals>-->
-            <!--                    </execution>-->
-            <!--                </executions>-->
-            <!--                <configuration>-->
-            <!--                    <schemaLanguage>WSDL</schemaLanguage>-->
-            <!--                    <generateDirectory>${project.basedir}/src/main/java</generateDirectory>-->
-            <!--                    <generatePackage>jvn.RentACar.dto.soap.advertisement</generatePackage>-->
-            <!--                    <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>-->
-            <!--                    <schemaIncludes>-->
-            <!--                        <include>createOrEditAdvertisement.wsdl</include>-->
-            <!--                        <include>deleteAdvertisement.wsdl</include>-->
-            <!--                        <include>editPartialAdvertisement.wsdl</include>-->
-            <!--                        <include>getAdvertisementEditType.wsdl</include>-->
-            <!--                        <include>listAdvertisement.wsdl</include>-->
-            <!--                    </schemaIncludes>-->
-            <!--                </configuration>-->
-            <!--            </plugin>-->
         </plugins>
     </build>
 
 </project>
+

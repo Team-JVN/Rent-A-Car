@@ -1,5 +1,6 @@
 package jvn.Users.endpoint;
 
+import jvn.Users.dto.response.UserDTO;
 import jvn.Users.dto.response.UserInfoDTO;
 import jvn.Users.dto.soap.client.*;
 import jvn.Users.mapper.ClientDetailsMapper;
@@ -40,7 +41,7 @@ public class ClientDetailsEndpoint {
         if (clientDetails.getId() != null) {
             clientDetails = clientDetailsMapper.toDto(clientService.edit(client.getId(), client));
         } else {
-            clientDetails = clientDetailsMapper.toDto(clientService.create(client, true));
+            clientDetails = clientDetailsMapper.toDto(clientService.create(client, true, user.getId()));
         }
 
         CreateOrEditClientResponse response = new CreateOrEditClientResponse();

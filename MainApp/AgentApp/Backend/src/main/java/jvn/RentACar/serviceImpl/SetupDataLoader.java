@@ -64,6 +64,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         createRoleIfNotFound("ROLE_AGENT", agentPermissions);
 
         Set<Permission> clientPermissions = new HashSet<>(Arrays.asList(clientEditProfile, myRentRequests));
+
         createRoleIfNotFound("ROLE_CLIENT", clientPermissions);
 
         RandomPasswordGenerator randomPasswordGenerator = new RandomPasswordGenerator();

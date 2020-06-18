@@ -9,12 +9,15 @@ import jvn.Advertisements.mapper.AdvertisementDetailsMapper;
 import jvn.Advertisements.mapper.EditPartialAdvertisementMapper;
 import jvn.Advertisements.model.Advertisement;
 import jvn.Advertisements.service.AdvertisementService;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -123,6 +126,32 @@ public class AdvertisementEndpoint {
         dto.setCanCreateComments(userInfoDTO.getCanCreateComments());
         dto.setCanCreateRentRequests(userInfoDTO.getCanCreateRentRequests());
         return dto;
+    }
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "checkIfCarIsAvailableRequest")
+    @ResponsePayload
+    public CheckIfCarIsAvailableResponse checkIfCarIsAvailable(@RequestPayload CheckIfCarIsAvailableRequest request) {
+        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        if (dto == null) {
+            return null;
+        }
+        LocalDate dateFrom = getLocalDate(request.getDateFrom());
+        LocalDate dateTo = null;
+        if (request.getDateTo() != null) {
+            dateTo = getLocalDate(request.getDateTo());
+        }
+        CheckIfCarIsAvailableResponse response = new CheckIfCarIsAvailableResponse();
+        response.setAvailable(advertisementService.checkIfCarIsAvailableForSoap(request.getCarId(), dateFrom, dateTo));
+        return response;
+    }
+
+
+    private LocalDate getLocalDate(XMLGregorianCalendar xmlGregorianCalendar) {
+        LocalDate localDate = LocalDate.of(
+                xmlGregorianCalendar.getYear(),
+                xmlGregorianCalendar.getMonth(),
+                xmlGregorianCalendar.getDay());
+        return localDate;
     }
 
     @Autowired

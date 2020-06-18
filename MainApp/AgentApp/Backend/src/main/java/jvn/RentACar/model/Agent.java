@@ -28,6 +28,7 @@ public class Agent extends User {
 
     public Agent(Long mainAppId, String name, String email, String password, String address, String taxIdNumber, String phoneNumber) {
         super(mainAppId, name, email, password, address, true);
+
         this.taxIdNumber = taxIdNumber;
         this.status = AgentStatus.INACTIVE;
         this.phoneNumber = phoneNumber;

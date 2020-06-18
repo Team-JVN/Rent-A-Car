@@ -106,7 +106,7 @@ public class UserController {
         }
         try {
             return new ResponseEntity<>(
-                    clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO), false)),
+                    clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO), false, null)),
                     HttpStatus.CREATED);
         } catch (NoSuchAlgorithmException e) {
             logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "REG", "Hash algorithm threw exception"));

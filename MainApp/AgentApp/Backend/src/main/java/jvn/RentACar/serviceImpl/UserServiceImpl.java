@@ -143,8 +143,12 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     }
 
     @Override
-    public User findByMainAppId(Long mainAppId) {
-        return userRepository.findByMainAppId(mainAppId);
+    public User getByMainAppId(Long mainAppId) {
+        User user = userRepository.findByMainAppId(mainAppId);
+        if (user == null) {
+            throw new InvalidUserDataException("This user doesn't exist.", HttpStatus.NOT_FOUND);
+        }
+        return user;
     }
 
     private String getClientIP() {

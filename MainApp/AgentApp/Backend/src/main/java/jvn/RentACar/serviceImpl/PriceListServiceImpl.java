@@ -13,6 +13,7 @@ import jvn.RentACar.repository.PriceListRepository;
 import jvn.RentACar.service.PriceListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -97,6 +98,7 @@ public class PriceListServiceImpl implements PriceListService {
         return priceListRepository.findByMainAppId(mainAppId);
     }
 
+    @Scheduled(cron = "0 30 0/3 * * ?")
     private void synchronizePriceLists() {
         GetAllPriceListDetailsResponse response = priceListClient.getAll();
         List<PriceListDetails> priceListDetails = response.getPriceListDetails();
