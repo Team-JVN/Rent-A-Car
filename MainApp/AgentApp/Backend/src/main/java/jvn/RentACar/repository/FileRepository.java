@@ -1,6 +1,6 @@
-package jvn.Logger.repository;
+package jvn.RentACar.repository;
 
-import jvn.Logger.model.Writable;
+import jvn.RentACar.model.Writable;
 
 import java.io.IOException;
 import java.nio.file.Path;
