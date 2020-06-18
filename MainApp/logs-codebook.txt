@@ -54,3 +54,7 @@ DAD|Delete advertisement
 CPL|Create price list
 EPL|Edit price list
 DPL|Delete price list
+CRQ|Create rent request
+SRQ|Change rent request status
+CRI|Create rent info
+PAY|Pay for made mileage over limit

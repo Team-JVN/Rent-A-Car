@@ -5,11 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Renting.dto.both.RentInfoDTO;
 import jvn.Renting.dto.both.RentRequestDTO;
 import jvn.Renting.dto.both.UserDTO;
+import jvn.Renting.dto.message.Log;
 import jvn.Renting.dto.request.RentRequestStatusDTO;
 import jvn.Renting.enumeration.EditType;
 import jvn.Renting.exceptionHandler.InvalidRentRequestDataException;
 import jvn.Renting.mapper.RentInfoDtoMapper;
 import jvn.Renting.mapper.RentRequestDtoMapper;
+import jvn.Renting.model.RentInfo;
+import jvn.Renting.model.RentRequest;
+import jvn.Renting.producer.LogProducer;
 import jvn.Renting.service.RentInfoService;
 import jvn.Renting.service.RentRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +36,9 @@ import java.util.List;
 @RequestMapping(value = "/api/rent-request", produces = MediaType.APPLICATION_JSON_VALUE)
 public class RentRequestController {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private RentRequestService rentRequestService;
 
     private RentRequestDtoMapper rentRequestDtoMapper;
@@ -44,12 +51,19 @@ public class RentRequestController {
 
     private RentInfoDtoMapper rentInfoDtoMapper;
 
+    private LogProducer logProducer;
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<RentRequestDTO> create(@Valid @RequestBody RentRequestDTO rentRequestDTO) {
         try {
             UserDTO userDTO = stringToObject(request.getHeader("user"));
-            return new ResponseEntity<>(rentRequestDtoMapper.toDto(rentRequestService.create(rentRequestDtoMapper.toEntity(rentRequestDTO), userDTO,
-                    request.getHeader("Auth"), request.getHeader("user"))),
+            RentRequest rentRequest = rentRequestService.create(rentRequestDtoMapper.toEntity(rentRequestDTO), userDTO,
+                    request.getHeader("Auth"), request.getHeader("user"));
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CRQ", String.format("User %s successfully created rent request %s", userDTO.getId(), rentRequest.getId())));
+            for (RentInfo rentInfo : rentRequest.getRentInfos()) {
+                logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CRI", String.format("User %s successfully created rent info %s", userDTO.getId(), rentInfo.getId())));
+            }
+            return new ResponseEntity<>(rentRequestDtoMapper.toDto(rentRequest),
                     HttpStatus.CREATED);
         } catch (DateTimeParseException | ParseException e) {
             throw new InvalidRentRequestDataException("Please choose valid date and time.", HttpStatus.BAD_REQUEST);
@@ -80,7 +94,9 @@ public class RentRequestController {
     public ResponseEntity<RentRequestDTO> changeRentRequestStatus(@PathVariable @Positive(message = "Id must be positive.") Long id,
                                                                   @Valid @RequestBody RentRequestStatusDTO status) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(rentRequestDtoMapper.toDto(rentRequestService.changeRentRequestStatus(id, status, userDTO.getId())), HttpStatus.OK);
+        RentRequest rentRequest = rentRequestService.changeRentRequestStatus(id, status, userDTO.getId());
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SRQ", String.format("User %s successfully changed rent request %s status to %s", userDTO.getId(), rentRequest.getId(), rentRequest.getRentRequestStatus().toString())));
+        return new ResponseEntity<>(rentRequestDtoMapper.toDto(rentRequest), HttpStatus.OK);
     }
 
     @GetMapping(value = "/advertisement/{advId}/edit-type", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -102,6 +118,8 @@ public class RentRequestController {
     public ResponseEntity<RentInfoDTO> pay(@PathVariable("rentRequestId") @Positive(message = "Id must be positive.") Long rentRequestId,
                                            @PathVariable("rentInfoId") @Positive(message = "Id must be positive.") Long rentInfoId) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
+        rentInfoService.pay(rentRequestId, rentInfoId, userDTO.getId());
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PAY", String.format("User %s successfully paid for rent info %s from rent request %s", userDTO.getId(), rentInfoId, rentRequestId)));
         return new ResponseEntity<>(rentInfoDtoMapper.toDto(rentInfoService.pay(rentRequestId, rentInfoId, userDTO.getId())), HttpStatus.OK);
     }
 
@@ -109,7 +127,6 @@ public class RentRequestController {
         try {
             return objectMapper.readValue(user, UserDTO.class);
         } catch (JsonProcessingException e) {
-            //TODO: Add to log and delete return null;
             return null;
         }
     }
@@ -117,12 +134,13 @@ public class RentRequestController {
     @Autowired
     public RentRequestController(RentRequestService rentRequestService, RentRequestDtoMapper rentRequestDtoMapper,
                                  ObjectMapper objectMapper, HttpServletRequest request, RentInfoService rentInfoService,
-                                 RentInfoDtoMapper rentInfoDtoMapper) {
+                                 RentInfoDtoMapper rentInfoDtoMapper, LogProducer logProducer) {
         this.rentRequestService = rentRequestService;
         this.rentRequestDtoMapper = rentRequestDtoMapper;
         this.objectMapper = objectMapper;
         this.request = request;
         this.rentInfoService = rentInfoService;
         this.rentInfoDtoMapper = rentInfoDtoMapper;
+        this.logProducer = logProducer;
     }
 }
