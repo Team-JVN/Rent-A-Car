@@ -340,12 +340,6 @@ public class RentRequestServiceImpl implements RentRequestService {
         };
     }
 
-    private void hasDebt(Long loggedInUserId) {
-        if (!rentRequestRepository.findByRentRequestStatusAndRentInfosRentReportPaidAndClientId(RentRequestStatus.PAID, false, loggedInUserId).isEmpty()) {
-            throw new InvalidRentRequestDataException("You are not allowed to create rent requests because you have outstanding debts. ", HttpStatus.BAD_REQUEST);
-        }
-    }
-
     @Scheduled(cron = "0 40 0/3 * * ?")
     public void synchronize() {
         try {

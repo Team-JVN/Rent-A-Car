@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service
+@Transactional
 public class PictureServiceImpl implements PictureService {
 
     private PictureRepository pictureRepository;
@@ -71,7 +72,8 @@ public class PictureServiceImpl implements PictureService {
             String fileName = StringUtils.cleanPath(picture.getFileName());
             if (!uniquePictures.contains(fileName)) {
                 uniquePictures.add(fileName);
-                pictureRepository.saveAndFlush(new Picture(savePictureOnDiskSynchronize(picture.getMultiPartFile(), path, car.getId(), picture.getFileName()), car));
+                Picture dbPicture = pictureRepository.saveAndFlush(new Picture(savePictureOnDiskSynchronize(picture.getMultiPartFile(), path, car.getId(), picture.getFileName()), car));
+                pictureRepository.refresh(dbPicture);
             }
         }
     }
@@ -131,7 +133,8 @@ public class PictureServiceImpl implements PictureService {
                     if (!uniquePictures.contains(fileName)) {
                         uniquePictures.add(fileName);
                         pictureData = new Picture(savePictureOnDiskSynchronize(picture.getMultiPartFile(), path, car.getId(), picture.getFileName()), car);
-                        pictureRepository.saveAndFlush(pictureData);
+                        Picture dbPicture = pictureRepository.saveAndFlush(pictureData);
+                        pictureRepository.refresh(dbPicture);
                     }
                 } else {
                     removedPictures.remove(pictureData);

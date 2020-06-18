@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service
+@Transactional
 public class CarServiceImpl implements CarService {
 
     @Value("${UPLOADED_PICTURES_PATH:src/main/resources/uploadedPictures/}")
@@ -264,6 +265,8 @@ public class CarServiceImpl implements CarService {
         car.setOwner(userService.getLoginUser());
         Car savedCar = carRepository.saveAndFlush(car);
         pictureService.savePicturesSynchronize(pictureInfos, UPLOADED_PICTURES_PATH, savedCar);
+        savedCar = carRepository.saveAndFlush(savedCar);
+        carRepository.refresh(savedCar);
     }
 
     public void editCarSynchronize(Car car, Car dbCar, List<PictureInfo> pictureInfos) {
@@ -291,6 +294,8 @@ public class CarServiceImpl implements CarService {
         if (pictureInfos != null && !pictureInfos.isEmpty()) {
             pictureService.editCarPicturesSynchronize(pictureInfos, UPLOADED_PICTURES_PATH, newCar);
         }
+        newCar = carRepository.saveAndFlush(newCar);
+        carRepository.refresh(newCar);
     }
 
 

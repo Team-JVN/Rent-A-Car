@@ -218,7 +218,6 @@ public class ClientServiceImpl implements ClientService {
 
     @Scheduled(cron = "0 20 0/3 * * ?")
     public void synchronize() {
-        System.out.println("ffff");
         try {
             GetAllClientDetailsResponse response = clientClient.getAll();
             if (response == null) {
