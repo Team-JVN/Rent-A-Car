@@ -1,10 +1,7 @@
 package jvn.RentACar.mapper;
 
-import jvn.RentACar.dto.request.AdvertisementEditDTO;
 import jvn.RentACar.dto.soap.advertisement.EditPartialAdvertisementDetails;
 import jvn.RentACar.model.Advertisement;
-import jvn.RentACar.repository.AdvertisementRepository;
-import jvn.RentACar.service.AdvertisementService;
 import jvn.RentACar.service.PriceListService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

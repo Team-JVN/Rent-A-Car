@@ -16,6 +16,7 @@ import jvn.RentACar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -100,6 +101,15 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public Client get(Long id) {
         Client client = clientRepository.findOneById(id);
+        if (client == null) {
+            throw new InvalidClientDataException("This client doesn't exist.", HttpStatus.NOT_FOUND);
+        }
+        return client;
+    }
+
+    @Override
+    public Client getByMainAppId(Long mainAppId) {
+        Client client = clientRepository.findByMainAppId(mainAppId);
         if (client == null) {
             throw new InvalidClientDataException("This client doesn't exist.", HttpStatus.NOT_FOUND);
         }
@@ -206,6 +216,7 @@ public class ClientServiceImpl implements ClientService {
         emailNotificationService.sendEmail(recipientEmail, subject, text);
     }
 
+    @Scheduled(cron = "0 20 0/3 * * ?")
     public void synchronize() {
         try {
             GetAllClientDetailsResponse response = clientClient.getAll();
@@ -219,7 +230,7 @@ public class ClientServiceImpl implements ClientService {
 
             for (ClientDetails current : clientDetails) {
                 Client currentClient = clientDetailsMapper.toEntity(current);
-                User dbUser = userService.findByMainAppId(currentClient.getMainAppId());
+                User dbUser = userService.getByMainAppId(currentClient.getMainAppId());
                 if (dbUser == null) {
                     createSynchronize(currentClient);
                 } else {

@@ -1,5 +1,6 @@
 package jvn.Users.service;
 
+import jvn.Users.dto.response.UserDTO;
 import jvn.Users.enumeration.ClientStatus;
 import jvn.Users.model.Client;
 
@@ -8,7 +9,7 @@ import java.util.List;
 
 public interface ClientService {
 
-    Client create(Client client, boolean fromAgentApp) throws NoSuchAlgorithmException;
+    Client create(Client client, boolean fromAgentApp, Long user) throws NoSuchAlgorithmException;
 
     Client get(Long id, ClientStatus status);
 

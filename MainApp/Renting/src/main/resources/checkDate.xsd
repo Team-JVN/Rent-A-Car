@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+           targetNamespace="http://www.soap.dto/rentrequest" xmlns:tns="http://www.soap.dto/rentrequest">
+
+    <xs:element name="checkDateRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="email" type="xs:string"/>
+                <xs:element name="advId">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:long">
+                            <xs:minInclusive value="1"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="advDateFrom" type="xs:date"/>
+                <xs:element name="advDateTo" type="xs:date" minOccurs="0"/>
+                <xs:element name="dateTimeFrom" type="xs:dateTime"/>
+                <xs:element name="dateTimeTo" type="xs:dateTime"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="checkDateResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="value" type="xs:boolean"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

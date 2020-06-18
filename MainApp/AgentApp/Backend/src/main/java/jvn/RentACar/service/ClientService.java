@@ -11,6 +11,8 @@ public interface ClientService {
 
     Client get(Long id);
 
+    Client getByMainAppId(Long mainAppId);
+
     List<Client> get();
 
     Client edit(Long id, Client client);

@@ -11,11 +11,12 @@ import jvn.Renting.model.RentRequest;
 
 import java.text.ParseException;
 import java.util.BitSet;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface RentRequestService {
 
-    RentRequest create(RentRequest rentRequestDTO, UserDTO loggedInUser, String jwt, String user) throws ParseException;
+    RentRequest create(RentRequest rentRequestDTO, Long loggedInUser, boolean canCreateRent) throws ParseException;
 
     List<RentRequestDTO> get(Long advertisementId, String status, Long loggedInUserId, String jwt, String user);
 
@@ -42,4 +43,14 @@ public interface RentRequestService {
     Message createMessage(Message message, Long id, Long userId, String userEmail);
 
     List<Message> getMessages(Long id, Long userId);
+    
+    void checkDate(Long id, LocalDate advertisementDateFrom, LocalDate advertisementDateTo, LocalDate rentInfoDateFrom, LocalDate rentInfoDateTo);
+
+    void checkIfCanAcceptRentRequest(RentRequest rentRequest);
+
+    RentRequest getRentRequest(Long id);
+
+    void hasDebt(Long loggedInUserId);
+
+    List<RentRequest> getAll(Long loggedInUserId);
 }

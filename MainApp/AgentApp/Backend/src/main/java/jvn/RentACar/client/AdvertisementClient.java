@@ -9,6 +9,11 @@ import jvn.RentACar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.time.LocalDate;
+
 public class AdvertisementClient extends WebServiceGatewaySupport {
 
     @Autowired
@@ -85,6 +90,34 @@ public class AdvertisementClient extends WebServiceGatewaySupport {
         GetAllAdvertisementDetailsResponse response = (GetAllAdvertisementDetailsResponse) getWebServiceTemplate()
                 .marshalSendAndReceive(request);
         return response;
+    }
+
+    public CheckIfCarIsAvailableResponse checkIfCarIsAvailable(Long carId, LocalDate dateFrom, LocalDate dateTo) {
+        CheckIfCarIsAvailableRequest request = new CheckIfCarIsAvailableRequest();
+        request.setCarId(carId);
+        request.setDateFrom(getXMLGregorianCalendar(dateFrom));
+        if (dateTo != null) {
+            request.setDateTo(getXMLGregorianCalendar(dateTo));
+        } else {
+            request.setDateTo(null);
+        }
+        request.setCarId(carId);
+        User user = userService.getLoginUser();
+        if (user == null) {
+            return null;
+        }
+        request.setEmail(user.getEmail());
+        CheckIfCarIsAvailableResponse response = (CheckIfCarIsAvailableResponse) getWebServiceTemplate()
+                .marshalSendAndReceive(request);
+        return response;
+    }
+
+    private XMLGregorianCalendar getXMLGregorianCalendar(LocalDate localDate) {
+        try {
+            return DatatypeFactory.newInstance().newXMLGregorianCalendar(localDate.toString());
+        } catch (DatatypeConfigurationException e) {
+            return null;
+        }
     }
 
 }
