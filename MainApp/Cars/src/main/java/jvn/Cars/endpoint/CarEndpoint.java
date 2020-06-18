@@ -64,9 +64,11 @@ public class CarEndpoint {
 
         CarDetails carDetailsForResponse;
         if (car.getId() != null) {
-            carDetailsForResponse = carDetailsMapper.toDto(carService.editAll(car.getId(), car, getFiles(request.getPictureInfo()), dto.getId()));
+            carDetailsForResponse = carDetailsMapper
+                    .toDto(carService.editAll(car.getId(), car, getFiles(request.getPictureInfo()), dto.getId()));
         } else {
-            carDetailsForResponse = carDetailsMapper.toDto(carService.create(car, getFiles(request.getPictureInfo()), dto.getId()));
+            carDetailsForResponse = carDetailsMapper
+                    .toDto(carService.create(car, getFiles(request.getPictureInfo()), dto.getId()));
         }
         CreateOrEditCarDetailsResponse response = new CreateOrEditCarDetailsResponse();
         response.setCreateCarDetails(carDetailsForResponse);
@@ -101,7 +103,8 @@ public class CarEndpoint {
     private List<MultipartFile> getFiles(List<PictureInfo> pictureInfos) {
         List<MultipartFile> multipartFiles = new ArrayList<>();
         for (PictureInfo pictureInfo : pictureInfos) {
-            BASE64DecodedMultipartFile base64DecodedMultipartFile = new BASE64DecodedMultipartFile(pictureInfo.getMultiPartFile(), pictureInfo.getFileName());
+            BASE64DecodedMultipartFile base64DecodedMultipartFile = new BASE64DecodedMultipartFile(
+                    pictureInfo.getMultiPartFile(), pictureInfo.getFileName());
             multipartFiles.add(base64DecodedMultipartFile);
         }
         return multipartFiles;
@@ -109,14 +112,16 @@ public class CarEndpoint {
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "editPartialCarDetailsRequest")
     @ResponsePayload
-    public EditPartialCarDetailsResponse editPartialCarDetailsRequest(@RequestPayload EditPartialCarDetailsRequest request) {
+    public EditPartialCarDetailsResponse editPartialCarDetailsRequest(
+            @RequestPayload EditPartialCarDetailsRequest request) {
         UserInfoDTO dto = userClient.getUser(request.getEmail());
         if (dto == null) {
             return null;
         }
 
         CarEditDTO carEditDTO = editPartialCarDetailsmapper.toEntity(request.getEditPartialCarDetails());
-        Car car = carService.editPartial(carEditDTO.getId(), carEditDTO, getFiles(request.getPictureInfo()), dto.getId());
+        Car car = carService.editPartial(carEditDTO.getId(), carEditDTO, getFiles(request.getPictureInfo()),
+                dto.getId());
 
         EditPartialCarDetailsResponse response = new EditPartialCarDetailsResponse();
         response.setEditPartialCarDetails(editPartialCarDetailsAndCarMapper.toDto(car));
@@ -175,8 +180,8 @@ public class CarEndpoint {
 
     @Autowired
     public CarEndpoint(CarService carService, CarDetailsMapper carDetailsMapper, UserClient userClient,
-                       EditPartialCarDetailsMapper editPartialCarDetailsmapper,
-                       EditPartialCarDetailsAndCarMapper editPartialCarDetailsAndCarMapper, LogProducer logProducer) {
+            EditPartialCarDetailsMapper editPartialCarDetailsmapper,
+            EditPartialCarDetailsAndCarMapper editPartialCarDetailsAndCarMapper, LogProducer logProducer) {
         this.carService = carService;
         this.carDetailsMapper = carDetailsMapper;
         this.userClient = userClient;

@@ -34,9 +34,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/car/statistics/{filter}")
                 .hasAuthority("GET_STATISTICS")
 
-                .antMatchers("/api/car/verify/{userId}/{carId}")
-                .hasAuthority("MANAGE_ADVERTISEMENTS")
-
                 .antMatchers("/api/body-style/{id}", "/api/fuel-type/{id}", "/api/gearbox-type", "/api/gearbox-type/{id}",
                         "/api/make/{id}", "/api/make/{makeId}/model/{modelId}")
                 .hasAuthority("MANAGE_CODE_BOOKS")
@@ -68,6 +65,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers(HttpMethod.GET, "/api/gearbox-type");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/make");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/make/{makeId}/models");
+        web.ignoring().antMatchers(HttpMethod.GET, "/api/car/verify/{userId}/{carId}");
     }
 
 }

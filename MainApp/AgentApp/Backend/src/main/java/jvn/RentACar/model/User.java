@@ -23,7 +23,6 @@ import java.util.*;
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
 public abstract class User implements UserDetails {
 
     private static final long serialVersionUID = 1L;
@@ -124,6 +123,10 @@ public abstract class User implements UserDetails {
             return false;
         }
         return Objects.equals(id, user.id);
+    }
+
+    public User() {
+        super();
     }
 
     @Override

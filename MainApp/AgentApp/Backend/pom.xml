@@ -119,34 +119,10 @@
     </dependencies>
     <build>
         <plugins>
-<!--            <plugin>-->
-<!--                <groupId>org.springframework.boot</groupId>-->
-<!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
-<!--            </plugin>-->
-<!--            <plugin>-->
-<!--                <groupId>org.jvnet.jaxb2.maven2</groupId>-->
-<!--                <artifactId>maven-jaxb2-plugin</artifactId>-->
-<!--                <version>0.14.0</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <goals>-->
-<!--                            <goal>generate</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--                <configuration>-->
-<!--                    <schemaLanguage>WSDL</schemaLanguage>-->
-<!--                    <generateDirectory>${project.basedir}/src/main/java</generateDirectory>-->
-<!--                    <generatePackage>jvn.RentACar.dto.soap.pricelist</generatePackage>-->
-<!--                    <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>-->
-<!--                    <schemaIncludes>-->
-<!--                        <include>priceLists.wsdl</include>-->
-<!--                        <include>deletePriceLists.wsdl</include>-->
-<!--                        <include>listPriceList.wsdl</include>-->
-<!--                    </schemaIncludes>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
-
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
@@ -161,18 +137,68 @@
                 <configuration>
                     <schemaLanguage>WSDL</schemaLanguage>
                     <generateDirectory>${project.basedir}/src/main/java</generateDirectory>
-                    <generatePackage>jvn.RentACar.dto.soap.car</generatePackage>
+                    <generatePackage>jvn.RentACar.dto.soap.pricelist</generatePackage>
                     <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>
                     <schemaIncludes>
-                        <include>createOrEditCar.wsdl</include>
-                        <include>deleteCar.wsdl</include>
-                        <include>getCarEditType.wsdl</include>
-                        <include>editPartialCar.wsdl</include>
-                        <include>listCar.wsdl</include>
+                        <include>priceLists.wsdl</include>
+                        <include>deletePriceLists.wsdl</include>
+                        <include>listPriceList.wsdl</include>
                     </schemaIncludes>
                 </configuration>
             </plugin>
+
+            <!--            <plugin>-->
+            <!--                <groupId>org.jvnet.jaxb2.maven2</groupId>-->
+            <!--                <artifactId>maven-jaxb2-plugin</artifactId>-->
+            <!--                <version>0.14.0</version>-->
+            <!--                <executions>-->
+            <!--                    <execution>-->
+            <!--                        <goals>-->
+            <!--                            <goal>generate</goal>-->
+            <!--                        </goals>-->
+            <!--                    </execution>-->
+            <!--                </executions>-->
+            <!--                <configuration>-->
+            <!--                    <schemaLanguage>WSDL</schemaLanguage>-->
+            <!--                    <generateDirectory>${project.basedir}/src/main/java</generateDirectory>-->
+            <!--                    <generatePackage>jvn.RentACar.dto.soap.car</generatePackage>-->
+            <!--                    <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>-->
+            <!--                    <schemaIncludes>-->
+            <!--                        <include>createOrEditCar.wsdl</include>-->
+            <!--                        <include>deleteCar.wsdl</include>-->
+            <!--                        <include>getCarEditType.wsdl</include>-->
+            <!--                        <include>editPartialCar.wsdl</include>-->
+            <!--                        <include>listCar.wsdl</include>-->
+            <!--                    </schemaIncludes>-->
+            <!--                </configuration>-->
+            <!--            </plugin>-->
+
+            <!--            <plugin>-->
+            <!--                <groupId>org.jvnet.jaxb2.maven2</groupId>-->
+            <!--                <artifactId>maven-jaxb2-plugin</artifactId>-->
+            <!--                <version>0.14.0</version>-->
+            <!--                <executions>-->
+            <!--                    <execution>-->
+            <!--                        <goals>-->
+            <!--                            <goal>generate</goal>-->
+            <!--                        </goals>-->
+            <!--                    </execution>-->
+            <!--                </executions>-->
+            <!--                <configuration>-->
+            <!--                    <schemaLanguage>WSDL</schemaLanguage>-->
+            <!--                    <generateDirectory>${project.basedir}/src/main/java</generateDirectory>-->
+            <!--                    <generatePackage>jvn.RentACar.dto.soap.advertisement</generatePackage>-->
+            <!--                    <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>-->
+            <!--                    <schemaIncludes>-->
+            <!--                        <include>createOrEditAdvertisement.wsdl</include>-->
+            <!--                        <include>deleteAdvertisement.wsdl</include>-->
+            <!--                        <include>editPartialAdvertisement.wsdl</include>-->
+            <!--                        <include>getAdvertisementEditType.wsdl</include>-->
+            <!--                        <include>listAdvertisement.wsdl</include>-->
+            <!--                    </schemaIncludes>-->
+            <!--                </configuration>-->
+            <!--            </plugin>-->
         </plugins>
     </build>
- 
+
 </project>

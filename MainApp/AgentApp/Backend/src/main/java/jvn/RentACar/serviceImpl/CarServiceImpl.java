@@ -77,9 +77,10 @@ public class CarServiceImpl implements CarService {
         car.setGearBoxType(gearboxTypeService.get(car.getGearBoxType().getId()));
         car.setCommentsCount(0);
         car.setAvgRating(0.0);
-        car.setMainAppId(saveInMainApp(car, multipartFiles));
         Car savedCar = carRepository.saveAndFlush(car);
         pictureService.savePictures(multipartFiles, UPLOADED_PICTURES_PATH, savedCar);
+        car.setMainAppId(saveInMainApp(car, multipartFiles));
+        savedCar = carRepository.saveAndFlush(car);
         return savedCar;
     }
 
@@ -91,7 +92,7 @@ public class CarServiceImpl implements CarService {
     @Override
     public List<Car> get() {
         synchronizeCars();
-        carRepository.flush();
+
         return carRepository.findAllByLogicalStatusNot(LogicalStatus.DELETED);
     }
 
@@ -105,7 +106,7 @@ public class CarServiceImpl implements CarService {
         Car car = get(id);
         checkOwner(car);
         Set<Advertisement> advertisements = get(id).getAdvertisements();
-        if (advertisements != null && !advertisements.isEmpty()) {
+        if (!getEditType(car.getMainAppId()).equals(EditType.ALL)) {
             throw new InvalidCarDataException("Car is in use and therefore can not be edited.", HttpStatus.BAD_REQUEST);
         }
         car.setMake(makeService.get(carDTO.getMake().getId()));
@@ -186,6 +187,11 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
+    public Car getByMainAppId(Long id) {
+        return carRepository.findByMainAppId(id);
+    }
+
+    @Override
     public List<Car> getStatistics(String filter) {
         synchronizeCars();
         String sortFilter = "";
@@ -207,8 +213,6 @@ public class CarServiceImpl implements CarService {
     private Long saveInMainApp(Car car, List<MultipartFile> multipartFiles) {
         try {
             CreateOrEditCarDetailsResponse response = carClient.createOrEdit(car, multipartFiles);
-            car.setMainAppId(response.getCreateCarDetails().getId());
-            carRepository.saveAndFlush(car);
             return response.getCreateCarDetails().getId();
         } catch (Exception e) {
             e.printStackTrace();

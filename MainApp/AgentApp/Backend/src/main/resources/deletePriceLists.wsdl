@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:sch="http://www.soap.dto/pricelist" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.pricelist.dto/soap" targetNamespace="http://www.pricelist.dto/soap">
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:sch="http://www.soap.dto/pricelist"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.pricelist.dto/soap"
+                  targetNamespace="http://www.pricelist.dto/soap">
     <wsdl:types>
-        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.soap.dto/pricelist">
+        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+                   targetNamespace="http://www.soap.dto/pricelist">
             <xs:element name="deletePriceListDetailsRequest">
                 <xs:complexType>
                     <xs:sequence>
@@ -55,7 +58,7 @@
     </wsdl:binding>
     <wsdl:service name="PriceListsPortService">
         <wsdl:port binding="tns:PriceListsPortSoap11" name="PriceListsPortSoap11">
-            <soap:address location="http://192.168.56.1:8081/pricelist/ws"/>
+            <soap:address location="http://192.168.56.1:8081/ws/pricelist"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

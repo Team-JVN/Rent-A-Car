@@ -59,7 +59,7 @@ public class PriceListEndpoint {
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getAllPriceListDetailsRequest")
     @ResponsePayload
-    public GetAllPriceListDetailsResponse createOrEdit(@RequestPayload GetAllPriceListDetailsRequest request) {
+    public GetAllPriceListDetailsResponse getAllPriceListDetails(@RequestPayload GetAllPriceListDetailsRequest request) {
         UserInfoDTO dto = userClient.getUser(request.getEmail());
         if (dto == null) {
             return null;
