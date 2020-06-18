@@ -258,7 +258,7 @@ public class CarServiceImpl implements CarService {
 
     }
 
-    public void createCarSynchronize(Car car, List<PictureInfo> pictureInfos) {
+    private void createCarSynchronize(Car car, List<PictureInfo> pictureInfos) {
         if (pictureInfos.size() > 5) {
             throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
         }
@@ -269,7 +269,7 @@ public class CarServiceImpl implements CarService {
         carRepository.refresh(savedCar);
     }
 
-    public void editCarSynchronize(Car car, Car dbCar, List<PictureInfo> pictureInfos) {
+    private void editCarSynchronize(Car car, Car dbCar, List<PictureInfo> pictureInfos) {
 
         if (pictureInfos.size() > 5) {
             throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
@@ -291,7 +291,7 @@ public class CarServiceImpl implements CarService {
         dbCar.setKidsSeats(car.getKidsSeats());
         dbCar.setAvailableTracking(car.getAvailableTracking());
         Car newCar = carRepository.saveAndFlush(dbCar);
-        if (pictureInfos != null && !pictureInfos.isEmpty()) {
+        if (!pictureInfos.isEmpty()) {
             pictureService.editCarPicturesSynchronize(pictureInfos, UPLOADED_PICTURES_PATH, newCar);
         }
         newCar = carRepository.saveAndFlush(newCar);

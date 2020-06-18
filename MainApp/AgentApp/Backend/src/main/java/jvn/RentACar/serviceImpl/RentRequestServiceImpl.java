@@ -21,9 +21,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -138,7 +136,7 @@ public class RentRequestServiceImpl implements RentRequestService {
         if (!rentRequest.getRentRequestStatus().equals(RentRequestStatus.PENDING)) {
             throw new InvalidRentRequestDataException("Your request is already expected, therefore you can not cancel/accept/reject it.", HttpStatus.BAD_REQUEST);
         }
-        RentRequest rentRequest1 = null;
+        RentRequest rentRequest1;
         if (rentRequestStatus.equals(RentRequestStatus.CANCELED)) {
             if (userService.getLoginUser().getId().equals(rentRequest.getCreatedBy().getId())) {
                 rentRequest1 = cancel(rentRequest);
@@ -151,7 +149,7 @@ public class RentRequestServiceImpl implements RentRequestService {
             throw new InvalidRentRequestDataException("This rent request's status doesn't exist.", HttpStatus.BAD_REQUEST);
         }
         ChangeRentRequestStatusResponse response = rentRequestClient.changeRentRequestStatus(rentRequest.getMainAppId(), rentRequestStatus);
-        if (response.equals("ERROR")) {
+        if (response.getStatus().equals("ERROR")) {
             throw new InvalidRentRequestDataException("You can't change status of this request.", HttpStatus.BAD_REQUEST);
         }
         return rentRequest1;

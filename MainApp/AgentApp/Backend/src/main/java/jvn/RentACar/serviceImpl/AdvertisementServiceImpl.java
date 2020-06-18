@@ -58,7 +58,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
             throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
         }
         createAdvertisementDTO.setPriceList(priceListService.get(createAdvertisementDTO.getPriceList().getId()));
-        createAdvertisementDTO = setPriceList(createAdvertisementDTO, createAdvertisementDTO.getKilometresLimit());
+        setPriceList(createAdvertisementDTO, createAdvertisementDTO.getKilometresLimit());
         createAdvertisementDTO.setMainAppId(saveInMainApp(createAdvertisementDTO));
         return advertisementRepository.save(createAdvertisementDTO);
     }
@@ -85,7 +85,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         checkOwner(dbAdvertisement.getCar());
         dbAdvertisement.setPriceList(priceListService.get(advertisement.getPriceList().getId()));
         dbAdvertisement.setPickUpPoint(advertisement.getPickUpPoint());
-        dbAdvertisement = setPriceList(dbAdvertisement, advertisement.getKilometresLimit());
+        setPriceList(dbAdvertisement, advertisement.getKilometresLimit());
         dbAdvertisement.setDiscount(advertisement.getDiscount());
         saveInMainApp(dbAdvertisement);
         return advertisementRepository.save(dbAdvertisement);
@@ -96,7 +96,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         Advertisement dbAdvertisement = get(id);
         checkOwner(dbAdvertisement.getCar());
         dbAdvertisement.setPriceList(priceListService.get(advertisement.getPriceList().getId()));
-        dbAdvertisement = setPriceList(dbAdvertisement, advertisement.getKilometresLimit());
+        setPriceList(dbAdvertisement, advertisement.getKilometresLimit());
         dbAdvertisement.setDiscount(advertisement.getDiscount());
         advertisementClient.editPartial(dbAdvertisement);
         return advertisementRepository.save(dbAdvertisement);
