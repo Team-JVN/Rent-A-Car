@@ -1,4 +1,5 @@
 APP|Aplication startup/shutdown
+SYN|Data synchronization with Main application using SOAP protocol
 LGN|Login
 REG|Client registration
 CPW|Change password

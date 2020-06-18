@@ -300,7 +300,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         return null;
     }
 
-    public void synchronizeAdvertisements() {
+    private void synchronizeAdvertisements() {
         try {
             GetAllAdvertisementDetailsResponse response = advertisementClient.getAll();
             if (response == null) {
@@ -319,8 +319,8 @@ public class AdvertisementServiceImpl implements AdvertisementService {
                 } else {
                     editSynchronize(advertisement, dbAdvertisement);
                 }
-
             }
+            logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SYN", "[SOAP] Advertisements are successfully synchronized"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -330,8 +330,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         if (advertisement.getCar() == null || advertisement.getPriceList() == null) {
             return;
         }
-        Advertisement dbAdvertisement = advertisementRepository.saveAndFlush(advertisement);
-        logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CAD", String.format("[SOAP Sync] Advertisement %s successfully created", dbAdvertisement.getId())));
+        advertisementRepository.saveAndFlush(advertisement);
     }
 
     private void editSynchronize(Advertisement advertisement, Advertisement dbAdvertisement) {
@@ -348,7 +347,6 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         dbAdvertisement.setCDW(advertisement.getCDW());
         dbAdvertisement.setLogicalStatus(advertisement.getLogicalStatus());
         advertisementRepository.save(dbAdvertisement);
-        logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EAD", String.format("[SOAP Sync] Advertisement %s successfully edited", dbAdvertisement.getId())));
     }
 
     @Autowired

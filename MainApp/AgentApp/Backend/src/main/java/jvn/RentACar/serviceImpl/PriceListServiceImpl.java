@@ -113,12 +113,11 @@ public class PriceListServiceImpl implements PriceListService {
                 dbPriceList.setPriceForCDW(priceList.getPriceForCDW());
                 dbPriceList.setStatus(priceList.getStatus());
                 priceListRepository.save(dbPriceList);
-                logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EPL", String.format("[SOAP Sync] Price list %s successfully edited", dbPriceList.getId())));
             } else {
-                PriceList newPriceList = priceListRepository.save(priceList);
-                logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CPL", String.format("[SOAP Sync] Price list %s successfully created", newPriceList.getId())));
+                priceListRepository.save(priceList);
             }
         }
+        logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SYN", "[SOAP] Price lists are successfully synchronized"));
     }
 
     @Autowired

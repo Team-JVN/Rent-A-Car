@@ -11,6 +11,7 @@ import jvn.RentACar.mapper.CarDetailsMapper;
 import jvn.RentACar.mapper.CarDtoMapper;
 import jvn.RentACar.model.Advertisement;
 import jvn.RentACar.model.Car;
+import jvn.RentACar.model.Log;
 import jvn.RentACar.model.Picture;
 import jvn.RentACar.repository.CarRepository;
 import jvn.RentACar.service.*;
@@ -36,6 +37,9 @@ public class CarServiceImpl implements CarService {
     @Value("${UPLOADED_PICTURES_PATH:src/main/resources/uploadedPictures/}")
     private String UPLOADED_PICTURES_PATH;
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private CarRepository carRepository;
 
     private BodyStyleService bodyStyleService;
@@ -57,6 +61,8 @@ public class CarServiceImpl implements CarService {
     private CarClient carClient;
 
     private CarDetailsMapper carDetailsMapper;
+
+    private LogService logService;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -222,6 +228,7 @@ public class CarServiceImpl implements CarService {
 
     private void checkOwner(Car car) {
         if (!userService.getLoginAgent().getEmail().equals(car.getOwner().getEmail())) {
+            logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CHO", String.format("User %s is not the owner of car %s", userService.getLoginUser().getId(), car.getId())));
             throw new InvalidCarDataException("You are not owner of this car.", HttpStatus.BAD_REQUEST);
         }
     }
@@ -249,6 +256,7 @@ public class CarServiceImpl implements CarService {
                 }
 
             }
+            logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SYN", "[SOAP] Cars are successfully synchronized"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -298,7 +306,7 @@ public class CarServiceImpl implements CarService {
     public CarServiceImpl(CarRepository carRepository, BodyStyleService bodyStyleService,
                           FuelTypeService fuelTypeService, GearboxTypeService gearboxTypeService,
                           PictureService pictureService, CarDtoMapper carMapper, ModelService modelService, MakeService makeService,
-                          UserService userService, CarClient carClient, CarDetailsMapper carDetailsMapper) {
+                          UserService userService, CarClient carClient, CarDetailsMapper carDetailsMapper, LogService logService) {
         this.carRepository = carRepository;
         this.bodyStyleService = bodyStyleService;
         this.fuelTypeService = fuelTypeService;
@@ -310,6 +318,7 @@ public class CarServiceImpl implements CarService {
         this.userService = userService;
         this.carClient = carClient;
         this.carDetailsMapper = carDetailsMapper;
+        this.logService = logService;
     }
 
 }
