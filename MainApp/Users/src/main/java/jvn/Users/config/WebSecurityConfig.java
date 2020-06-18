@@ -44,8 +44,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 
                 .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
-
-                .authorizeRequests().antMatchers("/api/auth/**", "/api/verify/user**", "/ws**", "/ws/**", "/ws").permitAll()
+                .authorizeRequests()
+                .antMatchers("/api/auth/**", "/api/verify/user**", "/ws**", "/ws/**", "/ws")
+                .permitAll()
                 .antMatchers(HttpMethod.PUT, "/api/admin")
                 .hasAuthority("ADMIN_EDIT_PROFILE")
                 .antMatchers(HttpMethod.GET, "/api/admin/profile")

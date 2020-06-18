@@ -1,5 +1,6 @@
 package jvn.RentACar.repository;
 
+import jvn.RentACar.enumeration.ClientStatus;
 import jvn.RentACar.model.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -18,4 +19,7 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     Client findOneById(Long id);
 
     Client findByMainAppId(Long mainAppId);
+
+    List<Client> findAllByStatusNot(ClientStatus status);
+
 }

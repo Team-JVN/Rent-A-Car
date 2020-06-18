@@ -56,8 +56,8 @@ public class AgentServiceImpl implements AgentService {
 
     }
     @Autowired
-    public AgentServiceImpl(AgentRepository agentRepository,AgentClient agentClient) {
+    public AgentServiceImpl(AgentRepository agentRepository, AgentClient agentClient) {
         this.agentRepository = agentRepository;
-        this.agentClient =agentClient;
+        this.agentClient = agentClient;
     }
 }

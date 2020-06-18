@@ -13,14 +13,14 @@ public class AgentDetailsMapper implements MapperInterface<Agent, AgentDetails> 
 
     @Override
     public Agent toEntity(AgentDetails dto) {
-        Agent admin = modelMapper.map(dto, Agent.class);
-        return admin;
+        Agent entity = modelMapper.map(dto, Agent.class);
+        return entity;
     }
 
     @Override
     public AgentDetails toDto(Agent entity) {
-        AgentDetails adminDTO = modelMapper.map(entity, AgentDetails.class);
-        return adminDTO;
+        AgentDetails dto = modelMapper.map(entity, AgentDetails.class);
+        return dto;
     }
 
     @Autowired

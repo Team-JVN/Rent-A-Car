@@ -1,12 +1,13 @@
 package jvn.RentACar.serviceImpl;
 
+import jvn.RentACar.client.ClientClient;
 import jvn.RentACar.common.RandomPasswordGenerator;
+import jvn.RentACar.dto.soap.client.*;
 import jvn.RentACar.enumeration.ClientStatus;
 import jvn.RentACar.exceptionHandler.InvalidClientDataException;
 import jvn.RentACar.exceptionHandler.InvalidTokenException;
-import jvn.RentACar.model.Client;
-import jvn.RentACar.model.Role;
-import jvn.RentACar.model.VerificationToken;
+import jvn.RentACar.mapper.ClientDetailsMapper;
+import jvn.RentACar.model.*;
 import jvn.RentACar.repository.ClientRepository;
 import jvn.RentACar.repository.VerificationTokenRepository;
 import jvn.RentACar.service.ClientService;
@@ -39,14 +40,20 @@ public class ClientServiceImpl implements ClientService {
 
     private VerificationTokenRepository verificationTokenRepository;
 
+    private ClientClient clientClient;
+
+    private ClientDetailsMapper clientDetailsMapper;
+
     @Override
     public Client create(Client client) throws NoSuchAlgorithmException {
-        if (clientRepository.findByPhoneNumber(client.getPhoneNumber()) != null) {
-            throw new InvalidClientDataException("Client with same phone number already exists.",
+        CheckClientPersonalInfoResponse response = clientClient.checkClientPersonalInfo(client.getEmail(), client.getPhoneNumber());
+        String dataValid = response.getDataValid();
+        if (dataValid.equals("EMAIL_NOT_VALID")) {
+            throw new InvalidClientDataException("Client with same email address already exists.",
                     HttpStatus.BAD_REQUEST);
         }
-        if (userService.findByEmail(client.getEmail()) != null) {
-            throw new InvalidClientDataException("Client with same email address already exists.",
+        if (dataValid.equals("PHONE_NUMBER_NOT_VALID")) {
+            throw new InvalidClientDataException("Client with same phone number already exists.",
                     HttpStatus.BAD_REQUEST);
         }
 
@@ -60,7 +67,12 @@ public class ClientServiceImpl implements ClientService {
             client.setStatus(ClientStatus.NEVER_LOGGED_IN);
 
             composeAndSendEmailToChangePassword(client.getEmail(), generatedPassword);
-            return clientRepository.save(client);
+            Client dbClient = clientRepository.save(client);
+            dbClient.setPassword(null);
+            CreateOrEditClientResponse responseSave = clientClient.createOrEdit(dbClient);
+            dbClient.setMainAppId(responseSave.getClientDetails().getId());
+            dbClient = clientRepository.save(dbClient);
+            return dbClient;
         } else {
             client.setPassword(passwordEncoder.encode(client.getPassword()));
             client.setStatus(ClientStatus.APPROVED);
@@ -78,6 +90,9 @@ public class ClientServiceImpl implements ClientService {
             verificationTokenRepository.save(verificationToken);
 
             composeAndSendEmailToActivate(client.getEmail(), nonHashedToken);
+            CreateOrEditClientResponse responseSave = clientClient.createOrEdit(savedClient);
+            savedClient.setMainAppId(responseSave.getClientDetails().getId());
+            savedClient = clientRepository.save(savedClient);
             return savedClient;
         }
     }
@@ -102,12 +117,22 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public List<Client> get() {
-        return clientRepository.findAll();
+        synchronize();
+        return clientRepository.findAllByStatusNot(ClientStatus.DELETED);
     }
 
     @Override
     public Client edit(Long id, Client client) {
+        synchronize();
         Client dbClient = get(id);
+        if (!dbClient.getPhoneNumber().equals(client.getPhoneNumber())) {
+            CheckClientPersonalInfoResponse response = clientClient.checkClientPersonalInfo(client.getEmail(), client.getPhoneNumber());
+            String dataValid = response.getDataValid();
+            if (dataValid.equals("PHONE_NUMBER_NOT_VALID")) {
+                throw new InvalidClientDataException("Client with same phone number already exists.",
+                        HttpStatus.BAD_REQUEST);
+            }
+        }
         if (clientRepository.findByPhoneNumberAndIdNot(client.getPhoneNumber(), id) != null) {
             throw new InvalidClientDataException("Client with same phone number already exists.",
                     HttpStatus.BAD_REQUEST);
@@ -116,15 +141,17 @@ public class ClientServiceImpl implements ClientService {
         dbClient.setName(client.getName());
         dbClient.setAddress(client.getAddress());
         dbClient = clientRepository.save(dbClient);
+        clientClient.createOrEdit(dbClient);
         return dbClient;
     }
 
     @Override
     public void delete(Long id) {
         Client dbClient = get(id);
-        if (!dbClient.getClientRentRequests().isEmpty()) {
+        DeleteClientDetailsResponse response = clientClient.checkAndDeleteIfCan(dbClient);
+        if (response == null || !response.isCanDelete()) {
             throw new InvalidClientDataException(
-                    "This client has at least one request so you can not delete this client.", HttpStatus.BAD_REQUEST);
+                    "You can not delete this client.", HttpStatus.BAD_REQUEST);
         }
         dbClient.setRole(null);
         clientRepository.deleteById(id);
@@ -188,16 +215,63 @@ public class ClientServiceImpl implements ClientService {
         emailNotificationService.sendEmail(recipientEmail, subject, text);
     }
 
+    public void synchronize() {
+        try {
+            GetAllClientDetailsResponse response = clientClient.getAll();
+            if (response == null) {
+                return;
+            }
+            List<ClientDetails> clientDetails = response.getClientDetails();
+            if (clientDetails == null || clientDetails.isEmpty()) {
+                return;
+            }
+
+            for (ClientDetails current : clientDetails) {
+                Client currentClient = clientDetailsMapper.toEntity(current);
+                User dbUser = userService.getByMainAppId(currentClient.getMainAppId());
+                if (dbUser == null) {
+                    createSynchronize(currentClient);
+                } else {
+                    if (dbUser instanceof Client) {
+                        Client dbClient = (Client) dbUser;
+                        editSynchronize(currentClient, dbClient);
+                    }
+                }
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void createSynchronize(Client client) {
+        Role role = userService.findRoleByName("ROLE_CLIENT");
+        client.setRole(role);
+        clientRepository.saveAndFlush(client);
+    }
+
+    private void editSynchronize(Client client, Client dbClient) {
+        dbClient.setStatus(client.getStatus());
+        dbClient.setPhoneNumber(client.getPhoneNumber());
+        dbClient.setName(client.getName());
+        dbClient.setAddress(client.getAddress());
+        clientRepository.save(dbClient);
+    }
+
     @Autowired
     public ClientServiceImpl(ClientRepository clientRepository, UserService userService,
                              PasswordEncoder passwordEncoder, EmailNotificationService emailNotificationService, Environment environment,
-                             VerificationTokenRepository verificationTokenRepository) {
+                             VerificationTokenRepository verificationTokenRepository, ClientClient clientClient,
+                             ClientDetailsMapper clientDetailsMapper) {
         this.clientRepository = clientRepository;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.emailNotificationService = emailNotificationService;
         this.environment = environment;
         this.verificationTokenRepository = verificationTokenRepository;
+        this.clientClient = clientClient;
+        this.clientDetailsMapper = clientDetailsMapper;
     }
 
     private String getLocalhostURL() {
