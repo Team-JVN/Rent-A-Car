@@ -2,6 +2,7 @@ package jvn.RentACar.serviceImpl;
 
 import jvn.RentACar.client.ClientClient;
 import jvn.RentACar.common.RandomPasswordGenerator;
+import jvn.RentACar.dto.soap.client.CreateOrEditClientResponse;
 import jvn.RentACar.enumeration.ClientStatus;
 import jvn.RentACar.exceptionHandler.InvalidClientDataException;
 import jvn.RentACar.exceptionHandler.InvalidTokenException;
@@ -65,7 +66,9 @@ public class ClientServiceImpl implements ClientService {
             composeAndSendEmailToChangePassword(client.getEmail(), generatedPassword);
             Client dbClient = clientRepository.save(client);
             dbClient.setPassword(null);
-            clientClient.createOrEdit(dbClient);
+            CreateOrEditClientResponse response = clientClient.createOrEdit(dbClient);
+            dbClient.setMainAppId(response.getClientDetails().getId());
+            dbClient = clientRepository.save(dbClient);
             return dbClient;
         } else {
             client.setPassword(passwordEncoder.encode(client.getPassword()));
@@ -84,7 +87,9 @@ public class ClientServiceImpl implements ClientService {
             verificationTokenRepository.save(verificationToken);
 
             composeAndSendEmailToActivate(client.getEmail(), nonHashedToken);
-            clientClient.createOrEdit(savedClient);
+            CreateOrEditClientResponse response = clientClient.createOrEdit(savedClient);
+            savedClient.setMainAppId(response.getClientDetails().getId());
+            savedClient = clientRepository.save(savedClient);
             return savedClient;
         }
     }

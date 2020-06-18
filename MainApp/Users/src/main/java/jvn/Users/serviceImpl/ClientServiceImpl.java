@@ -74,6 +74,19 @@ public class ClientServiceImpl implements ClientService {
             if (fromAgentApp) {
                 client.setPassword(client.getPassword());
                 client.setStatus(client.getStatus());
+                client = clientRepository.save(client);
+                VerificationToken verificationToken = new VerificationToken(client);
+                String nonHashedToken = verificationToken.getToken();
+                verificationToken.setToken(getTokenHash(nonHashedToken));
+
+                VerificationToken dbToken = verificationTokenRepository.findByToken(verificationToken.getToken());
+                while (dbToken != null) {
+                    verificationToken = new VerificationToken(client);
+                    dbToken = verificationTokenRepository.findByToken(verificationToken.getToken());
+                }
+                verificationTokenRepository.save(verificationToken);
+
+                composeAndSendEmailToActivate(client.getEmail(), nonHashedToken);
             } else {
                 client.setPassword(passwordEncoder.encode(client.getPassword()));
                 client.setStatus(ClientStatus.AWAITING);
