@@ -10,7 +10,11 @@ import jvn.RentACar.exceptionHandler.InvalidCarDataException;
 import jvn.RentACar.mapper.CarDtoMapper;
 import jvn.RentACar.mapper.CarWithPicturesDtoMapper;
 import jvn.RentACar.mapper.CreateCarDtoMapper;
+import jvn.RentACar.model.Car;
+import jvn.RentACar.model.Log;
 import jvn.RentACar.service.CarService;
+import jvn.RentACar.service.LogService;
+import jvn.RentACar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -37,6 +41,9 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/api/car")
 public class CarController {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private CarService carService;
 
     private CarDtoMapper carMapper;
@@ -44,6 +51,10 @@ public class CarController {
     private CreateCarDtoMapper createCarDtoMapper;
 
     private CarWithPicturesDtoMapper carWithPicturesDtoMapper;
+
+    private LogService logService;
+
+    private UserService userService;
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CarDTO> create(@RequestParam("carData") String jsonString, @RequestParam("files") List<MultipartFile> multipartFiles) {
@@ -56,8 +67,9 @@ public class CarController {
         } catch (IOException e) {
             throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
-        CarDTO carDTO = carMapper.toDto(carService.create(createCarDtoMapper.toEntity(createCarDTO), multipartFiles));
-        return new ResponseEntity<>(carDTO, HttpStatus.CREATED);
+        Car car = carService.create(createCarDtoMapper.toEntity(createCarDTO), multipartFiles);
+        logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CCA", String.format("User %s successfully created car %s", userService.getLoginUser().getId(), car.getId())));
+        return new ResponseEntity<>(carMapper.toDto(car), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -76,6 +88,7 @@ public class CarController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") @Positive(message = "Id must be positive.") Long id) {
         carService.delete(id);
+        logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "DCA", String.format("User %s successfully deleted car %s", userService.getLoginUser().getId(), id)));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -97,8 +110,9 @@ public class CarController {
         } catch (IOException e) {
             throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
-        CarDTO newCarDTO = carMapper.toDto(carService.editAll(id, carDTO, multipartFiles));
-        return new ResponseEntity<>(newCarDTO, HttpStatus.OK);
+        Car car = carService.editAll(id, carDTO, multipartFiles);
+        logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "ECA", String.format("User %s successfully edited car %s", userService.getLoginUser().getId(), car.getId())));
+        return new ResponseEntity<>(carMapper.toDto(car), HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}/partial", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -112,8 +126,9 @@ public class CarController {
         } catch (IOException e) {
             throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
-        CarDTO newCarDTO = carMapper.toDto(carService.editPartial(id, carEditDTO, multipartFiles));
-        return new ResponseEntity<>(newCarDTO, HttpStatus.OK);
+        Car car = carService.editPartial(id, carEditDTO, multipartFiles);
+        logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "ECA", String.format("User %s successfully edited car %s", userService.getLoginUser().getId(), car.getId())));
+        return new ResponseEntity<>(carMapper.toDto(car), HttpStatus.OK);
     }
 
     @GetMapping(value = "/statistics/{filter}")
@@ -122,6 +137,7 @@ public class CarController {
 
         return new ResponseEntity<>(carService.getStatistics(filter).stream().map(carWithPicturesDtoMapper::toDto).collect(Collectors.toList()), HttpStatus.OK);
     }
+
     private void validateCreateCarDTO(CreateCarDTO createCarDTO) {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
@@ -151,10 +167,12 @@ public class CarController {
 
     @Autowired
     public CarController(CarService carService, CarDtoMapper carMapper, CreateCarDtoMapper createCarDtoMapper,
-                         CarWithPicturesDtoMapper carWithPicturesDtoMapper) {
+                         CarWithPicturesDtoMapper carWithPicturesDtoMapper, LogService logService, UserService userService) {
         this.carService = carService;
         this.carMapper = carMapper;
         this.createCarDtoMapper = createCarDtoMapper;
         this.carWithPicturesDtoMapper = carWithPicturesDtoMapper;
+        this.logService = logService;
+        this.userService = userService;
     }
 }

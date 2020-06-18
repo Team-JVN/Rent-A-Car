@@ -14,6 +14,7 @@ import jvn.RentACar.repository.UserRepository;
 import jvn.RentACar.security.JwtAuthenticationRequest;
 import jvn.RentACar.security.TokenUtils;
 import jvn.RentACar.service.AuthentificationService;
+import jvn.RentACar.service.LogService;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -27,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -37,6 +37,9 @@ import java.time.LocalDateTime;
 
 @Service
 public class AuthentificationServiceImpl implements AuthentificationService {
+
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
 
     public TokenUtils tokenUtils;
 
@@ -54,6 +57,8 @@ public class AuthentificationServiceImpl implements AuthentificationService {
 
     private ChangePasswordAttemptService changePasswordAttemptService;
 
+    private LogService logService;
+
     @Override
     public UserTokenState login(JwtAuthenticationRequest authenticationRequest) {
         final Authentication authentication = authenticationManager
@@ -68,6 +73,7 @@ public class AuthentificationServiceImpl implements AuthentificationService {
         String refreshJwt = tokenUtils.generateRefreshToken(user.getUsername());
         int expiresIn = tokenUtils.getExpiredIn();
 
+        logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "LGN", String.format("User %s successfully logged in", user.getId())));
         return new UserTokenState(jwt, expiresIn, refreshJwt);
     }
 
@@ -76,6 +82,7 @@ public class AuthentificationServiceImpl implements AuthentificationService {
             throws NullPointerException, NoSuchAlgorithmException {
         String ip = getClientIP();
         if (changePasswordAttemptService.isBlocked(ip)) {
+            logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CPW", String.format("User from %s is blocked.", getClientIP())));
             throw new BlockedUserException(
                     "You tried to log in too many times. Your account wil be blocked for the next 24 hours.",
                     HttpStatus.BAD_REQUEST);
@@ -98,6 +105,7 @@ public class AuthentificationServiceImpl implements AuthentificationService {
         user.setLastPasswordResetDate(new Timestamp(DateTime.now().getMillis()));
         userRepository.save(user);
         changePasswordAttemptService.changePassSucceeded();
+        logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CPW", String.format("User %s successfully changed password", user.getId())));
     }
 
     @Override
@@ -142,7 +150,7 @@ public class AuthentificationServiceImpl implements AuthentificationService {
     @Override
     public boolean userIsNeverLoggedIn(String email) {
         User user = userRepository.findByEmail(email);
-        if(user == null){
+        if (user == null) {
             return false;
         }
         if (user instanceof Agent) {
@@ -177,9 +185,9 @@ public class AuthentificationServiceImpl implements AuthentificationService {
 
     @Autowired
     public AuthentificationServiceImpl(TokenUtils tokenUtils, AuthenticationManager authenticationManager,
-            UserRepository userRepository, PasswordEncoder passwordEncoder, RestTemplateBuilder restTemplateBuilder,
-            HttpServletRequest request, ChangePasswordAttemptService changePasswordAttemptService,
-            ResetTokenRepository resetTokenRepository) {
+                                       UserRepository userRepository, PasswordEncoder passwordEncoder, RestTemplateBuilder restTemplateBuilder,
+                                       HttpServletRequest request, ChangePasswordAttemptService changePasswordAttemptService,
+                                       ResetTokenRepository resetTokenRepository, LogService logService) {
         this.tokenUtils = tokenUtils;
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
@@ -188,5 +196,6 @@ public class AuthentificationServiceImpl implements AuthentificationService {
         this.request = request;
         this.changePasswordAttemptService = changePasswordAttemptService;
         this.resetTokenRepository = resetTokenRepository;
+        this.logService = logService;
     }
 }

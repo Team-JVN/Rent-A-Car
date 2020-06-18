@@ -153,9 +153,9 @@ services:
         environment:
             REGISTRY_HOST: eureka-serviceregistry
             RMQ_HOST: rabbitmq-broker
-            LOG_STORAGE: /var/log/web-traffic.log
+            LOG_STORAGE: /var/log/mainapp-web-traffic.log
         volumes:
-            - logs:/var/log
+            - mainapp-logs:/var/log
         depends_on:
             - eureka-serviceregistry
             - rabbitmq-broker
@@ -203,9 +203,11 @@ services:
     #         TRUSTSTORE: /etc/keystore/agentapp.truststore.p12
     #         TRUSTSTORE_PASSWORD: agentapp_pass
     #         UPLOADED_PICTURES_PATH: /etc/uploadedPictures/
+    #         LOG_STORAGE: /var/log/agentapp-web-traffic.log
     #     volumes:
     #         - ./tls/certs/agentapp/keystore:/etc/keystore
     #         - ./AgentApp/Backend/src/main/resources/uploadedPictures/:/etc/uploadedPictures/
+    #         - agentapp-logs:/var/log
     #     depends_on: 
     #         - agentapp-mysql
 
@@ -226,7 +228,8 @@ services:
 volumes:
     agentapp-mysql-data:
     mainapp-mysql-data:
-    logs:
+    agentapp-logs:
+    mainapp-logs:
     
 networks:
     agent-app-tls:

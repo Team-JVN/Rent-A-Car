@@ -2,6 +2,7 @@ package jvn.Advertisements.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jvn.Advertisements.dto.message.Log;
 import jvn.Advertisements.dto.request.AdvertisementEditAllInfoDTO;
 import jvn.Advertisements.dto.request.AdvertisementEditDTO;
 import jvn.Advertisements.dto.request.CreateAdvertisementDTO;
@@ -12,6 +13,8 @@ import jvn.Advertisements.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.Advertisements.mapper.AdvertisementDtoMapper;
 import jvn.Advertisements.mapper.AdvertisementEditAllInfoDtoMapper;
 import jvn.Advertisements.mapper.CreateAdvertisementDtoMapper;
+import jvn.Advertisements.model.Advertisement;
+import jvn.Advertisements.producer.LogProducer;
 import jvn.Advertisements.service.AdvertisementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +34,10 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping(value = "/api/advertisement", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AdvertisementController {
+
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private AdvertisementService advertisementService;
 
     private CreateAdvertisementDtoMapper createAdvertisementDtoMapper;
@@ -43,12 +50,15 @@ public class AdvertisementController {
 
     private AdvertisementEditAllInfoDtoMapper advertisementEditAllInfoDtoMapper;
 
+    private LogProducer logProducer;
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AdvertisementDTO> create(@Valid @RequestBody CreateAdvertisementDTO createAdvertisementDTO) {
         try {
             UserDTO userDTO = stringToObject(request.getHeader("user"));
-            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.create(createAdvertisementDtoMapper.toEntity(createAdvertisementDTO), userDTO)),
-                    HttpStatus.CREATED);
+            Advertisement advertisement = advertisementService.create(createAdvertisementDtoMapper.toEntity(createAdvertisementDTO), userDTO);
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CAD", String.format("User %s successfully created advertisement %s", userDTO.getId(), advertisement.getId())));
+            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisement), HttpStatus.CREATED);
         } catch (ParseException e) {
             throw new InvalidAdvertisementDataException("Please choose valid date.", HttpStatus.BAD_REQUEST);
         }
@@ -65,6 +75,7 @@ public class AdvertisementController {
     public ResponseEntity<Void> delete(@PathVariable("id") @Positive(message = "Id must be positive.") Long id) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
         advertisementService.delete(id, userDTO.getId());
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "DAD", String.format("User %s successfully deleted advertisement %s", userDTO.getId(), id)));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -73,7 +84,9 @@ public class AdvertisementController {
                                                  @Valid @RequestBody AdvertisementEditAllInfoDTO advertisementDTO) {
         try {
             UserDTO userDTO = stringToObject(request.getHeader("user"));
-            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.edit(id, advertisementEditAllInfoDtoMapper.toEntity(advertisementDTO), userDTO)), HttpStatus.OK);
+            Advertisement advertisement = advertisementService.edit(id, advertisementEditAllInfoDtoMapper.toEntity(advertisementDTO), userDTO);
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EAD", String.format("User %s successfully edited advertisement %s", userDTO.getId(), advertisement.getId())));
+            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisement), HttpStatus.OK);
         } catch (ParseException e) {
             throw new InvalidAdvertisementDataException("Please choose valid date.", HttpStatus.BAD_REQUEST);
         }
@@ -83,7 +96,9 @@ public class AdvertisementController {
     public ResponseEntity<AdvertisementDTO> editPartial(@PathVariable @Positive(message = "Id must be positive.") Long id,
                                                         @Valid @RequestBody AdvertisementEditDTO advertisementDTO) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.editPartial(id, advertisementDTO, userDTO.getId())), HttpStatus.OK);
+        Advertisement advertisement = advertisementService.editPartial(id, advertisementDTO, userDTO.getId());
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EAD", String.format("User %s successfully edited advertisement %s", userDTO.getId(), advertisement.getId())));
+        return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisement), HttpStatus.OK);
     }
 
     @GetMapping(value = "/car/{carId}/edit-type", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -105,7 +120,6 @@ public class AdvertisementController {
         try {
             return objectMapper.readValue(user, UserDTO.class);
         } catch (JsonProcessingException e) {
-            //TODO: Add to log and delete return null;
             return null;
         }
     }
@@ -114,13 +128,14 @@ public class AdvertisementController {
     @Autowired
     public AdvertisementController(AdvertisementService advertisementService, CreateAdvertisementDtoMapper createAdvertisementDtoMapper,
                                    AdvertisementDtoMapper advertisementDtoMapper, ObjectMapper objectMapper, HttpServletRequest request,
-                                   AdvertisementEditAllInfoDtoMapper advertisementEditAllInfoDtoMapper) {
+                                   AdvertisementEditAllInfoDtoMapper advertisementEditAllInfoDtoMapper, LogProducer logProducer) {
         this.advertisementService = advertisementService;
         this.createAdvertisementDtoMapper = createAdvertisementDtoMapper;
         this.advertisementDtoMapper = advertisementDtoMapper;
         this.objectMapper = objectMapper;
         this.request = request;
         this.advertisementEditAllInfoDtoMapper = advertisementEditAllInfoDtoMapper;
+        this.logProducer = logProducer;
     }
 
 

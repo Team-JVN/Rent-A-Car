@@ -10,6 +10,6 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 public class ApplicationConfiguration {
 
-    @Value("${LOG_STORAGE:web-traffic.log}")
+    @Value("${LOG_STORAGE:mainapp-web-traffic.log}")
     private String logStorage;
 }

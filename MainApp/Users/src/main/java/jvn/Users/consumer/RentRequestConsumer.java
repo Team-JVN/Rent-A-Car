@@ -3,9 +3,11 @@ package jvn.Users.consumer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Users.config.RabbitMQConfiguration;
+import jvn.Users.dto.message.Log;
 import jvn.Users.dto.message.RentRequestMessageDTO;
 import jvn.Users.enumeration.ClientStatus;
 import jvn.Users.model.Client;
+import jvn.Users.producer.LogProducer;
 import jvn.Users.repository.ClientRepository;
 import jvn.Users.service.EmailNotificationService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -16,6 +18,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class RentRequestConsumer {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private ClientRepository clientRepository;
 
     private ObjectMapper objectMapper;
@@ -24,6 +29,8 @@ public class RentRequestConsumer {
 
     private Environment environment;
 
+    private LogProducer logProducer;
+
     @RabbitListener(queues = RabbitMQConfiguration.CANCELED_RESERVATION)
     public void listen(Long clientId) {
         Client client = clientRepository.findOneByIdAndStatusNot(clientId, ClientStatus.DELETED);
@@ -31,6 +38,7 @@ public class RentRequestConsumer {
             int canceledReservationCounter = client.getCanceledReservationCounter() + 1;
             client.setCanceledReservationCounter(canceledReservationCounter);
             clientRepository.save(client);
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "ECL", String.format("Increased canceled reservations counter for user %s", client.getId())));
         }
     }
 
@@ -90,7 +98,6 @@ public class RentRequestConsumer {
         try {
             return objectMapper.readValue(message, RentRequestMessageDTO.class);
         } catch (JsonProcessingException e) {
-            //TODO: Add to log and delete return null;
             return null;
         }
     }
@@ -101,10 +108,11 @@ public class RentRequestConsumer {
 
     @Autowired
     public RentRequestConsumer(ObjectMapper objectMapper, ClientRepository clientRepository, EmailNotificationService emailNotificationService,
-                               Environment environment) {
+                               Environment environment, LogProducer logProducer) {
         this.objectMapper = objectMapper;
         this.clientRepository = clientRepository;
         this.emailNotificationService = emailNotificationService;
         this.environment = environment;
+        this.logProducer = logProducer;
     }
 }

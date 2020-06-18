@@ -2,11 +2,14 @@ package jvn.RentACar.serviceImpl;
 
 import jvn.RentACar.dto.both.MakeDTO;
 import jvn.RentACar.exceptionHandler.InvalidMakeDataException;
+import jvn.RentACar.model.Log;
 import jvn.RentACar.model.Make;
 import jvn.RentACar.model.Model;
 import jvn.RentACar.repository.MakeRepository;
+import jvn.RentACar.service.LogService;
 import jvn.RentACar.service.MakeService;
 import jvn.RentACar.service.ModelService;
+import jvn.RentACar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -17,9 +20,16 @@ import java.util.Set;
 @Service
 public class MakeServiceImpl implements MakeService {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private MakeRepository makeRepository;
 
     private ModelService modelService;
+
+    private LogService logService;
+
+    private UserService userService;
 
     @Override
     public Make create(Make make) {
@@ -65,6 +75,7 @@ public class MakeServiceImpl implements MakeService {
         make.setModels(null);
         for (Model model : models) {
             modelService.delete(model.getId(), make.getId());
+            logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "DMK", String.format("Successfully deleted model %s of make %s", model.getId(), make.getId())));
         }
         makeRepository.deleteById(id);
     }
@@ -79,8 +90,10 @@ public class MakeServiceImpl implements MakeService {
     }
 
     @Autowired
-    public MakeServiceImpl(MakeRepository makeRepository, ModelService modelService) {
+    public MakeServiceImpl(MakeRepository makeRepository, ModelService modelService, LogService logService, UserService userService) {
         this.makeRepository = makeRepository;
         this.modelService = modelService;
+        this.logService = logService;
+        this.userService = userService;
     }
 }

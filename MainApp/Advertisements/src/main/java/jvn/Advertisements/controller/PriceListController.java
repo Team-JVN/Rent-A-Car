@@ -3,8 +3,11 @@ package jvn.Advertisements.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Advertisements.dto.both.PriceListDTO;
+import jvn.Advertisements.dto.message.Log;
 import jvn.Advertisements.dto.request.UserDTO;
 import jvn.Advertisements.mapper.PriceListDtoMapper;
+import jvn.Advertisements.model.PriceList;
+import jvn.Advertisements.producer.LogProducer;
 import jvn.Advertisements.service.PriceListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +27,9 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/api/price-list", produces = MediaType.APPLICATION_JSON_VALUE)
 public class PriceListController {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private PriceListService priceListService;
 
     private PriceListDtoMapper priceListDtoMapper;
@@ -31,6 +37,8 @@ public class PriceListController {
     private HttpServletRequest request;
 
     private ObjectMapper objectMapper;
+
+    private LogProducer logProducer;
 
     @GetMapping("/{id}")
     public ResponseEntity<PriceListDTO> get(@PathVariable @Positive(message = "Id must be positive.") Long id) {
@@ -49,19 +57,24 @@ public class PriceListController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PriceListDTO> create(@Valid @RequestBody PriceListDTO priceListDTO) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.create(priceListDtoMapper.toEntity(priceListDTO), userDTO.getId())), HttpStatus.CREATED);
+        PriceList priceList = priceListService.create(priceListDtoMapper.toEntity(priceListDTO), userDTO.getId());
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CPL", String.format("User %s successfully created price list %s", userDTO.getId(), priceList.getId())));
+        return new ResponseEntity<>(priceListDtoMapper.toDto(priceList), HttpStatus.CREATED);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PriceListDTO> edit(@PathVariable @Positive(message = "Id must be positive.") Long id, @Valid @RequestBody PriceListDTO priceListDTO) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(priceListDtoMapper.toDto(priceListService.edit(id, priceListDtoMapper.toEntity(priceListDTO), userDTO.getId())), HttpStatus.OK);
+        PriceList priceList = priceListService.edit(id, priceListDtoMapper.toEntity(priceListDTO), userDTO.getId());
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EPL", String.format("User %s successfully edited price list %s", userDTO.getId(), priceList.getId())));
+        return new ResponseEntity<>(priceListDtoMapper.toDto(priceList), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable @Positive(message = "Id must be positive.") Long id) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
         priceListService.delete(id, userDTO.getId());
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "DPL", String.format("User %s successfully deleted price list %s", userDTO.getId(), id)));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -69,18 +82,18 @@ public class PriceListController {
         try {
             return objectMapper.readValue(user, UserDTO.class);
         } catch (JsonProcessingException e) {
-            //TODO: Add to log and delete return null;
             return null;
         }
     }
 
     @Autowired
     public PriceListController(PriceListService priceListService, PriceListDtoMapper priceListDtoMapper, HttpServletRequest request,
-                               ObjectMapper objectMapper) {
+                               ObjectMapper objectMapper, LogProducer logProducer) {
         this.priceListService = priceListService;
         this.priceListDtoMapper = priceListDtoMapper;
         this.request = request;
         this.objectMapper = objectMapper;
+        this.logProducer = logProducer;
     }
 
 

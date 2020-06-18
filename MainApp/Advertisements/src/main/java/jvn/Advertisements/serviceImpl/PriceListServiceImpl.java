@@ -1,10 +1,14 @@
 package jvn.Advertisements.serviceImpl;
 
 import jvn.Advertisements.dto.both.PriceListDTO;
+import jvn.Advertisements.dto.message.Log;
 import jvn.Advertisements.enumeration.LogicalStatus;
+import jvn.Advertisements.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.Advertisements.exceptionHandler.InvalidPriceListDataException;
+import jvn.Advertisements.model.Advertisement;
 import jvn.Advertisements.model.PriceList;
 import jvn.Advertisements.producer.AdvertisementProducer;
+import jvn.Advertisements.producer.LogProducer;
 import jvn.Advertisements.repository.PriceListRepository;
 import jvn.Advertisements.service.PriceListService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,15 +21,14 @@ import java.util.List;
 @Service
 public class PriceListServiceImpl implements PriceListService {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private PriceListRepository priceListRepository;
 
     private AdvertisementProducer advertisementProducer;
 
-    @Autowired
-    public PriceListServiceImpl(PriceListRepository priceListRepository, AdvertisementProducer advertisementProducer) {
-        this.priceListRepository = priceListRepository;
-        this.advertisementProducer = advertisementProducer;
-    }
+    private LogProducer logProducer;
 
     @Override
     public PriceList get(Long id, Long loggedInUserId) {
@@ -50,6 +53,8 @@ public class PriceListServiceImpl implements PriceListService {
     @Override
     public PriceList edit(Long id, PriceList priceList, Long loggedInUserId) {
         PriceList dbPriceList = get(id, loggedInUserId);
+        checkOwner(dbPriceList, loggedInUserId);
+
         dbPriceList.setPricePerDay(priceList.getPricePerDay());
 
         if (dbPriceList.getPricePerKm() != null) {
@@ -67,6 +72,7 @@ public class PriceListServiceImpl implements PriceListService {
     @Override
     public void delete(Long id, Long loggedInUserId) {
         PriceList priceList = get(id, loggedInUserId);
+        checkOwner(priceList, loggedInUserId);
 
         if (priceListRepository.findByIdAndStatusNotAndAdvertisementsLogicalStatusNot(id, LogicalStatus.DELETED, LogicalStatus.DELETED) != null) {
             throw new InvalidPriceListDataException("Price list is used in advertisements, so it can't be deleted.", HttpStatus.BAD_REQUEST);
@@ -94,5 +100,21 @@ public class PriceListServiceImpl implements PriceListService {
     @Async
     public void editPriceList(PriceListDTO priceListDTO) {
         advertisementProducer.sendMessageForSearch(priceListDTO);
+    }
+
+    private void checkOwner(PriceList priceList, Long loggedInUserId) {
+        if (!priceList.getOwnerId().equals(loggedInUserId)) {
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CHO", String.format("User %s is not the owner of price list %s", loggedInUserId, priceList.getId())));
+            throw new InvalidAdvertisementDataException("You are not the owner of this price list, therefore you cannot edit or delete it.",
+                    HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Autowired
+    public PriceListServiceImpl(PriceListRepository priceListRepository, AdvertisementProducer advertisementProducer,
+                                LogProducer logProducer) {
+        this.priceListRepository = priceListRepository;
+        this.advertisementProducer = advertisementProducer;
+        this.logProducer = logProducer;
     }
 }
