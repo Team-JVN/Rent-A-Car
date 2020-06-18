@@ -202,7 +202,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
                 return false;
             }
         }
-        return false;
+        return true;
     }
 
     @Async
