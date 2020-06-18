@@ -4,23 +4,21 @@ import jvn.RentACar.client.AdvertisementClient;
 import jvn.RentACar.dto.request.AdvertisementEditDTO;
 import jvn.RentACar.dto.response.SearchParamsDTO;
 import jvn.RentACar.dto.soap.advertisement.*;
-import jvn.RentACar.dto.soap.car.CreateOrEditCarDetailsResponse;
 import jvn.RentACar.enumeration.EditType;
 import jvn.RentACar.enumeration.LogicalStatus;
 import jvn.RentACar.enumeration.RentRequestStatus;
 import jvn.RentACar.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.RentACar.exceptionHandler.InvalidCarDataException;
 import jvn.RentACar.mapper.AdvertisementDetailsMapper;
-import jvn.RentACar.mapper.AdvertisementDtoMapper;
 import jvn.RentACar.model.Advertisement;
 import jvn.RentACar.model.Car;
+import jvn.RentACar.model.Log;
 import jvn.RentACar.model.PriceList;
 import jvn.RentACar.repository.AdvertisementRepository;
 import jvn.RentACar.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,21 +30,22 @@ import java.util.stream.Collectors;
 @Service
 public class AdvertisementServiceImpl implements AdvertisementService {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private CarService carService;
 
     private PriceListService priceListService;
 
     private AdvertisementRepository advertisementRepository;
 
-    private AdvertisementDtoMapper advertisementMapper;
-
-    private RentInfoService rentInfoService;
-
     private UserService userService;
 
     private AdvertisementClient advertisementClient;
 
     private AdvertisementDetailsMapper advertisementDetailsMapper;
+
+    private LogService logService;
 
     @Override
     public Advertisement create(Advertisement createAdvertisementDTO) {
@@ -251,7 +250,6 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         }
     }
 
-
     private void checkDate(LocalDate dateFrom, LocalDate dateTo) {
         if (dateFrom.isBefore(LocalDate.now()) || (dateTo != null && dateTo.isBefore(LocalDate.now()))) {
             throw new InvalidAdvertisementDataException("Invalid date from/to.", HttpStatus.BAD_REQUEST);
@@ -269,6 +267,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     private void checkOwner(Car car) {
         if (!userService.getLoginAgent().getEmail().equals(car.getOwner().getEmail())) {
+            logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CHO", String.format("User %s is not the owner of advertisement %s", userService.getLoginUser().getId(), car.getId())));
             throw new InvalidCarDataException("You are not owner of this car.", HttpStatus.BAD_REQUEST);
         }
     }
@@ -325,14 +324,14 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     private void createSynchronize(Advertisement advertisement) {
         if (advertisement.getCar() == null || advertisement.getPriceList() == null) {
             return;
         }
-        advertisementRepository.saveAndFlush(advertisement);
+        Advertisement dbAdvertisement = advertisementRepository.saveAndFlush(advertisement);
+        logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CAD", String.format("[SOAP Sync] Advertisement %s successfully created", dbAdvertisement.getId())));
     }
 
     private void editSynchronize(Advertisement advertisement, Advertisement dbAdvertisement) {
@@ -349,19 +348,19 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         dbAdvertisement.setCDW(advertisement.getCDW());
         dbAdvertisement.setLogicalStatus(advertisement.getLogicalStatus());
         advertisementRepository.save(dbAdvertisement);
+        logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EAD", String.format("[SOAP Sync] Advertisement %s successfully edited", dbAdvertisement.getId())));
     }
 
     @Autowired
-    public AdvertisementServiceImpl(CarService carService, PriceListService priceListService, RentInfoService rentInfoService, UserService userService,
-                                    AdvertisementRepository advertisementRepository, AdvertisementDtoMapper advertisementMapper,
-                                    AdvertisementClient advertisementClient, AdvertisementDetailsMapper advertisementDetailsMapper) {
+    public AdvertisementServiceImpl(CarService carService, PriceListService priceListService, UserService userService,
+                                    AdvertisementRepository advertisementRepository, AdvertisementClient advertisementClient,
+                                    AdvertisementDetailsMapper advertisementDetailsMapper, LogService logService) {
         this.carService = carService;
         this.priceListService = priceListService;
         this.advertisementRepository = advertisementRepository;
-        this.advertisementMapper = advertisementMapper;
         this.userService = userService;
-        this.rentInfoService = rentInfoService;
         this.advertisementClient = advertisementClient;
         this.advertisementDetailsMapper = advertisementDetailsMapper;
+        this.logService = logService;
     }
 }

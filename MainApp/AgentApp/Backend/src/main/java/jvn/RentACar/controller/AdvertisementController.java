@@ -12,8 +12,12 @@ import jvn.RentACar.mapper.AdvertisementDtoMapper;
 import jvn.RentACar.mapper.AdvertisementWithPicturesDtoMapper;
 import jvn.RentACar.mapper.CreateAdvertisementDtoMapper;
 import jvn.RentACar.mapper.RentRequestDtoMapper;
+import jvn.RentACar.model.Advertisement;
+import jvn.RentACar.model.Log;
 import jvn.RentACar.service.AdvertisementService;
+import jvn.RentACar.service.LogService;
 import jvn.RentACar.service.RentRequestService;
+import jvn.RentACar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,6 +37,9 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/api/advertisement", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AdvertisementController {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private AdvertisementService advertisementService;
 
     private CreateAdvertisementDtoMapper createAdvertisementDtoMapper;
@@ -45,11 +52,16 @@ public class AdvertisementController {
 
     private RentRequestDtoMapper rentRequestDtoMapper;
 
+    private LogService logService;
+
+    private UserService userService;
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AdvertisementDTO> create(@Valid @RequestBody CreateAdvertisementDTO createAdvertisementDTO) {
         try {
-            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.create(createAdvertisementDtoMapper.toEntity(createAdvertisementDTO))),
-                    HttpStatus.CREATED);
+            Advertisement advertisement = advertisementService.create(createAdvertisementDtoMapper.toEntity(createAdvertisementDTO));
+            logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CAD", String.format("User %s successfully created advertisement %s", userService.getLoginUser().getId(), advertisement.getId())));
+            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisement), HttpStatus.CREATED);
         } catch (ParseException e) {
             throw new InvalidAdvertisementDataException("Please choose valid date.", HttpStatus.BAD_REQUEST);
         }
@@ -59,7 +71,9 @@ public class AdvertisementController {
     public ResponseEntity<AdvertisementDTO> edit(@PathVariable @Positive(message = "Id must be positive.") Long id,
                                                  @Valid @RequestBody AdvertisementWithPicturesDTO advertisementDTO) {
         try {
-            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.edit(id, adWithPicturesDtoMapper.toEntity(advertisementDTO))), HttpStatus.OK);
+            Advertisement advertisement = advertisementService.edit(id, adWithPicturesDtoMapper.toEntity(advertisementDTO));
+            logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EAD", String.format("User %s successfully edited advertisement %s", userService.getLoginUser().getId(), advertisement.getId())));
+            return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisement), HttpStatus.OK);
         } catch (ParseException e) {
             throw new InvalidAdvertisementDataException("Please choose valid date.", HttpStatus.BAD_REQUEST);
         }
@@ -68,7 +82,9 @@ public class AdvertisementController {
     @PutMapping(value = "/{id}/partial", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AdvertisementDTO> editPartial(@PathVariable @Positive(message = "Id must be positive.") Long id,
                                                         @Valid @RequestBody AdvertisementEditDTO advertisementDTO) {
-        return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.editPartial(id, advertisementDTO)), HttpStatus.OK);
+        Advertisement advertisement = advertisementService.editPartial(id, advertisementDTO);
+        logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EAD", String.format("User %s successfully edited advertisement %s", userService.getLoginUser().getId(), advertisement.getId())));
+        return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisement), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}/edit", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -79,6 +95,7 @@ public class AdvertisementController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") @Positive(message = "Id must be positive.") Long id) {
         advertisementService.delete(id);
+        logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "DAD", String.format("User %s successfully deleted advertisement %s", userService.getLoginUser().getId(), id)));
         rentRequestService.rejectAllRequests(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -114,12 +131,15 @@ public class AdvertisementController {
     @Autowired
     public AdvertisementController(AdvertisementService advertisementService, CreateAdvertisementDtoMapper createAdvertisementDtoMapper,
                                    AdvertisementDtoMapper advertisementDtoMapper, AdvertisementWithPicturesDtoMapper adWithPicturesDtoMapper,
-                                   RentRequestDtoMapper rentRequestDtoMapper, RentRequestService rentRequestService) {
+                                   RentRequestDtoMapper rentRequestDtoMapper, RentRequestService rentRequestService, LogService logService,
+                                   UserService userService) {
         this.advertisementService = advertisementService;
         this.createAdvertisementDtoMapper = createAdvertisementDtoMapper;
         this.advertisementDtoMapper = advertisementDtoMapper;
         this.adWithPicturesDtoMapper = adWithPicturesDtoMapper;
         this.rentRequestDtoMapper = rentRequestDtoMapper;
         this.rentRequestService = rentRequestService;
+        this.logService = logService;
+        this.userService = userService;
     }
 }

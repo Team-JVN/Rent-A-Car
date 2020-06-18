@@ -8,8 +8,10 @@ import jvn.RentACar.dto.soap.pricelist.PriceListDetails;
 import jvn.RentACar.enumeration.LogicalStatus;
 import jvn.RentACar.exceptionHandler.InvalidPriceListDataException;
 import jvn.RentACar.mapper.PriceListDetailsMapper;
+import jvn.RentACar.model.Log;
 import jvn.RentACar.model.PriceList;
 import jvn.RentACar.repository.PriceListRepository;
+import jvn.RentACar.service.LogService;
 import jvn.RentACar.service.PriceListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,18 +23,16 @@ import java.util.stream.Collectors;
 @Service
 public class PriceListServiceImpl implements PriceListService {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private PriceListRepository priceListRepository;
 
     private PriceListClient priceListClient;
 
     private PriceListDetailsMapper priceListDetailsMapper;
 
-    @Autowired
-    public PriceListServiceImpl(PriceListRepository priceListRepository, PriceListClient priceListClient, PriceListDetailsMapper priceListDetailsMapper) {
-        this.priceListRepository = priceListRepository;
-        this.priceListClient = priceListClient;
-        this.priceListDetailsMapper = priceListDetailsMapper;
-    }
+    private LogService logService;
 
     @Override
     public PriceList get(Long id) {
@@ -113,9 +113,20 @@ public class PriceListServiceImpl implements PriceListService {
                 dbPriceList.setPriceForCDW(priceList.getPriceForCDW());
                 dbPriceList.setStatus(priceList.getStatus());
                 priceListRepository.save(dbPriceList);
+                logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EPL", String.format("[SOAP Sync] Price list %s successfully edited", dbPriceList.getId())));
             } else {
-                priceListRepository.save(priceList);
+                PriceList newPriceList = priceListRepository.save(priceList);
+                logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CPL", String.format("[SOAP Sync] Price list %s successfully created", newPriceList.getId())));
             }
         }
+    }
+
+    @Autowired
+    public PriceListServiceImpl(PriceListRepository priceListRepository, PriceListClient priceListClient,
+                                PriceListDetailsMapper priceListDetailsMapper, LogService logService) {
+        this.priceListRepository = priceListRepository;
+        this.priceListClient = priceListClient;
+        this.priceListDetailsMapper = priceListDetailsMapper;
+        this.logService = logService;
     }
 }
