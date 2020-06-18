@@ -191,6 +191,27 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         return advertisementRepository.findAllByOwner(loggedInUser);
     }
 
+    @Override
+    public boolean checkIfCarIsAvailableForSoap(Long carId, LocalDate dateFrom, LocalDate dateTo) {
+        if (!advertisementRepository.findByCarAndLogicalStatusNotAndDateToEquals(carId, LogicalStatus.DELETED, null)
+                .isEmpty()) {
+            return false;
+        }
+
+        if (dateTo == null) {
+            if (!advertisementRepository.findByCarAndLogicalStatusNotAndDateToGreaterThanEqual(carId,
+                    LogicalStatus.DELETED, dateFrom).isEmpty()) {
+                return false;
+            }
+        } else {
+            if (!advertisementRepository.findByCarAndLogicalStatusNotAndDateFromLessThanEqualAndDateToGreaterThanEqual(
+                    carId, LogicalStatus.DELETED, dateTo, dateFrom).isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Async
     public void editAdvertisement(AdvertisementEditDTO advertisementEditDTO) {
         advertisementProducer.sendMessageForSearch(advertisementEditDTO);

@@ -35,9 +35,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/advertisement")
                 .hasAuthority("MANAGE_ADVERTISEMENTS")
 
-                .antMatchers("/api/advertisement/by-ids/{advIds}")
-                .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
-
                 .anyRequest().authenticated().and()
 
                 .cors().and()
@@ -51,6 +48,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/ws/**");
         web.ignoring().antMatchers("/api/advertisement/car/{carId}/edit-type");
+        web.ignoring().antMatchers("/api/advertisement/by-ids/{advIds}");
         web.ignoring().antMatchers("/api/advertisement/car/{carId}/check-for-delete");
         web.ignoring().antMatchers("/api/advertisement/car/{carId}/check-for-partial-edit");
     }

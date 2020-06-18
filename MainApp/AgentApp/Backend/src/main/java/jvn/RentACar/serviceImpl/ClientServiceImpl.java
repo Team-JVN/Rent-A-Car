@@ -111,6 +111,15 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
+    public Client getByMainAppId(Long mainAppId) {
+        Client client = clientRepository.findByMainAppId(mainAppId);
+        if (client == null) {
+            throw new InvalidClientDataException("This client doesn't exist.", HttpStatus.NOT_FOUND);
+        }
+        return client;
+    }
+
+    @Override
     public List<Client> get() {
         synchronize();
         return clientRepository.findAllByStatusNot(ClientStatus.DELETED);
@@ -223,7 +232,7 @@ public class ClientServiceImpl implements ClientService {
 
             for (ClientDetails current : clientDetails) {
                 Client currentClient = clientDetailsMapper.toEntity(current);
-                User dbUser = userService.findByMainAppId(currentClient.getMainAppId());
+                User dbUser = userService.getByMainAppId(currentClient.getMainAppId());
                 if (dbUser == null) {
                     createSynchronize(currentClient);
                 } else {

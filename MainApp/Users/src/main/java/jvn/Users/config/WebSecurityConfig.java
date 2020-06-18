@@ -79,7 +79,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/role").hasAuthority("MANAGE_ROLES")
                 .antMatchers(HttpMethod.GET, "/api/permission").hasAuthority("MANAGE_ROLES")
 
-                .antMatchers("/api/client/by-ids/{clientIds}", "/api/client/{clientId}/verify")
+                .antMatchers("/api/client/by-ids/{clientIds}")
                 .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
 
                 .anyRequest().authenticated().and()
@@ -102,6 +102,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers(HttpMethod.PUT, "/api/client/activate**");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/client/for-rent-request");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/verify/user**");
+        web.ignoring().antMatchers(HttpMethod.GET, "/api/client/{clientId}/verify");
 
         web.ignoring().antMatchers("/ws/**");
         web.ignoring().antMatchers("/ws**");

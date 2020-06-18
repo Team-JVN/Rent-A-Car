@@ -21,5 +21,5 @@ public interface UserService {
 
     UserTokenState refreshAuthenticationToken(HttpServletRequest request);
 
-    User findByMainAppId(Long mainAppId);
+    User getByMainAppId(Long mainAppId);
 }

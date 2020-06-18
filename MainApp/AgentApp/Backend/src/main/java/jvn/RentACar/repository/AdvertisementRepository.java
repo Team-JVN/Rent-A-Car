@@ -15,6 +15,8 @@ public interface AdvertisementRepository extends JpaRepository<Advertisement, Lo
 
     Advertisement findByIdAndLogicalStatus(Long id, LogicalStatus logicalStatus);
 
+    Advertisement findByMainAppIdAndLogicalStatus(Long mainAppId, LogicalStatus logicalStatus);
+
     List<Advertisement> findAllByLogicalStatusNot(LogicalStatus logicalStatus);
 
     List<Advertisement> findAllByLogicalStatusNotAndDateToEqualsOrLogicalStatusNotAndDateToGreaterThan(LogicalStatus logicalStatus, LocalDate localDate, LogicalStatus logicalStatus1,

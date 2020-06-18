@@ -150,4 +150,20 @@ public class WebServiceConfig {
     public XsdSchema listAdvertisementSchema() {
         return new SimpleXsdSchema(new ClassPathResource("listAdvertisement.xsd"));
     }
+
+    @Bean(name = "checkIfCarIsAvailable")
+    public DefaultWsdl11Definition defaultWsdl11DefinitionCheckIfCarIsAvailable(@Qualifier("checkIfCarIsAvailable") XsdSchema checkIfCarIsAvailable) {
+        DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
+        wsdl11Definition.setPortTypeName("AdvertisementsPort");
+        wsdl11Definition.setLocationUri("/ws/advertisement");
+        wsdl11Definition.setTargetNamespace("http://www.advertisement.dto/soap");
+        wsdl11Definition.setSchema(checkIfCarIsAvailable);
+        return wsdl11Definition;
+    }
+
+    @Bean
+    @Qualifier("checkIfCarIsAvailable")
+    public XsdSchema checkIfCarIsAvailableSchema() {
+        return new SimpleXsdSchema(new ClassPathResource("checkIfCarIsAvailable.xsd"));
+    }
 }

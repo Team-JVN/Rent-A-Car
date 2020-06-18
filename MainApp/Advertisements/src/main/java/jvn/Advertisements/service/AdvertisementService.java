@@ -5,6 +5,7 @@ import jvn.Advertisements.dto.request.UserDTO;
 import jvn.Advertisements.enumeration.EditType;
 import jvn.Advertisements.model.Advertisement;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface AdvertisementService {
@@ -29,5 +30,7 @@ public interface AdvertisementService {
     String getAdvertisementEditType(Long id, Long loggedInUser);
 
     List<Advertisement> getAll(Long loggedInUser);
+
+    boolean checkIfCarIsAvailableForSoap(Long carId, LocalDate dateFrom, LocalDate dateTo);
 }
 

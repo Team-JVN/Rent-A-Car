@@ -19,6 +19,9 @@ public class RentRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
+    private Long mainAppId;
+
     @Enumerated(EnumType.STRING)
     private RentRequestStatus rentRequestStatus;
 

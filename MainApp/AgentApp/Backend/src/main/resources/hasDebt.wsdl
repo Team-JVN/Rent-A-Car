@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:sch="http://www.soap.dto/rentrequest"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.rentrequest.dto/soap"
+                  targetNamespace="http://www.rentrequest.dto/soap">
+    <wsdl:types>
+        <xs:schema xmlns:tns="http://www.soap.dto/rentrequest" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   elementFormDefault="qualified" targetNamespace="http://www.soap.dto/rentrequest">
+            <xs:element name="hasDebtRequest">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="email" type="xs:string"/>
+                        <xs:element name="id">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:long">
+                                    <xs:minInclusive value="1"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="hasDebtResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="value" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="hasDebtRequest">
+        <wsdl:part element="sch:hasDebtRequest" name="hasDebtRequest">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="hasDebtResponse">
+        <wsdl:part element="sch:hasDebtResponse" name="hasDebtResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="RentRequestsPort">
+        <wsdl:operation name="hasDebt">
+            <wsdl:input message="tns:hasDebtRequest" name="hasDebtRequest">
+            </wsdl:input>
+            <wsdl:output message="tns:hasDebtResponse" name="hasDebtResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="RentRequestsPortSoap11" type="tns:RentRequestsPort">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="hasDebt">
+            <soap:operation soapAction=""/>
+            <wsdl:input name="hasDebtRequest">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="hasDebtResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="RentRequestsPortService">
+        <wsdl:port binding="tns:RentRequestsPortSoap11" name="RentRequestsPortSoap11">
+            <soap:address location="http://192.168.56.1:8083/rentrequest/ws"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

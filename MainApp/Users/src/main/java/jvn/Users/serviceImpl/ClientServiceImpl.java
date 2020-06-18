@@ -80,8 +80,8 @@ public class ClientServiceImpl implements ClientService {
             client.setStatus(ClientStatus.NEVER_LOGGED_IN);
             composeAndSendEmailToChangePassword(client.getEmail(), generatedPassword);
             Client dbClient = clientRepository.save(client);
-            Long loggedInUserId = userService.getLoginUser().getId();
-            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CCL", String.format("User %s successfully created client %s", loggedInUserId, dbClient.getId())));
+//            Long loggedInUserId = userService.getLoginUser().getId();
+//            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CCL", String.format("User %s successfully created client %s", loggedInUserId, dbClient.getId())));
             return dbClient;
         } else {
 
