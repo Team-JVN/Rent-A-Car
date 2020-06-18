@@ -76,7 +76,7 @@ public class RentRequestEndpoint {
         return response;
     }
 
-    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "checkDate")
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "checkDateRequest")
     @ResponsePayload
     public CheckDateResponse checkDate(@RequestPayload CheckDateRequest request) {
         UserInfoDTO dto = userClient.getUser(request.getEmail());
@@ -101,7 +101,7 @@ public class RentRequestEndpoint {
         return response;
     }
 
-    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "checkIfCanAcceptRentRequest")
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "checkIfCanAcceptRequest")
     @ResponsePayload
     public CheckIfCanAcceptResponse checkIfCanAcceptRentRequest(@RequestPayload CheckIfCanAcceptRequest request) {
         UserInfoDTO dto = userClient.getUser(request.getEmail());

@@ -4,7 +4,6 @@ import jvn.RentACar.client.AdvertisementClient;
 import jvn.RentACar.dto.request.AdvertisementEditDTO;
 import jvn.RentACar.dto.response.SearchParamsDTO;
 import jvn.RentACar.dto.soap.advertisement.*;
-import jvn.RentACar.dto.soap.car.CreateOrEditCarDetailsResponse;
 import jvn.RentACar.enumeration.EditType;
 import jvn.RentACar.enumeration.LogicalStatus;
 import jvn.RentACar.enumeration.RentRequestStatus;
@@ -20,7 +19,6 @@ import jvn.RentACar.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -53,7 +51,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         checkDate(createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
         createAdvertisementDTO.setCar(carService.get(createAdvertisementDTO.getCar().getId()));
         checkOwner(createAdvertisementDTO.getCar());
-        CheckIfCarIsAvailableResponse response = advertisementClient.checkIfCarIsAvailable(createAdvertisementDTO.getCar().getId(),
+        CheckIfCarIsAvailableResponse response = advertisementClient.checkIfCarIsAvailable(createAdvertisementDTO.getCar().getMainAppId(),
                 createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
         if (!response.isAvailable()) {
             throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);
@@ -75,7 +73,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         if (!dbAdvertisement.getCar().getId().equals(advertisement.getCar().getId())) {
             dbAdvertisement.setCar(advertisement.getCar());
 
-            CheckIfCarIsAvailableResponse response = advertisementClient.checkIfCarIsAvailable(dbAdvertisement.getCar().getId(),
+            CheckIfCarIsAvailableResponse response = advertisementClient.checkIfCarIsAvailable(dbAdvertisement.getCar().getMainAppId(),
                     dbAdvertisement.getDateFrom(), dbAdvertisement.getDateTo());
             if (!response.isAvailable()) {
                 throw new InvalidAdvertisementDataException("Active advertisement for this car already exist!", HttpStatus.BAD_REQUEST);

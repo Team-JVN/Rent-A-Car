@@ -105,6 +105,19 @@ public class RentRequestClient extends WebServiceGatewaySupport {
         return response;
     }
 
+    public GetAllRentRequestDetailsResponse getAll() {
+        GetAllRentRequestDetailsRequest request = new GetAllRentRequestDetailsRequest();
+        User user = userService.getLoginUser();
+        if (user == null) {
+            return null;
+        }
+        request.setEmail(user.getEmail());
+
+        GetAllRentRequestDetailsResponse response = (GetAllRentRequestDetailsResponse) getWebServiceTemplate()
+                .marshalSendAndReceive(request);
+        return response;
+    }
+
     private XMLGregorianCalendar getXMLGregorianCalendar(LocalDateTime localDateTime) {
         try {
             String dateTimeStr = localDateTime.toString();
