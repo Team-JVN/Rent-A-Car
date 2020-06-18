@@ -34,29 +34,6 @@ public class CommentController {
 
     private CommentService commentService;
 
-    @PostMapping(value="/{id}/rent-info/{rentInfoId}/comment")
-    public ResponseEntity<CommentDTO> createComment(@PathVariable Long id, @PathVariable Long rentInfoId, @Valid @RequestBody CommentDTO commentDTO){
-        UserDTO userDTO = stringToObject(request.getHeader("user"));
-        commentDTO.setSender(userDTO);
-        return new ResponseEntity<>(commentDtoMapper.toDto(commentService.createComment(commentDtoMapper.toEntity(commentDTO),id, rentInfoId, userDTO.getId())),
-                HttpStatus.CREATED);
-    }
-
-    @PostMapping(value="/{id}/rent-info/{rentInfoId}/feedback")
-    public ResponseEntity<FeedbackDTO> leaveFeedback(@PathVariable Long id, @PathVariable Long rentInfoId, @Valid @RequestBody FeedbackDTO feedbackDTO){
-        UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(commentService.leaveFeedback(feedbackDTO, id, rentInfoId, userDTO.getId(), userDTO.getName()),
-                HttpStatus.CREATED);
-    }
-
-    @GetMapping(value="/{id}/rent-info/{rentInfoId}/feedback")
-    public ResponseEntity<FeedbackDTO> getFeedback(@PathVariable Long id, @PathVariable Long rentInfoId){
-
-        UserDTO userDTO = stringToObject(request.getHeader("user"));
-
-        return new ResponseEntity<>(commentService.getFeedback(id, rentInfoId, userDTO.getId()), HttpStatus.OK);
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<CommentDTO> get(@PathVariable Long id){
         return new ResponseEntity<>(commentDtoMapper.toDto(commentService.get(id)), HttpStatus.OK);

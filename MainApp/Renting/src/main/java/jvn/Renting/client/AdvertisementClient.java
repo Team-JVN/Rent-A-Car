@@ -15,4 +15,8 @@ public interface AdvertisementClient {
     @RequestMapping(method = RequestMethod.GET, path = "/api/advertisement/by-ids/{advIds}")
     List<AdvertisementWithIdsDTO> get(@RequestHeader("Auth") String token, @RequestHeader("user") String user,
                                       @PathVariable("advIds") List<Long> advertisements);
+
+    @RequestMapping(method = RequestMethod.GET, path = "/api/advertisement/by-id/{advId}")
+    AdvertisementWithIdsDTO getOne(@RequestHeader("Auth") String token, @RequestHeader("user") String user,
+                                      @PathVariable("advId") Long advertisement);
 }

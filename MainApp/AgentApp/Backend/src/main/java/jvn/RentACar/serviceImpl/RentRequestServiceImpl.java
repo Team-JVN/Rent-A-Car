@@ -1,9 +1,15 @@
 package jvn.RentACar.serviceImpl;
 
+import jvn.RentACar.dto.both.CommentDTO;
+import jvn.RentACar.dto.both.FeedbackDTO;
 import jvn.RentACar.dto.request.RentRequestStatusDTO;
+import jvn.RentACar.enumeration.CommentStatus;
 import jvn.RentACar.enumeration.RentRequestStatus;
+import jvn.RentACar.exceptionHandler.InvalidCommentDataException;
 import jvn.RentACar.exceptionHandler.InvalidRentRequestDataException;
+import jvn.RentACar.mapper.CommentDtoMapper;
 import jvn.RentACar.model.*;
+import jvn.RentACar.repository.RentInfoRepository;
 import jvn.RentACar.repository.RentRequestRepository;
 import jvn.RentACar.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +45,8 @@ public class RentRequestServiceImpl implements RentRequestService {
     private EmailNotificationService emailNotificationService;
 
     private Environment environment;
+
+
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -130,6 +138,39 @@ public class RentRequestServiceImpl implements RentRequestService {
             composeAndSendRejectedRentRequest(rentRequest.getClient().getEmail(), rentRequest.getId());
         }
         rentRequestRepository.saveAll(rentRequests);
+    }
+
+    @Override
+    public Message createMessage(Message message, Long id) {
+        User loggedInUser = userService.getLoginUser();
+        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, loggedInUser.getId(), id, loggedInUser.getId());
+        message.setRentRequest(rentRequest);
+        message.setSender(loggedInUser);
+        rentRequest.getMessages().add(message);
+
+
+//        try {
+//            this.simpMessagingTemplate.convertAndSend("/socket-publisher", messageDtoMapper.toDto(message));
+//        } catch (Exception e) {
+//            throw new InvalidRentRequestDataException("Socket error", HttpStatus.BAD_REQUEST);
+//        }
+
+        rentRequestRepository.save(rentRequest);
+
+        return message;
+    }
+
+    @Override
+    public List<Message> getMessages(Long id) {
+        User loggedInUser = userService.getLoginUser();
+        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, loggedInUser.getId(), id, loggedInUser.getId());
+        List<Message> messages = new ArrayList<>();
+        for(Message message: rentRequest.getMessages()){
+            if(message.getSender().getId().equals(loggedInUser.getId()) || rentRequest.getCreatedBy().equals(loggedInUser.getId()) || rentRequest.getClient().equals(loggedInUser.getId())){
+                messages.add(message);
+            }
+        }
+        return messages;
     }
 
     private RentRequest cancel(RentRequest rentRequest) {
@@ -372,5 +413,6 @@ public class RentRequestServiceImpl implements RentRequestService {
         this.userService = userService;
         this.emailNotificationService = emailNotificationService;
         this.environment = environment;
+
     }
 }

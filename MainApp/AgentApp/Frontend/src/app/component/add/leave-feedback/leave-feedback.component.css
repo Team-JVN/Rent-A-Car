@@ -1,0 +1,35 @@
+.dialog-class {
+  width: 600px;
+}
+
+.form-full-width {
+  width: 100%;
+}
+
+.labelRaiting {
+  margin-top: 15px;
+}
+
+.page-title {
+  color: black;
+  text-align: center;
+  font-weight: 550;
+}
+.rating-list li {
+  float: right;
+  color: #ddd;
+  padding: 10px 5px;
+}
+
+.rating-list li:hover,
+.rating-list li:hover ~ li {
+  color: #87c7f3;
+}
+
+.rating-list {
+  display: inline-block;
+  list-style: none;
+}
+.rating-list li.selected {
+  color: #87c7f3;
+}

@@ -38,8 +38,8 @@ export class RentRequestDetailsComponent implements OnInit {
     ""
   );
   loggedInUserEmail: string;
-  availableRentReport: boolean;
-  availableReviewFeedback: boolean;
+  availableRentReport: Map<number, boolean>;
+  availableReviewFeedback: Map<number, boolean>;
   messages: Message[];
 
   constructor(
@@ -55,6 +55,8 @@ export class RentRequestDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.availableRentReport = new Map();
+    this.availableReviewFeedback = new Map();
     this.messageForm = this.formBuilder.group({
       text: new FormControl(null, Validators.required),
     });
@@ -88,7 +90,7 @@ export class RentRequestDetailsComponent implements OnInit {
   }
 
   createRentReport(rentInfo: RentInfo) {
-    this.availableRentReport = true;
+    this.availableRentReport.set(rentInfo.id, true);
     let dialogRef = this.dialog.open(AddRentReportComponent, {
       data: {
         rentReport: null,
@@ -98,13 +100,13 @@ export class RentRequestDetailsComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result == true) {
-        this.availableRentReport = false;
+        this.availableRentReport.set(rentInfo.id, false);
       }
     });
   }
 
   reviewFeedback(rentInfo: RentInfo) {
-    this.availableReviewFeedback = true;
+    this.availableReviewFeedback.set(rentInfo.id, true);
     let dialogRef = this.dialog.open(ReviewFeedbackComponent, {
       data: {
         feedback: null,
@@ -114,7 +116,7 @@ export class RentRequestDetailsComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result == true) {
-        this.availableReviewFeedback = false;
+        this.availableReviewFeedback.set(rentInfo.id, false);
       }
     });
   }
@@ -132,7 +134,7 @@ export class RentRequestDetailsComponent implements OnInit {
       rentInfo.comments.length > 0 &&
       rentInfo.comments.length < 2 &&
       comm.status == "APPROVED" &&
-      this.availableReviewFeedback != false
+      this.availableReviewFeedback.get(rentInfo.id) != false
     ) {
       return true;
     }
@@ -145,7 +147,7 @@ export class RentRequestDetailsComponent implements OnInit {
       this.rentRequest.rentRequestStatus == "PAID" &&
       dateTimeTo < new Date() &&
       rentInfo.rentReport == null &&
-      this.availableRentReport != false
+      this.availableRentReport.get(rentInfo.id) != false
     ) {
       return true;
     }

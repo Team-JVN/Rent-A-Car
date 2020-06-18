@@ -12,6 +12,8 @@ public interface AdvertisementService {
 
     List<Advertisement> get(List<Long> advertisements);
 
+    Advertisement getOne (Long advertisementId);
+
     void delete(Long id, Long loggedInUserId, String jwtToken, String user);
 
     Advertisement edit(Long id, Advertisement advertisement, Long loggedInUserId, String jwtToken, String user, UserDTO userDTO);

@@ -1,0 +1,52 @@
+<ng-template #noMessages>
+  <div class="no-messages">
+    <img src="/assets/no-messages-illustration.svg" />
+    <span class="title">No new message?</span>
+    <span class="info">Send your first message below.</span>
+  </div>
+</ng-template>
+
+<div class="main">
+  <div class="user-info">{{ client.name }}</div>
+  <div
+    *ngIf="messages && messages[0]; else noMessages"
+    class="messages-container"
+    #scrollMe
+  >
+    <ul>
+      <li
+        *ngFor="let message of messages"
+        [style.flex-direction]="
+          message.sender.email != loggedInUser ? 'row-reverse' : 'row'
+        "
+      >
+        <mat-icon style="margin-bottom: 5px;">person</mat-icon>
+        <span
+          [ngClass]="
+            message.sender.email == loggedInUser
+              ? 'speech-bubble-own'
+              : 'speech-bubble'
+          "
+          >{{ message.text }}</span
+        >
+      </li>
+    </ul>
+  </div>
+  <div class="input-container">
+    <input
+      placeholder="Type a message..."
+      #messageInput
+      (keydown.enter)="
+        onSendMessage(messageInput.value); messageInput.value = ''
+      "
+    />
+    <button
+      mat-icon-button
+      color="primary"
+      aria-label="Send"
+      (click)="onSendMessage(messageInput.value); messageInput.value = ''"
+    >
+      <mat-icon>send</mat-icon>
+    </button>
+  </div>
+</div>

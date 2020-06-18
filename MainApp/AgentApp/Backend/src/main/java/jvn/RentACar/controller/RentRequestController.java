@@ -1,12 +1,13 @@
 package jvn.RentACar.controller;
 
-import jvn.RentACar.dto.both.RentInfoDTO;
-import jvn.RentACar.dto.both.RentRequestDTO;
+import jvn.RentACar.dto.both.*;
 import jvn.RentACar.dto.request.RentRequestStatusDTO;
-import jvn.RentACar.dto.response.UserDTO;
 import jvn.RentACar.exceptionHandler.InvalidAdvertisementDataException;
+import jvn.RentACar.mapper.CommentDtoMapper;
+import jvn.RentACar.mapper.MessageDtoMapper;
 import jvn.RentACar.mapper.RentInfoDtoMapper;
 import jvn.RentACar.mapper.RentRequestDtoMapper;
+import jvn.RentACar.service.CommentService;
 import jvn.RentACar.service.RentInfoService;
 import jvn.RentACar.service.RentRequestService;
 import jvn.RentACar.service.UserService;
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
-import java.text.ParseException;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,6 +39,12 @@ public class RentRequestController {
     private RentInfoDtoMapper rentInfoDtoMapper;
 
     private UserService userService;
+
+    private MessageDtoMapper messageDtoMapper;
+
+    private CommentDtoMapper commentDtoMapper;
+
+    private CommentService commentService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<RentRequestDTO> create(@Valid @RequestBody RentRequestDTO rentRequestDTO) {
@@ -73,14 +79,48 @@ public class RentRequestController {
                                            @PathVariable("rentInfoId") @Positive(message = "Id must be positive.") Long rentInfoId) {
         return new ResponseEntity<>(rentInfoDtoMapper.toDto(rentInfoService.pay(rentRequestId, rentInfoId,userService.getLoginUser().getId())), HttpStatus.OK);
     }
+    @PostMapping("/{id}/message")
+    public ResponseEntity<MessageDTO> createMessage(@PathVariable Long id, @Valid @RequestBody MessageDTO messageDTO){
+        return new ResponseEntity<>(messageDtoMapper.toDto(rentRequestService.createMessage(messageDtoMapper.toEntity(messageDTO), id)),
+                HttpStatus.CREATED);
+    }
+
+    @GetMapping(value="/{id}/message")
+    public ResponseEntity<List<MessageDTO>> getMessages(@PathVariable Long id){
+        List<MessageDTO> list;
+        list= rentRequestService.getMessages(id).stream().map(messageDtoMapper::toDto).
+                collect(Collectors.toList());
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @PostMapping(value="/{id}/rent-info/{rentInfoId}/comment")
+    public ResponseEntity<CommentDTO> createComment(@PathVariable Long id, @PathVariable Long rentInfoId, @Valid @RequestBody CommentDTO commentDTO){
+        return new ResponseEntity<>(commentDtoMapper.toDto(commentService.createComment(commentDtoMapper.toEntity(commentDTO),id, rentInfoId)),
+                HttpStatus.CREATED);
+    }
+
+    @PostMapping(value="/{id}/rent-info/{rentInfoId}/feedback")
+    public ResponseEntity<FeedbackDTO> leaveFeedback(@PathVariable Long id, @PathVariable Long rentInfoId, @Valid @RequestBody FeedbackDTO feedbackDTO){
+        return new ResponseEntity<>(commentService.leaveFeedback(feedbackDTO, id, rentInfoId),
+                HttpStatus.CREATED);
+    }
+
+    @GetMapping(value="/{id}/rent-info/{rentInfoId}/feedback")
+    public ResponseEntity<FeedbackDTO> getFeedback(@PathVariable Long id, @PathVariable Long rentInfoId){
+        return new ResponseEntity<>(commentService.getFeedback(id, rentInfoId), HttpStatus.OK);
+    }
 
     @Autowired
     public RentRequestController(RentRequestService rentRequestService, RentRequestDtoMapper rentRequestDtoMapper,
-                                 RentInfoService rentInfoService, RentInfoDtoMapper rentInfoDtoMapper,UserService userService) {
+                                 RentInfoService rentInfoService, RentInfoDtoMapper rentInfoDtoMapper,UserService userService,
+                                 MessageDtoMapper messageDtoMapper, CommentDtoMapper commentDtoMapper, CommentService commentService) {
         this.rentRequestService = rentRequestService;
         this.rentRequestDtoMapper = rentRequestDtoMapper;
         this.rentInfoService = rentInfoService;
         this.rentInfoDtoMapper = rentInfoDtoMapper;
         this.userService = userService;
+        this.messageDtoMapper = messageDtoMapper;
+        this.commentDtoMapper = commentDtoMapper;
+        this.commentService = commentService;
     }
 }

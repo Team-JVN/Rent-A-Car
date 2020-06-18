@@ -48,7 +48,7 @@ export class ClientRentRequestDetailsComponent implements OnInit {
   );
   loggedInUserEmail: string;
   messages: Message[];
-  availibleLeavingFeedback: boolean;
+  availibleLeavingFeedback: Map<number, boolean>;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -82,28 +82,7 @@ export class ClientRentRequestDetailsComponent implements OnInit {
         }
       );
     });
-    this.fetchComments();
     this.loggedInUserEmail = this.authentificationService.getLoggedInUserEmail();
-    // this.getMessages();
-
-    //Delete this
-    // this.messages = [new Message("Cao sta radi,kako si, da li si dorbo.Kako su tvoji. sta radis", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 1), new Message("Kako si", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 2),
-    // new Message("Dobro", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 1), new Message("To?", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 2)];
-    // this.rentRequestId = 2;
-  }
-  fetchComments() {
-    // this.rentRequestService
-    //   .getRentInfoFeedback(this.data.rentInfo.id, this.data.rentRequest.id)
-    //   .subscribe(
-    //     (data: Feedback) => {
-    //       console.log("FEEDBACK");
-    //       console.log(data);
-    //       this.toastr.success("Success!", "Fetch feedback");
-    //     },
-    //     (httpErrorResponse: HttpErrorResponse) => {
-    //       this.toastr.error(httpErrorResponse.error.message, "Fetch feedback");
-    //     }
-    //   );
   }
 
   advertisementDetails(rentInfo: RentInfo) {
@@ -123,15 +102,12 @@ export class ClientRentRequestDetailsComponent implements OnInit {
   }
 
   checkIfCanLeaveFeedback(rentInfo: RentInfo, rentRequest: RentRequest) {
-    console.log("rentInfo*****");
-    console.log(rentInfo);
-
     const dateTimeTo = new Date(rentInfo.dateTimeTo.substring(0, 10));
     if (
       rentRequest.rentRequestStatus == "PAID" &&
       dateTimeTo < new Date() &&
       rentInfo.comments.length < 1 &&
-      this.availibleLeavingFeedback != false
+      this.availibleLeavingFeedback.get(rentInfo.id) != false
     ) {
       return true;
     }
@@ -139,13 +115,13 @@ export class ClientRentRequestDetailsComponent implements OnInit {
   }
 
   leaveFeedback(rentInfo: RentInfo) {
-    this.availibleLeavingFeedback = true;
+    this.availibleLeavingFeedback.set(rentInfo.id, true);
     let dialogRef = this.dialog.open(LeaveFeedbackComponent, {
       data: { rentInfo: rentInfo, rentRequest: this.rentRequest },
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result == true) {
-        this.availibleLeavingFeedback = false;
+        this.availibleLeavingFeedback.set(rentInfo.id, false);
       }
     });
   }

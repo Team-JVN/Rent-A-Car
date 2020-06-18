@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface CommentService {
 
-    Comment createComment(Comment comment, Long id, Long rentInfoId, Long userId);
+    Comment createComment(Comment comment, Long id, Long rentInfoId);
 
-    FeedbackDTO leaveFeedback(FeedbackDTO feedbackDTO, Long id, Long rentInfoId, Long userId, String userName);
+    FeedbackDTO leaveFeedback(FeedbackDTO feedbackDTO, Long id, Long rentInfoId);
 
-    FeedbackDTO getFeedback(Long id, Long rentInfoId, Long userId);
+    FeedbackDTO getFeedback(Long id, Long rentInfoId);
 
     Comment get(Long id);
 

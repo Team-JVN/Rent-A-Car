@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @Validated
@@ -21,16 +22,21 @@ public class RentReportController {
 
     private RentReportDtoMapper rentReportDtoMapper;
 
+    private HttpServletRequest request;
+
     @PostMapping(value = "/{rentInfoId}",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<RentReportDTO> create(@PathVariable Long rentInfoId, @Valid @RequestBody RentReportDTO rentReport) {
 
-        return new ResponseEntity<>(rentReportDtoMapper.toDto(rentReportService.create(rentReportDtoMapper.toEntity(rentReport), rentInfoId)),
+        return new ResponseEntity<>(rentReportDtoMapper.toDto(rentReportService.create(rentReportDtoMapper.toEntity(rentReport), rentInfoId,
+                request.getHeader("Auth"), request.getHeader("user"))),
                 HttpStatus.CREATED);
     }
 
     @Autowired
-    public RentReportController(RentReportService rentReportService, RentReportDtoMapper rentReportDtoMapper) {
+    public RentReportController(RentReportService rentReportService, RentReportDtoMapper rentReportDtoMapper,
+                                HttpServletRequest request) {
         this.rentReportService = rentReportService;
         this.rentReportDtoMapper = rentReportDtoMapper;
+        this.request = request;
     }
 }

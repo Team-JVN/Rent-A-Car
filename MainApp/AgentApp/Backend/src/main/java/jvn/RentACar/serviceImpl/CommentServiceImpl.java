@@ -8,6 +8,7 @@ import jvn.RentACar.mapper.CommentDtoMapper;
 import jvn.RentACar.model.*;
 import jvn.RentACar.repository.*;
 import jvn.RentACar.service.CommentService;
+import jvn.RentACar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -32,11 +33,16 @@ public class CommentServiceImpl implements CommentService {
 
     private UserRepository userRepository;
 
+    private UserService userService;
+
+
     @Override
-    public Comment createComment(Comment comment, Long id, Long rentInfoId, Long userId) {
+    public Comment createComment(Comment comment, Long id, Long rentInfoId) {
         //TODO: which status has the comment made by agent
+        User loggedInUser = userService.getLoginUser();
         comment.setStatus(CommentStatus.APPROVED);
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
+        comment.setSender(loggedInUser);
+        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, loggedInUser.getId(), id, loggedInUser.getId());
         RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
         rentInfo.getComments().add(comment);
         comment.setRentInfo(rentInfo);
@@ -48,16 +54,16 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public FeedbackDTO leaveFeedback(FeedbackDTO feedbackDTO, Long id, Long rentInfoId, Long userId, String userName){
-
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
+    public FeedbackDTO leaveFeedback(FeedbackDTO feedbackDTO, Long id, Long rentInfoId){
+        User loggedInUser = userService.getLoginUser();
+        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, loggedInUser.getId(), id, loggedInUser.getId());
         Set<RentInfo> rentInfos = rentRequest.getRentInfos();
 //        RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
-        if(commentRepository.findBySenderIdAndRentInfoId(userId, rentInfoId).isEmpty()){
+        if(commentRepository.findBySenderIdAndRentInfoId(loggedInUser.getId(), rentInfoId).isEmpty()){
             RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
             List<CommentDTO> commentDTOS = new ArrayList<>(feedbackDTO.getComments());
             Comment comment = new Comment();
-            Client client = clientRepository.findById(userId).orElse(null);
+            Client client = clientRepository.findById(loggedInUser.getId()).orElse(null);
             comment.setSender(client);
             comment.setStatus(CommentStatus.AWAITING);
             comment.setRentInfo(rentInfo);
@@ -76,9 +82,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public FeedbackDTO getFeedback(Long id, Long rentInfoId, Long userId) {
+    public FeedbackDTO getFeedback(Long id, Long rentInfoId) {
+        User loggedInUser = userService.getLoginUser();
         FeedbackDTO feedbackDTO = new FeedbackDTO();
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
+        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, loggedInUser.getId(), id, loggedInUser.getId());
         RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
         feedbackDTO.setRating(rentInfo.getRating());
         feedbackDTO.setComments(new HashSet<>());
@@ -146,12 +153,16 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Autowired
-    public CommentServiceImpl(CommentRepository commentRepository, CommentDtoMapper commentDtoMapper, RentRequestRepository rentRequestRepository, RentInfoRepository rentInfoRepository, ClientRepository clientRepository, UserRepository userRepository) {
+    public CommentServiceImpl(CommentRepository commentRepository, CommentDtoMapper commentDtoMapper,
+                              RentRequestRepository rentRequestRepository, RentInfoRepository rentInfoRepository,
+                              ClientRepository clientRepository, UserRepository userRepository,
+                              UserService userService) {
         this.commentRepository = commentRepository;
         this.commentDtoMapper = commentDtoMapper;
         this.rentRequestRepository = rentRequestRepository;
         this.rentInfoRepository = rentInfoRepository;
         this.clientRepository = clientRepository;
         this.userRepository = userRepository;
+        this.userService = userService;
     }
 }

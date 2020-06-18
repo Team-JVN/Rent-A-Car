@@ -55,8 +55,7 @@ export class AddRentReportComponent implements OnInit {
     private formBuilder: FormBuilder,
     public dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public selectedItem: RentInfo
-  ) {
-  }
+  ) {}
 
   ngOnInit() {
     this.createForm = this.formBuilder.group({
@@ -82,7 +81,7 @@ export class AddRentReportComponent implements OnInit {
     this.rentReportService.create(rentReport).subscribe(
       (data: RentReport) => {
         this.createForm.reset();
-        this.dialogRef.close();
+        this.dialogRef.close(true);
         this.toastr.success("Success!", "Create Rent Report");
         this.rentReportService.createSuccessEmitter.next(data);
       },
@@ -94,8 +93,4 @@ export class AddRentReportComponent implements OnInit {
       }
     );
   }
-
-  // openAddClient() {
-  //   this.dialog.open(AddClientComponent);
-  // }
 }

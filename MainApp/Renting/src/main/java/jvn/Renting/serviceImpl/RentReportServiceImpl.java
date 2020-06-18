@@ -1,5 +1,7 @@
 package jvn.Renting.serviceImpl;
 
+import jvn.Renting.client.AdvertisementClient;
+import jvn.Renting.dto.both.AdvertisementWithIdsDTO;
 import jvn.Renting.enumeration.RentRequestStatus;
 import jvn.Renting.exceptionHandler.InvalidRentReportDataException;
 import jvn.Renting.model.RentInfo;
@@ -14,6 +16,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class RentReportServiceImpl implements RentReportService {
@@ -24,8 +28,10 @@ public class RentReportServiceImpl implements RentReportService {
 
     private RentReportProducer rentReportProducer;
 
+    private AdvertisementClient advertisementClient;
+
     @Override
-    public RentReport create(RentReport toEntity, Long rentInfoId) {
+    public RentReport create(RentReport toEntity, Long rentInfoId, String jwt, String user) {
 
         if (rentReportRepository.findByRentInfoId(rentInfoId) != null) {
             throw new InvalidRentReportDataException("Rent report for this rent info already exist.", HttpStatus.BAD_REQUEST);
@@ -41,6 +47,10 @@ public class RentReportServiceImpl implements RentReportService {
         RentReport rentReport = rentReportRepository.save(toEntity);
 
         sendUpdatesCar(rentReport);
+        AdvertisementWithIdsDTO adWithDTO = advertisementClient.getOne(jwt, user, rentReport.getRentInfo().getAdvertisement());
+        System.out.println("AD------>");
+//        System.out.println(adWithDTO.getPriceList().getPricePerKm().toString());
+//        System.out.println(adWithDTO.getKilometresLimit().toString());
         return rentReport;
     }
 
@@ -89,9 +99,10 @@ public class RentReportServiceImpl implements RentReportService {
 
     @Autowired
     public RentReportServiceImpl(RentReportRepository rentReportRepository, RentInfoRepository rentInfoRepository,
-                                 RentReportProducer rentReportProducer) {
+                                 RentReportProducer rentReportProducer, AdvertisementClient advertisementClient) {
         this.rentReportRepository = rentReportRepository;
         this.rentInfoRepository = rentInfoRepository;
         this.rentReportProducer = rentReportProducer;
+        this.advertisementClient = advertisementClient;
     }
 }
