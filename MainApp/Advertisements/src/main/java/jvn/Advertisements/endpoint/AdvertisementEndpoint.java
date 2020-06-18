@@ -1,6 +1,7 @@
 package jvn.Advertisements.endpoint;
 
 import jvn.Advertisements.client.UserClient;
+import jvn.Advertisements.dto.message.Log;
 import jvn.Advertisements.dto.request.AdvertisementEditDTO;
 import jvn.Advertisements.dto.request.UserDTO;
 import jvn.Advertisements.dto.response.UserInfoDTO;
@@ -8,6 +9,7 @@ import jvn.Advertisements.dto.soap.advertisement.*;
 import jvn.Advertisements.mapper.AdvertisementDetailsMapper;
 import jvn.Advertisements.mapper.EditPartialAdvertisementMapper;
 import jvn.Advertisements.model.Advertisement;
+import jvn.Advertisements.producer.LogProducer;
 import jvn.Advertisements.service.AdvertisementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
@@ -21,6 +23,9 @@ import java.util.stream.Collectors;
 @Endpoint
 public class AdvertisementEndpoint {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private static final String NAMESPACE_URI = "http://www.soap.dto/advertisement";
 
     private AdvertisementService advertisementService;
@@ -30,6 +35,8 @@ public class AdvertisementEndpoint {
     private UserClient userClient;
 
     private EditPartialAdvertisementMapper editPartialAdvertisementMapper;
+
+    private LogProducer logProducer;
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "createOrEditAdvertisementDetailsRequest")
     @ResponsePayload
@@ -43,8 +50,10 @@ public class AdvertisementEndpoint {
         AdvertisementDetails advertisementDetails = request.getAdvertisementDetails();
         if (advertisementDetails.getId() != null) {
             advertisementDetails = advertisementDetailsMapper.toDto(advertisementService.edit(advertisementDetails.getId(), advertisementDetailsMapper.toEntity(advertisementDetails), userDTO));
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EAD", String.format("[SOAP] User %s successfully edited advertisement %s", userDTO.getId(), advertisementDetails.getId())));
         } else {
             advertisementDetails = advertisementDetailsMapper.toDto(advertisementService.create(advertisementDetailsMapper.toEntity(advertisementDetails), userDTO));
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CAD", String.format("[SOAP] User %s successfully created advertisement %s", userDTO.getId(), advertisementDetails.getId())));
         }
         CreateOrEditAdvertisementDetailsResponse response = new CreateOrEditAdvertisementDetailsResponse();
         response.setAdvertisementDetails(advertisementDetails);
@@ -59,7 +68,11 @@ public class AdvertisementEndpoint {
             return null;
         }
         DeleteAdvertisementDetailsResponse response = new DeleteAdvertisementDetailsResponse();
-        response.setCanDelete(advertisementService.checkIfCanDeleteAndDelete(request.getId(), dto.getId()));
+        boolean isDeleted = advertisementService.checkIfCanDeleteAndDelete(request.getId(), dto.getId());
+        response.setCanDelete(isDeleted);
+        if (isDeleted) {
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "DAD", String.format("[SOAP] User %s successfully deleted advertisement %s", dto.getId(), request.getId())));
+        }
         return response;
     }
 
@@ -83,6 +96,7 @@ public class AdvertisementEndpoint {
         details.setDiscount(advertisement.getDiscount());
         response.setEditPartialAdvertisementDetails(details);
 
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EAD", String.format("[SOAP] User %s successfully edited advertisement %s", dto.getId(), advertisement.getId())));
         return response;
     }
 
@@ -127,10 +141,11 @@ public class AdvertisementEndpoint {
 
     @Autowired
     public AdvertisementEndpoint(AdvertisementService advertisementService, AdvertisementDetailsMapper advertisementDetailsMapper, UserClient userClient,
-                                 EditPartialAdvertisementMapper editPartialAdvertisementMapper) {
+                                 EditPartialAdvertisementMapper editPartialAdvertisementMapper, LogProducer logProducer) {
         this.advertisementService = advertisementService;
         this.advertisementDetailsMapper = advertisementDetailsMapper;
         this.userClient = userClient;
         this.editPartialAdvertisementMapper = editPartialAdvertisementMapper;
+        this.logProducer = logProducer;
     }
 }

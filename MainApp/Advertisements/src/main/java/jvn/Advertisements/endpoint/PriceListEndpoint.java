@@ -1,9 +1,11 @@
 package jvn.Advertisements.endpoint;
 
 import jvn.Advertisements.client.UserClient;
+import jvn.Advertisements.dto.message.Log;
 import jvn.Advertisements.dto.response.UserInfoDTO;
 import jvn.Advertisements.dto.soap.pricelist.*;
 import jvn.Advertisements.mapper.PriceListDetailsMapper;
+import jvn.Advertisements.producer.LogProducer;
 import jvn.Advertisements.service.PriceListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
@@ -16,6 +18,10 @@ import java.util.stream.Collectors;
 
 @Endpoint
 public class PriceListEndpoint {
+
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private static final String NAMESPACE_URI = "http://www.soap.dto/pricelist";
 
     private PriceListService priceListService;
@@ -23,6 +29,8 @@ public class PriceListEndpoint {
     private PriceListDetailsMapper priceListDetailsMapper;
 
     private UserClient userClient;
+
+    private LogProducer logProducer;
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getPriceListDetailsRequest")
     @ResponsePayload
@@ -35,8 +43,10 @@ public class PriceListEndpoint {
         PriceListDetails priceListDetails = request.getPriceListDetails();
         if (priceListDetails.getId() != null) {
             priceListDetails = priceListDetailsMapper.toDto(priceListService.edit(priceListDetails.getId(), priceListDetailsMapper.toEntity(priceListDetails), dto.getId()));
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EPL", String.format("[SOAP] User %s successfully edited price list %s", dto.getId(), priceListDetails.getId())));
         } else {
             priceListDetails = priceListDetailsMapper.toDto(priceListService.create(priceListDetailsMapper.toEntity(priceListDetails), dto.getId()));
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CPL", String.format("[SOAP] User %s successfully created price list %s", dto.getId(), priceListDetails.getId())));
         }
         GetPriceListDetailsResponse response = new GetPriceListDetailsResponse();
         response.setPriceListDetails(priceListDetails);
@@ -52,7 +62,11 @@ public class PriceListEndpoint {
             return null;
         }
         DeletePriceListDetailsResponse response = new DeletePriceListDetailsResponse();
-        response.setCanDelete(priceListService.checkIfCanDeleteAndDelete(request.getId(), dto.getId()));
+        boolean isDeleted = priceListService.checkIfCanDeleteAndDelete(request.getId(), dto.getId());
+        response.setCanDelete(isDeleted);
+        if (isDeleted) {
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "DPL", String.format("[SOAP] User %s successfully deleted price list %s", dto.getId(), request.getId())));
+        }
         return response;
     }
 
@@ -73,9 +87,11 @@ public class PriceListEndpoint {
     }
 
     @Autowired
-    public PriceListEndpoint(PriceListService priceListService, PriceListDetailsMapper priceListDetailsMapper, UserClient userClient) {
+    public PriceListEndpoint(PriceListService priceListService, PriceListDetailsMapper priceListDetailsMapper, UserClient userClient,
+                             LogProducer logProducer) {
         this.priceListService = priceListService;
         this.userClient = userClient;
         this.priceListDetailsMapper = priceListDetailsMapper;
+        this.logProducer = logProducer;
     }
 }

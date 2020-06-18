@@ -221,7 +221,7 @@ public class CarServiceImpl implements CarService {
 
     private void checkOwner(Car car, Long loggedInUserId) {
         if (!car.getOwner().equals(loggedInUserId)) {
-            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CWO", String.format("User %s is not the owner of car %s", loggedInUserId, car.getId())));
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CHO", String.format("User %s is not the owner of car %s", loggedInUserId, car.getId())));
             throw new InvalidCarDataException("You are not the owner of this car, therefore you cannot edit or delete it.", HttpStatus.BAD_REQUEST);
         }
     }

@@ -20,17 +20,17 @@ public class StartupShutdownEventListener {
 
     @EventListener
     public void onStartup(ApplicationReadyEvent event) {
-        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "APP", String.format("--- %s gateway started ---", Log.getServiceName(CLASS_PATH))));
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "APP", String.format("--- %s service started ---", Log.getServiceName(CLASS_PATH))));
     }
 
     @EventListener
     public void onShutdown(ContextStoppedEvent event) {
-        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "APP", String.format("--- %s gateway shut down ---", Log.getServiceName(CLASS_PATH))));
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "APP", String.format("--- %s service shut down ---", Log.getServiceName(CLASS_PATH))));
     }
 
     @PreDestroy
     public void onDestroy() {
-        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "APP", String.format("--- %s gateway shut down ---", Log.getServiceName(CLASS_PATH))));
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "APP", String.format("--- %s service shut down ---", Log.getServiceName(CLASS_PATH))));
     }
 
     @Autowired

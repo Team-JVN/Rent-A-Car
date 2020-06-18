@@ -45,8 +45,12 @@ DML|Delete model
 PEX|Picture exception
 PDB|Picture in database
 PDI|Picture on disk
-COW|Check owner
+COW|Create owner
+CHO|Check owner
 EOW|Edit owner
 CAD|Create advertisement
 EAD|Edit advertisement
 DAD|Delete advertisement
+CPL|Create price list
+EPL|Edit price list
+DPL|Delete price list

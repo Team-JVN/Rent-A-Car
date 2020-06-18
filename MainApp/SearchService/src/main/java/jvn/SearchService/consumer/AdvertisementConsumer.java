@@ -35,6 +35,9 @@ public class AdvertisementConsumer {
         Advertisement advertisement = stringToObject(advertisementMessageStr);
         advertisementRepository.save(advertisement);
         logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CAD", String.format("Successfully created advertisement %s", advertisement.getId())));
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CCA", String.format("Successfully created car %s", advertisement.getCar().getId())));
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CPL", String.format("Successfully created price list %s", advertisement.getPriceList().getId())));
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "COW", String.format("Successfully created owner %s", advertisement.getOwner().getId())));
     }
 
     @RabbitListener(queues = RabbitMQConfiguration.DELETED_ADVERTISEMENT)
