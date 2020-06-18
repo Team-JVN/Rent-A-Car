@@ -18,12 +18,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Value;
 
+import javax.persistence.EntityManager;
 import java.io.File;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -92,7 +94,6 @@ public class CarServiceImpl implements CarService {
     @Override
     public List<Car> get() {
         synchronizeCars();
-
         return carRepository.findAllByLogicalStatusNot(LogicalStatus.DELETED);
     }
 
@@ -227,6 +228,7 @@ public class CarServiceImpl implements CarService {
     }
 
     @Transactional
+    @Scheduled(cron = "0 10 0/3 * * ?")
     public void synchronizeCars() {
         try {
             GetAllCarDetailsResponse response = carClient.getAll();
@@ -262,7 +264,6 @@ public class CarServiceImpl implements CarService {
         car.setOwner(userService.getLoginUser());
         Car savedCar = carRepository.saveAndFlush(car);
         pictureService.savePicturesSynchronize(pictureInfos, UPLOADED_PICTURES_PATH, savedCar);
-        carRepository.saveAndFlush(savedCar);
     }
 
     public void editCarSynchronize(Car car, Car dbCar, List<PictureInfo> pictureInfos) {
@@ -290,7 +291,6 @@ public class CarServiceImpl implements CarService {
         if (pictureInfos != null && !pictureInfos.isEmpty()) {
             pictureService.editCarPicturesSynchronize(pictureInfos, UPLOADED_PICTURES_PATH, newCar);
         }
-        carRepository.saveAndFlush(dbCar);
     }
 
 

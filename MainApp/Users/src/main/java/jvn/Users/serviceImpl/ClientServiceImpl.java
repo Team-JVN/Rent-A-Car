@@ -3,6 +3,7 @@ package jvn.Users.serviceImpl;
 import jvn.Users.common.RandomPasswordGenerator;
 import jvn.Users.dto.message.Log;
 import jvn.Users.dto.message.OwnerMessageDTO;
+import jvn.Users.dto.response.UserDTO;
 import jvn.Users.enumeration.ClientStatus;
 import jvn.Users.exceptionHandler.InvalidClientDataException;
 import jvn.Users.exceptionHandler.InvalidTokenException;
@@ -54,8 +55,7 @@ public class ClientServiceImpl implements ClientService {
     private LogProducer logProducer;
 
     @Override
-
-    public Client create(Client client, boolean fromAgentApp) throws NoSuchAlgorithmException {
+    public Client create(Client client, boolean fromAgentApp, Long user) throws NoSuchAlgorithmException {
 
 
         if (clientRepository.findByPhoneNumber(client.getPhoneNumber()) != null) {
@@ -80,8 +80,8 @@ public class ClientServiceImpl implements ClientService {
             client.setStatus(ClientStatus.NEVER_LOGGED_IN);
             composeAndSendEmailToChangePassword(client.getEmail(), generatedPassword);
             Client dbClient = clientRepository.save(client);
-//            Long loggedInUserId = userService.getLoginUser().getId();
-//            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CCL", String.format("User %s successfully created client %s", loggedInUserId, dbClient.getId())));
+
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CCL", String.format("User %s successfully created client %s", user, dbClient.getId())));
             return dbClient;
         } else {
 

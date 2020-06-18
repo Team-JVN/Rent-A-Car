@@ -16,6 +16,7 @@ import jvn.RentACar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -215,7 +216,9 @@ public class ClientServiceImpl implements ClientService {
         emailNotificationService.sendEmail(recipientEmail, subject, text);
     }
 
+    @Scheduled(cron = "0 20 0/3 * * ?")
     public void synchronize() {
+        System.out.println("ffff");
         try {
             GetAllClientDetailsResponse response = clientClient.getAll();
             if (response == null) {
