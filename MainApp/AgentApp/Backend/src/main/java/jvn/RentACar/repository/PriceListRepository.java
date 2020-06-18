@@ -12,6 +12,8 @@ public interface PriceListRepository extends JpaRepository<PriceList, Long> {
 
     PriceList findOneByIdAndStatusNot(Long id, LogicalStatus logicalStatus);
 
+    PriceList findByMainAppId(Long id);
+
     List<PriceList> findByStatus(LogicalStatus status);
 
     PriceList findByIdAndStatusNotAndAdvertisementsLogicalStatusNot(Long id, LogicalStatus logicalStatus, LogicalStatus logicalStatusNot);

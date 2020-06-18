@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -42,11 +43,11 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     private RentingClient rentingClient;
 
     @Override
-    public Advertisement create(Advertisement createAdvertisementDTO, UserDTO userDTO, String jwtToken, String user) {
+    @Transactional
+    public Advertisement create(Advertisement createAdvertisementDTO, UserDTO userDTO) {
 
         checkDate(createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
-        CarWithAllInformationDTO carDTO = carClient.verify(jwtToken, user, userDTO.getId(),
-                createAdvertisementDTO.getCar());
+        CarWithAllInformationDTO carDTO = carClient.verify(userDTO.getId(), createAdvertisementDTO.getCar());
         checkIfCarIsAvailable(createAdvertisementDTO.getCar(), createAdvertisementDTO.getDateFrom(),
                 createAdvertisementDTO.getDateTo());
         createAdvertisementDTO.setOwner(userDTO.getId());
@@ -75,11 +76,11 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     }
 
     @Override
-    public void delete(Long id, Long loggedInUserId, String jwtToken, String user) {
+    public void delete(Long id, Long loggedInUserId) {
         Advertisement advertisement = get(id, LogicalStatus.EXISTING);
         checkOwner(advertisement, loggedInUserId);
 
-        if (rentingClient.canDeleteAdvertisement(jwtToken, user, id)) {
+        if (rentingClient.canDeleteAdvertisement(id)) {
             advertisement.setLogicalStatus(LogicalStatus.DELETED);
             advertisementRepository.save(advertisement);
             sendMessageToSearchService(advertisement.getId());
@@ -91,11 +92,10 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     }
 
     @Override
-    public Advertisement edit(Long id, Advertisement advertisement, Long loggedInUserId, String jwtToken, String user,
-                              UserDTO userDTO) {
+    public Advertisement edit(Long id, Advertisement advertisement, UserDTO userDTO) {
         Advertisement dbAdvertisement = get(id, LogicalStatus.EXISTING);
-        checkOwner(dbAdvertisement, loggedInUserId);
-        if (!rentingClient.getAdvertisementEditType(jwtToken, user, id).equals(EditType.ALL)) {
+        checkOwner(dbAdvertisement, userDTO.getId());
+        if (!rentingClient.getAdvertisementEditType(id).equals(EditType.ALL)) {
             throw new InvalidAdvertisementDataException(
                     "This advertisement is in use and therefore it cannot be edited.", HttpStatus.BAD_REQUEST);
         }
@@ -104,10 +104,10 @@ public class AdvertisementServiceImpl implements AdvertisementService {
             dbAdvertisement.setCar(advertisement.getCar());
             checkIfCarIsAvailable(dbAdvertisement.getCar(), dbAdvertisement.getDateFrom(), dbAdvertisement.getDateTo());
         }
-        CarWithAllInformationDTO carDTO = carClient.verify(jwtToken, user, loggedInUserId, dbAdvertisement.getCar());
+        CarWithAllInformationDTO carDTO = carClient.verify(userDTO.getId(), dbAdvertisement.getCar());
         dbAdvertisement.setDateFrom(advertisement.getDateFrom());
         dbAdvertisement.setDateTo(advertisement.getDateTo());
-        dbAdvertisement.setPriceList(priceListService.get(advertisement.getPriceList().getId(), loggedInUserId));
+        dbAdvertisement.setPriceList(priceListService.get(advertisement.getPriceList().getId(), userDTO.getId()));
         dbAdvertisement.setPickUpPoint(advertisement.getPickUpPoint());
         dbAdvertisement = setPriceList(dbAdvertisement, advertisement.getKilometresLimit());
         dbAdvertisement.setDiscount(advertisement.getDiscount());
@@ -139,12 +139,12 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     }
 
     @Override
-    public Boolean canEditCarPartially(Long carId, String jwtToken, String user) {
+    public Boolean canEditCarPartially(Long carId) {
         List<Advertisement> advertisements = advertisementRepository.findByCarAndLogicalStatus(carId, LogicalStatus.EXISTING);
         if (advertisements == null || advertisements.isEmpty()) {
             return true;
         } else {
-            return !rentingClient.hasRentInfos(jwtToken, user, advertisements.stream().map(Advertisement::getId).collect(Collectors.toList()));
+            return !rentingClient.hasRentInfos(advertisements.stream().map(Advertisement::getId).collect(Collectors.toList()));
         }
     }
 
@@ -154,6 +154,34 @@ public class AdvertisementServiceImpl implements AdvertisementService {
                 .findByCarAndLogicalStatusAndDateToGreaterThanEqualOrCarAndLogicalStatusAndDateToEquals(carId,
                         LogicalStatus.EXISTING, LocalDate.now(), carId, LogicalStatus.EXISTING, null);
         return advertisements == null || advertisements.isEmpty();
+    }
+
+    @Override
+    public boolean checkIfCanDeleteAndDelete(Long id, Long loggedInUser) {
+        Advertisement advertisement = get(id, LogicalStatus.EXISTING);
+        checkOwner(advertisement, loggedInUser);
+
+        if (rentingClient.canDeleteAdvertisement(id)) {
+            advertisement.setLogicalStatus(LogicalStatus.DELETED);
+            advertisementRepository.save(advertisement);
+            sendMessageToSearchService(advertisement.getId());
+            rejectAllRequests(id);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public String getAdvertisementEditType(Long id, Long loggedInUser) {
+        if (rentingClient.getAdvertisementEditType(id).equals(EditType.ALL)) {
+            return "ALL";
+        }
+        return "PARTIAL";
+    }
+
+    @Override
+    public List<Advertisement> getAll(Long loggedInUser) {
+        return advertisementRepository.findAllByOwner(loggedInUser);
     }
 
     @Async

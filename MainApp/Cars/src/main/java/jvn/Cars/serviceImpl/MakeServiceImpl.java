@@ -26,7 +26,7 @@ public class MakeServiceImpl implements MakeService {
         if (makeRepository.findByName(make.getName()) != null) {
             throw new InvalidMakeDataException("This Make already exist.", HttpStatus.BAD_REQUEST);
         }
-        return makeRepository.save(make);
+        return makeRepository.saveAndFlush(make);
     }
 
     @Override
@@ -36,6 +36,11 @@ public class MakeServiceImpl implements MakeService {
             throw new InvalidMakeDataException("This Make doesn't exist.", HttpStatus.NOT_FOUND);
         }
         return make;
+    }
+
+    @Override
+    public Make get(String name) {
+        return makeRepository.findByName(name);
     }
 
     @Override

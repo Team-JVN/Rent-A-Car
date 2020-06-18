@@ -1,6 +1,7 @@
 package jvn.RentACar.client;
 
 import jvn.RentACar.dto.soap.pricelist.*;
+import jvn.RentACar.mapper.PriceListDetailsMapper;
 import jvn.RentACar.model.PriceList;
 import jvn.RentACar.model.User;
 import jvn.RentACar.service.UserService;
@@ -12,12 +13,12 @@ public class PriceListClient extends WebServiceGatewaySupport {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private PriceListDetailsMapper priceListDetailsMapper;
+
     public GetPriceListDetailsResponse createOrEdit(PriceList priceList) {
-        PriceListDetails priceListDetails = new PriceListDetails();
-        priceListDetails.setPricePerKm(priceList.getPricePerKm());
-        priceListDetails.setPricePerCDW(priceList.getPriceForCDW());
-        priceListDetails.setPricePerDay(priceList.getPricePerDay());
-        priceListDetails.setId(priceList.getMainAppId());
+        PriceListDetails priceListDetails = priceListDetailsMapper.toDto(priceList);
+
         GetPriceListDetailsRequest request = new GetPriceListDetailsRequest();
         request.setPriceListDetails(priceListDetails);
         User user = userService.getLoginUser();
@@ -40,6 +41,19 @@ public class PriceListClient extends WebServiceGatewaySupport {
         }
         request.setEmail(user.getEmail());
         DeletePriceListDetailsResponse response = (DeletePriceListDetailsResponse) getWebServiceTemplate()
+                .marshalSendAndReceive(request);
+        return response;
+    }
+
+    public GetAllPriceListDetailsResponse getAll() {
+        GetAllPriceListDetailsRequest request = new GetAllPriceListDetailsRequest();
+        User user = userService.getLoginUser();
+        if(user == null){
+            return null;
+        }
+        request.setEmail(user.getEmail());
+
+        GetAllPriceListDetailsResponse response = (GetAllPriceListDetailsResponse) getWebServiceTemplate()
                 .marshalSendAndReceive(request);
         return response;
     }

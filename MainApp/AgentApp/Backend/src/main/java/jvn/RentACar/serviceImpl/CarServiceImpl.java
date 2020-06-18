@@ -1,13 +1,17 @@
 package jvn.RentACar.serviceImpl;
 
+import jvn.RentACar.client.CarClient;
 import jvn.RentACar.dto.both.CarDTO;
 import jvn.RentACar.dto.request.CarEditDTO;
+import jvn.RentACar.dto.soap.car.*;
 import jvn.RentACar.enumeration.EditType;
 import jvn.RentACar.enumeration.LogicalStatus;
 import jvn.RentACar.exceptionHandler.InvalidCarDataException;
+import jvn.RentACar.mapper.CarDetailsMapper;
 import jvn.RentACar.mapper.CarDtoMapper;
 import jvn.RentACar.model.Advertisement;
 import jvn.RentACar.model.Car;
+import jvn.RentACar.model.Picture;
 import jvn.RentACar.repository.CarRepository;
 import jvn.RentACar.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +23,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Value;
+
 import java.io.File;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -48,6 +54,10 @@ public class CarServiceImpl implements CarService {
 
     private UserService userService;
 
+    private CarClient carClient;
+
+    private CarDetailsMapper carDetailsMapper;
+
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Car create(Car car, List<MultipartFile> multipartFiles) {
@@ -69,6 +79,8 @@ public class CarServiceImpl implements CarService {
         car.setAvgRating(0.0);
         Car savedCar = carRepository.saveAndFlush(car);
         pictureService.savePictures(multipartFiles, UPLOADED_PICTURES_PATH, savedCar);
+        car.setMainAppId(saveInMainApp(car, multipartFiles));
+        savedCar = carRepository.saveAndFlush(car);
         return savedCar;
     }
 
@@ -79,6 +91,8 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public List<Car> get() {
+        synchronizeCars();
+
         return carRepository.findAllByLogicalStatusNot(LogicalStatus.DELETED);
     }
 
@@ -92,7 +106,7 @@ public class CarServiceImpl implements CarService {
         Car car = get(id);
         checkOwner(car);
         Set<Advertisement> advertisements = get(id).getAdvertisements();
-        if (advertisements != null && !advertisements.isEmpty()) {
+        if (!getEditType(car.getMainAppId()).equals(EditType.ALL)) {
             throw new InvalidCarDataException("Car is in use and therefore can not be edited.", HttpStatus.BAD_REQUEST);
         }
         car.setMake(makeService.get(carDTO.getMake().getId()));
@@ -104,6 +118,11 @@ public class CarServiceImpl implements CarService {
         car.setKidsSeats(carDTO.getKidsSeats());
         car.setAvailableTracking(carDTO.getAvailableTracking());
         Car newCar = carRepository.save(car);
+        try {
+            carClient.createOrEdit(car, multipartFiles);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         pictureService.editCarPictures(multipartFiles, UPLOADED_PICTURES_PATH, car);
         return newCar;
     }
@@ -125,6 +144,9 @@ public class CarServiceImpl implements CarService {
         car.setKidsSeats(carDTO.getKidsSeats());
         car.setAvailableTracking(carDTO.getAvailableTracking());
         Car newCar = carRepository.save(car);
+
+        carDTO.setId(newCar.getMainAppId());
+        carClient.editPartial(carDTO, multipartFiles);
         pictureService.editCarPictures(multipartFiles, UPLOADED_PICTURES_PATH, car);
         return newCar;
     }
@@ -133,22 +155,24 @@ public class CarServiceImpl implements CarService {
     public void delete(Long id) {
         Car car = get(id);
         checkOwner(car);
-        if (carRepository.findByIdAndAdvertisementsLogicalStatusAndAdvertisementsDateToGreaterThanEqual(id, LogicalStatus.EXISTING, LocalDate.now()) != null) {
+
+        DeleteCarDetailsResponse response = carClient.checkAndDeleteIfCan(car);
+        if (response == null || !response.isCanDelete()) {
             throw new InvalidCarDataException("Car is in use and therefore can not be deleted.", HttpStatus.BAD_REQUEST);
         }
 
-        if (carRepository.findByIdAndAdvertisementsLogicalStatusAndAdvertisementsDateToEquals(id, LogicalStatus.EXISTING, null) != null) {
-            throw new InvalidCarDataException("Car is in use and therefore can not be deleted.", HttpStatus.BAD_REQUEST);
-        }
         car.setLogicalStatus(LogicalStatus.DELETED);
         carRepository.save(car);
     }
 
     @Override
     public EditType getEditType(Long id) {
-        Set<Advertisement> advertisements = get(id).getAdvertisements();
-        if (advertisements == null || advertisements.isEmpty()) {
-            return EditType.ALL;
+        Car car = get(id);
+        GetCarEditTypeResponse response = carClient.getEditType(car);
+        if (response != null) {
+            if (response.getEditType().equals("ALL")) {
+                return EditType.ALL;
+            }
         }
         return EditType.PARTIAL;
     }
@@ -163,7 +187,13 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
+    public Car getByMainAppId(Long id) {
+        return carRepository.findByMainAppId(id);
+    }
+
+    @Override
     public List<Car> getStatistics(String filter) {
+        synchronizeCars();
         String sortFilter = "";
         switch (filter) {
             case "most-km-made":
@@ -179,17 +209,96 @@ public class CarServiceImpl implements CarService {
 
         return carRepository.findFirst3ByLogicalStatus(LogicalStatus.EXISTING, Sort.by(Sort.Direction.DESC, sortFilter));
     }
+
+    private Long saveInMainApp(Car car, List<MultipartFile> multipartFiles) {
+        try {
+            CreateOrEditCarDetailsResponse response = carClient.createOrEdit(car, multipartFiles);
+            return response.getCreateCarDetails().getId();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private void checkOwner(Car car) {
         if (!userService.getLoginAgent().getEmail().equals(car.getOwner().getEmail())) {
             throw new InvalidCarDataException("You are not owner of this car.", HttpStatus.BAD_REQUEST);
         }
     }
 
+    @Transactional
+    public void synchronizeCars() {
+        try {
+            GetAllCarDetailsResponse response = carClient.getAll();
+            if (response == null) {
+                return;
+            }
+            List<CarWithPictures> carWithPictures = response.getCarWithPictures();
+            if (carWithPictures == null || carWithPictures.isEmpty()) {
+                return;
+            }
+
+            for (CarWithPictures carWithPicture : carWithPictures) {
+                Car car = carDetailsMapper.toEntity(carWithPicture.getCreateCarDetails());
+                List<PictureInfo> pictureInfos = carWithPicture.getPictureInfo();
+                Car dbCar = carRepository.findByMainAppId(car.getMainAppId());
+                if (dbCar == null) {
+                    createCarSynchronize(car, pictureInfos);
+                } else {
+                    editCarSynchronize(car, dbCar, pictureInfos);
+                }
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void createCarSynchronize(Car car, List<PictureInfo> pictureInfos) {
+        if (pictureInfos.size() > 5) {
+            throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
+        }
+        car.setOwner(userService.getLoginUser());
+        Car savedCar = carRepository.saveAndFlush(car);
+        pictureService.savePicturesSynchronize(pictureInfos, UPLOADED_PICTURES_PATH, savedCar);
+        carRepository.saveAndFlush(savedCar);
+    }
+
+    public void editCarSynchronize(Car car, Car dbCar, List<PictureInfo> pictureInfos) {
+
+        if (pictureInfos.size() > 5) {
+            throw new InvalidCarDataException("You can choose 5 pictures maximally.", HttpStatus.BAD_REQUEST);
+        }
+        if (!car.getMake().getName().equals("Other")) {
+            dbCar.setMake(car.getMake());
+            dbCar.setModel(car.getModel());
+        }
+        if (!car.getBodyStyle().getName().equals("Other")) {
+            dbCar.setBodyStyle(car.getBodyStyle());
+        }
+        if (!car.getFuelType().getName().equals("Other")) {
+            dbCar.setFuelType(car.getFuelType());
+        }
+        if (!car.getGearBoxType().getName().equals("Other")) {
+            dbCar.setGearBoxType(car.getGearBoxType());
+        }
+        dbCar.setMileageInKm(car.getMileageInKm());
+        dbCar.setKidsSeats(car.getKidsSeats());
+        dbCar.setAvailableTracking(car.getAvailableTracking());
+        Car newCar = carRepository.saveAndFlush(dbCar);
+        if (pictureInfos != null && !pictureInfos.isEmpty()) {
+            pictureService.editCarPicturesSynchronize(pictureInfos, UPLOADED_PICTURES_PATH, newCar);
+        }
+        carRepository.saveAndFlush(dbCar);
+    }
+
+
     @Autowired
     public CarServiceImpl(CarRepository carRepository, BodyStyleService bodyStyleService,
                           FuelTypeService fuelTypeService, GearboxTypeService gearboxTypeService,
                           PictureService pictureService, CarDtoMapper carMapper, ModelService modelService, MakeService makeService,
-                          UserService userService) {
+                          UserService userService, CarClient carClient, CarDetailsMapper carDetailsMapper) {
         this.carRepository = carRepository;
         this.bodyStyleService = bodyStyleService;
         this.fuelTypeService = fuelTypeService;
@@ -199,5 +308,8 @@ public class CarServiceImpl implements CarService {
         this.modelService = modelService;
         this.makeService = makeService;
         this.userService = userService;
+        this.carClient = carClient;
+        this.carDetailsMapper = carDetailsMapper;
     }
+
 }

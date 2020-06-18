@@ -141,6 +141,25 @@ services:
             - eureka-serviceregistry
             - rabbitmq-broker
 
+    logger:
+        build: ./Logger
+        image: nikolabrodic/logger
+        container_name: logger
+        restart: on-failure
+        networks:
+            - main-app-tls
+        ports:
+            - 8086:8086
+        environment:
+            REGISTRY_HOST: eureka-serviceregistry
+            RMQ_HOST: rabbitmq-broker
+            LOG_STORAGE: /var/log/web-traffic.log
+        volumes:
+            - logs:/var/log
+        depends_on:
+            - eureka-serviceregistry
+            - rabbitmq-broker
+
     mainapp-mysql:
         image: mysql:8.0.19
         container_name: mainapp-mysql

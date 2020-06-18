@@ -44,7 +44,7 @@ public class Car {
     private Integer kidsSeats;
 
     //Edit is not working when you put CascadeType.ALL and FetchType.EAGER
-    @OneToMany(mappedBy = "car")
+    @OneToMany(mappedBy = "car", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Picture> pictures = new HashSet<>();
 
     @Column(nullable = false)
@@ -58,4 +58,5 @@ public class Car {
 
     @Column
     private Integer commentsCount;
+
 }

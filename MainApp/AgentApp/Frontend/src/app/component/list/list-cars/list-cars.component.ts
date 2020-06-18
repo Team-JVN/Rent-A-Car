@@ -37,16 +37,19 @@ export class ListCarsComponent implements OnInit {
   }
 
   getPicture(carWithPicturesDTO: CarWithPictures) {
-    this.carService.getPicture(carWithPicturesDTO.pictures[0].data, carWithPicturesDTO.id).subscribe(
-      (data) => {
-        this.createImageFromBlob(data, carWithPicturesDTO);
-        carWithPicturesDTO.isImageLoading = false;
-      },
-      (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Get picture');
-      }
+    if (carWithPicturesDTO.pictures.length > 0) {
+      this.carService.getPicture(carWithPicturesDTO.pictures[0].data, carWithPicturesDTO.id).subscribe(
+        (data) => {
+          this.createImageFromBlob(data, carWithPicturesDTO);
+          carWithPicturesDTO.isImageLoading = false;
+        },
+        (httpErrorResponse: HttpErrorResponse) => {
+          this.toastr.error(httpErrorResponse.error.message, 'Get picture');
+        }
 
-    );
+      );
+    }
+
   }
 
   createImageFromBlob(image: Blob, carWithPicturesDTO: CarWithPictures) {

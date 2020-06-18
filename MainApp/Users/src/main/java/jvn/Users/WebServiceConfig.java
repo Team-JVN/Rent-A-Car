@@ -25,7 +25,7 @@ public class WebServiceConfig {
     }
 
     @Bean(name = "agents")
-    public DefaultWsdl11Definition defaultWsdl11Definition(XsdSchema agentsSchema) {
+    public DefaultWsdl11Definition defaultWsdl11Definition(@Qualifier("agentsSchema") XsdSchema agentsSchema) {
         DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
         wsdl11Definition.setPortTypeName("AgentsPort");
         wsdl11Definition.setLocationUri("/ws");
@@ -35,8 +35,26 @@ public class WebServiceConfig {
     }
 
     @Bean
+    @Qualifier("agentsSchema")
     public XsdSchema agentsSchema() {
         return new SimpleXsdSchema(new ClassPathResource("agents.xsd"));
+    }
+
+
+    @Bean(name = "getProfileAgent")
+    public DefaultWsdl11Definition defaultWsdl11DefinitionGetProfileAgent(@Qualifier("getProfileAgentSchema") XsdSchema getProfileAgentSchema) {
+        DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
+        wsdl11Definition.setPortTypeName("AgentsPort");
+        wsdl11Definition.setLocationUri("/ws");
+        wsdl11Definition.setTargetNamespace("http://www.agent.dto/soap");
+        wsdl11Definition.setSchema(getProfileAgentSchema);
+        return wsdl11Definition;
+    }
+
+    @Bean
+    @Qualifier("getProfileAgentSchema")
+    public XsdSchema getProfileAgentSchema() {
+        return new SimpleXsdSchema(new ClassPathResource("getProfileAgent.xsd"));
     }
 
     @Bean(name = "clients")
@@ -54,4 +72,5 @@ public class WebServiceConfig {
     public XsdSchema createOrEditClientSchema() {
         return new SimpleXsdSchema(new ClassPathResource("clients.xsd"));
     }
+
 }

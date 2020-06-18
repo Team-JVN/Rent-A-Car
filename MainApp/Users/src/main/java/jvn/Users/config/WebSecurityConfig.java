@@ -45,10 +45,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
 
+<<<<<<< HEAD
                 .authorizeRequests()
                 .antMatchers("/api/auth/**", "/api/verify/user**", "/ws**", "/ws/**", "/ws")
                 .permitAll()
 
+=======
+                .authorizeRequests().antMatchers("/api/auth/**", "/api/verify/user**", "/ws**", "/ws/**", "/ws").permitAll()
+>>>>>>> master
                 .antMatchers(HttpMethod.PUT, "/api/admin")
                 .hasAuthority("ADMIN_EDIT_PROFILE")
                 .antMatchers(HttpMethod.GET, "/api/admin/profile")

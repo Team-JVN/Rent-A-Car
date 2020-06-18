@@ -3,8 +3,11 @@ package jvn.Users.endpoint;
 import jvn.Users.dto.response.UserInfoDTO;
 import jvn.Users.dto.soap.agent.GetAgentDetailsRequest;
 import jvn.Users.dto.soap.agent.GetAgentDetailsResponse;
+import jvn.Users.dto.soap.agent.GetProfileAgentDetailsRequest;
+import jvn.Users.dto.soap.agent.GetProfileAgentDetailsResponse;
 import jvn.Users.mapper.AgentDetailsMapper;
 import jvn.Users.model.Agent;
+import jvn.Users.model.User;
 import jvn.Users.service.AgentService;
 import jvn.Users.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +39,23 @@ public class AgentDetailsEndpoint {
             return null;
         }
         GetAgentDetailsResponse response = new GetAgentDetailsResponse();
+        response.setAgentDetails(agentDetailsMapper.toDto(agent));
+        return response;
+    }
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getProfileAgentDetailsRequest")
+    @ResponsePayload
+    public GetProfileAgentDetailsResponse getProfileAgentDetails(@RequestPayload GetProfileAgentDetailsRequest request) {
+        UserInfoDTO user = userService.getByEmail(request.getEmail());
+        if (user == null) {
+            return null;
+        }
+        User chosenAgent = userService.findByEmail(request.getEmail());
+        if(chosenAgent == null){
+            return null;
+        }
+        Agent agent = agentService.get(chosenAgent.getId());
+        GetProfileAgentDetailsResponse response = new GetProfileAgentDetailsResponse();
         response.setAgentDetails(agentDetailsMapper.toDto(agent));
         return response;
     }

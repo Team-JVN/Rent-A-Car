@@ -21,7 +21,7 @@ public class BodyStyle {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "bodyStyle", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "bodyStyle", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Car> cars = new HashSet<>();
 
     public BodyStyle(String name) {

@@ -27,15 +27,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
                 .authorizeRequests()
-
+                .antMatchers("/ws**", "/ws/**", "/car/ws**", "/car/ws/**", "/car/ws").permitAll()
                 .antMatchers("/api/car", "/api/car/{id}", "/api/car/{id}/partial")
                 .hasAuthority("MANAGE_CARS")
 
                 .antMatchers("/api/car/statistics/{filter}")
                 .hasAuthority("GET_STATISTICS")
-
-                .antMatchers("/api/car/verify/{userId}/{carId}")
-                .hasAuthority("MANAGE_ADVERTISEMENTS")
 
                 .antMatchers("/api/body-style/{id}", "/api/fuel-type/{id}", "/api/gearbox-type", "/api/gearbox-type/{id}",
                         "/api/make/{id}", "/api/make/{makeId}/model/{modelId}")
@@ -57,12 +54,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/ws/**");
+        web.ignoring().antMatchers("/car/ws/**");
+        web.ignoring().antMatchers("/car/ws/**");
+        web.ignoring().antMatchers("/car/ws**");
+        web.ignoring().antMatchers("/car/ws");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/car/{id}/picture");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/body-style");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/fuel-type");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/gearbox-type");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/make");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/make/{makeId}/models");
+        web.ignoring().antMatchers(HttpMethod.GET, "/api/car/verify/{userId}/{carId}");
     }
 
 }

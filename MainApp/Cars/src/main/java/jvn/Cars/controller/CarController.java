@@ -64,7 +64,7 @@ public class CarController {
             throw new InvalidCarDataException("Please enter valid data.", HttpStatus.BAD_REQUEST);
         }
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        CarDTO carDTO = carDtoMapper.toDto(carService.create(createCarDtoMapper.toEntity(createCarDTO), multipartFiles, userDTO));
+        CarDTO carDTO = carDtoMapper.toDto(carService.create(createCarDtoMapper.toEntity(createCarDTO), multipartFiles, userDTO.getId()));
         return new ResponseEntity<>(carDTO, HttpStatus.CREATED);
     }
 
@@ -116,7 +116,7 @@ public class CarController {
         }
 
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(carDtoMapper.toDto(carService.editAll(id, carDtoMapper.toEntity(carDTO), multipartFiles, userDTO.getId(), request.getHeader("Auth"), request.getHeader("user"), userDTO)), HttpStatus.OK);
+        return new ResponseEntity<>(carDtoMapper.toDto(carService.editAll(id, carDtoMapper.toEntity(carDTO), multipartFiles, userDTO.getId())), HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}/partial", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -132,7 +132,7 @@ public class CarController {
         }
 
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(carDtoMapper.toDto(carService.editPartial(id, carEditDTO, multipartFiles, userDTO.getId(), request.getHeader("Auth"), request.getHeader("user"), userDTO)), HttpStatus.OK);
+        return new ResponseEntity<>(carDtoMapper.toDto(carService.editPartial(id, carEditDTO, multipartFiles, userDTO.getId())), HttpStatus.OK);
     }
 
     private void validateCreateCarDTO(CreateCarDTO createCarDTO) {

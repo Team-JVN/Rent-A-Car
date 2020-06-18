@@ -1,12 +1,14 @@
 package jvn.Users.controller;
 
 import jvn.Users.dto.both.ClientDTO;
+import jvn.Users.dto.message.Log;
 import jvn.Users.enumeration.ClientStatus;
 import jvn.Users.exceptionHandler.InvalidClientDataException;
 import jvn.Users.exceptionHandler.InvalidTokenException;
 import jvn.Users.mapper.ClientDtoMapper;
 import jvn.Users.model.Client;
 import jvn.Users.model.User;
+import jvn.Users.producer.LogProducer;
 import jvn.Users.service.ClientService;
 import jvn.Users.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,17 +30,23 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/api/client", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ClientController {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private ClientService clientService;
 
     private ClientDtoMapper clientDtoMapper;
 
     private UserService userService;
 
+    private LogProducer logProducer;
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ClientDTO> create(@Valid @RequestBody ClientDTO clientDTO) {
         try {
             return new ResponseEntity<>(clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO), false)), HttpStatus.CREATED);
         } catch (NoSuchAlgorithmException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CCL", "Hash algorithm threw exception"));
             throw new InvalidTokenException("Activation token cannot be generated. Please try again.", HttpStatus.BAD_REQUEST);
         }
     }
@@ -82,6 +90,7 @@ public class ClientController {
         try {
             return new ResponseEntity<>(clientDtoMapper.toDto(clientService.activateAccount(t)), HttpStatus.OK);
         } catch (NoSuchAlgorithmException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "ACT", "Hash algorithm threw exception"));
             throw new InvalidTokenException("Activation token cannot be checked. Please try again.", HttpStatus.BAD_REQUEST);
         }
     }
@@ -91,6 +100,7 @@ public class ClientController {
         try {
             return new ResponseEntity<>(clientDtoMapper.toDto(clientService.approveRequestToRegister(id)), HttpStatus.OK);
         } catch (NoSuchAlgorithmException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "APR", "Hash algorithm threw exception"));
             throw new InvalidTokenException("Activation token cannot be checked. Please try again.", HttpStatus.BAD_REQUEST);
         }
     }
@@ -149,9 +159,10 @@ public class ClientController {
     }
 
     @Autowired
-    public ClientController(ClientService clientService, ClientDtoMapper clientDtoMapper, UserService userService) {
+    public ClientController(ClientService clientService, ClientDtoMapper clientDtoMapper, UserService userService, LogProducer logProducer) {
         this.clientService = clientService;
         this.clientDtoMapper = clientDtoMapper;
         this.userService = userService;
+        this.logProducer = logProducer;
     }
 }

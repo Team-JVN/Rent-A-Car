@@ -55,6 +55,11 @@ public class FuelTypeServiceImpl implements FuelTypeService {
         fuelTypeRepository.deleteById(id);
     }
 
+    @Override
+    public FuelType get(String name) {
+        return fuelTypeRepository.findByName(name);
+    }
+
     private FuelType isEditable(Long id) {
         FuelType fuelType = get(id);
 

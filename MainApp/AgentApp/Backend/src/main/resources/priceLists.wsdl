@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:sch="http://www.soap.dto/pricelist" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.pricelist.dto/soap" targetNamespace="http://www.pricelist.dto/soap">
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:sch="http://www.soap.dto/pricelist"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.pricelist.dto/soap"
+                  targetNamespace="http://www.pricelist.dto/soap">
     <wsdl:types>
-        <xs:schema xmlns:tns="http://www.soap.dto/pricelist" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.soap.dto/pricelist">
+        <xs:schema xmlns:tns="http://www.soap.dto/pricelist" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   elementFormDefault="qualified" targetNamespace="http://www.soap.dto/pricelist">
             <xs:element name="getPriceListDetailsRequest">
                 <xs:complexType>
                     <xs:sequence>
@@ -47,6 +50,14 @@
                             </xs:restriction>
                         </xs:simpleType>
                     </xs:element>
+                    <xs:element minOccurs="0" name="status">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                                <xs:enumeration value="EXISTING"/>
+                                <xs:enumeration value="DELETED"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
                 </xs:sequence>
             </xs:complexType>
         </xs:schema>
@@ -81,7 +92,7 @@
     </wsdl:binding>
     <wsdl:service name="PriceListsPortService">
         <wsdl:port binding="tns:PriceListsPortSoap11" name="PriceListsPortSoap11">
-            <soap:address location="http://192.168.56.1:8081/pricelist/ws"/>
+            <soap:address location="http://192.168.56.1:8081/ws/pricelist"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

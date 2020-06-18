@@ -58,7 +58,7 @@
     </wsdl:binding>
     <wsdl:service name="AgentsPortService">
         <wsdl:port binding="tns:AgentsPortSoap11" name="AgentsPortSoap11">
-            <soap:address location="http://192.168.56.1:8084/agent/ws"/>
+            <soap:address location="http://192.168.56.1:8084/ws"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

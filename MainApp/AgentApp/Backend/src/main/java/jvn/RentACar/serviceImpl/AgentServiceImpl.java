@@ -1,6 +1,8 @@
 package jvn.RentACar.serviceImpl;
 
 import jvn.RentACar.client.AgentClient;
+import jvn.RentACar.dto.soap.agent.AgentDetails;
+import jvn.RentACar.dto.soap.agent.GetProfileAgentDetailsResponse;
 import jvn.RentACar.enumeration.AgentStatus;
 import jvn.RentACar.exceptionHandler.InvalidAgentDataException;
 import jvn.RentACar.model.Agent;
@@ -29,7 +31,9 @@ public class AgentServiceImpl implements AgentService {
         return dbAgent;
     }
 
-    private Agent get(Long id) {
+    @Override
+    public Agent get(Long id) {
+        synchronize();
         Agent agent = agentRepository.findOneByIdAndStatusNot(id, AgentStatus.INACTIVE);
         if (agent == null) {
             throw new InvalidAgentDataException("Requested agent does not exist.", HttpStatus.NOT_FOUND);
@@ -37,6 +41,20 @@ public class AgentServiceImpl implements AgentService {
         return agent;
     }
 
+    private void synchronize(){
+        GetProfileAgentDetailsResponse response = agentClient.getProfile();
+        AgentDetails agentDetails = response.getAgentDetails();
+        if(agentDetails != null){
+            Agent agent =agentRepository.findByEmail(agentDetails.getEmail());
+            if(agent != null){
+                agent.setName(agentDetails.getName());
+                agent.setAddress(agentDetails.getAddress());
+                agent.setPhoneNumber(agentDetails.getPhoneNumber());
+                agent.setTaxIdNumber(agentDetails.getTaxIdNumber());
+            }
+        }
+
+    }
     @Autowired
     public AgentServiceImpl(AgentRepository agentRepository, AgentClient agentClient) {
         this.agentRepository = agentRepository;
