@@ -10,6 +10,8 @@ public interface MakeService {
 
     Make get(Long id);
 
+    Make get(String name);
+
     List<Make> get();
 
     Make edit(Long id, MakeDTO makeDTO);

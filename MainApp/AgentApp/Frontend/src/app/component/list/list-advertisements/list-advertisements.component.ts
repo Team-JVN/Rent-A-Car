@@ -63,15 +63,18 @@ export class ListAdvertisementsComponent implements OnInit {
   }
 
   getPicture(adWithPicturesDTO: AdvertisementWithPictures) {
-    this.carService.getPicture(adWithPicturesDTO.car.pictures[0].data, adWithPicturesDTO.car.id).subscribe(
-      (data) => {
-        this.createImageFromBlob(data, adWithPicturesDTO);
-        adWithPicturesDTO.car.isImageLoading = false;
-      },
-      (httpErrorResponse: HttpErrorResponse) => {
-        this.toastr.error(httpErrorResponse.error.message, 'Get picture');
-      }
-    );
+    if (adWithPicturesDTO.car.pictures.length > 0) {
+      this.carService.getPicture(adWithPicturesDTO.car.pictures[0].data, adWithPicturesDTO.car.id).subscribe(
+        (data) => {
+          this.createImageFromBlob(data, adWithPicturesDTO);
+          adWithPicturesDTO.car.isImageLoading = false;
+        },
+        (httpErrorResponse: HttpErrorResponse) => {
+          this.toastr.error(httpErrorResponse.error.message, 'Get picture');
+        }
+      );
+    }
+
   }
 
   createImageFromBlob(image: Blob, adWithPicturesDTO: AdvertisementWithPictures) {

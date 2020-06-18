@@ -1,11 +1,13 @@
 package jvn.Users.serviceImpl;
 
 import jvn.Users.common.RandomPasswordGenerator;
+import jvn.Users.dto.message.Log;
 import jvn.Users.dto.message.OwnerMessageDTO;
 import jvn.Users.enumeration.AgentStatus;
 import jvn.Users.exceptionHandler.InvalidAgentDataException;
 import jvn.Users.model.Agent;
 import jvn.Users.model.Role;
+import jvn.Users.producer.LogProducer;
 import jvn.Users.producer.UserProducer;
 import jvn.Users.repository.AgentRepository;
 import jvn.Users.service.AgentService;
@@ -23,6 +25,9 @@ import java.util.List;
 @Service
 public class AgentServiceImpl implements AgentService {
 
+    private final String CLASS_PATH = this.getClass().getCanonicalName();
+    private final String CLASS_NAME = this.getClass().getSimpleName();
+
     private AgentRepository agentRepository;
 
     private UserService userService;
@@ -34,6 +39,8 @@ public class AgentServiceImpl implements AgentService {
     private Environment environment;
 
     private UserProducer userProducer;
+
+    private LogProducer logProducer;
 
     @Override
     public Agent create(Agent agent) {
@@ -55,8 +62,11 @@ public class AgentServiceImpl implements AgentService {
         agent.setPassword(passwordEncoder.encode(generatedPassword));
 
         composeAndSendEmailToChangePassword(agent.getEmail(), generatedPassword);
-        return agentRepository.save(agent);
+        Agent dbAgent = agentRepository.save(agent);
 
+        Long loggedInUserId = userService.getLoginUser().getId();
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CAG", String.format("User %s successfully created agent %s", loggedInUserId, dbAgent.getId())));
+        return dbAgent;
     }
 
     @Override
@@ -86,6 +96,9 @@ public class AgentServiceImpl implements AgentService {
             throw new InvalidAgentDataException("This agent is already deleted.", HttpStatus.NOT_FOUND);
         }
         agent.setStatus(AgentStatus.DELETED);
+
+        Long loggedInUserId = userService.getLoginUser().getId();
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CAD", String.format("User %s successfully deleted agent %s", loggedInUserId, agent.getId())));
         agentRepository.save(agent);
     }
 
@@ -142,12 +155,14 @@ public class AgentServiceImpl implements AgentService {
 
     @Autowired
     public AgentServiceImpl(AgentRepository agentRepository, UserService userService, PasswordEncoder passwordEncoder,
-                            EmailNotificationService emailNotificationService, Environment environment, UserProducer userProducer) {
+                            EmailNotificationService emailNotificationService, Environment environment, UserProducer userProducer,
+                            LogProducer logProducer) {
         this.agentRepository = agentRepository;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.emailNotificationService = emailNotificationService;
         this.environment = environment;
         this.userProducer = userProducer;
+        this.logProducer = logProducer;
     }
 }

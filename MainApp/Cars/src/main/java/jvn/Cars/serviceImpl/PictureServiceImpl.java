@@ -80,6 +80,8 @@ public class PictureServiceImpl implements PictureService {
                         pictureData = new Picture(savePictureOnDisk(picture, path, carId), car);
                         pictureRepository.save(pictureData);
                     }
+                } else {
+                    removedPictures.remove(pictureData);
                 }
             } else {
                 removedPictures.remove(pictureData);

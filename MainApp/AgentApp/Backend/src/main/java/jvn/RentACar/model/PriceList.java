@@ -19,7 +19,7 @@ public class PriceList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(unique = true)
     private Long mainAppId;
 
     @Column(nullable = false)

@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public interface CarClient {
 
     @RequestMapping(method = RequestMethod.GET, path = "/api/car/verify/{userId}/{carId}")
-    CarWithAllInformationDTO verify(@RequestHeader("Auth") String token, @RequestHeader("user") String user,
-                                    @PathVariable("userId") Long userId, @PathVariable("carId") Long carId);
+    CarWithAllInformationDTO verify(@PathVariable("userId") Long userId, @PathVariable("carId") Long carId);
 
 }

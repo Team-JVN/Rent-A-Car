@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:sch="http://www.soap.dto/advertisement"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.advertisement.dto/soap"
+                  targetNamespace="http://www.advertisement.dto/soap">
+    <wsdl:types>
+        <xs:schema xmlns:tns="http://www.soap.dto/advertisement" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   elementFormDefault="qualified" targetNamespace="http://www.soap.dto/advertisement">
+            <xs:element name="editPartialAdvertisementDetailsRequest">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="email" type="xs:string"/>
+                        <xs:element name="editPartialAdvertisementDetails" type="tns:editPartialAdvertisementDetails"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="editPartialAdvertisementDetailsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="editPartialAdvertisementDetails" type="tns:editPartialAdvertisementDetails"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:complexType name="editPartialAdvertisementDetails">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="id">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:long">
+                                <xs:minInclusive value="1"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="priceList">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:long">
+                                <xs:minInclusive value="1"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="kilometresLimit">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:int">
+                                <xs:minInclusive value="0"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="discount">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:int">
+                                <xs:minInclusive value="0"/>
+                                <xs:maxInclusive value="99"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="editPartialAdvertisementDetailsRequest">
+        <wsdl:part element="sch:editPartialAdvertisementDetailsRequest" name="editPartialAdvertisementDetailsRequest">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="editPartialAdvertisementDetailsResponse">
+        <wsdl:part element="sch:editPartialAdvertisementDetailsResponse" name="editPartialAdvertisementDetailsResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="AdvertisementsPort">
+        <wsdl:operation name="editPartialAdvertisementDetails">
+            <wsdl:input message="tns:editPartialAdvertisementDetailsRequest"
+                        name="editPartialAdvertisementDetailsRequest">
+            </wsdl:input>
+            <wsdl:output message="tns:editPartialAdvertisementDetailsResponse"
+                         name="editPartialAdvertisementDetailsResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="AdvertisementsPortSoap11" type="tns:AdvertisementsPort">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="editPartialAdvertisementDetails">
+            <soap:operation soapAction=""/>
+            <wsdl:input name="editPartialAdvertisementDetailsRequest">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="editPartialAdvertisementDetailsResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="AdvertisementsPortService">
+        <wsdl:port binding="tns:AdvertisementsPortSoap11" name="AdvertisementsPortSoap11">
+            <soap:address location="http://192.168.56.1:8081/ws/advertisement"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

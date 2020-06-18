@@ -35,6 +35,11 @@ public class BodyStyleServiceImpl implements BodyStyleService {
     }
 
     @Override
+    public BodyStyle get(String name) {
+        return bodyStyleRepository.findByName(name);
+    }
+
+    @Override
     public List<BodyStyle> get() {
         return bodyStyleRepository.findAll();
     }

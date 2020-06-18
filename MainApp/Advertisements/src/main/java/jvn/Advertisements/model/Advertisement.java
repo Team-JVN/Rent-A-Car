@@ -24,7 +24,7 @@ public class Advertisement {
     @Column(nullable = false)
     private Long car;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     private PriceList priceList;
 
     @Column(nullable = false)

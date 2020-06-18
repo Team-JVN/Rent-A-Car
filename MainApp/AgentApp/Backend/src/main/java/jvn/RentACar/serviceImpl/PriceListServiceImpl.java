@@ -28,7 +28,7 @@ public class PriceListServiceImpl implements PriceListService {
     private PriceListDetailsMapper priceListDetailsMapper;
 
     @Autowired
-    public PriceListServiceImpl(PriceListRepository priceListRepository,PriceListClient priceListClient,PriceListDetailsMapper priceListDetailsMapper) {
+    public PriceListServiceImpl(PriceListRepository priceListRepository, PriceListClient priceListClient, PriceListDetailsMapper priceListDetailsMapper) {
         this.priceListRepository = priceListRepository;
         this.priceListClient = priceListClient;
         this.priceListDetailsMapper = priceListDetailsMapper;
@@ -53,7 +53,7 @@ public class PriceListServiceImpl implements PriceListService {
     public PriceList create(PriceList priceList) {
         GetPriceListDetailsResponse response = priceListClient.createOrEdit(priceList);
         PriceListDetails priceListDetails = response.getPriceListDetails();
-        if(priceListDetails != null && priceListDetails.getId() != null){
+        if (priceListDetails != null && priceListDetails.getId() != null) {
             priceList.setMainAppId(priceListDetails.getId());
         }
         return priceListRepository.save(priceList);
@@ -73,7 +73,7 @@ public class PriceListServiceImpl implements PriceListService {
 
         GetPriceListDetailsResponse response = priceListClient.createOrEdit(dbPriceList);
         PriceListDetails priceListDetails = response.getPriceListDetails();
-        if(priceListDetails != null && priceListDetails.getId() != null){
+        if (priceListDetails != null && priceListDetails.getId() != null) {
             dbPriceList.setMainAppId(priceListDetails.getId());
         }
 
@@ -92,23 +92,28 @@ public class PriceListServiceImpl implements PriceListService {
         priceListRepository.save(priceList);
     }
 
-    private void synchronizePriceLists(){
+    @Override
+    public PriceList getByMainAppId(Long mainAppId) {
+        return priceListRepository.findByMainAppId(mainAppId);
+    }
+
+    private void synchronizePriceLists() {
         GetAllPriceListDetailsResponse response = priceListClient.getAll();
         List<PriceListDetails> priceListDetails = response.getPriceListDetails();
-        if(priceListDetails == null){
+        if (priceListDetails == null) {
             return;
         }
         List<PriceList> priceLists = priceListDetails.stream().map(priceListDetailsMapper::toEntity).
                 collect(Collectors.toList());
-        for (PriceList priceList:priceLists) {
+        for (PriceList priceList : priceLists) {
             PriceList dbPriceList = priceListRepository.findByMainAppId(priceList.getMainAppId());
-            if(dbPriceList != null){
+            if (dbPriceList != null) {
                 dbPriceList.setPricePerKm(priceList.getPricePerKm());
                 dbPriceList.setPricePerDay(priceList.getPricePerDay());
                 dbPriceList.setPriceForCDW(priceList.getPriceForCDW());
                 dbPriceList.setStatus(priceList.getStatus());
                 priceListRepository.save(dbPriceList);
-            }else{
+            } else {
                 priceListRepository.save(priceList);
             }
         }

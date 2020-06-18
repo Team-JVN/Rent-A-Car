@@ -1,12 +1,16 @@
 package jvn.RentACar.serviceImpl;
 
+import jvn.RentACar.client.AdvertisementClient;
 import jvn.RentACar.dto.request.AdvertisementEditDTO;
 import jvn.RentACar.dto.response.SearchParamsDTO;
+import jvn.RentACar.dto.soap.advertisement.*;
+import jvn.RentACar.dto.soap.car.CreateOrEditCarDetailsResponse;
 import jvn.RentACar.enumeration.EditType;
 import jvn.RentACar.enumeration.LogicalStatus;
 import jvn.RentACar.enumeration.RentRequestStatus;
 import jvn.RentACar.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.RentACar.exceptionHandler.InvalidCarDataException;
+import jvn.RentACar.mapper.AdvertisementDetailsMapper;
 import jvn.RentACar.mapper.AdvertisementDtoMapper;
 import jvn.RentACar.model.Advertisement;
 import jvn.RentACar.model.Car;
@@ -16,6 +20,7 @@ import jvn.RentACar.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -39,6 +44,10 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     private UserService userService;
 
+    private AdvertisementClient advertisementClient;
+
+    private AdvertisementDetailsMapper advertisementDetailsMapper;
+
     @Override
     public Advertisement create(Advertisement createAdvertisementDTO) {
         checkDate(createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
@@ -47,6 +56,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         checkIfCarIsAvailable(createAdvertisementDTO.getCar().getId(), createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
         createAdvertisementDTO.setPriceList(priceListService.get(createAdvertisementDTO.getPriceList().getId()));
         createAdvertisementDTO = setPriceList(createAdvertisementDTO, createAdvertisementDTO.getKilometresLimit());
+        createAdvertisementDTO.setMainAppId(saveInMainApp(createAdvertisementDTO));
         return advertisementRepository.save(createAdvertisementDTO);
     }
 
@@ -54,7 +64,11 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     public Advertisement edit(Long id, Advertisement advertisement) {
         Advertisement dbAdvertisement = get(advertisement.getId());
         isEditable(dbAdvertisement);
-        if (!dbAdvertisement.getCar().equals(advertisement.getCar())) {
+        if (!getEditType(dbAdvertisement.getId()).equals(EditType.ALL)) {
+            throw new InvalidAdvertisementDataException(
+                    "This advertisement is in use and therefore it cannot be edited.", HttpStatus.BAD_REQUEST);
+        }
+        if (!dbAdvertisement.getCar().getId().equals(advertisement.getCar().getId())) {
             dbAdvertisement.setCar(advertisement.getCar());
             checkIfCarIsAvailable(dbAdvertisement.getCar().getId(), dbAdvertisement.getDateFrom(), dbAdvertisement.getDateTo());
         }
@@ -65,6 +79,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         dbAdvertisement.setPickUpPoint(advertisement.getPickUpPoint());
         dbAdvertisement = setPriceList(dbAdvertisement, advertisement.getKilometresLimit());
         dbAdvertisement.setDiscount(advertisement.getDiscount());
+        saveInMainApp(dbAdvertisement);
         return advertisementRepository.save(dbAdvertisement);
     }
 
@@ -75,23 +90,28 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         dbAdvertisement.setPriceList(priceListService.get(advertisement.getPriceList().getId()));
         dbAdvertisement = setPriceList(dbAdvertisement, advertisement.getKilometresLimit());
         dbAdvertisement.setDiscount(advertisement.getDiscount());
+        advertisementClient.editPartial(dbAdvertisement);
         return advertisementRepository.save(dbAdvertisement);
     }
 
     @Override
     public EditType getEditType(Long id) {
         Advertisement advertisement = get(id);
-        if (advertisementRepository.findByIdAndRentInfosRentRequestRentRequestStatusNotAndLogicalStatus(advertisement.getId(), RentRequestStatus.CANCELED, LogicalStatus.EXISTING) != null) {
-            return EditType.PARTIAL;
+        GetAdvertisementEditTypeResponse response = advertisementClient.getEditType(advertisement);
+        if (response != null) {
+            if (response.getEditType().equals("ALL")) {
+                return EditType.ALL;
+            }
         }
-        return EditType.ALL;
+        return EditType.PARTIAL;
     }
 
     @Override
     public void delete(Long id) {
         Advertisement advertisement = get(id);
         checkOwner(advertisement.getCar());
-        if (advertisementRepository.findByIdAndLogicalStatusAndRentInfosRentRequestRentRequestStatusAndRentInfosDateTimeToGreaterThanEqual(advertisement.getId(), LogicalStatus.EXISTING, RentRequestStatus.PAID, LocalDateTime.now()) != null) {
+        DeleteAdvertisementDetailsResponse response = advertisementClient.checkAndDeleteIfCan(advertisement);
+        if (response == null || !response.isCanDelete()) {
             throw new InvalidAdvertisementDataException("This advertisement is in use and therefore can not be deleted.", HttpStatus.BAD_REQUEST);
         }
         advertisement.setLogicalStatus(LogicalStatus.DELETED);
@@ -119,6 +139,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     @Override
     public List<Advertisement> searchAdvertisements(SearchParamsDTO searchParamsDTO) {
+
         LocalDateTime dateTimeFrom = getDateConverted(searchParamsDTO.getDateTimeFrom());
         LocalDateTime dateTimeTo = getDateConverted(searchParamsDTO.getDateTimeTo());
         LocalDateTime todayPlus48h = (LocalDateTime.now().minusMinutes(3)).plusDays(2);
@@ -128,7 +149,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         if (dateTimeTo.isBefore(todayPlus48h)) {
             throw new InvalidAdvertisementDataException("Date and time to must be at least 48h from now.", HttpStatus.BAD_REQUEST);
         }
-
+        synchronizeAdvertisements();
         SearchParamsDTO newSearchParamsDTO = replaceNullValues(searchParamsDTO);
 
         List<Advertisement> searchedAdsList;
@@ -163,6 +184,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     @Override
     public List<Advertisement> getAll(String status) {
+        synchronizeAdvertisements();
         List<Advertisement> ads;
         switch (status) {
             case "all":
@@ -278,14 +300,78 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         return dbAdvertisement;
     }
 
+
+    private Long saveInMainApp(Advertisement advertisement) {
+        try {
+            CreateOrEditAdvertisementDetailsResponse response = advertisementClient.createOrEdit(advertisement);
+            return response.getAdvertisementDetails().getId();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void synchronizeAdvertisements() {
+        try {
+            GetAllAdvertisementDetailsResponse response = advertisementClient.getAll();
+            if (response == null) {
+                return;
+            }
+            List<AdvertisementDetails> advertisementDetails = response.getAdvertisementDetails();
+            if (advertisementDetails == null || advertisementDetails.isEmpty()) {
+                return;
+            }
+
+            for (AdvertisementDetails current : advertisementDetails) {
+                Advertisement advertisement = advertisementDetailsMapper.toEntity(current);
+                Advertisement dbAdvertisement = advertisementRepository.findByMainAppId(advertisement.getMainAppId());
+                if (dbAdvertisement == null) {
+                    createSynchronize(advertisement);
+                } else {
+                    editSynchronize(advertisement, dbAdvertisement);
+                }
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void createSynchronize(Advertisement advertisement) {
+        if (advertisement.getCar() == null || advertisement.getPriceList() == null) {
+            return;
+        }
+        advertisementRepository.saveAndFlush(advertisement);
+    }
+
+    private void editSynchronize(Advertisement advertisement, Advertisement dbAdvertisement) {
+        if (advertisement.getCar() == null || advertisement.getPriceList() == null) {
+            return;
+        }
+        dbAdvertisement.setCar(advertisement.getCar());
+        dbAdvertisement.setPriceList(advertisement.getPriceList());
+        dbAdvertisement.setKilometresLimit(advertisement.getKilometresLimit());
+        dbAdvertisement.setDiscount(advertisement.getDiscount());
+        dbAdvertisement.setDateFrom(advertisement.getDateFrom());
+        dbAdvertisement.setDateTo(advertisement.getDateTo());
+        dbAdvertisement.setPickUpPoint(advertisement.getPickUpPoint());
+        dbAdvertisement.setCDW(advertisement.getCDW());
+        dbAdvertisement.setLogicalStatus(advertisement.getLogicalStatus());
+        advertisementRepository.save(dbAdvertisement);
+    }
+
     @Autowired
     public AdvertisementServiceImpl(CarService carService, PriceListService priceListService, RentInfoService rentInfoService, UserService userService,
-                                    AdvertisementRepository advertisementRepository, AdvertisementDtoMapper advertisementMapper) {
+                                    AdvertisementRepository advertisementRepository, AdvertisementDtoMapper advertisementMapper,
+                                    AdvertisementClient advertisementClient, AdvertisementDetailsMapper advertisementDetailsMapper) {
         this.carService = carService;
         this.priceListService = priceListService;
         this.advertisementRepository = advertisementRepository;
         this.advertisementMapper = advertisementMapper;
         this.userService = userService;
         this.rentInfoService = rentInfoService;
+        this.advertisementClient = advertisementClient;
+        this.advertisementDetailsMapper = advertisementDetailsMapper;
     }
 }
