@@ -1,5 +1,6 @@
 package jvn.Cars.endpoint;
 
+import jvn.Cars.dto.message.Log;
 import jvn.Cars.producer.LogProducer;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -66,9 +67,11 @@ public class CarEndpoint {
         if (car.getId() != null) {
             carDetailsForResponse = carDetailsMapper
                     .toDto(carService.editAll(car.getId(), car, getFiles(request.getPictureInfo()), dto.getId()));
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "ECA", String.format("[SOAP] User %s successfully edited car %s", dto.getId(), carDetailsForResponse.getId())));
         } else {
             carDetailsForResponse = carDetailsMapper
                     .toDto(carService.create(car, getFiles(request.getPictureInfo()), dto.getId()));
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CCA", String.format("[SOAP] User %s successfully created car %s", dto.getId(), carDetailsForResponse.getId())));
         }
         CreateOrEditCarDetailsResponse response = new CreateOrEditCarDetailsResponse();
         response.setCreateCarDetails(carDetailsForResponse);
@@ -84,7 +87,11 @@ public class CarEndpoint {
             return null;
         }
         DeleteCarDetailsResponse response = new DeleteCarDetailsResponse();
-        response.setCanDelete(carService.checkIfCanDeleteAndDelete(request.getId(), dto.getId()));
+        boolean isDeleted = carService.checkIfCanDeleteAndDelete(request.getId(), dto.getId());
+        response.setCanDelete(isDeleted);
+        if (isDeleted) {
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "DCA", String.format("[SOAP] User %s successfully deleted car %s", dto.getId(), request.getId())));
+        }
         return response;
     }
 
@@ -125,6 +132,7 @@ public class CarEndpoint {
 
         EditPartialCarDetailsResponse response = new EditPartialCarDetailsResponse();
         response.setEditPartialCarDetails(editPartialCarDetailsAndCarMapper.toDto(car));
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "ECA", String.format("[SOAP] User %s successfully edited car %s", dto.getId(), car.getId())));
 
         return response;
     }
@@ -173,15 +181,15 @@ public class CarEndpoint {
             byte[] fileContent = FileUtils.readFileToByteArray(new File(String.valueOf(filePath)));
             return fileContent;
         } catch (IOException ex) {
-
+            logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PEX", String.format("[SOAP] Picture \"%s\" not found on server", fileName)));
         }
         return null;
     }
 
     @Autowired
     public CarEndpoint(CarService carService, CarDetailsMapper carDetailsMapper, UserClient userClient,
-            EditPartialCarDetailsMapper editPartialCarDetailsmapper,
-            EditPartialCarDetailsAndCarMapper editPartialCarDetailsAndCarMapper, LogProducer logProducer) {
+                       EditPartialCarDetailsMapper editPartialCarDetailsmapper,
+                       EditPartialCarDetailsAndCarMapper editPartialCarDetailsAndCarMapper, LogProducer logProducer) {
         this.carService = carService;
         this.carDetailsMapper = carDetailsMapper;
         this.userClient = userClient;

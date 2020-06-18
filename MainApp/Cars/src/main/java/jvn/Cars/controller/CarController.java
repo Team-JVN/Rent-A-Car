@@ -108,7 +108,7 @@ public class CarController {
     public ResponseEntity<Void> delete(@PathVariable("id") @Positive(message = "Id must be positive.") Long id) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));
         carService.delete(id, userDTO.getId(), request.getHeader("Auth"), request.getHeader("user"));
-        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CCA", String.format("User %s successfully deleted car %s", userDTO.getId(), id)));
+        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "DCA", String.format("User %s successfully deleted car %s", userDTO.getId(), id)));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
