@@ -31,22 +31,6 @@ public class LogConsumer {
         }
     }
 
-    @RabbitListener(queues = RabbitMQConfiguration.LOGS)
-    public void writeAll(List<String> logStrList) {
-        try {
-            List<Log> logs = new ArrayList<>();
-            for (String logStr : logStrList) {
-                System.out.println(logStr);
-                logs.add(Log.parse(logStr));
-            }
-            repository.writeAll(Paths.get(configuration.getLogStorage()), logs);
-        } catch (IOException e) {
-            System.out.println("Cannot write log messages to a file.");
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
     @Autowired
     public LogConsumer(FileRepository<Log> repository, ApplicationConfiguration configuration) {
         this.repository = repository;

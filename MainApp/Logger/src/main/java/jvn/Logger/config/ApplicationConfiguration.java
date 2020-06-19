@@ -10,6 +10,12 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 public class ApplicationConfiguration {
 
-    @Value("${LOG_STORAGE:mainapp-web-traffic.log}")
+    @Value("${LOG_STORAGE:mainapp-log-storage.log}")
     private String logStorage;
+
+    @Value("${LOG_BACKUP_1:mainapp-log-backup-1.log}")
+    private String logBackup1;
+
+    @Value("${LOG_BACKUP_2:mainapp-log-backup-2.log}")
+    private String logBackup2;
 }
