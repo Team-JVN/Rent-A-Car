@@ -2,6 +2,7 @@ package jvn.RentACar.repository;
 
 import jvn.RentACar.config.ApplicationConfiguration;
 import jvn.RentACar.model.Log;
+import org.owasp.esapi.ESAPI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
@@ -16,26 +17,27 @@ import java.util.stream.Collectors;
 @Repository
 public class LogRepository implements FileRepository<Log> {
 
-    //    private static int MAX_FILE_SIZE = 10000000;    // 10 MB
-    private static int MAX_FILE_SIZE = 1000;
+    //    private static int MAX_FILE_SIZE = 10000000;    // 10 MB to store around 100,000 entries
+    private static int MAX_FILE_SIZE = 1000;    // 1 KB for testing
 
     private ApplicationConfiguration configuration;
 
     @Override
     public void write(Path file, Log log) throws IOException {
-        Files.write(file, (log.toFile() + "\n").getBytes(), StandardOpenOption.APPEND, StandardOpenOption.CREATE);
+//        String logStr = encode(log.toFile()) + "\n";  // In production
+        String logStr = log.toFile() + "\n";    // In development
+        Files.write(file, logStr.getBytes(), StandardOpenOption.APPEND, StandardOpenOption.CREATE);
         if (Files.exists(file) && Files.size(file) > MAX_FILE_SIZE) {
             rotateLogFiles(file, Paths.get(configuration.getLogBackup1()), Paths.get(configuration.getLogBackup2()));
         }
     }
 
-    @Override
-    public void writeAll(Path file, List<Log> t) throws IOException {
-        Files.write(file, t.stream().map(Log::toFile).collect(Collectors.toList()),
-                StandardOpenOption.APPEND, StandardOpenOption.CREATE);
-        if (Files.exists(file) && Files.size(file) > MAX_FILE_SIZE) {
-            rotateLogFiles(file, Paths.get(configuration.getLogBackup1()), Paths.get(configuration.getLogBackup2()));
-        }
+    private String encode(String message) {
+        String sanitized = message
+                .replace('\n', '_')
+                .replace('\r', '_')
+                .replace('\t', '_');
+        return ESAPI.encoder().encodeForHTML(sanitized);
     }
 
     @Async
