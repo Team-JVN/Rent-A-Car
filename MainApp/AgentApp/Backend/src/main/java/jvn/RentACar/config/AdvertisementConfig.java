@@ -29,7 +29,7 @@ public class AdvertisementConfig {
     @Bean
     public AdvertisementClient advertisementClient(@Qualifier("marshallerAdvertisement") Jaxb2Marshaller marshallerAdvertisement) throws Exception {
         AdvertisementClient client = new AdvertisementClient();
-        client.setDefaultUri("https://localhost:8080/advertisements/ws/advertisement");
+        client.setDefaultUri("http://localhost:8080/advertisements/ws/advertisement");
         client.setMarshaller(marshallerAdvertisement);
         client.setUnmarshaller(marshallerAdvertisement);
 //        client.setMessageSender(httpComponentsMessageSender());

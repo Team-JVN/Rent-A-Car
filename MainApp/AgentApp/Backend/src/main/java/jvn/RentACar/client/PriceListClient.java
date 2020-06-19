@@ -10,15 +10,15 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
-@Component
+
 public class PriceListClient extends WebServiceGatewaySupport {
 
     @Autowired
     private UserService userService;
 
-    @Autowired
-    @Qualifier("webServiceTemplatePriceList")
-    private WebServiceTemplate webServiceTemplate;
+    // @Autowired
+    // @Qualifier("webServiceTemplatePriceList")
+    // private WebServiceTemplate webServiceTemplate;
 
     @Autowired
     private PriceListDetailsMapper priceListDetailsMapper;
@@ -33,7 +33,7 @@ public class PriceListClient extends WebServiceGatewaySupport {
             return null;
         }
         request.setEmail(user.getEmail());
-        GetPriceListDetailsResponse response = (GetPriceListDetailsResponse)webServiceTemplate
+        GetPriceListDetailsResponse response = (GetPriceListDetailsResponse)getWebServiceTemplate()
                 .marshalSendAndReceive(request);
         return response;
     }
@@ -47,7 +47,7 @@ public class PriceListClient extends WebServiceGatewaySupport {
             return null;
         }
         request.setEmail(user.getEmail());
-        DeletePriceListDetailsResponse response = (DeletePriceListDetailsResponse)webServiceTemplate
+        DeletePriceListDetailsResponse response = (DeletePriceListDetailsResponse)getWebServiceTemplate()
                 .marshalSendAndReceive(request);
         return response;
     }
@@ -60,7 +60,7 @@ public class PriceListClient extends WebServiceGatewaySupport {
         }
         request.setEmail(user.getEmail());
         System.out.println("Hajssss1");
-        GetAllPriceListDetailsResponse response = (GetAllPriceListDetailsResponse) webServiceTemplate
+        GetAllPriceListDetailsResponse response = (GetAllPriceListDetailsResponse) getWebServiceTemplate()
                 .marshalSendAndReceive(request);
         System.out.println("Haj2");
         return response;

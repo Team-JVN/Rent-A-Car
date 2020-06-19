@@ -1,6 +1,7 @@
 package jvn.RentACar.config;
 import javax.net.ssl.HostnameVerifier;
 
+import jvn.RentACar.client.PriceListClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
@@ -17,29 +18,29 @@ import org.springframework.ws.transport.http.HttpsUrlConnectionMessageSender;
 @Configuration
 public class PriceListConfig {
 
-    @Value("${server.ssl.algorithm}")
-    private String algorithm;
+    // @Value("${server.ssl.algorithm}")
+    // private String algorithm;
 
-    @Value("${server.ssl.key-store}")
-    private String keystore;
+    // @Value("${server.ssl.key-store}")
+    // private String keystore;
 
-    @Value("${server.ssl.key-store-type}")
-    private String keystoreType;
+    // @Value("${server.ssl.key-store-type}")
+    // private String keystoreType;
 
-    @Value("${server.ssl.key-store-password}")
-    private String keystorePassword;
+    // @Value("${server.ssl.key-store-password}")
+    // private String keystorePassword;
 
-    @Value("${server.ssl.key-alias}")
-    private String applicationKeyAlias;
+    // @Value("${server.ssl.key-alias}")
+    // private String applicationKeyAlias;
 
-    @Value("${server.ssl.trust-store}")
-    private Resource truststore;
+    // @Value("${server.ssl.trust-store}")
+    // private Resource truststore;
 
-    @Value("${server.ssl.trust-store-type}")
-    private String truststoreType;
+    // @Value("${server.ssl.trust-store-type}")
+    // private String truststoreType;
 
-    @Value("${server.ssl.trust-store-password}")
-    private String truststorePassword;
+    // @Value("${server.ssl.trust-store-password}")
+    // private String truststorePassword;
 
     @Bean
     @Qualifier("marshallerPriceList")
@@ -50,52 +51,61 @@ public class PriceListConfig {
     }
 
     @Bean
-    @Qualifier("webServiceTemplatePriceList")
-    public WebServiceTemplate webServiceTemplatePriceList() throws Exception {
-        WebServiceTemplate webServiceTemplate = new WebServiceTemplate();
-        webServiceTemplate.setMarshaller(marshallerPriceList());
-        webServiceTemplate.setUnmarshaller(marshallerPriceList());
-        webServiceTemplate.setDefaultUri("https://localhost:8080/advertisements/ws/pricelist");
-        // set a httpsUrlConnectionMessageSender to handle the HTTPS session
-        webServiceTemplate.setMessageSender(httpsUrlConnectionMessageSender());
-
-        return webServiceTemplate;
+    public PriceListClient priceListClient(@Qualifier("marshallerPriceList") Jaxb2Marshaller marshallerPriceList) throws Exception {
+        PriceListClient client = new PriceListClient();
+        client.setDefaultUri("http://localhost:8080/advertisements/ws/pricelist");
+        client.setMarshaller(marshallerPriceList);
+        client.setUnmarshaller(marshallerPriceList);
+//        client.setMessageSender(httpComponentsMessageSender());
+        return client;
     }
+//    @Bean
+//    @Qualifier("webServiceTemplatePriceList")
+//    public WebServiceTemplate webServiceTemplatePriceList() throws Exception {
+//        WebServiceTemplate webServiceTemplate = new WebServiceTemplate();
+//        webServiceTemplate.setMarshaller(marshallerPriceList());
+//        webServiceTemplate.setUnmarshaller(marshallerPriceList());
+//        webServiceTemplate.setDefaultUri("https://localhost:8080/advertisements/ws/pricelist");
+////        // set a httpsUrlConnectionMessageSender to handle the HTTPS session
+////        webServiceTemplate.setMessageSender(httpsUrlConnectionMessageSender());
+//
+//        return webServiceTemplate;
+//    }
 
-    @Bean
-    public HttpsUrlConnectionMessageSender httpsUrlConnectionMessageSender() throws Exception {
-        HttpsUrlConnectionMessageSender httpsUrlConnectionMessageSender =
-                new HttpsUrlConnectionMessageSender();
-        httpsUrlConnectionMessageSender.setTrustManagers(trustManagersFactoryBean().getObject());
-        httpsUrlConnectionMessageSender.setHostnameVerifier(new HostnameVerifier() {
-            @Override
-            public boolean verify(String hostname, javax.net.ssl.SSLSession sslSession) {
-                if ("localhost".equals(hostname)) {
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        return httpsUrlConnectionMessageSender;
-    }
-
-    @Bean
-    public KeyStoreFactoryBean trustStore() {
-        KeyStoreFactoryBean keyStoreFactoryBean = new KeyStoreFactoryBean();
-        keyStoreFactoryBean.setLocation(truststore);
-        keyStoreFactoryBean.setPassword(truststorePassword);
-
-        return keyStoreFactoryBean;
-    }
-
-    @Bean
-    public TrustManagersFactoryBean trustManagersFactoryBean() {
-        TrustManagersFactoryBean trustManagersFactoryBean = new TrustManagersFactoryBean();
-        trustManagersFactoryBean.setKeyStore(trustStore().getObject());
-
-        return trustManagersFactoryBean;
-    }
+//    @Bean
+//    public HttpsUrlConnectionMessageSender httpsUrlConnectionMessageSender() throws Exception {
+//        HttpsUrlConnectionMessageSender httpsUrlConnectionMessageSender =
+//                new HttpsUrlConnectionMessageSender();
+//        httpsUrlConnectionMessageSender.setTrustManagers(trustManagersFactoryBean().getObject());
+//        httpsUrlConnectionMessageSender.setHostnameVerifier(new HostnameVerifier() {
+//            @Override
+//            public boolean verify(String hostname, javax.net.ssl.SSLSession sslSession) {
+//                if ("localhost".equals(hostname)) {
+//                    return true;
+//                }
+//                return false;
+//            }
+//        });
+//
+//        return httpsUrlConnectionMessageSender;
+//    }
+//
+//    @Bean
+//    public KeyStoreFactoryBean trustStore() {
+//        KeyStoreFactoryBean keyStoreFactoryBean = new KeyStoreFactoryBean();
+//        keyStoreFactoryBean.setLocation(truststore);
+//        keyStoreFactoryBean.setPassword(truststorePassword);
+//
+//        return keyStoreFactoryBean;
+//    }
+//
+//    @Bean
+//    public TrustManagersFactoryBean trustManagersFactoryBean() {
+//        TrustManagersFactoryBean trustManagersFactoryBean = new TrustManagersFactoryBean();
+//        trustManagersFactoryBean.setKeyStore(trustStore().getObject());
+//
+//        return trustManagersFactoryBean;
+//    }
 //
 //
 //    @Bean

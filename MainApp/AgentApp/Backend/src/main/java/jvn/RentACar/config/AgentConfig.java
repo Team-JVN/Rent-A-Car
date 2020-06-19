@@ -19,7 +19,7 @@ public class AgentConfig {
     @Bean
     public AgentClient agentClient(@Qualifier("marshallerAgent") Jaxb2Marshaller marshallerAgent) {
         AgentClient client = new AgentClient();
-        client.setDefaultUri("https://localhost:8080/users/ws");
+        client.setDefaultUri("http://localhost:8080/users/ws");
         client.setMarshaller(marshallerAgent);
         client.setUnmarshaller(marshallerAgent);
         return client;

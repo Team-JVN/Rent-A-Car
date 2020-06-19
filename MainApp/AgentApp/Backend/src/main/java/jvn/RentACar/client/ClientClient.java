@@ -11,7 +11,7 @@ import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-@Component
+
 public class ClientClient extends WebServiceGatewaySupport {
 
     @Autowired
@@ -20,9 +20,9 @@ public class ClientClient extends WebServiceGatewaySupport {
     @Autowired
     private ClientDetailsMapper clientDetailsMapper;
 
-    @Autowired
-    @Qualifier("webServiceTemplateClient")
-    private WebServiceTemplate webServiceTem;
+//    @Autowired
+//    @Qualifier("webServiceTemplateClient")
+//    private WebServiceTemplate webServiceTem;
 
     public CreateOrEditClientResponse createOrEdit(Client client) {
 
@@ -35,7 +35,7 @@ public class ClientClient extends WebServiceGatewaySupport {
             request.setEmail(user.getEmail());
         }
 
-        CreateOrEditClientResponse response = (CreateOrEditClientResponse) webServiceTem
+        CreateOrEditClientResponse response = (CreateOrEditClientResponse) getWebServiceTemplate()
                 .marshalSendAndReceive(request);
         return response;
     }
@@ -48,7 +48,7 @@ public class ClientClient extends WebServiceGatewaySupport {
             return null;
         }
         request.setEmail(user.getEmail());
-        DeleteClientDetailsResponse response = (DeleteClientDetailsResponse) webServiceTem
+        DeleteClientDetailsResponse response = (DeleteClientDetailsResponse) getWebServiceTemplate()
                 .marshalSendAndReceive(request);
         return response;
     }
@@ -57,7 +57,7 @@ public class ClientClient extends WebServiceGatewaySupport {
         CheckClientPersonalInfoRequest request = new CheckClientPersonalInfoRequest();
         request.setClientEmail(clientEmail);
         request.setPhoneNumber(phoneNumber);
-        CheckClientPersonalInfoResponse response = (CheckClientPersonalInfoResponse)webServiceTem
+        CheckClientPersonalInfoResponse response = (CheckClientPersonalInfoResponse)getWebServiceTemplate()
                 .marshalSendAndReceive(request);
         return response;
     }
@@ -70,7 +70,7 @@ public class ClientClient extends WebServiceGatewaySupport {
         }
         request.setEmail(user.getEmail());
 
-        GetAllClientDetailsResponse response = (GetAllClientDetailsResponse) webServiceTem
+        GetAllClientDetailsResponse response = (GetAllClientDetailsResponse) getWebServiceTemplate()
                 .marshalSendAndReceive(request);
         return response;
     }
