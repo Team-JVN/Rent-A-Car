@@ -17,6 +17,7 @@ import jvn.RentACar.service.LogService;
 import jvn.RentACar.service.UserService;
 import jvn.RentACar.utils.IPAddressProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -54,9 +55,9 @@ public class UserController {
             UserTokenState userTokenState = authentificationService.login(authenticationRequest);
             if (userTokenState == null) {
                 logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "LGN", String.format("Invalid email or password provided from %s", ipAddressProvider.get())));
-                throw new UsernameNotFoundException(String.format("Invalid email or password. Please try again."));
+                throw new UsernameNotFoundException("Invalid email or password. Please try again.");
             }
-            return new ResponseEntity<>(userTokenState, HttpStatus.OK);
+            return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(userTokenState);
         } catch (AuthenticationException e) {
             if (authentificationService.userIsNeverLoggedIn(authenticationRequest.getUsername())) {
                 return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
@@ -86,7 +87,7 @@ public class UserController {
             logService.write(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CPW", "External password check failed"));
             throw new InvalidUserDataException("Password cannot be checked. Please try again.", HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(null);
     }
 
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -98,9 +99,7 @@ public class UserController {
             throw new InvalidUserDataException("Password cannot be check. Please try again.", HttpStatus.BAD_REQUEST);
         }
         try {
-            return new ResponseEntity<>(
-                    clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO))),
-                    HttpStatus.CREATED);
+            return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO))));
         } catch (NoSuchAlgorithmException e) {
             logService.write(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "REG", "Hash algorithm threw exception"));
             throw new InvalidTokenException("Activation token cannot be generated. Please try again.",
@@ -134,12 +133,12 @@ public class UserController {
             throw new InvalidUserDataException("Reset token or new password cannot be checked. Please try again.",
                     HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(null);
     }
 
     @RequestMapping(value = "/refresh", method = RequestMethod.POST)
     public ResponseEntity<UserTokenState> refreshAuthenticationToken(HttpServletRequest request) {
-        return new ResponseEntity<>(userService.refreshAuthenticationToken(request), HttpStatus.OK);
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(userService.refreshAuthenticationToken(request));
     }
 
     @Autowired
