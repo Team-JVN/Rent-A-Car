@@ -8,6 +8,10 @@ services:
             - main-app-tls
         ports:
             - "8761:8761"
+        environment:
+            RMQ_HOST: rabbitmq-broker
+        depends_on:
+            - rabbitmq-broker
 
     zuul:
         build: ./ZuulAndFrontend
@@ -24,6 +28,7 @@ services:
             KEYSTORE_ALIAS: mainapp
             TRUSTSTORE: /etc/keystore/mainapp.truststore.p12
             TRUSTSTORE_PASSWORD: mainapp_pass
+            RMQ_HOST: rabbitmq-broker
         volumes:
             - ./tls/certs/mainapp/keystore:/etc/keystore
         depends_on:
@@ -33,6 +38,7 @@ services:
             - renting
             - users
             - search-service
+            - rabbitmq-broker
 
     advertisements:
         build: ./Advertisements
@@ -71,11 +77,13 @@ services:
             DATABASE_DOMAIN: mainapp-mysql
             DATABASE_SCHEMA: rentacardb
             UPLOADED_PICTURES_PATH: /etc/uploadedPictures/
+            RMQ_HOST: rabbitmq-broker
         volumes:
             - ./uploadedPictures/:/etc/uploadedPictures/
         depends_on: 
             - mainapp-mysql
             - eureka-serviceregistry
+            - rabbitmq-broker
 
     renting:
         build: ./Renting
