@@ -4,7 +4,7 @@ import { map } from 'rxjs/operators';
 import { User } from './../model/user';
 import { environment } from './../../environments/environment';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import { RegistrationClient } from '../model/registrationClient';
@@ -33,7 +33,11 @@ export class AuthentificationService {
   }
 
   login(user: User) {
-    return this.httpClient.post(this.url + "/login", user).pipe(map((res: UserTokenState) => {
+    let header = new HttpHeaders();
+    header.append('Cache-Control', 'no-store, no-cache, must-revalidate, post- check=0, pre-check=0');
+    header.append('Pragma', 'no-cache');
+    header.append('Expires', '0');
+    return this.httpClient.post(this.url + "/login", user, { headers: header }).pipe(map((res: UserTokenState) => {
       this.access_token = res.accessToken;
       this.refreshToken = res.refreshToken;
       localStorage.setItem('UserTokenState', JSON.stringify(res));
@@ -43,11 +47,19 @@ export class AuthentificationService {
   }
 
   register(client: RegistrationClient) {
-    return this.httpClient.post(this.url + "/register", client);
+    let header = new HttpHeaders();
+    header.append('Cache-Control', 'no-store, no-cache, must-revalidate, post- check=0, pre-check=0');
+    header.append('Pragma', 'no-cache');
+    header.append('Expires', '0');
+    return this.httpClient.post(this.url + "/register", client, { headers: header });
   }
 
   changePassword(changePassword: ChangePassword) {
-    return this.httpClient.put(this.url, changePassword);
+    let header = new HttpHeaders();
+    header.append('Cache-Control', 'no-store, no-cache, must-revalidate, post- check=0, pre-check=0');
+    header.append('Pragma', 'no-cache');
+    header.append('Expires', '0');
+    return this.httpClient.put(this.url, changePassword, { headers: header });
   }
 
   requestToken(email: string) {
@@ -55,9 +67,13 @@ export class AuthentificationService {
   }
 
   resetPassword(token: string, newPassword: string) {
+    let header = new HttpHeaders();
+    header.append('Cache-Control', 'no-store, no-cache, must-revalidate, post- check=0, pre-check=0');
+    header.append('Pragma', 'no-cache');
+    header.append('Expires', '0');
     let params = new HttpParams();
     params = params.append('t', token);
-    return this.httpClient.put(this.url + '/reset-password', { newPassword: newPassword }, { params: params });
+    return this.httpClient.put(this.url + '/reset-password', { newPassword: newPassword }, { params: params, headers: header });
   }
 
   logout() {

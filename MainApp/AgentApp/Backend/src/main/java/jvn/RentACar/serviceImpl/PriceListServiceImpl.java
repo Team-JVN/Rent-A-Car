@@ -98,7 +98,8 @@ public class PriceListServiceImpl implements PriceListService {
         return priceListRepository.findByMainAppId(mainAppId);
     }
 
-    @Scheduled(cron = "0 30 0/3 * * ?")
+
+    @Scheduled(cron = "0 0 0/3 * * ?")
     private void synchronizePriceLists() {
         GetAllPriceListDetailsResponse response = priceListClient.getAll();
         List<PriceListDetails> priceListDetails = response.getPriceListDetails();
