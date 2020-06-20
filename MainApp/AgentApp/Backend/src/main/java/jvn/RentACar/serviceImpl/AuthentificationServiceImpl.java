@@ -98,7 +98,7 @@ public class AuthentificationServiceImpl implements AuthentificationService {
 
         if (!passwordEncoder.matches(changePasswordDTO.getOldPassword(), user.getPassword())) {
             changePasswordAttemptService.changePassFailed();
-            throw new InvalidUserDataException("Invalid password.", HttpStatus.BAD_REQUEST);
+            throw new InvalidUserDataException("Invalid email or password. Please try again.", HttpStatus.BAD_REQUEST);
         }
         checkPassword(changePasswordDTO.getNewPassword());
         user.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));

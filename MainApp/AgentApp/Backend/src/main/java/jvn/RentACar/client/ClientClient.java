@@ -6,7 +6,11 @@ import jvn.RentACar.model.Client;
 import jvn.RentACar.model.User;
 import jvn.RentACar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
 
 public class ClientClient extends WebServiceGatewaySupport {
 
@@ -15,6 +19,10 @@ public class ClientClient extends WebServiceGatewaySupport {
 
     @Autowired
     private ClientDetailsMapper clientDetailsMapper;
+
+//    @Autowired
+//    @Qualifier("webServiceTemplateClient")
+//    private WebServiceTemplate webServiceTem;
 
     public CreateOrEditClientResponse createOrEdit(Client client) {
 
@@ -49,7 +57,7 @@ public class ClientClient extends WebServiceGatewaySupport {
         CheckClientPersonalInfoRequest request = new CheckClientPersonalInfoRequest();
         request.setClientEmail(clientEmail);
         request.setPhoneNumber(phoneNumber);
-        CheckClientPersonalInfoResponse response = (CheckClientPersonalInfoResponse) getWebServiceTemplate()
+        CheckClientPersonalInfoResponse response = (CheckClientPersonalInfoResponse)getWebServiceTemplate()
                 .marshalSendAndReceive(request);
         return response;
     }

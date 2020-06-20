@@ -4,8 +4,8 @@ LABEL maintainer="Tim 29"
 
 WORKDIR /usr/src/zuul 
 COPY Frontend .
-RUN ["npm", "install"]
-RUN ["npm", "install", "ng-starrating@1.0.11"]
+RUN npm install
+RUN npm install ng-starrating@1.0.11
 RUN ["npm", "run", "build", "--prod"]
 
 

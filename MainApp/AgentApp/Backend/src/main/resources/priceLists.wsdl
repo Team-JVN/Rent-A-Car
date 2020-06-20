@@ -92,7 +92,7 @@
     </wsdl:binding>
     <wsdl:service name="PriceListsPortService">
         <wsdl:port binding="tns:PriceListsPortSoap11" name="PriceListsPortSoap11">
-            <soap:address location="http://192.168.56.1:8081/ws/pricelist"/>
+            <soap:address location="http://172.18.0.10:8081/ws/pricelist"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

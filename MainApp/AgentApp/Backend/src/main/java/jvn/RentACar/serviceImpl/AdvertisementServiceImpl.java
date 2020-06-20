@@ -174,20 +174,20 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         List<Advertisement> searchedAdsList;
         if (newSearchParamsDTO.getCDW() != null && newSearchParamsDTO.getCDW()) {
             searchedAdsList = advertisementRepository
-                    .findByCDWAndLogicalStatusAndDateFromLessThanEqualAndDateToIsNotNullAndDateToGreaterThanEqualAndPickUpPointContainsIgnoringCaseAndCarMakeNameContainsAndCarModelNameContainsAndCarFuelTypeNameContainsAndCarGearBoxTypeNameContainsAndCarBodyStyleNameContainsAndCarMileageInKmLessThanEqualAndCarKidsSeatsGreaterThanEqualAndCarAvgRatingGreaterThanEqualAndPriceListPricePerDayBetweenOrCDWAndLogicalStatusAndDateFromLessThanEqualAndDateToIsNullAndPickUpPointContainsIgnoringCaseAndCarMakeNameContainsAndCarModelNameContainsAndCarFuelTypeNameContainsAndCarGearBoxTypeNameContainsAndCarBodyStyleContainsAndCarMileageInKmLessThanEqualAndCarKidsSeatsGreaterThanEqualAndCarAvgRatingGreaterThanEqualAndPriceListPricePerDayBetween(
-                            newSearchParamsDTO.getCDW(), LogicalStatus.EXISTING, dateTimeFrom.toLocalDate(),
-                            dateTimeTo.toLocalDate(), newSearchParamsDTO.getPickUpPoint(), newSearchParamsDTO.getMake(),
+                    .findByCDWIsNotNullAndCDWAndLogicalStatusAndDateFromLessThanEqualAndDateToIsNotNullAndDateToGreaterThanEqualAndPickUpPointContainsIgnoringCaseAndCarMakeNameContainsAndCarModelNameContainsAndCarFuelTypeNameContainsAndCarGearBoxTypeNameContainsAndCarBodyStyleNameContainsAndCarMileageInKmLessThanEqualAndCarKidsSeatsGreaterThanEqualAndCarAvgRatingGreaterThanEqualAndPriceListPricePerDayBetweenOrCDWIsNotNullAndCDWAndLogicalStatusAndDateFromLessThanEqualAndDateToIsNullAndPickUpPointContainsIgnoringCaseAndCarMakeNameContainsAndCarModelNameContainsAndCarFuelTypeNameContainsAndCarGearBoxTypeNameContainsAndCarBodyStyleNameContainsAndCarMileageInKmLessThanEqualAndCarKidsSeatsGreaterThanEqualAndCarAvgRatingGreaterThanEqualAndPriceListPricePerDayBetween(
+                            newSearchParamsDTO.getCDW(), LogicalStatus.EXISTING, dateTimeFrom.toLocalDate(), dateTimeTo.toLocalDate(),
+                            newSearchParamsDTO.getPickUpPoint(), newSearchParamsDTO.getMake(),
                             newSearchParamsDTO.getModel(), newSearchParamsDTO.getFuelType(),
                             newSearchParamsDTO.getGearBoxType(), newSearchParamsDTO.getBodyStyle(),
                             newSearchParamsDTO.getMileageInKm(), newSearchParamsDTO.getKidsSeats(),
                             newSearchParamsDTO.getMinRating().doubleValue(), newSearchParamsDTO.getMinPricePerDay(),
-                            newSearchParamsDTO.getMaxPricePerDay(), newSearchParamsDTO.getCDW(), LogicalStatus.EXISTING,
-                            dateTimeFrom.toLocalDate(), newSearchParamsDTO.getPickUpPoint(),
-                            newSearchParamsDTO.getMake(), newSearchParamsDTO.getModel(),
-                            newSearchParamsDTO.getFuelType(), newSearchParamsDTO.getGearBoxType(),
-                            newSearchParamsDTO.getBodyStyle(), newSearchParamsDTO.getMileageInKm(),
-                            newSearchParamsDTO.getKidsSeats(), newSearchParamsDTO.getMinRating().doubleValue(),
-                            newSearchParamsDTO.getMinPricePerDay(), newSearchParamsDTO.getMaxPricePerDay());
+                            newSearchParamsDTO.getMaxPricePerDay(), newSearchParamsDTO.getCDW(), LogicalStatus.EXISTING, dateTimeFrom.toLocalDate(),
+                            newSearchParamsDTO.getPickUpPoint(), newSearchParamsDTO.getMake(),
+                            newSearchParamsDTO.getModel(), newSearchParamsDTO.getFuelType(),
+                            newSearchParamsDTO.getGearBoxType(), newSearchParamsDTO.getBodyStyle(),
+                            newSearchParamsDTO.getMileageInKm(), newSearchParamsDTO.getKidsSeats(),
+                            newSearchParamsDTO.getMinRating().doubleValue(), newSearchParamsDTO.getMinPricePerDay(),
+                            newSearchParamsDTO.getMaxPricePerDay());
         } else {
             searchedAdsList = advertisementRepository
                     .findByLogicalStatusAndDateFromLessThanEqualAndDateToIsNotNullAndDateToGreaterThanEqualAndPickUpPointContainsIgnoringCaseAndCarMakeNameContainsAndCarModelNameContainsAndCarFuelTypeNameContainsAndCarGearBoxTypeNameContainsAndCarBodyStyleNameContainsAndCarMileageInKmLessThanEqualAndCarKidsSeatsGreaterThanEqualAndCarAvgRatingGreaterThanEqualAndPriceListPricePerDayBetweenOrLogicalStatusAndDateFromLessThanEqualAndDateToIsNullAndPickUpPointContainsIgnoringCaseAndCarMakeNameContainsAndCarModelNameContainsAndCarFuelTypeNameContainsAndCarGearBoxTypeNameContainsAndCarBodyStyleNameContainsAndCarMileageInKmLessThanEqualAndCarKidsSeatsGreaterThanEqualAndCarAvgRatingGreaterThanEqualAndPriceListPricePerDayBetween(
@@ -331,7 +331,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         return null;
     }
 
-    @Scheduled(cron = "0 0 0/3 * * ?")
+    @Scheduled(cron = "0 30 0/3 * * ?")
     public void synchronizeAdvertisements() {
         try {
             GetAllAdvertisementDetailsResponse response = advertisementClient.getAll();
@@ -384,8 +384,8 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     @Autowired
     public AdvertisementServiceImpl(CarService carService, PriceListService priceListService, UserService userService,
-            AdvertisementRepository advertisementRepository, AdvertisementClient advertisementClient,
-            AdvertisementDetailsMapper advertisementDetailsMapper, LogService logService) {
+                                    AdvertisementRepository advertisementRepository, AdvertisementClient advertisementClient,
+                                    AdvertisementDetailsMapper advertisementDetailsMapper, LogService logService) {
         this.carService = carService;
         this.priceListService = priceListService;
         this.advertisementRepository = advertisementRepository;

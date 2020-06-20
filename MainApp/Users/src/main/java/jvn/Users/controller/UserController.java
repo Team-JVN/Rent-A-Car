@@ -105,9 +105,8 @@ public class UserController {
             throw new InvalidUserDataException("Password cannot be check. Please try again.", HttpStatus.BAD_REQUEST);
         }
         try {
-            return new ResponseEntity<>(
-                    clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO), false, null)),
-                    HttpStatus.CREATED);
+            ClientDTO result = clientDtoMapper.toDto(clientService.create(clientDtoMapper.toEntity(clientDTO), false, null));
+            return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(result);
         } catch (NoSuchAlgorithmException e) {
             logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "REG", "Hash algorithm threw exception"));
             throw new InvalidTokenException("Activation token cannot be generated. Please try again.",
@@ -153,12 +152,12 @@ public class UserController {
             throw new InvalidUserDataException("Reset token or new password cannot be checked. Please try again.",
                     HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(null);
     }
 
     @RequestMapping(value = "/refresh", method = RequestMethod.POST)
     public ResponseEntity<UserTokenState> refreshAuthenticationToken(HttpServletRequest request) {
-        return new ResponseEntity<>(userService.refreshAuthenticationToken(request), HttpStatus.OK);
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(userService.refreshAuthenticationToken(request));
     }
 
     @Autowired
