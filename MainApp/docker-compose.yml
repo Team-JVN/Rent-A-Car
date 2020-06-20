@@ -193,7 +193,6 @@ services:
         networks:
             - main-app-tls
 
-<<<<<<< HEAD
     agentapp:
         build: ./AgentApp
         image: jelenapopov/agentapp
@@ -221,37 +220,6 @@ services:
             - agentapp-logs:/var/log
         depends_on: 
             - agentapp-mysql
-=======
-    # agentapp:
-    #     build: ./AgentApp
-    #     image: jelenapopov/agentapp
-    #     container_name: agentapp
-    #     restart: on-failure
-    #     networks:
-    #         - agent-app-tls
-    #     ports:
-    #         - 8090:8090
-    #     environment:
-    #         DATABASE_USERNAME: rentacar
-    #         DATABASE_PASSWORD: RentACarTeam29
-    #         DATABASE_DOMAIN: agentapp-mysql
-    #         DATABASE_SCHEMA: agentappdb
-    #         KEYSTORE: /etc/keystore/agentapp.keystore.p12
-    #         KEYSTORE_PASSWORD: agentapp_pass
-    #         KEYSTORE_ALIAS: agentapp
-    #         TRUSTSTORE: /etc/keystore/agentapp.truststore.p12
-    #         TRUSTSTORE_PASSWORD: agentapp_pass
-    #         UPLOADED_PICTURES_PATH: /etc/uploadedPictures/
-    #         LOG_STORAGE: /var/log/agentapp-log-storage.log
-    #         LOG_BACKUP_1: /var/log/agentapp-log-backup-1.log
-    #         LOG_BACKUP_2: /var/log/agentapp-log-backup-2.log
-    #     volumes:
-    #         - ./tls/certs/agentapp/keystore:/etc/keystore
-    #         - ./AgentApp/Backend/src/main/resources/uploadedPictures/:/etc/uploadedPictures/
-    #         - agentapp-logs:/var/log
-    #     depends_on: 
-    #         - agentapp-mysql
->>>>>>> master
 
     agentapp-mysql:
         image: mysql:8.0.19
