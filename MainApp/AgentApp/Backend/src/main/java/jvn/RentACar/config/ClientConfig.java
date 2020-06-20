@@ -54,7 +54,7 @@ public class ClientConfig {
     @Bean
     public ClientClient clientClient(@Qualifier("marshallerClient") Jaxb2Marshaller marshallerClient) {
         ClientClient client = new ClientClient();
-        client.setDefaultUri("http://localhost:8080/users/ws");
+        client.setDefaultUri("http://zuul:8080/users/ws");
         client.setMarshaller(marshallerClient);
         client.setUnmarshaller(marshallerClient);
         // client.setMessageSender(httpComponentsMessageSenderCar());

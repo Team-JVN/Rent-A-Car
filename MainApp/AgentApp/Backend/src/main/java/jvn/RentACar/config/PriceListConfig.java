@@ -53,7 +53,7 @@ public class PriceListConfig {
     @Bean
     public PriceListClient priceListClient(@Qualifier("marshallerPriceList") Jaxb2Marshaller marshallerPriceList) throws Exception {
         PriceListClient client = new PriceListClient();
-        client.setDefaultUri("http://localhost:8080/advertisements/ws/pricelist");
+        client.setDefaultUri("http://zuul:8080/advertisements/ws/pricelist");
         client.setMarshaller(marshallerPriceList);
         client.setUnmarshaller(marshallerPriceList);
 //        client.setMessageSender(httpComponentsMessageSender());

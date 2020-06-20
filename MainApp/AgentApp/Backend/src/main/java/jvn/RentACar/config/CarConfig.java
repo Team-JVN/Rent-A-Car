@@ -56,7 +56,7 @@ public class CarConfig {
     @Bean
     public CarClient carClient(@Qualifier("marshallerCar") Jaxb2Marshaller marshallerCar) {
         CarClient client = new CarClient();
-        client.setDefaultUri("https://localhost:8080/cars/car/ws");
+        client.setDefaultUri("http://zuul:8080/cars/car/ws");
         client.setMarshaller(marshallerCar);
         client.setUnmarshaller(marshallerCar);
         // client.setMessageSender(httpComponentsMessageSenderCar());
