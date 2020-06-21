@@ -65,7 +65,10 @@ public class AdvertisementProducer {
     }
 
     public void sendMessageToRentingService(Long advId) {
-        rabbitTemplate.convertAndSend(REJECT_ALL_REQUESTS, advId);
+        byte[] advIdBytes = convertToBytes(advId);
+        byte[] digitalSignature = digitalSignatureService.encrypt(advIdBytes);
+        AdvIdSignedDTO advIdSignedDTO = new AdvIdSignedDTO(advIdBytes, digitalSignature);
+        rabbitTemplate.convertAndSend(REJECT_ALL_REQUESTS, convertToString(advIdSignedDTO));
     }
 
 
