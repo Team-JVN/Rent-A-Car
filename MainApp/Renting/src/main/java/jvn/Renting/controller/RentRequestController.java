@@ -7,6 +7,7 @@ import jvn.Renting.dto.both.RentRequestDTO;
 import jvn.Renting.dto.both.UserDTO;
 import jvn.Renting.dto.message.Log;
 import jvn.Renting.dto.request.RentRequestStatusDTO;
+import jvn.Renting.dto.response.SignedMessageDTO;
 import jvn.Renting.enumeration.EditType;
 import jvn.Renting.exceptionHandler.InvalidRentRequestDataException;
 import jvn.Renting.mapper.RentInfoDtoMapper;
@@ -14,6 +15,7 @@ import jvn.Renting.mapper.RentRequestDtoMapper;
 import jvn.Renting.model.RentInfo;
 import jvn.Renting.model.RentRequest;
 import jvn.Renting.producer.LogProducer;
+import jvn.Renting.service.DigitalSignatureService;
 import jvn.Renting.service.RentInfoService;
 import jvn.Renting.service.RentRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +54,8 @@ public class RentRequestController {
     private RentInfoDtoMapper rentInfoDtoMapper;
 
     private LogProducer logProducer;
+
+    private DigitalSignatureService digitalSignatureService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<RentRequestDTO> create(@Valid @RequestBody RentRequestDTO rentRequestDTO) {
@@ -106,15 +110,36 @@ public class RentRequestController {
         return new ResponseEntity<>(rentRequestService.getAdvertisementEditType(id), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/advertisement/{advId}/edit-type-feign", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SignedMessageDTO> getAdvertisementEditTypeFeign(
+            @PathVariable("advId") @Positive(message = "Id must be positive.") Long id) {
+        EditType editType = rentRequestService.getAdvertisementEditType(id);
+        byte[] messageBytes = convertToBytes(editType);
+        byte[] digitalSignature = digitalSignatureService.encrypt(messageBytes);
+        SignedMessageDTO signedMessageDTO = new SignedMessageDTO(messageBytes, digitalSignature);
+
+        return new ResponseEntity<>(signedMessageDTO, HttpStatus.OK);
+    }
+
     @GetMapping(value = "/advertisement/{advId}/check-for-delete", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> canDeleteAdvertisement(
+    public ResponseEntity<SignedMessageDTO> canDeleteAdvertisement(
             @PathVariable("advId") @Positive(message = "Id must be positive.") Long advId) {
-        return new ResponseEntity<>(rentRequestService.canDeleteAdvertisement(advId), HttpStatus.OK);
+        Boolean result = rentRequestService.canDeleteAdvertisement(advId);
+        byte[] messageBytes = convertToBytes(result);
+        byte[] digitalSignature = digitalSignatureService.encrypt(messageBytes);
+        SignedMessageDTO signedMessageDTO = new SignedMessageDTO(messageBytes, digitalSignature);
+
+        return new ResponseEntity<>(signedMessageDTO, HttpStatus.OK);
     }
 
     @GetMapping(value = "/advertisement/{advIds}/check-rent-infos", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> hasRentInfos(@PathVariable("advIds") List<Long> advIds) {
-        return new ResponseEntity<>(rentRequestService.hasRentInfos(advIds), HttpStatus.OK);
+    public ResponseEntity<SignedMessageDTO> hasRentInfos(@PathVariable("advIds") List<Long> advIds) {
+        Boolean result = rentRequestService.hasRentInfos(advIds);
+        byte[] messageBytes = convertToBytes(result);
+        byte[] digitalSignature = digitalSignatureService.encrypt(messageBytes);
+        SignedMessageDTO signedMessageDTO = new SignedMessageDTO(messageBytes, digitalSignature);
+
+        return new ResponseEntity<>(signedMessageDTO, HttpStatus.OK);
     }
 
     @PutMapping(value = "/{rentRequestId}/rent-info/{rentInfoId}/pay")
@@ -135,10 +160,29 @@ public class RentRequestController {
         }
     }
 
+    private byte[] convertToBytes(Boolean obj) {
+        try {
+            return objectMapper.writeValueAsBytes(obj);
+        } catch (JsonProcessingException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping %s instance to byte array failed", Boolean.class.getSimpleName())));
+            return null;
+        }
+    }
+
+    private byte[] convertToBytes(EditType obj) {
+        try {
+            return objectMapper.writeValueAsBytes(obj);
+        } catch (JsonProcessingException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping %s instance to byte array failed", EditType.class.getSimpleName())));
+            return null;
+        }
+    }
+
     @Autowired
     public RentRequestController(RentRequestService rentRequestService, RentRequestDtoMapper rentRequestDtoMapper,
                                  ObjectMapper objectMapper, HttpServletRequest request, RentInfoService rentInfoService,
-                                 RentInfoDtoMapper rentInfoDtoMapper, LogProducer logProducer) {
+                                 RentInfoDtoMapper rentInfoDtoMapper, LogProducer logProducer,
+                                 DigitalSignatureService digitalSignatureService) {
         this.rentRequestService = rentRequestService;
         this.rentRequestDtoMapper = rentRequestDtoMapper;
         this.objectMapper = objectMapper;
@@ -146,5 +190,6 @@ public class RentRequestController {
         this.rentInfoService = rentInfoService;
         this.rentInfoDtoMapper = rentInfoDtoMapper;
         this.logProducer = logProducer;
+        this.digitalSignatureService = digitalSignatureService;
     }
 }

@@ -1,5 +1,7 @@
 package jvn.Advertisements.serviceImpl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Advertisements.client.CarClient;
 import jvn.Advertisements.client.RentingClient;
 import jvn.Advertisements.dto.message.AdvertisementMessageDTO;
@@ -8,6 +10,7 @@ import jvn.Advertisements.dto.message.OwnerMessageDTO;
 import jvn.Advertisements.dto.request.AdvertisementEditDTO;
 import jvn.Advertisements.dto.request.UserDTO;
 import jvn.Advertisements.dto.response.CarWithAllInformationDTO;
+import jvn.Advertisements.dto.response.SignedMessageDTO;
 import jvn.Advertisements.enumeration.EditType;
 import jvn.Advertisements.enumeration.LogicalStatus;
 import jvn.Advertisements.exceptionHandler.InvalidAdvertisementDataException;
@@ -18,6 +21,7 @@ import jvn.Advertisements.producer.AdvertisementProducer;
 import jvn.Advertisements.producer.LogProducer;
 import jvn.Advertisements.repository.AdvertisementRepository;
 import jvn.Advertisements.service.AdvertisementService;
+import jvn.Advertisements.service.DigitalSignatureService;
 import jvn.Advertisements.service.PriceListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +29,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,6 +39,9 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     private final String CLASS_PATH = this.getClass().getCanonicalName();
     private final String CLASS_NAME = this.getClass().getSimpleName();
+
+    private final String CARS_ALIAS = "cars";
+    private final String RENTING_ALIAS = "renting";
 
     private PriceListService priceListService;
 
@@ -49,12 +57,24 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     private LogProducer logProducer;
 
+    private DigitalSignatureService digitalSignatureService;
+
+    private ObjectMapper objectMapper;
+
     @Override
     @Transactional
     public Advertisement create(Advertisement createAdvertisementDTO, UserDTO userDTO) {
 
         checkDate(createAdvertisementDTO.getDateFrom(), createAdvertisementDTO.getDateTo());
-        CarWithAllInformationDTO carDTO = carClient.verify(userDTO.getId(), createAdvertisementDTO.getCar());
+
+        CarWithAllInformationDTO carDTO = null;
+        SignedMessageDTO signedMessageDTO = carClient.verify(userDTO.getId(), createAdvertisementDTO.getCar());
+        if (digitalSignatureService.decrypt(CARS_ALIAS, signedMessageDTO.getMessageBytes(), signedMessageDTO.getDigitalSignature())) {
+            carDTO = bytesToObject(signedMessageDTO.getMessageBytes());
+        } else {
+            logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SGN", "Invalid digital signature"));
+        }
+
         checkIfCarIsAvailable(createAdvertisementDTO.getCar(), createAdvertisementDTO.getDateFrom(),
                 createAdvertisementDTO.getDateTo());
         createAdvertisementDTO.setOwner(userDTO.getId());
@@ -87,7 +107,15 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         Advertisement advertisement = get(id, LogicalStatus.EXISTING);
         checkOwner(advertisement, loggedInUserId);
 
-        if (rentingClient.canDeleteAdvertisement(id)) {
+        Boolean canDelete = false;
+        SignedMessageDTO signedMessageDTO = rentingClient.canDeleteAdvertisement(id);
+        if (digitalSignatureService.decrypt(RENTING_ALIAS, signedMessageDTO.getMessageBytes(), signedMessageDTO.getDigitalSignature())) {
+            canDelete = bytesToBoolean(signedMessageDTO.getMessageBytes());
+        } else {
+            logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SGN", "Invalid digital signature"));
+        }
+
+        if (canDelete != null && canDelete) {
             advertisement.setLogicalStatus(LogicalStatus.DELETED);
             advertisementRepository.save(advertisement);
             sendMessageToSearchService(advertisement.getId());
@@ -102,7 +130,16 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     public Advertisement edit(Long id, Advertisement advertisement, UserDTO userDTO) {
         Advertisement dbAdvertisement = get(id, LogicalStatus.EXISTING);
         checkOwner(dbAdvertisement, userDTO.getId());
-        if (!rentingClient.getAdvertisementEditType(id).equals(EditType.ALL)) {
+
+        EditType editType = null;
+        SignedMessageDTO signedEditType = rentingClient.getAdvertisementEditTypeFeign(id);
+        if (digitalSignatureService.decrypt(RENTING_ALIAS, signedEditType.getMessageBytes(), signedEditType.getDigitalSignature())) {
+            editType = bytesToEditType(signedEditType.getMessageBytes());
+        } else {
+            logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SGN", "Invalid digital signature"));
+        }
+
+        if (editType != null && !editType.equals(EditType.ALL)) {
             throw new InvalidAdvertisementDataException(
                     "This advertisement is in use and therefore it cannot be edited.", HttpStatus.BAD_REQUEST);
         }
@@ -111,7 +148,15 @@ public class AdvertisementServiceImpl implements AdvertisementService {
             dbAdvertisement.setCar(advertisement.getCar());
             checkIfCarIsAvailable(dbAdvertisement.getCar(), dbAdvertisement.getDateFrom(), dbAdvertisement.getDateTo());
         }
-        CarWithAllInformationDTO carDTO = carClient.verify(userDTO.getId(), dbAdvertisement.getCar());
+
+        CarWithAllInformationDTO carDTO = null;
+        SignedMessageDTO signedMessageDTO = carClient.verify(userDTO.getId(), dbAdvertisement.getCar());
+        if (digitalSignatureService.decrypt(CARS_ALIAS, signedMessageDTO.getMessageBytes(), signedMessageDTO.getDigitalSignature())) {
+            carDTO = bytesToObject(signedMessageDTO.getMessageBytes());
+        } else {
+            logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SGN", "Invalid digital signature"));
+        }
+
         dbAdvertisement.setDateFrom(advertisement.getDateFrom());
         dbAdvertisement.setDateTo(advertisement.getDateTo());
         dbAdvertisement.setPriceList(priceListService.get(advertisement.getPriceList().getId(), userDTO.getId()));
@@ -151,7 +196,14 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         if (advertisements == null || advertisements.isEmpty()) {
             return true;
         } else {
-            return !rentingClient.hasRentInfos(advertisements.stream().map(Advertisement::getId).collect(Collectors.toList()));
+            Boolean hasRentInfos = false;
+            SignedMessageDTO signedMessageDTO = rentingClient.hasRentInfos(advertisements.stream().map(Advertisement::getId).collect(Collectors.toList()));
+            if (digitalSignatureService.decrypt(RENTING_ALIAS, signedMessageDTO.getMessageBytes(), signedMessageDTO.getDigitalSignature())) {
+                hasRentInfos = bytesToBoolean(signedMessageDTO.getMessageBytes());
+            } else {
+                logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SGN", "Invalid digital signature"));
+            }
+            return hasRentInfos != null && !hasRentInfos;
         }
     }
 
@@ -168,7 +220,15 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         Advertisement advertisement = get(id, LogicalStatus.EXISTING);
         checkOwner(advertisement, loggedInUser);
 
-        if (rentingClient.canDeleteAdvertisement(id)) {
+        Boolean canDelete = false;
+        SignedMessageDTO signedMessageDTO = rentingClient.canDeleteAdvertisement(id);
+        if (digitalSignatureService.decrypt(RENTING_ALIAS, signedMessageDTO.getMessageBytes(), signedMessageDTO.getDigitalSignature())) {
+            canDelete = bytesToBoolean(signedMessageDTO.getMessageBytes());
+        } else {
+            logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SGN", "Invalid digital signature"));
+        }
+
+        if (canDelete != null && canDelete) {
             advertisement.setLogicalStatus(LogicalStatus.DELETED);
             advertisementRepository.save(advertisement);
             sendMessageToSearchService(advertisement.getId());
@@ -180,7 +240,15 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     @Override
     public String getAdvertisementEditType(Long id, Long loggedInUser) {
-        if (rentingClient.getAdvertisementEditType(id).equals(EditType.ALL)) {
+        EditType editType = null;
+        SignedMessageDTO signedEditType = rentingClient.getAdvertisementEditTypeFeign(id);
+        if (digitalSignatureService.decrypt(RENTING_ALIAS, signedEditType.getMessageBytes(), signedEditType.getDigitalSignature())) {
+            editType = bytesToEditType(signedEditType.getMessageBytes());
+        } else {
+            logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SGN", "Invalid digital signature"));
+        }
+
+        if (editType != null && editType.equals(EditType.ALL)) {
             return "ALL";
         }
         return "PARTIAL";
@@ -312,10 +380,38 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         return dbAdvertisement;
     }
 
+    private CarWithAllInformationDTO bytesToObject(byte[] byteArray) {
+        try {
+            return objectMapper.readValue(byteArray, CarWithAllInformationDTO.class);
+        } catch (IOException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping byte array to %s failed", CarWithAllInformationDTO.class.getSimpleName())));
+            return null;
+        }
+    }
+
+    private Boolean bytesToBoolean(byte[] byteArray) {
+        try {
+            return objectMapper.readValue(byteArray, Boolean.class);
+        } catch (IOException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping byte array to %s failed", Boolean.class.getSimpleName())));
+            return null;
+        }
+    }
+
+    private EditType bytesToEditType(byte[] byteArray) {
+        try {
+            return objectMapper.readValue(byteArray, EditType.class);
+        } catch (IOException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping byte array to %s failed", EditType.class.getSimpleName())));
+            return null;
+        }
+    }
+
     @Autowired
-    public AdvertisementServiceImpl(PriceListService priceListService, CarClient carClient,
+    public AdvertisementServiceImpl(PriceListService priceListService, CarClient carClient, ObjectMapper objectMapper,
                                     AdvertisementRepository advertisementRepository, AdvertisementMessageDtoMapper advertisementMessageMapper,
-                                    AdvertisementProducer advertisementProducer, RentingClient rentingClient, LogProducer logProducer) {
+                                    AdvertisementProducer advertisementProducer, RentingClient rentingClient, LogProducer logProducer,
+                                    DigitalSignatureService digitalSignatureService) {
         this.priceListService = priceListService;
         this.carClient = carClient;
         this.advertisementRepository = advertisementRepository;
@@ -323,5 +419,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         this.advertisementProducer = advertisementProducer;
         this.rentingClient = rentingClient;
         this.logProducer = logProducer;
+        this.objectMapper = objectMapper;
+        this.digitalSignatureService = digitalSignatureService;
     }
 }

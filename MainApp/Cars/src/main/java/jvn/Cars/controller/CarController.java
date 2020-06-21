@@ -9,6 +9,7 @@ import jvn.Cars.dto.request.CreateCarDTO;
 import jvn.Cars.dto.request.UserDTO;
 import jvn.Cars.dto.response.CarWithAllInformationDTO;
 import jvn.Cars.dto.response.CarWithPicturesDTO;
+import jvn.Cars.dto.response.SignedMessageDTO;
 import jvn.Cars.exceptionHandler.InvalidCarDataException;
 import jvn.Cars.mapper.CarDtoMapper;
 import jvn.Cars.mapper.CarWithAllInformationDtoMapper;
@@ -17,6 +18,7 @@ import jvn.Cars.mapper.CreateCarDtoMapper;
 import jvn.Cars.model.Car;
 import jvn.Cars.producer.LogProducer;
 import jvn.Cars.service.CarService;
+import jvn.Cars.service.DigitalSignatureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -60,6 +62,8 @@ public class CarController {
 
     private LogProducer logProducer;
 
+    private DigitalSignatureService digitalSignatureService;
+
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CarDTO> create(@RequestParam("carData") String jsonString, @RequestParam("files") List<MultipartFile> multipartFiles) {
         ObjectMapper mapper = new ObjectMapper();
@@ -86,9 +90,14 @@ public class CarController {
     }
 
     @GetMapping("/verify/{userId}/{carId}")
-    public ResponseEntity<CarWithAllInformationDTO> verify(@PathVariable("userId") @Positive(message = "Id must be positive.") Long userId,
-                                                           @PathVariable("carId") @Positive(message = "Id must be positive.") Long carId) {
-        return new ResponseEntity<>(carWithAllInformationDtoMapper.toDto(carService.get(carId, userId)), HttpStatus.OK);
+    public ResponseEntity<SignedMessageDTO> verify(@PathVariable("userId") @Positive(message = "Id must be positive.") Long userId,
+                                                   @PathVariable("carId") @Positive(message = "Id must be positive.") Long carId) {
+        CarWithAllInformationDTO carWithAllInformationDTO = carWithAllInformationDtoMapper.toDto(carService.get(carId, userId));
+        byte[] messageBytes = convertToBytes(carWithAllInformationDTO);
+        byte[] digitalSignature = digitalSignatureService.encrypt(messageBytes);
+        SignedMessageDTO signedMessageDTO = new SignedMessageDTO(messageBytes, digitalSignature);
+
+        return new ResponseEntity<>(signedMessageDTO, HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}/picture", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
@@ -184,10 +193,19 @@ public class CarController {
         }
     }
 
+    private byte[] convertToBytes(CarWithAllInformationDTO obj) {
+        try {
+            return objectMapper.writeValueAsBytes(obj);
+        } catch (JsonProcessingException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping %s instance to byte array failed", CarWithAllInformationDTO.class.getSimpleName())));
+            return null;
+        }
+    }
+
     @Autowired
     public CarController(CarService carService, CarDtoMapper carDtoMapper, CreateCarDtoMapper createCarDtoMapper, HttpServletRequest request,
                          CarWithPicturesDtoMapper carWithPicturesDtoMapper, CarWithAllInformationDtoMapper carWithAllInformationDtoMapper,
-                         ObjectMapper objectMapper, LogProducer logProducer) {
+                         ObjectMapper objectMapper, LogProducer logProducer, DigitalSignatureService digitalSignatureService) {
         this.carService = carService;
         this.carDtoMapper = carDtoMapper;
         this.createCarDtoMapper = createCarDtoMapper;
@@ -196,5 +214,6 @@ public class CarController {
         this.request = request;
         this.objectMapper = objectMapper;
         this.logProducer = logProducer;
+        this.digitalSignatureService = digitalSignatureService;
     }
 }
