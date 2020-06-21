@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LogSignedDTO {
+public class LogMessageDTO {
 
     private String sender;
 

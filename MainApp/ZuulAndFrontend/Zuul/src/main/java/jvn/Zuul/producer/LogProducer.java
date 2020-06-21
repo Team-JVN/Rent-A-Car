@@ -3,8 +3,9 @@ package jvn.Zuul.producer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Zuul.config.RabbitMQConfiguration;
 import jvn.Zuul.dto.message.Log;
-import jvn.Zuul.dto.message.LogSignedDTO;
+import jvn.Zuul.dto.message.LogMessageDTO;
 import jvn.Zuul.service.DigitalSignatureService;
+import jvn.Zuul.serviceImpl.DigitalSignatureServiceImpl;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,14 +26,14 @@ public class LogProducer {
 
     public void send(Log log) {
         byte[] digitalSignature = digitalSignatureService.encrypt(log.toString().getBytes(StandardCharsets.UTF_8));
-        LogSignedDTO logSignedDTO = new LogSignedDTO(sender, log.toString(), digitalSignature);
-        rabbitTemplate.convertAndSend(RabbitMQConfiguration.LOGS, jsonToString(logSignedDTO));
+        LogMessageDTO logMessageDTO = new LogMessageDTO(sender, log.toString(), digitalSignature);
+        rabbitTemplate.convertAndSend(RabbitMQConfiguration.LOGS, jsonToString(logMessageDTO));
     }
 
-    private String jsonToString(LogSignedDTO logSignedDTO) {
+    private String jsonToString(LogMessageDTO logMessageDTO) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            return objectMapper.writeValueAsString(logSignedDTO);
+            return objectMapper.writeValueAsString(logMessageDTO);
         } catch (IOException e) {
             return null;
         }
