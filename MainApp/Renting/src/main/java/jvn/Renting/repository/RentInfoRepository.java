@@ -11,4 +11,7 @@ public interface RentInfoRepository extends JpaRepository<RentInfo, Long> {
     RentInfo findByIdAndRentRequestIdAndRentRequestRentRequestStatusAndRentReportPaidAndRentRequestClient(
             Long rentInfoId, Long rentRequestId, RentRequestStatus status, boolean paid, Long client
     );
+    RentInfo findByIdAndRentRequestId(Long rentInfoId, Long rentRequestId);
+
+    RentInfo findOneById(Long id);
 }

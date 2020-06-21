@@ -1,18 +1,29 @@
 package jvn.Renting.serviceImpl;
 
+import com.netflix.ribbon.proxy.annotation.Http;
 import jvn.Renting.client.AdvertisementClient;
 import jvn.Renting.client.SearchClient;
 import jvn.Renting.client.UserClient;
 import jvn.Renting.dto.both.*;
+import jvn.Renting.enumeration.CommentStatus;
 import jvn.Renting.dto.message.Log;
 import jvn.Renting.dto.request.RentRequestStatusDTO;
 import jvn.Renting.enumeration.EditType;
 import jvn.Renting.enumeration.RentRequestStatus;
+import jvn.Renting.exceptionHandler.InvalidCommentDataException;
+import jvn.Renting.exceptionHandler.InvalidMessageDataException;
 import jvn.Renting.exceptionHandler.InvalidRentRequestDataException;
+import jvn.Renting.mapper.CommentDtoMapper;
+import jvn.Renting.mapper.MessageDtoMapper;
+import jvn.Renting.mapper.RentReportDtoMapper;
+import jvn.Renting.model.Comment;
+import jvn.Renting.model.Message;
 import jvn.Renting.model.RentInfo;
 import jvn.Renting.model.RentRequest;
+import jvn.Renting.repository.CommentRepository;
 import jvn.Renting.producer.LogProducer;
 import jvn.Renting.producer.RentRequestProducer;
+import jvn.Renting.repository.RentInfoRepository;
 import jvn.Renting.repository.RentRequestRepository;
 import jvn.Renting.service.RentRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +35,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.net.SocketException;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -49,6 +62,16 @@ public class RentRequestServiceImpl implements RentRequestService {
     private UserClient userClient;
 
     private SearchClient searchClient;
+
+    private CommentDtoMapper commentDtoMapper;
+
+    private CommentRepository commentRepository;
+
+    private RentInfoRepository rentInfoRepository;
+
+    private MessageDtoMapper messageDtoMapper;
+
+    private RentReportDtoMapper rentReportDtoMapper;
 
     private RentRequestProducer rentRequestProducer;
 
@@ -79,6 +102,7 @@ public class RentRequestServiceImpl implements RentRequestService {
         rentRequest.setCreatedBy(loggedInUserId);
         rentRequest.setTotalPrice(0.0);
         rentRequest.setRentInfos(new HashSet<>());
+        rentRequest.setMessages(new HashSet<>());
         RentRequest savedRequest = rentRequestRepository.save(rentRequest);
 
         savedRequest = rentRequestRepository.save(setRentInfosData(savedRequest, rentInfos, advertisementDTOS));
@@ -183,14 +207,13 @@ public class RentRequestServiceImpl implements RentRequestService {
         return createListRentRequestDTOs(clientDTOS, advertisementWithIdsDTOS, rentRequests, loggedInUserId);
     }
 
-    @Override
     public RentRequest changeRentRequestStatus(Long id, RentRequestStatusDTO newStatus, Long loggedInUserId) {
         RentRequestStatus rentRequestStatus = getRentRequestStatus(newStatus.getStatus());
         RentRequest rentRequest = get(id, RentRequestStatus.PENDING);
 
         if (rentRequestStatus.equals(RentRequestStatus.CANCELED)) {
             if (loggedInUserId.equals(rentRequest.getCreatedBy())) {
-                return cancel(rentRequest, loggedInUserId);
+                return cancel(rentRequest,/**/ loggedInUserId);
             } else {
                 return reject(rentRequest, loggedInUserId);
             }
@@ -224,6 +247,11 @@ public class RentRequestServiceImpl implements RentRequestService {
             }
         }
         return false;
+    }
+
+    @Override
+    public RentRequestDTO get(Long id, Long loggedInUserId) {
+        return null;
     }
 
     private RentRequest cancel(RentRequest rentRequest, Long loggedInUserId) {
@@ -296,6 +324,14 @@ public class RentRequestServiceImpl implements RentRequestService {
             rentInfoDTO.setDateTimeTo(rentInfo.getDateTimeTo().toString());
             rentInfoDTO.setOptedForCDW(rentInfo.getOptedForCDW());
             rentInfoDTO.setAdvertisement(advertisementsMap.get(rentInfo.getAdvertisement()));
+            Set<CommentDTO> commentsDTO = new HashSet<CommentDTO>();
+            for(Comment comment: rentInfo.getComments()){
+                commentsDTO.add(commentDtoMapper.toDto(comment));
+            }
+            rentInfoDTO.setComments(commentsDTO);
+            if(rentInfo.getRentReport() != null ){
+                rentInfoDTO.setRentReport(rentReportDtoMapper.toDto(rentInfo.getRentReport()));
+            }
             rentInfoDTOS.add(rentInfoDTO);
             if (!rentInfoDTO.getAdvertisement().getOwner().getId().equals(loggedInUserId) && !rentRequest.getClient().equals(loggedInUserId)) {
                 throw new InvalidRentRequestDataException("You are not allowed to see rent requests of this advertisement.",
@@ -339,6 +375,7 @@ public class RentRequestServiceImpl implements RentRequestService {
             rentInfo.setRating(0);
             rentInfo.setKilometresLimit(advertisementDTO.getKilometresLimit());
             rentInfo.setPricePerKm(advertisementDTO.getPriceList().getPricePerKm());
+            rentInfo.setComments(new HashSet<>());
             totalPrice += countPrice(rentInfo, advertisementDTO);
         }
         rentRequest.setTotalPrice(totalPrice);
@@ -495,12 +532,20 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     @Autowired
     public RentRequestServiceImpl(RentRequestRepository rentRequestRepository, AdvertisementClient advertisementClient, UserClient userClient,
-                                  SearchClient searchClient, RentRequestProducer rentRequestProducer, LogProducer logProducer) {
+                                  SearchClient searchClient, CommentDtoMapper commentDtoMapper,
+                                  CommentRepository commentRepository, MessageDtoMapper messageDtoMapper,
+                                  RentRequestProducer rentRequestProducer, RentInfoRepository rentInfoRepository,
+                                  RentReportDtoMapper rentReportDtoMapper, LogProducer logProducer) {
         this.rentRequestRepository = rentRequestRepository;
         this.advertisementClient = advertisementClient;
         this.userClient = userClient;
         this.searchClient = searchClient;
+        this.commentDtoMapper = commentDtoMapper;
+        this.commentRepository = commentRepository;
+        this.messageDtoMapper = messageDtoMapper;
         this.rentRequestProducer = rentRequestProducer;
+        this.rentInfoRepository = rentInfoRepository;
+        this.rentReportDtoMapper = rentReportDtoMapper;
         this.logProducer = logProducer;
     }
 }

@@ -1,19 +1,14 @@
 package jvn.RentACar.controller;
 
-import jvn.RentACar.dto.both.RentInfoDTO;
-import jvn.RentACar.dto.both.RentRequestDTO;
+import jvn.RentACar.dto.both.*;
 import jvn.RentACar.dto.request.RentRequestStatusDTO;
-import jvn.RentACar.dto.response.UserDTO;
 import jvn.RentACar.exceptionHandler.InvalidAdvertisementDataException;
-import jvn.RentACar.mapper.RentInfoDtoMapper;
-import jvn.RentACar.mapper.RentRequestDtoMapper;
+import jvn.RentACar.mapper.*;
+import jvn.RentACar.model.User;
+import jvn.RentACar.service.*;
 import jvn.RentACar.model.Log;
 import jvn.RentACar.model.RentInfo;
 import jvn.RentACar.model.RentRequest;
-import jvn.RentACar.service.LogService;
-import jvn.RentACar.service.RentInfoService;
-import jvn.RentACar.service.RentRequestService;
-import jvn.RentACar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,8 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
-import java.text.ParseException;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,7 +42,17 @@ public class RentRequestController {
 
     private UserService userService;
 
+    private MessageDtoMapper messageDtoMapper;
+
+    private CommentDtoMapper commentDtoMapper;
+
+    private CommentService commentService;
+
     private LogService logService;
+
+    private UserDtoMapper userDtoMapper;
+
+    private MessageService messageService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<RentRequestDTO> create(@Valid @RequestBody RentRequestDTO rentRequestDTO) {
@@ -90,15 +95,64 @@ public class RentRequestController {
         logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PAY", String.format("User %s successfully paid for rent info %s from rent request %s", userService.getLoginUser().getId(), rentInfoId, rentRequestId)));
         return new ResponseEntity<>(rentInfoDtoMapper.toDto(rentInfo), HttpStatus.OK);
     }
+    @PostMapping("/{id}/message")
+    public ResponseEntity<MessageDTO> createMessage(@PathVariable Long id, @Valid @RequestBody MessageDTO messageDTO){
+        User user = userService.getLoginUser();
+        messageDTO.setSender(userDtoMapper.toDto(user));
+        return new ResponseEntity<>(messageDtoMapper.toDto(messageService.createMessage(messageDtoMapper.toEntity(messageDTO), id)),
+                HttpStatus.CREATED);
+    }
+
+    @GetMapping(value="/{id}/message")
+    public ResponseEntity<List<MessageDTO>> getMessages(@PathVariable Long id){
+        List<MessageDTO> list;
+        list= messageService.getMessages(id).stream().map(messageDtoMapper::toDto).
+                collect(Collectors.toList());
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @PostMapping(value="/{id}/rent-info/{rentInfoId}/comment")
+    public ResponseEntity<CommentDTO> createComment(@PathVariable Long id, @PathVariable Long rentInfoId, @Valid @RequestBody CommentDTO commentDTO){
+        return new ResponseEntity<>(commentDtoMapper.toDto(commentService.createComment(commentDtoMapper.toEntity(commentDTO),id, rentInfoId)),
+                HttpStatus.CREATED);
+    }
+
+    @PostMapping(value="/{id}/rent-info/{rentInfoId}/feedback")
+    public ResponseEntity<FeedbackDTO> leaveFeedback(@PathVariable Long id, @PathVariable Long rentInfoId, @Valid @RequestBody FeedbackDTO feedbackDTO){
+        if(feedbackDTO.getComments() != null){
+            int i = 0;
+            List<CommentDTO>commentDTOS = new ArrayList<>(feedbackDTO.getComments());
+            for(CommentDTO commentDTO: commentDTOS){
+                User user = userService.getLoginUser();
+                commentDTO.setSender(userDtoMapper.toDto(user));
+            }
+        }
+        return new ResponseEntity<>(commentService.leaveFeedback(feedbackDTO, id, rentInfoId),
+                HttpStatus.CREATED);
+    }
+
+    @GetMapping(value="/{id}/rent-info/{rentInfoId}/feedback")
+    public ResponseEntity<FeedbackDTO> getFeedback(@PathVariable Long id, @PathVariable Long rentInfoId){
+
+        return new ResponseEntity<>(commentService.getFeedback(id, rentInfoId), HttpStatus.OK);
+    }
 
     @Autowired
-    public RentRequestController(RentRequestService rentRequestService, RentRequestDtoMapper rentRequestDtoMapper, RentInfoService rentInfoService,
-                                 RentInfoDtoMapper rentInfoDtoMapper, UserService userService, LogService logService) {
+    public RentRequestController(RentRequestService rentRequestService, RentRequestDtoMapper rentRequestDtoMapper,
+                                 RentInfoService rentInfoService, RentInfoDtoMapper rentInfoDtoMapper,UserService userService,
+                                 MessageDtoMapper messageDtoMapper, CommentDtoMapper commentDtoMapper, CommentService commentService,
+                                 LogService logService, UserDtoMapper userDtoMapper, MessageService messageService) {
         this.rentRequestService = rentRequestService;
         this.rentRequestDtoMapper = rentRequestDtoMapper;
         this.rentInfoService = rentInfoService;
         this.rentInfoDtoMapper = rentInfoDtoMapper;
         this.userService = userService;
+        this.messageDtoMapper = messageDtoMapper;
+        this.commentDtoMapper = commentDtoMapper;
+        this.commentService = commentService;
         this.logService = logService;
+        this.userDtoMapper = userDtoMapper;
+        this.messageService = messageService;
+
     }
 }

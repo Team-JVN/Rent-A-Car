@@ -71,6 +71,11 @@ public class AdvertisementController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
+    @GetMapping("/by-id/{advId}")
+    public ResponseEntity<AdvertisementDTO> getOne(@PathVariable("advId") Long advertisement) {
+        return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.getOne(advertisement)), HttpStatus.OK);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") @Positive(message = "Id must be positive.") Long id) {
         UserDTO userDTO = stringToObject(request.getHeader("user"));

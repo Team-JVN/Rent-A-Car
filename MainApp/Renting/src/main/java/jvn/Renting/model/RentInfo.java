@@ -42,7 +42,7 @@ public class RentInfo {
     @Column
     private Integer rating;
 
-    @OneToMany(mappedBy = "rentInfo", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "rentInfo", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Comment> comments = new HashSet<>();
 
     @Column

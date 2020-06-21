@@ -21,11 +21,14 @@ public class Comment {
     private String text;
 
     @Column(nullable = false)
-    private Long sender;
+    private Long senderId;
+
+    @Column(nullable = false)
+    private String senderName;
 
     @Column(nullable = false)
     private CommentStatus status;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     private RentInfo rentInfo;
 }

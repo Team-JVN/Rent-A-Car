@@ -62,7 +62,7 @@
     </wsdl:binding>
     <wsdl:service name="RentRequestsPortService">
         <wsdl:port binding="tns:RentRequestsPortSoap11" name="RentRequestsPortSoap11">
-            <soap:address location="http://192.168.56.1:8083/rentrequest/ws"/>
+            <soap:address location="http://192.168.56.1:8083/ws/rentrequest"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

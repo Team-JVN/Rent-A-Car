@@ -13,6 +13,8 @@ public interface AdvertisementService {
 
     List<Advertisement> get(List<Long> advertisements);
 
+    Advertisement getOne (Long advertisementId);
+
     void delete(Long id, Long loggedInUserId);
 
     Advertisement edit(Long id, Advertisement advertisement, UserDTO userDTO);

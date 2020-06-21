@@ -1,9 +1,17 @@
 <mat-sidenav-container class="sidenav-container">
-  <mat-sidenav #drawer class="sidenav" fixedInViewport [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
-    [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="(isHandset$ | async) === false">
+  <mat-sidenav
+    #drawer
+    class="sidenav"
+    fixedInViewport
+    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+    [mode]="(isHandset$ | async) ? 'over' : 'side'"
+    [opened]="(isHandset$ | async) === false"
+  >
     <mat-toolbar>Menu</mat-toolbar>
     <mat-nav-list>
-      <a mat-list-item routerLink="/search-advertisements">Search Advertisements</a>
+      <a mat-list-item routerLink="/search-advertisements"
+        >Search Advertisements</a
+      >
       <span *ngIf="!isLoggedIn()">
         <a mat-list-item routerLink="/login">Login</a>
         <a mat-list-item routerLink="/client/registration">Registrate</a>
@@ -11,7 +19,9 @@
       </span>
       <span *ngIf="isLoggedIn() && hasPermissionMyRentRequests()">
         <a mat-list-item routerLink="/client/renting-cart">Renting Cart</a>
-        <a mat-list-item routerLink="/client-rent-requests">Clients' Rent Requests</a>
+        <a mat-list-item routerLink="/client-rent-requests"
+          >Clients' Rent Requests</a
+        >
       </span>
       <span *ngIf="isLoggedIn() && hasPermissionManageAdvertisements()">
         <a mat-list-item routerLink="/advertisements">Advertisements</a>
@@ -34,6 +44,9 @@
       <span *ngIf="isLoggedIn() && hasPermissionManageUsers()">
         <a mat-list-item routerLink="/manage-users">Manage Users</a>
       </span>
+      <span *ngIf="isLoggedIn() && hasPermissionManageUsers()">
+        <a mat-list-item routerLink="/manage-comments">Manage Comments</a>
+      </span>
       <span *ngIf="isLoggedIn() && hasPermissionAgentEditProfile()">
         <a mat-list-item routerLink="/edit-agent-info">Edit Profile Agent</a>
       </span>
@@ -53,8 +66,13 @@
   </mat-sidenav>
   <mat-sidenav-content>
     <mat-toolbar color="primary">
-      <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()"
-        *ngIf="isHandset$ | async">
+      <button
+        type="button"
+        aria-label="Toggle sidenav"
+        mat-icon-button
+        (click)="drawer.toggle()"
+        *ngIf="isHandset$ | async"
+      >
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
       <span>Rent-A-Car</span>

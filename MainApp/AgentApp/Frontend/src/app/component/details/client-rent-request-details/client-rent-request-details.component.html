@@ -1,98 +1,118 @@
 <div class="row div-page">
-    <div class="col-8">
-        <mat-card>
-            <mat-card-content>
-                <h2>Rent request from {{rentRequest.client.name}}</h2>
-                <div *ngFor="let rentInfo of rentRequest.rentInfos">
-                    <mat-card class="item-card">
-                        <div class="row">
-                            <div class="col-9">
-                                <mat-card-header>
-                                    <mat-card-title>
-                                        Rent info for
-                                        <span (click)="advertisementDetails(rentInfo)" class="btn-adv-details">
-                                            {{rentInfo.advertisement.car.make.name}}
-                                            {{rentInfo.advertisement.car.model.name}}
-                                        </span>
-                                    </mat-card-title>
-                                </mat-card-header>
-                            </div>
+  <div class="col-8">
+    <mat-card>
+      <mat-card-content>
+        <h2>Rent request from {{ rentRequest.client.name }}</h2>
+        <div *ngFor="let rentInfo of rentRequest.rentInfos">
+          <mat-card class="item-card">
+            <div class="row">
+              <div class="col-9">
+                <mat-card-header>
+                  <mat-card-title>
+                    Rent info for
+                    <span
+                      (click)="advertisementDetails(rentInfo)"
+                      class="btn-adv-details"
+                    >
+                      {{ rentInfo.advertisement.car.make.name }}
+                      {{ rentInfo.advertisement.car.model.name }}
+                    </span>
+                  </mat-card-title>
+                </mat-card-header>
+              </div>
 
-                            <div class="col-3 mt-0" align="end">
-                                <button mat-raised-button *ngIf="checkIfCanLeaveFeedback(rentInfo,rentRequest)"
-                                    color="primary" (click)="leaveFeedback(rentInfo)">Leave feedback
-                                </button>
-                            </div>
-
-                        </div>
-
-                        <mat-card-content>
-                            <table class="table">
-                                <tbody>
-                                    <tr>
-                                        <th class="first first-column">Starts on:</th>
-                                        <td>
-                                            {{rentInfo.dateTimeFrom | date:"dd.MM.yyyy."}} <span class="first">at</span>
-                                            {{rentInfo.dateTimeFrom | date:"HH:mm"}}h
-                                        </td>
-
-                                        <th class="first second-column">Ends on:</th>
-                                        <td>
-                                            {{rentInfo.dateTimeTo | date:"dd.MM.yyyy."}} <span class="first">at</span>
-                                            {{rentInfo.dateTimeTo | date:"HH:mm"}}h
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th class="first first-column">Pick up point:</th>
-                                        <td>
-                                            {{rentInfo.advertisement.pickUpPoint}}
-                                        </td>
-                                        <th class="first second-column"> Opted for Collision <br> Damage Waiver:
-                                        </th>
-                                        <td>
-                                            <span *ngIf="rentInfo.optedForCDW">
-                                                Yes
-                                            </span>
-                                            <span *ngIf="!rentInfo.optedForCDW">No</span>
-                                        </td>
-                                    </tr>
-                                    <tr *ngIf="rentInfo.additionalCost">
-                                        <th class="first first-column">Aditional cost:</th>
-                                        <td>
-                                            {{rentInfo.additionalCost | number : '1.2-2'}} €
-                                        </td>
-                                        <td>
-                                            <button mat-raised-button color="primary" class="pay-btn"
-                                                (click)="pay(rentInfo,rentRequest);$event.stopPropagation()"
-                                                *ngIf="!rentInfo.paid">
-                                                Pay!</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </mat-card-content>
-                    </mat-card>
-                </div>
-                <div class="row">
-                    <div class="col-6">
-                        &nbsp;
-                    </div>
-                    <div class="col-6 mt-2" align="end">
-                        <h3>Total price: {{rentRequest.totalPrice | number : '1.2-2'}} €</h3>
-                    </div>
-                </div>
-
-            </mat-card-content>
-        </mat-card>
-    </div>
-    <!-- <div class="col-4">
-        <div *ngIf="rentRequest.rentRequestStatus == 'PAID'">
-            <div class="chat-page">
-                <div class="chat-box">
-                    <app-view-messages [messages]="messages" [client]="rentRequest.client"></app-view-messages>
-                </div>
+              <div class="col-3 mt-0" align="end">
+                <button
+                  mat-raised-button
+                  *ngIf="checkIfCanLeaveFeedback(rentInfo, rentRequest)"
+                  color="primary"
+                  (click)="leaveFeedback(rentInfo)"
+                >
+                  Leave feedback
+                </button>
+              </div>
             </div>
-        </div>
-    </div> -->
 
+            <mat-card-content>
+              <table class="table">
+                <tbody>
+                  <tr>
+                    <th class="first first-column">Starts on:</th>
+                    <td>
+                      {{ rentInfo.dateTimeFrom | date: "dd.MM.yyyy." }}
+                      <span class="first">at</span>
+                      {{ rentInfo.dateTimeFrom | date: "HH:mm" }}h
+                    </td>
+
+                    <th class="first second-column">Ends on:</th>
+                    <td>
+                      {{ rentInfo.dateTimeTo | date: "dd.MM.yyyy." }}
+                      <span class="first">at</span>
+                      {{ rentInfo.dateTimeTo | date: "HH:mm" }}h
+                    </td>
+                  </tr>
+                  <tr>
+                    <th class="first first-column">Pick up point:</th>
+                    <td>
+                      {{ rentInfo.advertisement.pickUpPoint }}
+                    </td>
+                    <th class="first second-column">
+                      Opted for Collision <br />
+                      Damage Waiver:
+                    </th>
+                    <td>
+                      <span *ngIf="rentInfo.optedForCDW">
+                        Yes
+                      </span>
+                      <span *ngIf="!rentInfo.optedForCDW">No</span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="rentInfo.additionalCost">
+                    <th class="first first-column">Aditional cost:</th>
+                    <td>{{ rentInfo.additionalCost | number: "1.2-2" }} €</td>
+                    <td>
+                      <button
+                        mat-raised-button
+                        color="primary"
+                        class="pay-btn"
+                        (click)="
+                          pay(rentInfo, rentRequest); $event.stopPropagation()
+                        "
+                        *ngIf="!rentInfo.paid"
+                      >
+                        Pay!
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </mat-card-content>
+          </mat-card>
+        </div>
+        <div class="row">
+          <div class="col-6">
+            &nbsp;
+          </div>
+          <div class="col-6 mt-2" align="end">
+            <h3>
+              Total price: {{ rentRequest.totalPrice | number: "1.2-2" }} €
+            </h3>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  <div class="col-4">
+    <div *ngIf="rentRequest.rentRequestStatus == 'PAID'">
+      <div class="chat-page">
+        <div class="chat-box">
+          <app-view-messages
+            [messages]="messages"
+            [client]="rentRequest.client"
+            [rentRequest]="rentRequest"
+          ></app-view-messages>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

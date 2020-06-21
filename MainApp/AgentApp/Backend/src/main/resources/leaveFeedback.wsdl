@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:sch="http://www.soap.dto/comment"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.comment.dto/soap"
+                  targetNamespace="http://www.comment.dto/soap">
+    <wsdl:types>
+        <xs:schema xmlns:tns="http://www.soap.dto/comment" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   elementFormDefault="qualified" targetNamespace="http://www.soap.dto/comment">
+            <xs:element name="leaveFeedbackRequest">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="email" type="xs:string"/>
+                        <xs:element name="rentRequestId">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:long">
+                                    <xs:minInclusive value="1"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="rentInfoId">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:long">
+                                    <xs:minInclusive value="1"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="leaveFeedbackDetails" type="tns:leaveFeedbackDetails"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="leaveFeedbackResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="leaveFeedbackDetails" type="tns:leaveFeedbackDetails"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:complexType name="leaveFeedbackDetails">
+                <xs:sequence>
+                    <xs:element name="rating" minOccurs="0">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:int">
+                                <xs:minInclusive value="0"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element maxOccurs="unbounded" name="commentDetails" type="tns:commentDetails"
+                                minOccurs="0"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="commentDetails">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="id">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:long">
+                                <xs:minInclusive value="1"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="text" type="xs:string"/>
+                    <xs:element name="userId">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:long">
+                                <xs:minInclusive value="1"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="userName" type="xs:string"/>
+                    <xs:element name="status">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                                <xs:enumeration value="AWAITING"/>
+                                <xs:enumeration value="APPROVED"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="leaveFeedbackRequest">
+        <wsdl:part element="sch:leaveFeedbackRequest" name="leaveFeedbackRequest">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="leaveFeedbackResponse">
+        <wsdl:part element="sch:leaveFeedbackResponse" name="leaveFeedbackResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="CommentsPort">
+        <wsdl:operation name="leaveFeedback">
+            <wsdl:input message="tns:leaveFeedbackRequest" name="leaveFeedbackRequest">
+            </wsdl:input>
+            <wsdl:output message="tns:leaveFeedbackResponse" name="leaveFeedbackResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="CommentsPortSoap11" type="tns:CommentsPort">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="leaveFeedback">
+            <soap:operation soapAction=""/>
+            <wsdl:input name="leaveFeedbackRequest">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="leaveFeedbackResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="CommentsPortService">
+        <wsdl:port binding="tns:CommentsPortSoap11" name="CommentsPortSoap11">
+            <soap:address location="http://192.168.56.1:8083/ws/comment"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

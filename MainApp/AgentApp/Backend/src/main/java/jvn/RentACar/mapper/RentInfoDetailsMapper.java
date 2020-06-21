@@ -1,7 +1,9 @@
 package jvn.RentACar.mapper;
 
+import jvn.RentACar.dto.both.CommentDTO;
 import jvn.RentACar.dto.soap.rentrequest.RentInfoDetails;
 import jvn.RentACar.exceptionHandler.InvalidRentRequestDataException;
+import jvn.RentACar.model.Comment;
 import jvn.RentACar.model.RentInfo;
 import jvn.RentACar.service.AdvertisementService;
 import org.modelmapper.ModelMapper;
@@ -14,6 +16,8 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 public class RentInfoDetailsMapper implements MapperInterface<RentInfo, RentInfoDetails> {
@@ -35,6 +39,7 @@ public class RentInfoDetailsMapper implements MapperInterface<RentInfo, RentInfo
 //        rentInfo.setComments(dto.getCommentDetails());
         rentInfo.setKilometresLimit(dto.getKilometersLimit() == null ? null : dto.getKilometersLimit().intValue());
         rentInfo.setPricePerKm(dto.getPricePerKm());
+
         return rentInfo;
     }
 

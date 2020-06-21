@@ -1,11 +1,16 @@
 package jvn.Renting.service;
 
+import jvn.Renting.dto.both.FeedbackDTO;
 import jvn.Renting.dto.both.RentRequestDTO;
+import jvn.Renting.dto.both.UserDTO;
+import jvn.Renting.model.Comment;
+import jvn.Renting.model.Message;
 import jvn.Renting.dto.request.RentRequestStatusDTO;
 import jvn.Renting.enumeration.EditType;
 import jvn.Renting.model.RentRequest;
 
 import java.text.ParseException;
+import java.util.BitSet;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -26,6 +31,8 @@ public interface RentRequestService {
     Boolean canDeleteAdvertisement(Long advId);
 
     Boolean hasRentInfos(List<Long> advIds);
+
+    RentRequestDTO get(Long id, Long loggedInUserId);
 
     void checkDate(Long id, LocalDate advertisementDateFrom, LocalDate advertisementDateTo, LocalDate rentInfoDateFrom, LocalDate rentInfoDateTo);
 

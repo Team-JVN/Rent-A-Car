@@ -1,15 +1,25 @@
 package jvn.Renting.endpoint;
 
 import jvn.Renting.client.UserClient;
+import jvn.Renting.dto.both.CommentDTO;
+import jvn.Renting.dto.both.FeedbackDTO;
+import jvn.Renting.dto.both.UserDTO;
 import jvn.Renting.dto.message.Log;
 import jvn.Renting.dto.request.RentRequestStatusDTO;
 import jvn.Renting.dto.response.UserInfoDTO;
+import jvn.Renting.dto.soap.rentreport.RentReportDetails;
 import jvn.Renting.dto.soap.rentrequest.*;
 import jvn.Renting.exceptionHandler.InvalidRentRequestDataException;
+import jvn.Renting.mapper.CommentDetailsMapper;
+import jvn.Renting.mapper.CommentDtoMapper;
+import jvn.Renting.mapper.MessageDetailsMapper;
 import jvn.Renting.mapper.RentRequestDetailsMapper;
+import jvn.Renting.model.Comment;
+import jvn.Renting.model.Message;
 import jvn.Renting.model.RentInfo;
 import jvn.Renting.model.RentRequest;
 import jvn.Renting.producer.LogProducer;
+import jvn.Renting.service.CommentService;
 import jvn.Renting.service.RentRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
@@ -22,7 +32,10 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Endpoint
@@ -40,6 +53,8 @@ public class RentRequestEndpoint {
     private UserClient userClient;
 
     private LogProducer logProducer;
+
+
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "createRentRequestRequest")
     @ResponsePayload
