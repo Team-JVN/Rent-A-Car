@@ -49,11 +49,13 @@ public class PictureServiceImpl implements PictureService {
             if (resource.exists()) {
                 return resource;
             } else {
-                logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PEX", String.format("Picture \"%s\" not found on server", fileName)));
+                logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PEX",
+                        String.format("Picture \"%s\" not found on server", fileName)));
                 throw new FileNotFoundException("File not found " + fileName, HttpStatus.NOT_FOUND);
             }
         } catch (MalformedURLException ex) {
-            logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PEX", String.format("Invalid path to picture \"%s\"", fileName)));
+            logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PEX",
+                    String.format("Invalid path to picture \"%s\"", fileName)));
             throw new FileNotFoundException("File not found " + fileName, HttpStatus.NOT_FOUND);
         }
     }
@@ -67,7 +69,8 @@ public class PictureServiceImpl implements PictureService {
             if (!uniquePictures.contains(fileName)) {
                 uniquePictures.add(fileName);
                 Picture pic = pictureRepository.save(new Picture(savePictureOnDisk(picture, path, car.getId()), car));
-                logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PDB", String.format("Picture %s successfully saved in DB", pic.getId())));
+                logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PDB",
+                        String.format("Picture %s successfully saved in DB", pic.getId())));
             }
         }
     }
@@ -89,7 +92,8 @@ public class PictureServiceImpl implements PictureService {
                         uniquePictures.add(fileName);
                         pictureData = new Picture(savePictureOnDisk(picture, path, carId), car);
                         Picture pic = pictureRepository.save(pictureData);
-                        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PDB", String.format("Picture %s successfully saved in DB", pic.getId())));
+                        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PDB",
+                                String.format("Picture %s successfully saved in DB", pic.getId())));
                     }
                 } else {
                     removedPictures.remove(pictureData);
@@ -105,17 +109,22 @@ public class PictureServiceImpl implements PictureService {
         String fileName = StringUtils.cleanPath(picture.getOriginalFilename());
         try {
             if (fileName.contains("..")) {
-                logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PEX", String.format("Invalid path to picture \"%s_%s\"", id, fileName)));
-                throw new InvalidCarDataException("Filename contains invalid path sequence " + fileName, HttpStatus.BAD_REQUEST);
+                logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PEX",
+                        String.format("Invalid path to picture \"%s_%s\"", id, fileName)));
+                throw new InvalidCarDataException("Filename contains invalid path sequence " + fileName,
+                        HttpStatus.BAD_REQUEST);
             }
             Path fileStorageLocation = Paths.get(path);
             Path targetLocation = fileStorageLocation.resolve(id + "_" + fileName);
             Files.copy(picture.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PDI", String.format("Picture \"%s_%s\" successfully saved on server", id, fileName)));
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PDI",
+                    String.format("Picture \"%s_%s\" successfully saved on server", id, fileName)));
             return id + "_" + fileName;
         } catch (IOException ex) {
-            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PEX", String.format("Picture \"%s_%s\" could not be stored on server", id, fileName)));
-            throw new InvalidCarDataException("Could not store file " + fileName + ". Please try again!", HttpStatus.BAD_REQUEST);
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PEX",
+                    String.format("Picture \"%s_%s\" could not be stored on server", id, fileName)));
+            throw new InvalidCarDataException("Could not store file " + fileName + ". Please try again!",
+                    HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -125,13 +134,18 @@ public class PictureServiceImpl implements PictureService {
             Path filePath = fileStorageLocation.resolve(picture.getData()).normalize();
             File file = new File(String.valueOf(filePath));
             if (file.delete()) {
-                logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PDI", String.format("Picture \"%s\" successfully deleted from server", file.getName())));
+                logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PDI",
+                        String.format("Picture \"%s\" successfully deleted from server", file.getName())));
             } else {
-                logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PEX", String.format("Picture \"%s\" not found on server", file.getName())));
+                logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PEX",
+                        String.format("Picture \"%s\" not found on server", file.getName())));
             }
 
             picture.setCar(null);
-            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PDB", String.format("Picture %s successfully deleted from DB", picture.getId())));
+            pictureRepository.save(picture);
+            // pictureRepository.deleteById(picId);
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PDB",
+                    String.format("Picture %s successfully deleted from DB", picture.getId())));
         }
     }
 
