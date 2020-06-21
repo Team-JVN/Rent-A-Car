@@ -77,8 +77,10 @@ public class ClientServiceImpl implements ClientService {
 
             composeAndSendEmailToChangePassword(client.getEmail(), generatedPassword);
             Client dbClient = clientRepository.save(client);
+            String password = dbClient.getPassword();
             dbClient.setPassword(null);
             CreateOrEditClientResponse responseSave = clientClient.createOrEdit(dbClient);
+            dbClient.setPassword(password);
             dbClient.setMainAppId(responseSave.getClientDetails().getId());
             return clientRepository.save(dbClient);
         } else {
