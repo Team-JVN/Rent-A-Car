@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.List;
 
 @Service
 public class LogServiceImpl implements LogService {
@@ -23,14 +22,6 @@ public class LogServiceImpl implements LogService {
             repository.write(Paths.get(configuration.getLogStorage()), log);
         } catch (IOException e) {
             System.out.println("Cannot write log message to a file.");
-        }
-    }
-
-    public void writeAll(List<Log> logs) {
-        try {
-            repository.writeAll(Paths.get(configuration.getLogStorage()), logs);
-        } catch (IOException e) {
-            System.out.println("Cannot write log messages to a file.");
         }
     }
 

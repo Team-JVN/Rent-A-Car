@@ -13,6 +13,7 @@ public class PriceListClient extends WebServiceGatewaySupport {
     @Autowired
     private UserService userService;
 
+
     @Autowired
     private PriceListDetailsMapper priceListDetailsMapper;
 
@@ -52,7 +53,6 @@ public class PriceListClient extends WebServiceGatewaySupport {
             return null;
         }
         request.setEmail(user.getEmail());
-
         GetAllPriceListDetailsResponse response = (GetAllPriceListDetailsResponse) getWebServiceTemplate()
                 .marshalSendAndReceive(request);
         return response;

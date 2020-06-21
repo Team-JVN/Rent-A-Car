@@ -10,5 +10,4 @@ public interface FileRepository<T extends Writable> {
 
     void write(Path file, T t) throws IOException;
 
-    void writeAll(Path file, List<T> t) throws IOException;
 }

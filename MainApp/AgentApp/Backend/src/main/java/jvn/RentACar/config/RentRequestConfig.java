@@ -20,6 +20,7 @@ public class RentRequestConfig {
     public RentRequestClient rentRequestClient(Jaxb2Marshaller marshallerRentRequest) {
         RentRequestClient client = new RentRequestClient();
         client.setDefaultUri("http://localhost:8080/renting/ws/rentrequest");
+//       client.setDefaultUri("http://renting:8083/ws/rentrequest");
         client.setMarshaller(marshallerRentRequest);
         client.setUnmarshaller(marshallerRentRequest);
         return client;

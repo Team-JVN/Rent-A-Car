@@ -16,7 +16,7 @@ import java.util.List;
 
 public interface RentRequestService {
 
-    RentRequest create(RentRequest rentRequestDTO, Long loggedInUser, boolean canCreateRent) throws ParseException;
+    RentRequest create(RentRequest rentRequestDTO, Long loggedInUser, Boolean canCreateRent) throws ParseException;
 
     List<RentRequestDTO> get(Long advertisementId, String status, Long loggedInUserId, String jwt, String user);
 

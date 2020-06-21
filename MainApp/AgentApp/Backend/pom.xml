@@ -104,6 +104,11 @@
             <version>0.9.1</version>
         </dependency>
         <dependency>
+            <groupId>org.owasp.esapi</groupId>
+            <artifactId>esapi</artifactId>
+            <version>2.2.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.owasp</groupId>
             <artifactId>dependency-check-maven</artifactId>
             <version>5.3.2</version>
@@ -116,6 +121,19 @@
             <groupId>wsdl4j</groupId>
             <artifactId>wsdl4j</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.12</version>
+         </dependency>
+        <dependency>
+            <groupId>org.springframework.ws</groupId>
+            <artifactId>spring-ws-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ws</groupId>
+            <artifactId>spring-ws-support</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -123,30 +141,30 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-            <!--            <plugin>-->
-            <!--                <groupId>org.jvnet.jaxb2.maven2</groupId>-->
-            <!--                <artifactId>maven-jaxb2-plugin</artifactId>-->
-            <!--                <version>0.14.0</version>-->
-            <!--                <executions>-->
-            <!--                    <execution>-->
-            <!--                        <goals>-->
-            <!--                            <goal>generate</goal>-->
-            <!--                        </goals>-->
-            <!--                    </execution>-->
-            <!--                </executions>-->
-            <!--                <configuration>-->
-            <!--                    <schemaLanguage>WSDL</schemaLanguage>-->
-            <!--                    <generateDirectory>${project.basedir}/src/main/java</generateDirectory>-->
-            <!--                    <generatePackage>jvn.RentACar.dto.soap.pricelist</generatePackage>-->
-            <!--                    <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>-->
-            <!--                    <schemaIncludes>-->
-            <!--                        <include>priceLists.wsdl</include>-->
-            <!--                        <include>deletePriceLists.wsdl</include>-->
-            <!--                        <include>listPriceList.wsdl</include>-->
-            <!--                    </schemaIncludes>-->
-            <!--                </configuration>-->
-            <!--            </plugin>-->
-            <plugin>
+                        <!-- <plugin>
+                            <groupId>org.jvnet.jaxb2.maven2</groupId>
+                            <artifactId>maven-jaxb2-plugin</artifactId>
+                            <version>0.14.0</version>
+                            <executions>
+                                <execution>
+                                    <goals>
+                                        <goal>generate</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                            <configuration>
+                                <schemaLanguage>WSDL</schemaLanguage>
+                                <generateDirectory>${project.basedir}/src/main/java</generateDirectory>
+                                <generatePackage>jvn.RentACar.dto.soap.pricelist</generatePackage>
+                                <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>
+                                <schemaIncludes>
+                                    <include>priceLists.wsdl</include>
+                                    <include>deletePriceLists.wsdl</include>
+                                    <include>listPriceList.wsdl</include>
+                                </schemaIncludes>
+                            </configuration>
+                        </plugin> -->
+            <!-- <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
                 <version>0.14.0</version>
@@ -255,7 +273,7 @@
                         <include>listClient.wsdl</include>
                     </schemaIncludes>
                 </configuration>
-            </plugin>
+            </plugin> -->
         </plugins>
     </build>
 

@@ -33,7 +33,6 @@ services:
             - renting
             - users
             - rabbitmq-broker
-            # - axon-server
 
     advertisements:
         build: ./Advertisements
@@ -54,7 +53,6 @@ services:
             - mainapp-mysql
             - eureka-serviceregistry
             - rabbitmq-broker
-        #   - axon-server
 
     cars:
         build: ./Cars
@@ -75,7 +73,6 @@ services:
             - mainapp-mysql
             - eureka-serviceregistry
             - rabbitmq-broker
-        #   - axon-server
 
     renting:
         build: ./Renting
@@ -96,7 +93,6 @@ services:
             - mainapp-mysql
             - eureka-serviceregistry
             - rabbitmq-broker
-        #   - axon-server
 
     users:
         build: ./Users
@@ -117,7 +113,6 @@ services:
             - mainapp-mysql
             - eureka-serviceregistry
             - rabbitmq-broker
-        #   - axon-server
 
     mainapp-mysql:
         image: mysql:8.0.19

@@ -81,8 +81,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .cors().and()
 
                 .addFilterBefore(new TokenAuthenticationFilter(), BasicAuthenticationFilter.class);
+//                               .headers().contentSecurityPolicy(
+//                                               "default-src 'self' https://localhost:8080/;img-src 'self' blob: data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-eval'; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;");
 
-        ///verify/{userId}/{carId}
         http.csrf().disable();
     }
 

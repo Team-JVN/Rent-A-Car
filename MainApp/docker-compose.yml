@@ -8,6 +8,10 @@ services:
             - main-app-tls
         ports:
             - "8761:8761"
+        environment:
+            RMQ_HOST: rabbitmq-broker
+        depends_on:
+            - rabbitmq-broker
 
     zuul:
         build: ./ZuulAndFrontend
@@ -19,13 +23,14 @@ services:
         - "8080:8080"
         environment:
             REGISTRY_HOST: eureka-serviceregistry
-            KEYSTORE: /etc/keystore/mainapp.keystore.p12
-            KEYSTORE_PASSWORD: mainapp_pass
-            KEYSTORE_ALIAS: mainapp
-            TRUSTSTORE: /etc/keystore/mainapp.truststore.p12
-            TRUSTSTORE_PASSWORD: mainapp_pass
+            KEYSTORE: /etc/keystore/zuul.keystore.p12
+            KEYSTORE_PASSWORD: zuul_pass
+            KEYSTORE_ALIAS: zuul
+            TRUSTSTORE: /etc/keystore/zuul.truststore.p12
+            TRUSTSTORE_PASSWORD: zuul_pass
+            RMQ_HOST: rabbitmq-broker
         volumes:
-            - ./tls/certs/mainapp/keystore:/etc/keystore
+            - ./tls/certs/zuul/keystore:/etc/keystore
         depends_on:
             - eureka-serviceregistry
             - advertisements
@@ -33,6 +38,7 @@ services:
             - renting
             - users
             - search-service
+            - rabbitmq-broker
 
     advertisements:
         build: ./Advertisements
@@ -71,11 +77,13 @@ services:
             DATABASE_DOMAIN: mainapp-mysql
             DATABASE_SCHEMA: rentacardb
             UPLOADED_PICTURES_PATH: /etc/uploadedPictures/
+            RMQ_HOST: rabbitmq-broker
         volumes:
             - ./uploadedPictures/:/etc/uploadedPictures/
         depends_on: 
             - mainapp-mysql
             - eureka-serviceregistry
+            - rabbitmq-broker
 
     renting:
         build: ./Renting
@@ -153,7 +161,9 @@ services:
         environment:
             REGISTRY_HOST: eureka-serviceregistry
             RMQ_HOST: rabbitmq-broker
-            LOG_STORAGE: /var/log/mainapp-web-traffic.log
+            LOG_STORAGE: /var/log/mainapp-log-storage.log
+            LOG_BACKUP_1: /var/log/mainapp-log-backup-1.log
+            LOG_BACKUP_2: /var/log/mainapp-log-backup-2.log
         volumes:
             - mainapp-logs:/var/log
         depends_on:
@@ -183,47 +193,47 @@ services:
         networks:
             - main-app-tls
 
-    # agentapp:
-    #     build: ./AgentApp
-    #     image: jelenapopov/agentapp
-    #     container_name: agentapp
-    #     restart: on-failure
-    #     networks:
-    #         - agent-app-tls
-    #     ports:
-    #         - 8090:8090
-    #     environment:
-    #         DATABASE_USERNAME: rentacar
-    #         DATABASE_PASSWORD: RentACarTeam29
-    #         DATABASE_DOMAIN: agentapp-mysql
-    #         DATABASE_SCHEMA: agentappdb
-    #         KEYSTORE: /etc/keystore/agentapp.keystore.p12
-    #         KEYSTORE_PASSWORD: agentapp_pass
-    #         KEYSTORE_ALIAS: agentapp
-    #         TRUSTSTORE: /etc/keystore/agentapp.truststore.p12
-    #         TRUSTSTORE_PASSWORD: agentapp_pass
-    #         UPLOADED_PICTURES_PATH: /etc/uploadedPictures/
-    #         LOG_STORAGE: /var/log/agentapp-web-traffic.log
-    #     volumes:
-    #         - ./tls/certs/agentapp/keystore:/etc/keystore
-    #         - ./AgentApp/Backend/src/main/resources/uploadedPictures/:/etc/uploadedPictures/
-    #         - agentapp-logs:/var/log
-    #     depends_on: 
-    #         - agentapp-mysql
+    agentapp:
+        build: ./AgentApp
+        image: jelenapopov/agentapp
+        container_name: agentapp
+        restart: on-failure
+        networks:
+            - main-app-tls
+        ports:
+            - 8090:8090
+        environment:
+            DATABASE_USERNAME: rentacar
+            DATABASE_PASSWORD: RentACarTeam29
+            DATABASE_DOMAIN: agentapp-mysql
+            DATABASE_SCHEMA: agentappdb
+            KEYSTORE: /etc/keystore/agentapp.keystore.p12
+            KEYSTORE_PASSWORD: agentapp_pass
+            KEYSTORE_ALIAS: agentapp
+            TRUSTSTORE: /etc/keystore/agentapp.truststore.p12
+            TRUSTSTORE_PASSWORD: agentapp_pass
+            UPLOADED_PICTURES_PATH: /etc/uploadedPictures/
+            LOG_STORAGE: /var/log/agentapp-web-traffic.log
+        volumes:
+            - ./tls/certs/agentapp/keystore:/etc/keystore
+            - ./AgentApp/Backend/src/main/resources/uploadedPictures/:/etc/uploadedPictures/
+            - agentapp-logs:/var/log
+        depends_on: 
+            - agentapp-mysql
 
-    # agentapp-mysql:
-    #     image: mysql:8.0.19
-    #     container_name: agentapp-mysql
-    #     restart: always
-    #     networks:
-    #         - agent-app-tls
-    #     environment:
-    #         MYSQL_ROOT_PASSWORD: team29VJN
-    #         MYSQL_USER: rentacar
-    #         MYSQL_PASSWORD: RentACarTeam29
-    #         MYSQL_DATABASE: agentappdb
-    #     volumes:
-    #         - agentapp-mysql-data:/var/lib/mysql
+    agentapp-mysql:
+        image: mysql:8.0.19
+        container_name: agentapp-mysql
+        restart: always
+        networks:
+            - main-app-tls
+        environment:
+            MYSQL_ROOT_PASSWORD: team29VJN
+            MYSQL_USER: rentacar
+            MYSQL_PASSWORD: RentACarTeam29
+            MYSQL_DATABASE: agentappdb
+        volumes:
+            - agentapp-mysql-data:/var/lib/mysql
     
 volumes:
     agentapp-mysql-data:
@@ -232,9 +242,6 @@ volumes:
     mainapp-logs:
     
 networks:
-    agent-app-tls:
-        name: agent-app-tls
-        driver: bridge
     main-app-tls:
         name: main-app-tls
         driver: bridge
