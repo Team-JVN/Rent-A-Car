@@ -1,31 +1,25 @@
-package jvn.Zuul.serviceImpl;
+package jvn.Cars.serviceImpl;
 
-import jvn.Zuul.service.DigitalSignatureService;
+import jvn.Cars.service.DigitalSignatureService;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.*;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-
-import javax.crypto.*;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 
 @Service
 public class DigitalSignatureServiceImpl implements DigitalSignatureService {
 
-    @Value("${KEYSTORE:tls/certs/zuul/keystore/zuul.keystore.p12}")
+    @Value("${KEYSTORE:tls/certs/cars/keystore/cars.keystore.p12}")
     private String keyStorePath;
 
-    @Value("${KEYSTORE_PASSWORD:zuul_pass}")
+    @Value("${KEYSTORE_PASSWORD:cars_pass}")
     private String password;
 
-    @Value("${KEYSTORE_ALIAS:zuul}")
+    @Value("${KEYSTORE_ALIAS:cars}")
     private String alias;
 
     public DigitalSignatureServiceImpl() {

@@ -5,19 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Logger.config.ApplicationConfiguration;
 import jvn.Logger.config.RabbitMQConfiguration;
 import jvn.Logger.model.Log;
-import jvn.Logger.model.LogMessage;
+import jvn.Logger.model.LogMessageDTO;
 import jvn.Logger.repository.FileRepository;
 import jvn.Logger.serviceImpl.DigitalSignatureServiceImpl;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.SerializationUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class LogConsumer {
@@ -30,11 +27,11 @@ public class LogConsumer {
 
     @RabbitListener(queues = RabbitMQConfiguration.LOGS)
     public void write(String logMessageStr) {
-        LogMessage logMessage = stringToObject(logMessageStr);
-        if (digitalSignatureService.decrypt(logMessage.getLog().getBytes(StandardCharsets.UTF_8), logMessage.getDigitalSignature())) {
+        LogMessageDTO logMessageDTO = stringToObject(logMessageStr);
+        if (digitalSignatureService.decrypt(logMessageDTO.getSender(), logMessageDTO.getLog().getBytes(StandardCharsets.UTF_8), logMessageDTO.getDigitalSignature())) {
             try {
-                repository.write(Paths.get(configuration.getLogStorage()), Log.parse(logMessage.getLog()));
-                System.out.println(logMessage.getLog());
+                repository.write(Paths.get(configuration.getLogStorage()), Log.parse(logMessageDTO.getLog()));
+                System.out.println(logMessageDTO.getLog());
             } catch (IOException e) {
                 System.out.println("Cannot write log message to a file.");
             } catch (Exception e) {
@@ -56,10 +53,10 @@ public class LogConsumer {
     }
 */
 
-    private LogMessage stringToObject(String logMessageStr) {
+    private LogMessageDTO stringToObject(String logMessageStr) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            return objectMapper.readValue(logMessageStr, LogMessage.class);
+            return objectMapper.readValue(logMessageStr, LogMessageDTO.class);
         } catch (JsonProcessingException e) {
             return null;
         }

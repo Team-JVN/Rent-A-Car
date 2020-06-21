@@ -112,14 +112,18 @@ export class AddRentRequestComponent implements OnInit {
 
     const rentRequest = new RentRequest(this.clientForm.value.client, rentInfos);
 
+    console.log("pre slanja");
+
     this.rentRequestService.create(rentRequest).subscribe(
       (data: RentRequest) => {
+        console.log("odgovor super");
         this.clientForm.reset();
         this.informationForm.reset();
         this.dialogRef.close();
         this.toastr.success('Success.', 'Create Rent Request');
       },
       (httpErrorResponse: HttpErrorResponse) => {
+        console.log("odgovor greska");
         this.toastr.error(httpErrorResponse.error.message, 'Create Rent Request');
       }
     );

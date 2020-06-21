@@ -56,7 +56,7 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public RentRequest create(RentRequest rentRequest, Long loggedInUserId, boolean canCreateRentRequests) throws ParseException {
+    public RentRequest create(RentRequest rentRequest, Long loggedInUserId, Boolean canCreateRentRequests) throws ParseException {
         List<RentInfo> rentInfos = new ArrayList<>(rentRequest.getRentInfos());
         List<AdvertisementWithIdsDTO> advertisementDTOS = getAdvertisements(rentInfos);
         Long ownerId = getAdvertisementOwnerId(advertisementDTOS);
@@ -338,6 +338,7 @@ public class RentRequestServiceImpl implements RentRequestService {
             rentInfo.setRating(0);
             rentInfo.setKilometresLimit(advertisementDTO.getKilometresLimit());
             rentInfo.setPricePerKm(advertisementDTO.getPriceList().getPricePerKm());
+            rentInfo.setCar(advertisementDTO.getCar());
             totalPrice += countPrice(rentInfo, advertisementDTO);
         }
         rentRequest.setTotalPrice(totalPrice);

@@ -9,7 +9,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LogMessage {
+public class LogMessageDTO {
+
+    private String sender;
 
     private String log;
 

@@ -8,6 +8,18 @@ services:
             - main-app-tls
         ports:
             - "8761:8761"
+        environment:
+            KEYSTORE: /etc/keystore/EUREKA_NAME.keystore.p12
+            KEYSTORE_PASSWORD: EUREKA_KEYSTORE_PASSWORD
+            KEYSTORE_ALIAS: EUREKA_ALIAS
+            TRUSTSTORE: /etc/keystore/EUREKA_NAME.truststore.p12
+            TRUSTSTORE_PASSWORD: EUREKA_KEYSTORE_PASSWORD
+            RMQ_HOST: rabbitmq-broker
+            RMQ_PORT: 5671
+        volumes:
+            - ./tls/certs/EUREKA_NAME/keystore:/etc/keystore
+        depends_on:
+            - rabbitmq-broker
 
     zuul:
         build: ./ZuulAndFrontend
@@ -19,19 +31,22 @@ services:
         - "8080:8080"
         environment:
             REGISTRY_HOST: eureka-serviceregistry
-            KEYSTORE: /etc/keystore/MAIN_APP_NAME.keystore.p12
-            KEYSTORE_PASSWORD: MAIN_APP_KEYSTORE_PASSWORD
-            KEYSTORE_ALIAS: MAIN_APP_CLIENT_ALIAS
-            TRUSTSTORE: /etc/keystore/MAIN_APP_NAME.truststore.p12
-            TRUSTSTORE_PASSWORD: MAIN_APP_KEYSTORE_PASSWORD
+            KEYSTORE: /etc/keystore/ZUUL_NAME.keystore.p12
+            KEYSTORE_PASSWORD: ZUUL_KEYSTORE_PASSWORD
+            KEYSTORE_ALIAS: ZUUL_ALIAS
+            TRUSTSTORE: /etc/keystore/ZUUL_NAME.truststore.p12
+            TRUSTSTORE_PASSWORD: ZUUL_KEYSTORE_PASSWORD
+            RMQ_HOST: rabbitmq-broker
+            RMQ_PORT: 5671
         volumes:
-            - ./tls/certs/mainapp/keystore:/etc/keystore
+            - ./tls/certs/ZUUL_NAME/keystore:/etc/keystore
         depends_on:
             - eureka-serviceregistry
             - advertisements
             - cars
             - renting
             - users
+            - search-service
             - rabbitmq-broker
 
     advertisements:
@@ -49,6 +64,15 @@ services:
             DATABASE_PASSWORD: RentACarTeam29
             DATABASE_DOMAIN: mainapp-mysql
             DATABASE_SCHEMA: rentacardb
+            KEYSTORE: /etc/keystore/ADVERTISEMENTS_NAME.keystore.p12
+            KEYSTORE_PASSWORD: ADVERTISEMENTS_KEYSTORE_PASSWORD
+            KEYSTORE_ALIAS: ADVERTISEMENTS_ALIAS
+            TRUSTSTORE: /etc/keystore/ADVERTISEMENTS_NAME.truststore.p12
+            TRUSTSTORE_PASSWORD: ADVERTISEMENTS_KEYSTORE_PASSWORD
+            RMQ_HOST: rabbitmq-broker
+            RMQ_PORT: 5671
+        volumes:
+            - ./tls/certs/ADVERTISEMENTS_NAME/keystore:/etc/keystore
         depends_on:
             - mainapp-mysql
             - eureka-serviceregistry
@@ -69,6 +93,17 @@ services:
             DATABASE_PASSWORD: RentACarTeam29
             DATABASE_DOMAIN: mainapp-mysql
             DATABASE_SCHEMA: rentacardb
+            KEYSTORE: /etc/keystore/CARS_NAME.keystore.p12
+            KEYSTORE_PASSWORD: CARS_KEYSTORE_PASSWORD
+            KEYSTORE_ALIAS: CARS_ALIAS
+            TRUSTSTORE: /etc/keystore/CARS_NAME.truststore.p12
+            TRUSTSTORE_PASSWORD: CARS_KEYSTORE_PASSWORD
+            RMQ_HOST: rabbitmq-broker
+            RMQ_PORT: 5671
+            UPLOADED_PICTURES_PATH: /etc/uploadedPictures/
+        volumes:
+            - ./tls/certs/CARS_NAME/keystore:/etc/keystore
+            - ./uploadedPictures/:/etc/uploadedPictures/
         depends_on: 
             - mainapp-mysql
             - eureka-serviceregistry
@@ -89,6 +124,15 @@ services:
             DATABASE_PASSWORD: RentACarTeam29
             DATABASE_DOMAIN: mainapp-mysql
             DATABASE_SCHEMA: rentacardb
+            KEYSTORE: /etc/keystore/RENTING_NAME.keystore.p12
+            KEYSTORE_PASSWORD: RENTING_KEYSTORE_PASSWORD
+            KEYSTORE_ALIAS: RENTING_ALIAS
+            TRUSTSTORE: /etc/keystore/RENTING_NAME.truststore.p12
+            TRUSTSTORE_PASSWORD: RENTING_KEYSTORE_PASSWORD
+            RMQ_HOST: rabbitmq-broker
+            RMQ_PORT: 5671
+        volumes:
+            - ./tls/certs/RENTING_NAME/keystore:/etc/keystore
         depends_on:
             - mainapp-mysql
             - eureka-serviceregistry
@@ -108,9 +152,75 @@ services:
             DATABASE_USERNAME: rentacar
             DATABASE_PASSWORD: RentACarTeam29
             DATABASE_DOMAIN: mainapp-mysql
-            DATABASE_SCHEMA: rentacardb
+            DATABASE_SCHEMA: rentacardb            
+            KEYSTORE: /etc/keystore/USERS_NAME.keystore.p12
+            KEYSTORE_PASSWORD: USERS_KEYSTORE_PASSWORD
+            KEYSTORE_ALIAS: USERS_ALIAS
+            TRUSTSTORE: /etc/keystore/USERS_NAME.truststore.p12
+            TRUSTSTORE_PASSWORD: USERS_KEYSTORE_PASSWORD
+            RMQ_HOST: rabbitmq-broker
+            RMQ_PORT: 5671
+        volumes:
+            - ./tls/certs/USERS_NAME/keystore:/etc/keystore
         depends_on:
             - mainapp-mysql
+            - eureka-serviceregistry
+            - rabbitmq-broker
+
+    search-service:
+        build: ./SearchService
+        image: nikolabrodic/search-service
+        container_name: search-service
+        restart: on-failure
+        networks:
+            - main-app-tls
+        ports:
+            - 8085:8085
+        environment:
+            REGISTRY_HOST: eureka-serviceregistry
+            DATABASE_USERNAME: search
+            DATABASE_PASSWORD: RentACarTeam29
+            DATABASE_SCHEMA: searchservicedb
+            KEYSTORE: /etc/keystore/SEARCH_NAME.keystore.p12
+            KEYSTORE_PASSWORD: SEARCH_KEYSTORE_PASSWORD
+            KEYSTORE_ALIAS: SEARCH_ALIAS
+            TRUSTSTORE: /etc/keystore/SEARCH_NAME.truststore.p12
+            TRUSTSTORE_PASSWORD: SEARCH_KEYSTORE_PASSWORD
+            RMQ_HOST: rabbitmq-broker
+            RMQ_PORT: 5671
+            H2_DB_PATH: /etc/h2-db-data
+        volumes:
+            - ./tls/certs/SEARCH_NAME/keystore:/etc/keystore
+            - ./SearchService/src/main/resources/h2-db-data/:/etc/h2-db-data/
+        depends_on:
+            - eureka-serviceregistry
+            - rabbitmq-broker
+
+    logger:
+        build: ./Logger
+        image: nikolabrodic/logger
+        container_name: logger
+        restart: on-failure
+        networks:
+            - main-app-tls
+        ports:
+            - 8086:8086
+        environment:
+            REGISTRY_HOST: eureka-serviceregistry
+            KEYSTORE: /etc/keystore/LOGGER_NAME.keystore.p12
+            KEYSTORE_PASSWORD: LOGGER_KEYSTORE_PASSWORD
+            KEYSTORE_ALIAS: LOGGER_ALIAS
+            TRUSTSTORE: /etc/keystore/LOGGER_NAME.truststore.p12
+            TRUSTSTORE_PASSWORD: LOGGER_KEYSTORE_PASSWORD
+            RMQ_HOST: rabbitmq-broker
+            RMQ_PORT: 5671
+            LOG_STORAGE: /var/log/mainapp-log-storage.log
+            LOG_BACKUP_1: /var/log/mainapp-log-backup-1.log
+            LOG_BACKUP_2: /var/log/mainapp-log-backup-2.log
+        volumes:
+            - ./tls/certs/LOGGER_NAME/keystore:/etc/keystore
+            - mainapp-logs:/var/log
+        depends_on:
             - eureka-serviceregistry
             - rabbitmq-broker
 
@@ -133,19 +243,28 @@ services:
         container_name: rabbitmq-broker
         ports:
             - 5672:5672
-            - 15672:15672
+            - 5671:5671
+            - 15671:15671
         networks:
             - main-app-tls
+        environment:
+            RABBITMQ_SSL_CACERTFILE: /etc/rabbitmq/cert/tls-ca-chain.pem
+            RABBITMQ_SSL_CERTFILE: /etc/rabbitmq/cert/RMQ_NAME.crt
+            RABBITMQ_SSL_FAIL_IF_NO_PEER_CERT: "true"
+            RABBITMQ_SSL_KEYFILE: /etc/rabbitmq/cert/RMQ_NAME.key
+            RABBITMQ_SSL_VERIFY: verify_peer
+        volumes:
+            - ./tls/certs/RMQ_NAME:/etc/rabbitmq/cert
 
     agentapp:
-        build: .
+        build: ./AgentApp
         image: jelenapopov/agentapp
         container_name: agentapp
         restart: on-failure
         networks:
             - agent-app-tls
         ports:
-            - 8090:8080
+            - 8090:8090
         environment:
             DATABASE_USERNAME: rentacar
             DATABASE_PASSWORD: RentACarTeam29
@@ -156,8 +275,14 @@ services:
             KEYSTORE_ALIAS: AGENT_APP_ALIAS
             TRUSTSTORE: /etc/keystore/AGENT_APP_NAME.truststore.p12
             TRUSTSTORE_PASSWORD: AGENT_APP_KEYSTORE_PASSWORD
+            UPLOADED_PICTURES_PATH: /etc/uploadedPictures/
+            LOG_STORAGE: /var/log/agentapp-log-storage.log
+            LOG_BACKUP_1: /var/log/agentapp-log-backup-1.log
+            LOG_BACKUP_2: /var/log/agentapp-log-backup-2.log
         volumes:
-            - ./tls/certs/agentapp/keystore:/etc/keystore
+            - ./tls/certs/AGENT_APP_NAME/keystore:/etc/keystore
+            - ./AgentApp/Backend/src/main/resources/uploadedPictures/:/etc/uploadedPictures/
+            - agentapp-logs:/var/log
         depends_on: 
             - agentapp-mysql
 
@@ -173,11 +298,13 @@ services:
             MYSQL_PASSWORD: RentACarTeam29
             MYSQL_DATABASE: agentappdb
         volumes:
-            - agentapp-mysql-data:/var/lib/mysql       
+            - agentapp-mysql-data:/var/lib/mysql
+    
 volumes:
     agentapp-mysql-data:
     mainapp-mysql-data:
-    logs:
+    agentapp-logs:
+    mainapp-logs:
     
 networks:
     agent-app-tls:

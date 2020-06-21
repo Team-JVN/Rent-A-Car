@@ -36,4 +36,9 @@ public class RabbitMQConfiguration {
     public Queue queueDeletedAdvertisement() {
         return new Queue(REJECT_ALL_REQUESTS, false);
     }
+
+    @Bean
+    public Queue queueLogs() {
+        return new Queue(LOGS, false);
+    }
 }

@@ -1,5 +1,6 @@
 package jvn.Logger.serviceImpl;
 
+import jvn.Logger.service.DigitalSignatureService;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -11,19 +12,30 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 
 @Service
-public class DigitalSignatureServiceImpl {
+public class DigitalSignatureServiceImpl implements DigitalSignatureService {
 
-    @Value("${KEY_STORE_PATH:tls/certs/logger/keystore/logger.truststore.p12}")
+    @Value("${TRUSTSTORE:tls/certs/logger/keystore/logger.truststore.p12}")
     private String keyStorePath;
 
-    @Value("${PASSWORD:logger_pass}")
+    @Value("${TRUSTSTORE_PASSWORD:logger_pass}")
     private String password;
-
-    @Value("${ALIAS:zuul}")
-    private String alias;
 
     public DigitalSignatureServiceImpl() {
         Security.addProvider(new BouncyCastleProvider());
+    }
+
+    public boolean decrypt(String alias, byte[] messageBytes, byte[] encryptedMessageBytes) {
+        KeyStore keyStore = getKeyStore(keyStorePath, password);
+        PublicKey publicKey = getPublicKey(keyStore, alias);
+        try {
+            Signature signature = Signature.getInstance("SHA256withRSAandMGF1", BouncyCastleProvider.PROVIDER_NAME);
+            signature.initVerify(publicKey);
+            signature.update(messageBytes);
+            return signature.verify(encryptedMessageBytes);
+        } catch (NoSuchAlgorithmException | NoSuchProviderException | SignatureException | InvalidKeyException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private KeyStore getKeyStore(String keyStorePath, String keyStorePassword) {
@@ -35,33 +47,18 @@ public class DigitalSignatureServiceImpl {
         } catch (CertificateException | NoSuchAlgorithmException | IOException | KeyStoreException e) {
             e.printStackTrace();
         }
-
         return keyStore;
     }
 
     private PublicKey getPublicKey(KeyStore keyStore, String alias) {
-        Certificate certificate = null;
+        PublicKey publicKey = null;
         try {
-            certificate = keyStore.getCertificate(alias);
-        } catch (KeyStoreException e) {
+            Certificate certificate = keyStore.getCertificate(alias);
+            publicKey = certificate.getPublicKey();
+        } catch (KeyStoreException | NullPointerException e) {
             e.printStackTrace();
         }
-        return certificate.getPublicKey();
-    }
-
-    public boolean decrypt(byte[] messageBytes, byte[] encryptedMessageBytes) {
-        KeyStore keyStore = getKeyStore(keyStorePath, password);
-        PublicKey publicKey = getPublicKey(keyStore, alias);
-        Signature signature;
-        try {
-            signature = Signature.getInstance("SHA256withRSAandMGF1", BouncyCastleProvider.PROVIDER_NAME);
-            signature.initVerify(publicKey);
-            signature.update(messageBytes);
-            return signature.verify(encryptedMessageBytes);
-        } catch (NoSuchAlgorithmException | NoSuchProviderException | SignatureException | InvalidKeyException e) {
-            e.printStackTrace();
-        }
-        return false;
+        return publicKey;
     }
 
 }
