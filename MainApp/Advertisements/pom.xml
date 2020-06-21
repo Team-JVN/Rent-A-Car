@@ -91,7 +91,6 @@
         <dependency>
             <groupId>wsdl4j</groupId>
             <artifactId>wsdl4j</artifactId>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 
