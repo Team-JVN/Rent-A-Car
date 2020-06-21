@@ -1,7 +1,6 @@
 package jvn.Zuul.client;
 
-import jvn.Zuul.dto.UserDTO;
-import jvn.Zuul.dto.UserSignedDTO;
+import jvn.Zuul.dto.SignedMessageDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,5 +8,5 @@ import org.springframework.web.bind.annotation.*;
 public interface AuthClient {
 
     @RequestMapping(method = RequestMethod.GET, path = "/api/verify")
-    UserSignedDTO verify(@RequestHeader("Auth") String token);
+    SignedMessageDTO verify(@RequestHeader("Auth") String token);
 }

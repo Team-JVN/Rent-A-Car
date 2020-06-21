@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Users.dto.message.Log;
 import jvn.Users.dto.response.UserDTO;
 import jvn.Users.dto.response.UserInfoDTO;
-import jvn.Users.dto.response.UserSignedDTO;
+import jvn.Users.dto.response.SignedMessageDTO;
 import jvn.Users.mapper.UserDtoMapper;
 import jvn.Users.producer.LogProducer;
 import jvn.Users.service.DigitalSignatureService;
@@ -37,13 +37,13 @@ public class AuthController {
     private LogProducer logProducer;
 
     @GetMapping
-    public ResponseEntity<UserSignedDTO> verify() {
+    public ResponseEntity<SignedMessageDTO> verify() {
         UserDTO userDTO = userDtoMapper.toDto(this.userService.verify());
-        byte[] userBytes = convertToBytes(userDTO);
-        byte[] digitalSignature = digitalSignatureService.encrypt(userBytes);
-        UserSignedDTO userSignedDTO = new UserSignedDTO(userBytes, digitalSignature);
+        byte[] messageBytes = convertToBytes(userDTO);
+        byte[] digitalSignature = digitalSignatureService.encrypt(messageBytes);
+        SignedMessageDTO signedMessageDTO = new SignedMessageDTO(messageBytes, digitalSignature);
 
-        return new ResponseEntity<>(userSignedDTO, HttpStatus.OK);
+        return new ResponseEntity<>(signedMessageDTO, HttpStatus.OK);
     }
 
     @GetMapping(value = "/user")

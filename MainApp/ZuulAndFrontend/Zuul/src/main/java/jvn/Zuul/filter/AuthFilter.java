@@ -6,7 +6,7 @@ import com.netflix.zuul.context.RequestContext;
 import feign.FeignException;
 import jvn.Zuul.client.AuthClient;
 import jvn.Zuul.dto.UserDTO;
-import jvn.Zuul.dto.UserSignedDTO;
+import jvn.Zuul.dto.SignedMessageDTO;
 import jvn.Zuul.dto.message.Log;
 import jvn.Zuul.producer.LogProducer;
 import jvn.Zuul.service.DigitalSignatureService;
@@ -115,9 +115,9 @@ public class AuthFilter extends ZuulFilter {
             ctx.setSendZuulResponse(false);
         } else {
             try {
-                UserSignedDTO userSignedDTO = authClient.verify(header);
-                if (digitalSignatureService.decrypt(USERS_ALIAS, userSignedDTO.getUserBytes(), userSignedDTO.getDigitalSignature())) {
-                    UserDTO userDTO = bytesToObject(userSignedDTO.getUserBytes());
+                SignedMessageDTO signedMessageDTO = authClient.verify(header);
+                if (digitalSignatureService.decrypt(USERS_ALIAS, signedMessageDTO.getMessageBytes(), signedMessageDTO.getDigitalSignature())) {
+                    UserDTO userDTO = bytesToObject(signedMessageDTO.getMessageBytes());
                     ctx.addZuulRequestHeader("user", jsonToString(userDTO));
                     ctx.addZuulRequestHeader("Auth", header);
                 } else {

@@ -12,9 +12,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserSignedDTO {
+public class SignedMessageDTO {
 
-    private byte[] userBytes;
+    private byte[] messageBytes;
 
     private byte[] digitalSignature;
 
