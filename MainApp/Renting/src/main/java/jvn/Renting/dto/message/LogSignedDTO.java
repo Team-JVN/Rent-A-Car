@@ -1,4 +1,4 @@
-package jvn.Users.dto.message;
+package jvn.Renting.dto.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LogMessageDTO {
+public class LogSignedDTO {
 
     private String sender;
 

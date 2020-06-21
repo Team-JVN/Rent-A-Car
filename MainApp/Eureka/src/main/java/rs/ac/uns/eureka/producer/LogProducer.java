@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.eureka.config.RabbitMQConfiguration;
 import rs.ac.uns.eureka.message.Log;
-import rs.ac.uns.eureka.message.LogMessageDTO;
+import rs.ac.uns.eureka.message.LogSignedDTO;
 import rs.ac.uns.eureka.service.DigitalSignatureService;
 
 import java.io.IOException;
@@ -25,14 +25,14 @@ public class LogProducer {
 
     public void send(Log log) {
         byte[] digitalSignature = digitalSignatureService.encrypt(log.toString().getBytes(StandardCharsets.UTF_8));
-        LogMessageDTO logMessageDTO = new LogMessageDTO(sender, log.toString(), digitalSignature);
-        rabbitTemplate.convertAndSend(RabbitMQConfiguration.LOGS, jsonToString(logMessageDTO));
+        LogSignedDTO logSignedDTO = new LogSignedDTO(sender, log.toString(), digitalSignature);
+        rabbitTemplate.convertAndSend(RabbitMQConfiguration.LOGS, jsonToString(logSignedDTO));
     }
 
-    private String jsonToString(LogMessageDTO logMessageDTO) {
+    private String jsonToString(LogSignedDTO logSignedDTO) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            return objectMapper.writeValueAsString(logMessageDTO);
+            return objectMapper.writeValueAsString(logSignedDTO);
         } catch (IOException e) {
             return null;
         }
