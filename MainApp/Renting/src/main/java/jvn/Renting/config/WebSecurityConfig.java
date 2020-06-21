@@ -28,7 +28,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint).and()
 
                 .authorizeRequests()
-                .antMatchers("/ws**", "/ws/**", "/rentrequest/ws**", "/rentrequest/ws/**", "/rentrequest/ws").permitAll()
+                .antMatchers("/ws**", "/ws/**", "/rentrequest/ws**", "/rentrequest/ws/**", "/rentrequest/ws",
+                        "/rentreport/ws**", "/rentreport/ws/**", "/rentreport/ws",
+                        "/comment/ws**", "/comment/ws/**", "/comment/ws").permitAll()
 
                 .antMatchers(HttpMethod.POST, "/api/rent-request").hasAuthority("MY_RENT_REQUESTS")
                 .antMatchers(HttpMethod.GET, "/api/rent-request/{status}/mine",
@@ -49,6 +51,31 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.PUT, "/api/rent-request/{id}")
                 .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
 
+                .antMatchers(HttpMethod.POST, "/api/rent-request/{id}/rent-info/{rentInfoId}/comment")
+                .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
+
+                .antMatchers(HttpMethod.POST, "/api/rent-request/{id}/rent-info/{rentInfoId}/feedback")
+                .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
+
+                .antMatchers(HttpMethod.GET, "/api/rent-request/{id}/rent-info/{rentInfoId}/feedback")
+                .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
+
+                .antMatchers(HttpMethod.POST, "/api/rent-request/{id}/message")
+                .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
+
+                .antMatchers(HttpMethod.GET, "/api/rent-request/{id}/message")
+                .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
+
+                .antMatchers(HttpMethod.POST, "/api/rent-report/{rentInfoId}")
+                .hasAnyAuthority("MANAGE_RENT_REPORTS")
+
+                .antMatchers(HttpMethod.GET, "/api/comment/{id}")
+                .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
+
+                .antMatchers(HttpMethod.GET, "/api/comment/{status}/status")
+                .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
+
+
                 .anyRequest().authenticated().and()
 
                 .cors().and()
@@ -66,11 +93,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers("/rentrequest/ws/**");
         web.ignoring().antMatchers("/rentrequest/ws**");
         web.ignoring().antMatchers("/rentrequest/ws");
+        web.ignoring().antMatchers("/rentreport/ws/**");
+        web.ignoring().antMatchers("/rentreport/ws**");
+        web.ignoring().antMatchers("/rentreport/ws");
+        web.ignoring().antMatchers("/comment/ws/**");
+        web.ignoring().antMatchers("/comment/ws**");
+        web.ignoring().antMatchers("/comment/ws");
 
         web.ignoring().antMatchers(HttpMethod.GET, "/api/car/verify/{userId}/{carId}");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/rent-request/advertisement/{advId}/check-for-delete");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/rent-request/advertisement/{advId}/edit-type");
         web.ignoring().antMatchers(HttpMethod.GET, "/api/rent-request/advertisement/{advIds}/check-rent-infos");
+
     }
 
 }

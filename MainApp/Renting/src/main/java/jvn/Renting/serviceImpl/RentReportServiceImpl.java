@@ -31,13 +31,13 @@ public class RentReportServiceImpl implements RentReportService {
     private AdvertisementClient advertisementClient;
 
     @Override
-    public RentReport create(RentReport toEntity, Long rentInfoId, String jwt, String user) {
+    public RentReport create(RentReport toEntity, Long rentInfoId) {
 
         if (rentReportRepository.findByRentInfoId(rentInfoId) != null) {
             throw new InvalidRentReportDataException("Rent report for this rent info already exist.", HttpStatus.BAD_REQUEST);
         }
         //TODO:change mileage to the car and additional cost
-        RentInfo rentInfo = rentInfoRepository.findById(rentInfoId).orElse(null);
+        RentInfo rentInfo = rentInfoRepository.findOneById(rentInfoId);
         checkIfCreatingRentReportIsPossible(rentInfo);
         toEntity.setRentInfo(rentInfo);
         rentInfo.setRentReport(toEntity);
@@ -47,10 +47,7 @@ public class RentReportServiceImpl implements RentReportService {
         RentReport rentReport = rentReportRepository.save(toEntity);
 
         sendUpdatesCar(rentReport);
-        AdvertisementWithIdsDTO adWithDTO = advertisementClient.getOne(jwt, user, rentReport.getRentInfo().getAdvertisement());
-        System.out.println("AD------>");
-//        System.out.println(adWithDTO.getPriceList().getPricePerKm().toString());
-//        System.out.println(adWithDTO.getKilometresLimit().toString());
+//        AdvertisementWithIdsDTO adWithDTO = advertisementClient.getOne(rentReport.getRentInfo().getAdvertisement());
         return rentReport;
     }
 

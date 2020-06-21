@@ -27,8 +27,7 @@ public class RentReportController {
     @PostMapping(value = "/{rentInfoId}",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<RentReportDTO> create(@PathVariable Long rentInfoId, @Valid @RequestBody RentReportDTO rentReport) {
 
-        return new ResponseEntity<>(rentReportDtoMapper.toDto(rentReportService.create(rentReportDtoMapper.toEntity(rentReport), rentInfoId,
-                request.getHeader("Auth"), request.getHeader("user"))),
+        return new ResponseEntity<>(rentReportDtoMapper.toDto(rentReportService.create(rentReportDtoMapper.toEntity(rentReport), rentInfoId)),
                 HttpStatus.CREATED);
     }
 

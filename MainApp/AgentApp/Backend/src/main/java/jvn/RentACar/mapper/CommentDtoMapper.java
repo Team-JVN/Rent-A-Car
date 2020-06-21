@@ -1,8 +1,11 @@
 package jvn.RentACar.mapper;
 
+import jvn.RentACar.dto.both.ClientDTO;
 import jvn.RentACar.dto.both.CommentDTO;
 import jvn.RentACar.dto.both.UserDTO;
 import jvn.RentACar.model.Comment;
+import jvn.RentACar.model.User;
+import jvn.RentACar.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,16 +15,17 @@ public class CommentDtoMapper implements MapperInterface<Comment, CommentDTO>{
 
     private ModelMapper modelMapper;
 
-    private UserDtoMapper userDtoMapper;
 
+    private UserService userService;
 
     @Override
     public Comment toEntity(CommentDTO dto) {
 //        Comment entity = modelMapper.map(dto, Comment.class);
         Comment entity = new Comment();
         entity.setStatus(dto.getStatus());
-        entity.setSender(userDtoMapper.toEntity(dto.getSender()));
+        entity.setSender(userService.findByEmail(dto.getSender().getEmail()));
 //        entity.setSenderName(dto.getSender().getName());
+//        entity.setSender(userDtoMapper.toEntity(dto.getSender()));
         entity.setText(dto.getText());
 //        entity.setRentInfo(rentInfoDtoMapper.toEntity(dto.getRentInfo()));
         return entity;
@@ -42,7 +46,8 @@ public class CommentDtoMapper implements MapperInterface<Comment, CommentDTO>{
     }
 
     @Autowired
-    public CommentDtoMapper(ModelMapper modelMapper) {
+    public CommentDtoMapper(ModelMapper modelMapper, UserService userService) {
         this.modelMapper = modelMapper;
+        this.userService = userService;
     }
 }

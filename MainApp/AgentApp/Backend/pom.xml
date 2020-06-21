@@ -169,6 +169,14 @@
                         <include>checkIfCanAcceptRentRequest.wsdl</include>
                         <include>hasDebt.wsdl</include>
                         <include>listRentRequest.wsdl</include>
+                        <include>listMessages.wsdl</include>
+                        <include>createMessage.wsdl</include>
+                        <include>createRentReport.wsdl</include>
+                        <include>createComment.wsdl</include>
+                        <include>leaveFeedback.wsdl</include>
+                        <include>checkIfCanComment.wsdl</include>
+                        <include>getFeedback.wsdl</include>
+                        <include>getAllComments.wsdl</include>
                     </schemaIncludes>
                 </configuration>
             </plugin>

@@ -16,7 +16,7 @@ import {
   Validators,
 } from "@angular/forms";
 import { Client } from "src/app/model/client";
-import { Message } from "@angular/compiler/src/i18n/i18n_ast";
+import { Message } from "./../../../model/message";
 import { MessageService } from "src/app/service/message.service";
 import { AddRentReportComponent } from "../../add/add-rent-report/add-rent-report.component";
 import { ReviewFeedbackComponent } from "../../review-feedback/review-feedback.component";
@@ -55,6 +55,8 @@ export class RentRequestDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.availableRentReport = new Map();
+    this.availableReviewFeedback = new Map();
     this.messageForm = this.formBuilder.group({
       text: new FormControl(null, Validators.required),
     });
@@ -63,6 +65,10 @@ export class RentRequestDetailsComponent implements OnInit {
       this.rentRequestService.get(this.rentRequestId).subscribe(
         (data: RentRequest) => {
           this.rentRequest = data;
+          for (let rentInfo of this.rentRequest.rentInfos) {
+            this.availableRentReport.set(rentInfo.id, true);
+            this.availableReviewFeedback.set(rentInfo.id, true);
+          }
         },
         (httpErrorResponse: HttpErrorResponse) => {
           this.toastr.error(

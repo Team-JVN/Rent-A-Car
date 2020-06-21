@@ -80,7 +80,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                 .hasAuthority("MANAGE_PRICE_LISTS")
 
                                 .antMatchers(HttpMethod.GET, "/api/rent-report").hasAuthority("MANAGE_RENT_REPORTS")
-                                .antMatchers(HttpMethod.POST, "/api/rent-report").hasAuthority("MANAGE_RENT_REPORTS")
+                                .antMatchers(HttpMethod.POST, "/api/rent-report/{rentInfoId}").hasAuthority("MANAGE_RENT_REPORTS")
 
                                 .antMatchers("/api/role").hasAuthority("MANAGE_ROLES")
                                 .antMatchers(HttpMethod.GET, "/api/permission").hasAuthority("MANAGE_ROLES")
@@ -101,6 +101,27 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                                 .antMatchers("/api/car/statistics/{filter}")
                                 .hasAuthority("GET_STATISTICS")
+
+                                .antMatchers(HttpMethod.POST, "/api/rent-request/{id}/rent-info/{rentInfoId}/comment")
+                                .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
+
+                                .antMatchers(HttpMethod.POST, "/api/rent-request/{id}/rent-info/{rentInfoId}/feedback")
+                                .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
+
+                                .antMatchers(HttpMethod.GET, "/api/rent-request/{id}/rent-info/{rentInfoId}/feedback")
+                                .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
+
+                                .antMatchers(HttpMethod.POST, "/api/rent-request/{id}/message")
+                                .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
+
+                                .antMatchers(HttpMethod.GET, "/api/rent-request/{id}/message")
+                                .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
+
+                                .antMatchers(HttpMethod.GET, "/api/comment/{id}")
+                                .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
+
+                                .antMatchers(HttpMethod.GET, "/api/comment/{status}/status")
+                                .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
 
                                 .anyRequest().authenticated().and()
 

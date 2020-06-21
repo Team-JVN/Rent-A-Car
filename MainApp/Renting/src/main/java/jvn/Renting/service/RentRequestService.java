@@ -34,16 +34,6 @@ public interface RentRequestService {
 
     RentRequestDTO get(Long id, Long loggedInUserId);
 
-    Comment createComment(Comment comment, Long id, Long rentInfoId, Long userId);
-
-    FeedbackDTO leaveFeedback(FeedbackDTO feedbackDTO, Long id, Long rentInfoId, Long userId, String userName);
-
-    FeedbackDTO getFeedback(Long id, Long rentInfoId, Long userId);
-
-    Message createMessage(Message message, Long id, Long userId, String userEmail);
-
-    List<Message> getMessages(Long id, Long userId);
-    
     void checkDate(Long id, LocalDate advertisementDateFrom, LocalDate advertisementDateTo, LocalDate rentInfoDateFrom, LocalDate rentInfoDateTo);
 
     void checkIfCanAcceptRentRequest(RentRequest rentRequest);

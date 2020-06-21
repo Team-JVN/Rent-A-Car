@@ -24,10 +24,9 @@ public class RentReportController {
 
     private RentReportDtoMapper rentReportDtoMapper;
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<RentReportDTO> create(@Valid @RequestBody RentReportDTO rentReportDTO) throws ParseException {
-
-        return new ResponseEntity<>(rentReportDtoMapper.toDto(rentReportService.create(rentReportDtoMapper.toEntity(rentReportDTO))),
+    @PostMapping(value = "/{rentInfoId}",consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<RentReportDTO> create(@PathVariable Long rentInfoId, @Valid @RequestBody RentReportDTO rentReportDTO) throws ParseException {
+        return new ResponseEntity<>(rentReportDtoMapper.toDto(rentReportService.create(rentReportDtoMapper.toEntity(rentReportDTO), rentInfoId)),
                 HttpStatus.CREATED);
 
     }

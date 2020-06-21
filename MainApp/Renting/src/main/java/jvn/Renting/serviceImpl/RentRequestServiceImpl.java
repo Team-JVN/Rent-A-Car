@@ -28,7 +28,6 @@ import jvn.Renting.repository.RentRequestRepository;
 import jvn.Renting.service.RentRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
@@ -65,8 +64,6 @@ public class RentRequestServiceImpl implements RentRequestService {
     private SearchClient searchClient;
 
     private CommentDtoMapper commentDtoMapper;
-
-    private SimpMessagingTemplate simpMessagingTemplate;
 
     private CommentRepository commentRepository;
 
@@ -208,104 +205,6 @@ public class RentRequestServiceImpl implements RentRequestService {
         List<ClientDTO> clientDTOS = userClient.get(jwt, new ArrayList<>(clientIds));
         List<AdvertisementDTO> advertisementWithIdsDTOS = searchClient.get(jwt, user, new ArrayList<>(advertisements));
         return createListRentRequestDTOs(clientDTOS, advertisementWithIdsDTOS, rentRequests, loggedInUserId);
-    }
-
-    @Override
-    public Comment createComment(Comment comment, Long id, Long rentInfoId, Long userId) {
-        //TODO: which status has the comment made by agent
-        comment.setStatus(CommentStatus.APPROVED);
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
-        RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
-        rentInfo.getComments().add(comment);
-        comment.setRentInfo(rentInfo);
-        rentRequestRepository.save(rentRequest);
-
-
-//        commentRepository.save(comment);
-        return comment;
-    }
-
-    @Override
-    public FeedbackDTO leaveFeedback(FeedbackDTO feedbackDTO, Long id, Long rentInfoId, Long userId, String userName){
-
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
-        Set<RentInfo> rentInfos = rentRequest.getRentInfos();
-//        RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
-        if(commentRepository.findBySenderIdAndRentInfoId(userId, rentInfoId).isEmpty()){
-            RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
-            List<CommentDTO> commentDTOS = new ArrayList<>(feedbackDTO.getComments());
-            Comment comment = new Comment();
-            comment.setSenderId(userId);
-            comment.setSenderName(userName);
-            comment.setStatus(CommentStatus.AWAITING);
-            comment.setRentInfo(rentInfo);
-            comment.setText(commentDTOS.get(0).getText());
-            commentRepository.save(comment);
-            rentInfo.getComments().add(comment);
-            rentInfo.setRating(feedbackDTO.getRating());
-            rentRequest.setRentInfos(new HashSet<>(rentInfos));
-            rentRequestRepository.save(rentRequest);
-
-        }else{
-            throw new InvalidCommentDataException("There is already comment for this rent info.", HttpStatus.BAD_REQUEST);
-        }
-
-        return feedbackDTO;
-    }
-
-    @Override
-    public FeedbackDTO getFeedback(Long id, Long rentInfoId, Long userId) {
-        FeedbackDTO feedbackDTO = new FeedbackDTO();
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
-        RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
-        feedbackDTO.setRating(rentInfo.getRating());
-        feedbackDTO.setComments(new HashSet<>());
-        for(Comment comment: rentInfo.getComments()){
-            if(comment.getStatus().equals(CommentStatus.APPROVED)){
-
-                CommentDTO commentDTO = commentDtoMapper.toDto(comment);
-                feedbackDTO.getComments().add(commentDTO);
-
-            }
-
-        }
-
-
-
-        return feedbackDTO;
-    }
-
-    @Override
-    public Message createMessage(Message message, Long id, Long userId, String userEmail) {
-
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
-        message.setRentRequest(rentRequest);
-        message.setSenderId(userId);
-        message.setSenderEmail(userEmail);
-        rentRequest.getMessages().add(message);
-
-
-//        try {
-//            this.simpMessagingTemplate.convertAndSend("/socket-publisher", messageDtoMapper.toDto(message));
-//        } catch (Exception e) {
-//            throw new InvalidRentRequestDataException("Socket error", HttpStatus.BAD_REQUEST);
-//        }
-
-        rentRequestRepository.save(rentRequest);
-
-        return message;
-    }
-
-    @Override
-    public List<Message> getMessages(Long id, Long userId) {
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
-        List<Message> messages = new ArrayList<>();
-        for(Message message: rentRequest.getMessages()){
-            if(message.getSenderId().equals(userId) || rentRequest.getCreatedBy().equals(userId) || rentRequest.getClient().equals(userId)){
-                messages.add(message);
-            }
-        }
-        return messages;
     }
 
     public RentRequest changeRentRequestStatus(Long id, RentRequestStatusDTO newStatus, Long loggedInUserId) {
@@ -632,17 +531,15 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     @Autowired
     public RentRequestServiceImpl(RentRequestRepository rentRequestRepository, AdvertisementClient advertisementClient, UserClient userClient,
-                                  SearchClient searchClient, CommentDtoMapper commentDtoMapper, SimpMessagingTemplate simpMessagingTemplate,
+                                  SearchClient searchClient, CommentDtoMapper commentDtoMapper,
                                   CommentRepository commentRepository, MessageDtoMapper messageDtoMapper,
                                   RentRequestProducer rentRequestProducer, RentInfoRepository rentInfoRepository,
-                                  RentReportDtoMapper rentReportDtoMapper,
-                                  SearchClient searchClient, RentRequestProducer rentRequestProducer, LogProducer logProducer) {
+                                  RentReportDtoMapper rentReportDtoMapper, LogProducer logProducer) {
         this.rentRequestRepository = rentRequestRepository;
         this.advertisementClient = advertisementClient;
         this.userClient = userClient;
         this.searchClient = searchClient;
         this.commentDtoMapper = commentDtoMapper;
-        this.simpMessagingTemplate = simpMessagingTemplate;
         this.commentRepository = commentRepository;
         this.messageDtoMapper = messageDtoMapper;
         this.rentRequestProducer = rentRequestProducer;

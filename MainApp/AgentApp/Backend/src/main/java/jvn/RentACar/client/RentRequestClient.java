@@ -1,13 +1,23 @@
 package jvn.RentACar.client;
 
+import jvn.RentACar.dto.both.FeedbackDTO;
 import jvn.RentACar.dto.soap.advertisement.CheckIfCarIsAvailableRequest;
 import jvn.RentACar.dto.soap.advertisement.CheckIfCarIsAvailableResponse;
+import jvn.RentACar.dto.soap.comment.*;
 import jvn.RentACar.dto.soap.rentrequest.*;
+import jvn.RentACar.dto.soap.rentrequest.CommentDetails;
 import jvn.RentACar.enumeration.RentRequestStatus;
 import jvn.RentACar.exceptionHandler.InvalidRentRequestDataException;
+import jvn.RentACar.mapper.CommentDetailsMapper;
+import jvn.RentACar.mapper.CommentDtoMapper;
+import jvn.RentACar.mapper.MessageDetailsMapper;
 import jvn.RentACar.mapper.RentRequestDetailsMapper;
+import jvn.RentACar.model.Comment;
+import jvn.RentACar.model.Message;
 import jvn.RentACar.model.RentRequest;
 import jvn.RentACar.model.User;
+import jvn.RentACar.service.CommentService;
+import jvn.RentACar.service.RentInfoService;
 import jvn.RentACar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +28,8 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class RentRequestClient extends WebServiceGatewaySupport {
 
@@ -26,6 +38,18 @@ public class RentRequestClient extends WebServiceGatewaySupport {
 
     @Autowired
     private RentRequestDetailsMapper rentRequestDetailsMapper;
+
+    @Autowired
+    private CommentDetailsMapper commentDetailsMapper;
+
+    @Autowired
+    private CommentDtoMapper commentDtoMapper;
+
+    @Autowired
+    private RentInfoService rentInfoService;
+
+    @Autowired
+    private MessageDetailsMapper messageDetailsMapper;
 
     public CreateRentRequestResponse createOrEdit(RentRequest rentRequest) {
         RentRequestDetails rentRequestDetails = rentRequestDetailsMapper.toDto(rentRequest);

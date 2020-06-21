@@ -21,8 +21,5 @@ public interface RentRequestService {
 
     void rejectAllRequests(Long advId);
 
-    Message createMessage(Message message, Long id);
-
-    List<Message> getMessages(Long id);
 
 }
