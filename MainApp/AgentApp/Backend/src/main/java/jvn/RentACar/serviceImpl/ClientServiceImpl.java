@@ -6,6 +6,7 @@ import jvn.RentACar.dto.soap.client.*;
 import jvn.RentACar.enumeration.ClientStatus;
 import jvn.RentACar.exceptionHandler.InvalidClientDataException;
 import jvn.RentACar.exceptionHandler.InvalidTokenException;
+import jvn.RentACar.exceptionHandler.InvalidUserDataException;
 import jvn.RentACar.mapper.ClientDetailsMapper;
 import jvn.RentACar.model.*;
 import jvn.RentACar.repository.ClientRepository;
@@ -159,8 +160,8 @@ public class ClientServiceImpl implements ClientService {
         if (response == null || !response.isCanDelete()) {
             throw new InvalidClientDataException("You can not delete this client.", HttpStatus.BAD_REQUEST);
         }
-        dbClient.setRole(null);
-        clientRepository.deleteById(id);
+        dbClient.setStatus(ClientStatus.DELETED);
+        clientRepository.save(dbClient);
     }
 
     @Override
@@ -235,16 +236,20 @@ public class ClientServiceImpl implements ClientService {
 
             for (ClientDetails current : clientDetails) {
                 Client currentClient = clientDetailsMapper.toEntity(current);
-                User dbUser = userService.getByMainAppId(currentClient.getMainAppId());
-                if (dbUser == null) {
-                    createSynchronize(currentClient);
-                } else {
-                    if (dbUser instanceof Client) {
-                        Client dbClient = (Client) dbUser;
-                        editSynchronize(currentClient, dbClient);
-                    }
-                }
 
+                try {
+                    User dbUser = userService.getByMainAppId(currentClient.getMainAppId());
+                    if (dbUser == null) {
+                        createSynchronize(currentClient);
+                    } else {
+                        if (dbUser instanceof Client) {
+                            Client dbClient = (Client) dbUser;
+                            editSynchronize(currentClient, dbClient);
+                        }
+                    }
+                } catch (InvalidUserDataException e) {
+                    createSynchronize(currentClient);
+                }
             }
             logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SYN",
                     "[SOAP] Clients are successfully synchronized"));
@@ -269,9 +274,9 @@ public class ClientServiceImpl implements ClientService {
 
     @Autowired
     public ClientServiceImpl(ClientRepository clientRepository, UserService userService,
-            PasswordEncoder passwordEncoder, EmailNotificationService emailNotificationService, Environment environment,
-            VerificationTokenRepository verificationTokenRepository, ClientClient clientClient,
-            ClientDetailsMapper clientDetailsMapper, LogService logService) {
+                             PasswordEncoder passwordEncoder, EmailNotificationService emailNotificationService, Environment environment,
+                             VerificationTokenRepository verificationTokenRepository, ClientClient clientClient,
+                             ClientDetailsMapper clientDetailsMapper, LogService logService) {
         this.clientRepository = clientRepository;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;

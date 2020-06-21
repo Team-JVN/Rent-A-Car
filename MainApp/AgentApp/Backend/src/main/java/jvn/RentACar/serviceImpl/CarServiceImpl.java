@@ -298,6 +298,8 @@ public class CarServiceImpl implements CarService {
         dbCar.setMileageInKm(car.getMileageInKm());
         dbCar.setKidsSeats(car.getKidsSeats());
         dbCar.setAvailableTracking(car.getAvailableTracking());
+        dbCar.setAvgRating(car.getAvgRating());
+        dbCar.setCommentsCount(car.getCommentsCount());
         Car newCar = carRepository.saveAndFlush(dbCar);
         if (!pictureInfos.isEmpty()) {
             pictureService.editCarPicturesSynchronize(pictureInfos, UPLOADED_PICTURES_PATH, newCar);
