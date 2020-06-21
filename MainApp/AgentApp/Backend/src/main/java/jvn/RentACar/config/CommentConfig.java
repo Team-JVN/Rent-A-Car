@@ -19,7 +19,7 @@ public class CommentConfig {
     @Bean
     public CommentClient commentClient(Jaxb2Marshaller marshallerComment) {
         CommentClient client = new CommentClient();
-        client.setDefaultUri("http://localhost:8080/renting/ws/comment");
+        client.setDefaultUri("http://renting:8083/renting/ws/comment");
         client.setMarshaller(marshallerComment);
         client.setUnmarshaller(marshallerComment);
         return client;

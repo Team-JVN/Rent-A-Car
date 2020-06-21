@@ -19,7 +19,8 @@ public class MessageConfig {
     @Bean
     public MessageClient messageClient(Jaxb2Marshaller marshallerMessage) {
         MessageClient client = new MessageClient();
-        client.setDefaultUri("http://localhost:8080/renting/ws/message");
+//        client.setDefaultUri("http://localhost:8080/renting/ws/message");
+        client.setDefaultUri("http://renting:8083/renting/ws/message");
         client.setMarshaller(marshallerMessage);
         client.setUnmarshaller(marshallerMessage);
         return client;
