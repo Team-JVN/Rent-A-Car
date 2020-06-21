@@ -4,11 +4,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Advertisements.dto.both.PriceListDTO;
 import jvn.Advertisements.dto.message.AdvertisementMessageDTO;
+import jvn.Advertisements.dto.message.AdvertisementSignedDTO;
 import jvn.Advertisements.dto.message.Log;
+import jvn.Advertisements.dto.message.LogSignedDTO;
 import jvn.Advertisements.dto.request.AdvertisementEditDTO;
+import jvn.Advertisements.service.DigitalSignatureService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class AdvertisementProducer {
@@ -32,8 +37,13 @@ public class AdvertisementProducer {
 
     private LogProducer logProducer;
 
+    private DigitalSignatureService digitalSignatureService;
+
     public void sendMessageForSearch(AdvertisementMessageDTO advertisementMessageDTO) {
-        rabbitTemplate.convertAndSend(ADVERTISEMENT_FOR_SEARCH, jsonToString(advertisementMessageDTO));
+        byte[] advertisementBytes = objectToBytes(advertisementMessageDTO);
+        byte[] digitalSignature = digitalSignatureService.encrypt(advertisementBytes);
+        AdvertisementSignedDTO advertisementSignedDTO = new AdvertisementSignedDTO(advertisementBytes, digitalSignature);
+        rabbitTemplate.convertAndSend(ADVERTISEMENT_FOR_SEARCH, jsonToString(advertisementSignedDTO));
     }
 
     public void sendMessageForSearch(AdvertisementEditDTO advertisementEditDTO) {
@@ -79,10 +89,30 @@ public class AdvertisementProducer {
         }
     }
 
+    private String jsonToString(AdvertisementSignedDTO advertisementSignedDTO) {
+        try {
+            return objectMapper.writeValueAsString(advertisementSignedDTO);
+        } catch (JsonProcessingException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping %s instance to string failed", AdvertisementSignedDTO.class.getSimpleName())));
+            return null;
+        }
+    }
+
+    private byte[] objectToBytes(AdvertisementMessageDTO advertisementMessageDTO) {
+        try {
+            return objectMapper.writeValueAsBytes(advertisementMessageDTO);
+        } catch (JsonProcessingException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping %s instance to byte array failed", AdvertisementMessageDTO.class.getSimpleName())));
+            return null;
+        }
+    }
+
     @Autowired
-    public AdvertisementProducer(RabbitTemplate rabbitTemplate, ObjectMapper objectMapper, LogProducer logProducer) {
+    public AdvertisementProducer(RabbitTemplate rabbitTemplate, ObjectMapper objectMapper, LogProducer logProducer,
+                                 DigitalSignatureService digitalSignatureService) {
         this.rabbitTemplate = rabbitTemplate;
         this.objectMapper = objectMapper;
         this.logProducer = logProducer;
+        this.digitalSignatureService = digitalSignatureService;
     }
 }

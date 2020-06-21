@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.*;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 
 @Service
@@ -17,18 +18,24 @@ public class DigitalSignatureServiceImpl implements DigitalSignatureService {
     private String keyStorePath;
 
     @Value("${KEYSTORE_PASSWORD:advertisements_pass}")
-    private String password;
+    private String keyStorePassword;
 
     @Value("${KEYSTORE_ALIAS:advertisements}")
     private String alias;
+
+    @Value("${TRUSTSTORE:tls/certs/advertisements/keystore/advertisements.truststore.p12}")
+    private String trustStorePath;
+
+    @Value("${TRUSTSTORE_PASSWORD:advertisements_pass}")
+    private String trustStorePassword;
 
     public DigitalSignatureServiceImpl() {
         Security.addProvider(new BouncyCastleProvider());
     }
 
     public byte[] encrypt(byte[] messageBytes) {
-        KeyStore keyStore = getKeyStore(keyStorePath, password);
-        PrivateKey privateKey = getPrivateKey(keyStore, alias, password);
+        KeyStore keyStore = getKeyStore(keyStorePath, keyStorePassword);
+        PrivateKey privateKey = getPrivateKey(keyStore, alias, keyStorePassword);
         Signature signature;
         try {
             signature = Signature.getInstance("SHA256withRSAandMGF1", BouncyCastleProvider.PROVIDER_NAME);
@@ -39,6 +46,20 @@ public class DigitalSignatureServiceImpl implements DigitalSignatureService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public boolean decrypt(String alias, byte[] messageBytes, byte[] encryptedMessageBytes) {
+        KeyStore trustStore = getKeyStore(trustStorePath, trustStorePassword);
+        PublicKey publicKey = getPublicKey(trustStore, alias);
+        try {
+            Signature signature = Signature.getInstance("SHA256withRSAandMGF1", BouncyCastleProvider.PROVIDER_NAME);
+            signature.initVerify(publicKey);
+            signature.update(messageBytes);
+            return signature.verify(encryptedMessageBytes);
+        } catch (NoSuchAlgorithmException | NoSuchProviderException | SignatureException | InvalidKeyException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private KeyStore getKeyStore(String keyStorePath, String keyStorePassword) {
@@ -61,6 +82,17 @@ public class DigitalSignatureServiceImpl implements DigitalSignatureService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private PublicKey getPublicKey(KeyStore trustStore, String alias) {
+        PublicKey publicKey = null;
+        try {
+            Certificate certificate = trustStore.getCertificate(alias);
+            publicKey = certificate.getPublicKey();
+        } catch (KeyStoreException | NullPointerException e) {
+            e.printStackTrace();
+        }
+        return publicKey;
     }
 
 }

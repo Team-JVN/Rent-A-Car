@@ -1,5 +1,6 @@
-package jvn.Advertisements.dto.message;
+package jvn.SearchService.dto.message;
 
+import jvn.SearchService.model.Advertisement;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,11 +10,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LogMessageDTO {
+public class AdvertisementSignedDTO {
 
-    private String sender;
-
-    private String log;
+    private byte[] advertisementBytes;
 
     private byte[] digitalSignature;
 

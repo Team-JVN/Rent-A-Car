@@ -1,10 +1,13 @@
 package jvn.SearchService.consumer;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.SearchService.config.RabbitMQConfiguration;
 import jvn.SearchService.dto.AdvertisementEditDTO;
 import jvn.SearchService.dto.PriceListDTO;
+import jvn.SearchService.dto.message.AdvertisementSignedDTO;
 import jvn.SearchService.dto.message.Log;
 import jvn.SearchService.enumeration.LogicalStatus;
 import jvn.SearchService.model.Advertisement;
@@ -12,15 +15,20 @@ import jvn.SearchService.model.PriceList;
 import jvn.SearchService.producer.LogProducer;
 import jvn.SearchService.repository.AdvertisementRepository;
 import jvn.SearchService.repository.PriceListRepository;
+import jvn.SearchService.service.DigitalSignatureService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 @Service
 public class AdvertisementConsumer {
 
     private final String CLASS_PATH = this.getClass().getCanonicalName();
     private final String CLASS_NAME = this.getClass().getSimpleName();
+
+    private final String ADVERTISEMENTS_ALIAS = "advertisements";
 
     private ObjectMapper objectMapper;
 
@@ -30,14 +38,19 @@ public class AdvertisementConsumer {
 
     private LogProducer logProducer;
 
+    private DigitalSignatureService digitalSignatureService;
+
     @RabbitListener(queues = RabbitMQConfiguration.ADVERTISEMENT_FOR_SEARCH)
     public void listen(String advertisementMessageStr) {
-        Advertisement advertisement = stringToObject(advertisementMessageStr);
-        advertisementRepository.save(advertisement);
-        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CAD", String.format("Successfully created advertisement %s", advertisement.getId())));
-        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CCA", String.format("Successfully created car %s", advertisement.getCar().getId())));
-        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CPL", String.format("Successfully created price list %s", advertisement.getPriceList().getId())));
-        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "COW", String.format("Successfully created owner %s", advertisement.getOwner().getId())));
+        AdvertisementSignedDTO advertisementSignedDTO = stringToObject(advertisementMessageStr);
+        if (digitalSignatureService.decrypt(ADVERTISEMENTS_ALIAS, advertisementSignedDTO.getAdvertisementBytes(), advertisementSignedDTO.getDigitalSignature())) {
+            Advertisement advertisement = bytesToObject(advertisementSignedDTO.getAdvertisementBytes());
+            advertisementRepository.save(advertisement);
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CAD", String.format("Successfully created advertisement %s", advertisement.getId())));
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CCA", String.format("Successfully created car %s", advertisement.getCar().getId())));
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CPL", String.format("Successfully created price list %s", advertisement.getPriceList().getId())));
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "COW", String.format("Successfully created owner %s", advertisement.getOwner().getId())));
+        }
     }
 
     @RabbitListener(queues = RabbitMQConfiguration.DELETED_ADVERTISEMENT)
@@ -89,10 +102,27 @@ public class AdvertisementConsumer {
         logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EPL", String.format("Successfully edited price list %s", priceList.getId())));
     }
 
-    private Advertisement stringToObject(String advertisementMessageStr) {
+    private AdvertisementSignedDTO stringToObject(String advertisementMessageStr) {
         try {
-            return objectMapper.readValue(advertisementMessageStr, Advertisement.class);
+            return objectMapper.readValue(advertisementMessageStr, AdvertisementSignedDTO.class);
         } catch (JsonProcessingException e) {
+            return null;
+        }
+    }
+
+    private byte[] objectToBytes(Advertisement advertisementMessageDTO) {
+        try {
+            return objectMapper.writeValueAsBytes(advertisementMessageDTO);
+        } catch (JsonProcessingException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping %s instance to byte array failed", Advertisement.class.getSimpleName())));
+            return null;
+        }
+    }
+
+    private Advertisement bytesToObject(byte[] advertisementBytes) {
+        try {
+            return objectMapper.readValue(advertisementBytes, Advertisement.class);
+        } catch (IOException e) {
             return null;
         }
     }
@@ -115,10 +145,12 @@ public class AdvertisementConsumer {
 
     @Autowired
     public AdvertisementConsumer(ObjectMapper objectMapper, AdvertisementRepository advertisementRepository,
-                                 PriceListRepository priceListRepository, LogProducer logProducer) {
+                                 PriceListRepository priceListRepository, LogProducer logProducer,
+                                 DigitalSignatureService digitalSignatureService) {
         this.objectMapper = objectMapper;
         this.advertisementRepository = advertisementRepository;
         this.priceListRepository = priceListRepository;
         this.logProducer = logProducer;
+        this.digitalSignatureService = digitalSignatureService;
     }
 }
