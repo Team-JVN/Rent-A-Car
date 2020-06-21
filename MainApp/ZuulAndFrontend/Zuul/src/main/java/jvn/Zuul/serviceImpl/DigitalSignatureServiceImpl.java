@@ -28,6 +28,13 @@ public class DigitalSignatureServiceImpl implements DigitalSignatureService {
     @Value("${KEYSTORE_ALIAS:zuul}")
     private String alias;
 
+    @Value("${TRUSTSTORE:tls/certs/zuul/keystore/zuul.truststore.p12}")
+    private String trustStorePath;
+
+    @Value("${TRUSTSTORE_PASSWORD:zuul_pass}")
+    private String trustStorePassword;
+
+
     public DigitalSignatureServiceImpl() {
         Security.addProvider(new BouncyCastleProvider());
     }
@@ -45,6 +52,20 @@ public class DigitalSignatureServiceImpl implements DigitalSignatureService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public boolean decrypt(String alias, byte[] messageBytes, byte[] encryptedMessageBytes) {
+        KeyStore trustStore = getKeyStore(trustStorePath, trustStorePassword);
+        PublicKey publicKey = getPublicKey(trustStore, alias);
+        try {
+            Signature signature = Signature.getInstance("SHA256withRSAandMGF1", BouncyCastleProvider.PROVIDER_NAME);
+            signature.initVerify(publicKey);
+            signature.update(messageBytes);
+            return signature.verify(encryptedMessageBytes);
+        } catch (NoSuchAlgorithmException | NoSuchProviderException | SignatureException | InvalidKeyException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private KeyStore getKeyStore(String keyStorePath, String keyStorePassword) {
@@ -67,6 +88,17 @@ public class DigitalSignatureServiceImpl implements DigitalSignatureService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private PublicKey getPublicKey(KeyStore trustStore, String alias) {
+        PublicKey publicKey = null;
+        try {
+            Certificate certificate = trustStore.getCertificate(alias);
+            publicKey = certificate.getPublicKey();
+        } catch (KeyStoreException | NullPointerException e) {
+            e.printStackTrace();
+        }
+        return publicKey;
     }
 
 }

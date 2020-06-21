@@ -59,3 +59,4 @@ CRQ|Create rent request
 SRQ|Change rent request status
 CRI|Create rent info
 PAY|Pay for made mileage over limit
+SGN|Invalid digital signature
