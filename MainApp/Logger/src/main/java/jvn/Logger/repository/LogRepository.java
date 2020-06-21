@@ -2,7 +2,7 @@ package jvn.Logger.repository;
 
 import jvn.Logger.config.ApplicationConfiguration;
 import jvn.Logger.model.Log;
-import org.owasp.esapi.ESAPI;
+import org.owasp.encoder.Encode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
@@ -10,21 +10,18 @@ import org.springframework.stereotype.Repository;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Repository
 public class LogRepository implements FileRepository<Log> {
 
-    //    private static int MAX_FILE_SIZE = 10000000;    // 10 MB to store around 100,000 entries
+    //    private static int MAX_FILE_SIZE = 100000000;    // 100 MB to store around 1,000,000 entries
     private static int MAX_FILE_SIZE = 1000;    // 1 KB for testing
 
     private ApplicationConfiguration configuration;
 
     @Override
     public void write(Path file, Log log) throws IOException {
-//        String logStr = encode(log.toFile()) + "\n";  // In production
-        String logStr = log.toFile() + "\n";    // In development
+        String logStr = encode(log.toFile()) + "\n";
         Files.write(file, logStr.getBytes(), StandardOpenOption.APPEND, StandardOpenOption.CREATE);
         if (Files.exists(file) && Files.size(file) > MAX_FILE_SIZE) {
             rotateLogFiles(file, Paths.get(configuration.getLogBackup1()), Paths.get(configuration.getLogBackup2()));
@@ -36,7 +33,7 @@ public class LogRepository implements FileRepository<Log> {
                 .replace('\n', '_')
                 .replace('\r', '_')
                 .replace('\t', '_');
-        return ESAPI.encoder().encodeForHTML(sanitized);
+        return Encode.forHtml(sanitized);
     }
 
     @Async
