@@ -40,7 +40,7 @@ public class RentReportEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "createRentReportRequest")
     @ResponsePayload
     public CreateRentReportResponse createRentReport(@RequestPayload CreateRentReportRequest request) {
-        System.out.println("createRentReport end point");
+
         UserInfoDTO dto = userClient.getUser(request.getEmail());
         if (dto == null) {
             return null;
@@ -59,7 +59,7 @@ public class RentReportEndpoint {
 
         CreateRentReportResponse response = new CreateRentReportResponse();
         response.setRentReportDetails(rentReportDetails);
-        System.out.println("CreateRentReportResponse end point");
+
         return response;
     }
 
