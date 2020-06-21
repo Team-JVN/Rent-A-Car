@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Logger.config.ApplicationConfiguration;
 import jvn.Logger.config.RabbitMQConfiguration;
 import jvn.Logger.model.Log;
-import jvn.Logger.model.LogMessageDTO;
+import jvn.Logger.model.LogSignedDTO;
 import jvn.Logger.repository.FileRepository;
 import jvn.Logger.serviceImpl.DigitalSignatureServiceImpl;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -27,11 +27,11 @@ public class LogConsumer {
 
     @RabbitListener(queues = RabbitMQConfiguration.LOGS)
     public void write(String logMessageStr) {
-        LogMessageDTO logMessageDTO = stringToObject(logMessageStr);
-        if (digitalSignatureService.decrypt(logMessageDTO.getSender(), logMessageDTO.getLog().getBytes(StandardCharsets.UTF_8), logMessageDTO.getDigitalSignature())) {
+        LogSignedDTO logSignedDTO = stringToObject(logMessageStr);
+        if (digitalSignatureService.decrypt(logSignedDTO.getSender(), logSignedDTO.getLog().getBytes(StandardCharsets.UTF_8), logSignedDTO.getDigitalSignature())) {
             try {
-                repository.write(Paths.get(configuration.getLogStorage()), Log.parse(logMessageDTO.getLog()));
-                System.out.println(logMessageDTO.getLog());
+                repository.write(Paths.get(configuration.getLogStorage()), Log.parse(logSignedDTO.getLog()));
+                System.out.println(logSignedDTO.getLog());
             } catch (IOException e) {
                 System.out.println("Cannot write log message to a file.");
             } catch (Exception e) {
@@ -53,10 +53,10 @@ public class LogConsumer {
     }
 */
 
-    private LogMessageDTO stringToObject(String logMessageStr) {
+    private LogSignedDTO stringToObject(String logMessageStr) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            return objectMapper.readValue(logMessageStr, LogMessageDTO.class);
+            return objectMapper.readValue(logMessageStr, LogSignedDTO.class);
         } catch (JsonProcessingException e) {
             return null;
         }

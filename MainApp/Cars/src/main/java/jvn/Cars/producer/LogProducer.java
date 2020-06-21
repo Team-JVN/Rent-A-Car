@@ -3,7 +3,7 @@ package jvn.Cars.producer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Cars.config.RabbitMQConfiguration;
 import jvn.Cars.dto.message.Log;
-import jvn.Cars.dto.message.LogMessageDTO;
+import jvn.Cars.dto.message.LogSignedDTO;
 import jvn.Cars.service.DigitalSignatureService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +25,14 @@ public class LogProducer {
 
     public void send(Log log) {
         byte[] digitalSignature = digitalSignatureService.encrypt(log.toString().getBytes(StandardCharsets.UTF_8));
-        LogMessageDTO logMessageDTO = new LogMessageDTO(sender, log.toString(), digitalSignature);
-        rabbitTemplate.convertAndSend(RabbitMQConfiguration.LOGS, jsonToString(logMessageDTO));
+        LogSignedDTO logSignedDTO = new LogSignedDTO(sender, log.toString(), digitalSignature);
+        rabbitTemplate.convertAndSend(RabbitMQConfiguration.LOGS, jsonToString(logSignedDTO));
     }
 
-    private String jsonToString(LogMessageDTO logMessageDTO) {
+    private String jsonToString(LogSignedDTO logSignedDTO) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            return objectMapper.writeValueAsString(logMessageDTO);
+            return objectMapper.writeValueAsString(logSignedDTO);
         } catch (IOException e) {
             return null;
         }
