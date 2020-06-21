@@ -1,9 +1,11 @@
 package jvn.Advertisements.endpoint;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Advertisements.client.UserClient;
 import jvn.Advertisements.dto.message.Log;
 import jvn.Advertisements.dto.request.AdvertisementEditDTO;
 import jvn.Advertisements.dto.request.UserDTO;
+import jvn.Advertisements.dto.response.SignedMessageDTO;
 import jvn.Advertisements.dto.response.UserInfoDTO;
 import jvn.Advertisements.dto.soap.advertisement.*;
 import jvn.Advertisements.mapper.AdvertisementDetailsMapper;
@@ -11,6 +13,7 @@ import jvn.Advertisements.mapper.EditPartialAdvertisementMapper;
 import jvn.Advertisements.model.Advertisement;
 import jvn.Advertisements.producer.LogProducer;
 import jvn.Advertisements.service.AdvertisementService;
+import jvn.Advertisements.service.DigitalSignatureService;
 import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
@@ -19,6 +22,7 @@ import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +32,8 @@ public class AdvertisementEndpoint {
 
     private final String CLASS_PATH = this.getClass().getCanonicalName();
     private final String CLASS_NAME = this.getClass().getSimpleName();
+
+    private final String USERS_ALIAS = "users";
 
     private static final String NAMESPACE_URI = "http://www.soap.dto/advertisement";
 
@@ -39,12 +45,16 @@ public class AdvertisementEndpoint {
 
     private EditPartialAdvertisementMapper editPartialAdvertisementMapper;
 
+    private ObjectMapper objectMapper;
+
     private LogProducer logProducer;
+
+    private DigitalSignatureService digitalSignatureService;
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "createOrEditAdvertisementDetailsRequest")
     @ResponsePayload
     public CreateOrEditAdvertisementDetailsResponse createOrEdit(@RequestPayload CreateOrEditAdvertisementDetailsRequest request) {
-        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        UserInfoDTO dto = getUserInfo(request.getEmail());
         if (dto == null) {
             return null;
         }
@@ -66,7 +76,7 @@ public class AdvertisementEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "deleteAdvertisementDetailsRequest")
     @ResponsePayload
     public DeleteAdvertisementDetailsResponse delete(@RequestPayload DeleteAdvertisementDetailsRequest request) {
-        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        UserInfoDTO dto = getUserInfo(request.getEmail());
         if (dto == null) {
             return null;
         }
@@ -82,7 +92,7 @@ public class AdvertisementEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "editPartialAdvertisementDetailsRequest")
     @ResponsePayload
     public EditPartialAdvertisementDetailsResponse editPartial(@RequestPayload EditPartialAdvertisementDetailsRequest request) {
-        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        UserInfoDTO dto = getUserInfo(request.getEmail());
         if (dto == null) {
             return null;
         }
@@ -103,11 +113,10 @@ public class AdvertisementEndpoint {
         return response;
     }
 
-
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getAdvertisementEditTypeRequest")
     @ResponsePayload
     public GetAdvertisementEditTypeResponse getAdvertisementEditType(@RequestPayload GetAdvertisementEditTypeRequest request) {
-        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        UserInfoDTO dto = getUserInfo(request.getEmail());
         if (dto == null) {
             return null;
         }
@@ -119,7 +128,7 @@ public class AdvertisementEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getAllAdvertisementDetailsRequest")
     @ResponsePayload
     public GetAllAdvertisementDetailsResponse getAll(@RequestPayload GetAllAdvertisementDetailsRequest request) {
-        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        UserInfoDTO dto = getUserInfo(request.getEmail());
         if (dto == null) {
             return null;
         }
@@ -145,7 +154,7 @@ public class AdvertisementEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "checkIfCarIsAvailableRequest")
     @ResponsePayload
     public CheckIfCarIsAvailableResponse checkIfCarIsAvailable(@RequestPayload CheckIfCarIsAvailableRequest request) {
-        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        UserInfoDTO dto = getUserInfo(request.getEmail());
         if (dto == null) {
             return null;
         }
@@ -168,13 +177,36 @@ public class AdvertisementEndpoint {
         return localDate;
     }
 
+    private UserInfoDTO getUserInfo(String email) {
+        UserInfoDTO userInfoDTO = null;
+        SignedMessageDTO signedEditType = userClient.getUser(email);
+        if (digitalSignatureService.decrypt(USERS_ALIAS, signedEditType.getMessageBytes(), signedEditType.getDigitalSignature())) {
+            userInfoDTO = bytesToObject(signedEditType.getMessageBytes());
+        } else {
+            logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SGN", "Invalid digital signature"));
+        }
+        return userInfoDTO;
+    }
+
+    private UserInfoDTO bytesToObject(byte[] byteArray) {
+        try {
+            return objectMapper.readValue(byteArray, UserInfoDTO.class);
+        } catch (IOException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping byte array to %s failed", UserInfoDTO.class.getSimpleName())));
+            return null;
+        }
+    }
+
     @Autowired
-    public AdvertisementEndpoint(AdvertisementService advertisementService, AdvertisementDetailsMapper advertisementDetailsMapper, UserClient userClient,
-                                 EditPartialAdvertisementMapper editPartialAdvertisementMapper, LogProducer logProducer) {
+    public AdvertisementEndpoint(AdvertisementService advertisementService, AdvertisementDetailsMapper advertisementDetailsMapper,
+                                 UserClient userClient, EditPartialAdvertisementMapper editPartialAdvertisementMapper,
+                                 ObjectMapper objectMapper, LogProducer logProducer, DigitalSignatureService digitalSignatureService) {
         this.advertisementService = advertisementService;
         this.advertisementDetailsMapper = advertisementDetailsMapper;
         this.userClient = userClient;
         this.editPartialAdvertisementMapper = editPartialAdvertisementMapper;
+        this.objectMapper = objectMapper;
         this.logProducer = logProducer;
+        this.digitalSignatureService = digitalSignatureService;
     }
 }

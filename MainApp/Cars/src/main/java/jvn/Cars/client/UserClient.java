@@ -1,5 +1,6 @@
 package jvn.Cars.client;
 
+import jvn.Cars.dto.response.SignedMessageDTO;
 import jvn.Cars.dto.response.UserInfoDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,5 +11,5 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface UserClient {
 
     @RequestMapping(method = RequestMethod.GET, path = "/api/verify/user")
-    UserInfoDTO getUser(@RequestParam("email") String email);
+    SignedMessageDTO getUser(@RequestParam("email") String email);
 }

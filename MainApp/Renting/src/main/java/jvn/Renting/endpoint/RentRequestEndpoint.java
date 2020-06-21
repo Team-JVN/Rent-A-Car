@@ -1,8 +1,10 @@
 package jvn.Renting.endpoint;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Renting.client.UserClient;
 import jvn.Renting.dto.message.Log;
 import jvn.Renting.dto.request.RentRequestStatusDTO;
+import jvn.Renting.dto.response.SignedMessageDTO;
 import jvn.Renting.dto.response.UserInfoDTO;
 import jvn.Renting.dto.soap.rentrequest.*;
 import jvn.Renting.exceptionHandler.InvalidRentRequestDataException;
@@ -10,6 +12,7 @@ import jvn.Renting.mapper.RentRequestDetailsMapper;
 import jvn.Renting.model.RentInfo;
 import jvn.Renting.model.RentRequest;
 import jvn.Renting.producer.LogProducer;
+import jvn.Renting.service.DigitalSignatureService;
 import jvn.Renting.service.RentRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
@@ -18,6 +21,7 @@ import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.IOException;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,6 +35,8 @@ public class RentRequestEndpoint {
     private final String CLASS_PATH = this.getClass().getCanonicalName();
     private final String CLASS_NAME = this.getClass().getSimpleName();
 
+    private final String USERS_ALIAS = "users";
+
     private static final String NAMESPACE_URI = "http://www.soap.dto/rentrequest";
 
     private RentRequestService rentRequestService;
@@ -41,10 +47,14 @@ public class RentRequestEndpoint {
 
     private LogProducer logProducer;
 
+    private ObjectMapper objectMapper;
+
+    private DigitalSignatureService digitalSignatureService;
+
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "createRentRequestRequest")
     @ResponsePayload
     public CreateRentRequestResponse createOrEdit(@RequestPayload CreateRentRequestRequest request) {
-        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        UserInfoDTO dto = getUserInfo(request.getEmail());
         if (dto == null) {
             return null;
         }
@@ -71,7 +81,7 @@ public class RentRequestEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "changeRentRequestStatusRequest")
     @ResponsePayload
     public ChangeRentRequestStatusResponse changeRentRequestStatus(@RequestPayload ChangeRentRequestStatusRequest request) {
-        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        UserInfoDTO dto = getUserInfo(request.getEmail());
         if (dto == null) {
             return null;
         }
@@ -93,7 +103,7 @@ public class RentRequestEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "checkDateRequest")
     @ResponsePayload
     public CheckDateResponse checkDate(@RequestPayload CheckDateRequest request) {
-        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        UserInfoDTO dto = getUserInfo(request.getEmail());
         if (dto == null) {
             return null;
         }
@@ -117,7 +127,7 @@ public class RentRequestEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "checkIfCanAcceptRequest")
     @ResponsePayload
     public CheckIfCanAcceptResponse checkIfCanAcceptRentRequest(@RequestPayload CheckIfCanAcceptRequest request) {
-        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        UserInfoDTO dto = getUserInfo(request.getEmail());
         if (dto == null) {
             return null;
         }
@@ -141,7 +151,7 @@ public class RentRequestEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "hasDebtRequest")
     @ResponsePayload
     public HasDebtResponse hasDebt(@RequestPayload HasDebtRequest request) {
-        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        UserInfoDTO dto = getUserInfo(request.getEmail());
         if (dto == null) {
             return null;
         }
@@ -161,7 +171,7 @@ public class RentRequestEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getAllRentRequestDetailsRequest")
     @ResponsePayload
     public GetAllRentRequestDetailsResponse getAll(@RequestPayload GetAllRentRequestDetailsRequest request) {
-        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        UserInfoDTO dto = getUserInfo(request.getEmail());
         if (dto == null) {
             return null;
         }
@@ -185,12 +195,35 @@ public class RentRequestEndpoint {
         return xmlGregorianCalendar.toGregorianCalendar().toZonedDateTime().toLocalDateTime();
     }
 
+    private UserInfoDTO getUserInfo(String email) {
+        UserInfoDTO userInfoDTO = null;
+        SignedMessageDTO signedEditType = userClient.getUser(email);
+        if (digitalSignatureService.decrypt(USERS_ALIAS, signedEditType.getMessageBytes(), signedEditType.getDigitalSignature())) {
+            userInfoDTO = bytesToObject(signedEditType.getMessageBytes());
+        } else {
+            logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SGN", "Invalid digital signature"));
+        }
+        return userInfoDTO;
+    }
+
+    private UserInfoDTO bytesToObject(byte[] byteArray) {
+        try {
+            return objectMapper.readValue(byteArray, UserInfoDTO.class);
+        } catch (IOException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping byte array to %s failed", UserInfoDTO.class.getSimpleName())));
+            return null;
+        }
+    }
+
     @Autowired
     public RentRequestEndpoint(RentRequestService rentRequestService, RentRequestDetailsMapper rentRequestDetailsMapper,
-                               UserClient userClient, LogProducer logProducer) {
+                               UserClient userClient, ObjectMapper objectMapper, LogProducer logProducer,
+                               DigitalSignatureService digitalSignatureService) {
         this.rentRequestService = rentRequestService;
         this.userClient = userClient;
         this.rentRequestDetailsMapper = rentRequestDetailsMapper;
+        this.objectMapper = objectMapper;
         this.logProducer = logProducer;
+        this.digitalSignatureService = digitalSignatureService;
     }
 }

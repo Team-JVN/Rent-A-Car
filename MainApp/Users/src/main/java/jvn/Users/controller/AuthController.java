@@ -47,8 +47,13 @@ public class AuthController {
     }
 
     @GetMapping(value = "/user")
-    public ResponseEntity<UserInfoDTO> get(@RequestParam String email) {
-        return new ResponseEntity<>(userService.getByEmail(email), HttpStatus.OK);
+    public ResponseEntity<SignedMessageDTO> get(@RequestParam String email) {
+        UserInfoDTO userInfoDTO = userService.getByEmail(email);
+        byte[] messageBytes = convertToBytes(userInfoDTO);
+        byte[] digitalSignature = digitalSignatureService.encrypt(messageBytes);
+        SignedMessageDTO signedMessageDTO = new SignedMessageDTO(messageBytes, digitalSignature);
+
+        return new ResponseEntity<>(signedMessageDTO, HttpStatus.OK);
     }
 
     private byte[] convertToBytes(UserDTO obj) {
@@ -56,6 +61,15 @@ public class AuthController {
             return objectMapper.writeValueAsBytes(obj);
         } catch (JsonProcessingException e) {
             logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping %s instance to byte array failed", UserDTO.class.getSimpleName())));
+            return null;
+        }
+    }
+
+    private byte[] convertToBytes(UserInfoDTO obj) {
+        try {
+            return objectMapper.writeValueAsBytes(obj);
+        } catch (JsonProcessingException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping %s instance to byte array failed", UserInfoDTO.class.getSimpleName())));
             return null;
         }
     }

@@ -1,6 +1,7 @@
 package jvn.Renting.client;
 
 import jvn.Renting.dto.both.ClientDTO;
+import jvn.Renting.dto.response.SignedMessageDTO;
 import jvn.Renting.dto.response.UserInfoDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -19,5 +20,5 @@ public interface UserClient {
                         @PathVariable("clientIds") List<Long> clients);
 
     @RequestMapping(method = RequestMethod.GET, path = "/api/verify/user")
-    UserInfoDTO getUser(@RequestParam("email") String email);
+    SignedMessageDTO getUser(@RequestParam("email") String email);
 }

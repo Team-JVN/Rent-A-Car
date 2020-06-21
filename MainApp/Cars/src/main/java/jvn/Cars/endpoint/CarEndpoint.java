@@ -1,7 +1,10 @@
 package jvn.Cars.endpoint;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Cars.dto.message.Log;
+import jvn.Cars.dto.response.SignedMessageDTO;
 import jvn.Cars.producer.LogProducer;
+import jvn.Cars.service.DigitalSignatureService;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import jvn.Cars.client.UserClient;
@@ -36,6 +39,8 @@ public class CarEndpoint {
     private final String CLASS_PATH = this.getClass().getCanonicalName();
     private final String CLASS_NAME = this.getClass().getSimpleName();
 
+    private final String USERS_ALIAS = "users";
+
     @Value("${UPLOADED_PICTURES_PATH:uploadedPictures/}")
     private String UPLOADED_PICTURES_PATH;
 
@@ -53,10 +58,14 @@ public class CarEndpoint {
 
     private LogProducer logProducer;
 
+    private ObjectMapper objectMapper;
+
+    private DigitalSignatureService digitalSignatureService;
+
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "createOrEditCarDetailsRequest")
     @ResponsePayload
     public CreateOrEditCarDetailsResponse createOrEdit(@RequestPayload CreateOrEditCarDetailsRequest request) {
-        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        UserInfoDTO dto = getUserInfo(request.getEmail());
         if (dto == null) {
             return null;
         }
@@ -82,7 +91,7 @@ public class CarEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "deleteCarDetailsRequest")
     @ResponsePayload
     public DeleteCarDetailsResponse delete(@RequestPayload DeleteCarDetailsRequest request) {
-        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        UserInfoDTO dto = getUserInfo(request.getEmail());
         if (dto == null) {
             return null;
         }
@@ -98,7 +107,7 @@ public class CarEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getCarEditTypeRequest")
     @ResponsePayload
     public GetCarEditTypeResponse getCarEditTypeRequest(@RequestPayload GetCarEditTypeRequest request) {
-        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        UserInfoDTO dto = getUserInfo(request.getEmail());
         if (dto == null) {
             return null;
         }
@@ -121,7 +130,7 @@ public class CarEndpoint {
     @ResponsePayload
     public EditPartialCarDetailsResponse editPartialCarDetailsRequest(
             @RequestPayload EditPartialCarDetailsRequest request) {
-        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        UserInfoDTO dto = getUserInfo(request.getEmail());
         if (dto == null) {
             return null;
         }
@@ -140,7 +149,7 @@ public class CarEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getAllCarDetailsRequest")
     @ResponsePayload
     public GetAllCarDetailsResponse getAll(@RequestPayload GetAllCarDetailsRequest request) {
-        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        UserInfoDTO dto = getUserInfo(request.getEmail());
         if (dto == null) {
             return null;
         }
@@ -186,15 +195,38 @@ public class CarEndpoint {
         return null;
     }
 
+    private UserInfoDTO getUserInfo(String email) {
+        UserInfoDTO userInfoDTO = null;
+        SignedMessageDTO signedEditType = userClient.getUser(email);
+        if (digitalSignatureService.decrypt(USERS_ALIAS, signedEditType.getMessageBytes(), signedEditType.getDigitalSignature())) {
+            userInfoDTO = bytesToObject(signedEditType.getMessageBytes());
+        } else {
+            logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SGN", "Invalid digital signature"));
+        }
+        return userInfoDTO;
+    }
+
+    private UserInfoDTO bytesToObject(byte[] byteArray) {
+        try {
+            return objectMapper.readValue(byteArray, UserInfoDTO.class);
+        } catch (IOException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping byte array to %s failed", UserInfoDTO.class.getSimpleName())));
+            return null;
+        }
+    }
+
     @Autowired
     public CarEndpoint(CarService carService, CarDetailsMapper carDetailsMapper, UserClient userClient,
                        EditPartialCarDetailsMapper editPartialCarDetailsmapper,
-                       EditPartialCarDetailsAndCarMapper editPartialCarDetailsAndCarMapper, LogProducer logProducer) {
+                       EditPartialCarDetailsAndCarMapper editPartialCarDetailsAndCarMapper,
+                       ObjectMapper objectMapper, LogProducer logProducer, DigitalSignatureService digitalSignatureService) {
         this.carService = carService;
         this.carDetailsMapper = carDetailsMapper;
         this.userClient = userClient;
         this.editPartialCarDetailsmapper = editPartialCarDetailsmapper;
         this.editPartialCarDetailsAndCarMapper = editPartialCarDetailsAndCarMapper;
+        this.objectMapper = objectMapper;
         this.logProducer = logProducer;
+        this.digitalSignatureService = digitalSignatureService;
     }
 }
