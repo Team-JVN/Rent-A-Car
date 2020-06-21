@@ -42,6 +42,7 @@ import { EditRoleComponent } from "./component/edit/edit-role/edit-role.componen
 import { ActivateAccountComponent } from "./component/authentification/activate-account/activate-account.component";
 import { ManageAdvertisementsGuard } from "./guard/manage.advertisements.guard";
 import { ManageCommentsComponent } from "./component/manage-comments/manage-comments.component";
+import { ManageCommentsGuard } from './guard/manage.comment.guard';
 
 const routes: Routes = [
   /** MANAGE ADVERTISEMENTS */
@@ -118,7 +119,7 @@ const routes: Routes = [
   {
     path: "manage-comments",
     component: ManageCommentsComponent,
-    canActivate: [ManageUsersGuard],
+    canActivate: [ManageCommentsGuard],
   },
 
   /** Get my rent requests */
@@ -222,4 +223,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

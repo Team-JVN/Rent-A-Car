@@ -130,6 +130,8 @@ public class PictureServiceImpl implements PictureService {
                 logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PEX", String.format("Picture \"%s\" not found on server", file.getName())));
             }
             Long picId = picture.getId();
+            picture.setCar(null);
+            pictureRepository.save(picture);
             pictureRepository.deleteById(picId);
             logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PDB", String.format("Picture %s successfully deleted from DB", picId)));
         }

@@ -210,6 +210,8 @@ public class PictureServiceImpl implements PictureService {
                         String.format("Picture \"%s\" not found on server", file.getName())));
             }
             Long picId = picture.getId();
+            picture.setCar(null);
+            pictureRepository.save(picture);
             pictureRepository.deleteById(picId);
             logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PDB",
                     String.format("Picture %s successfully deleted from DB", picId)));

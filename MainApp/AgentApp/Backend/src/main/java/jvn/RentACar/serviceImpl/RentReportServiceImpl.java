@@ -40,11 +40,17 @@ public class RentReportServiceImpl implements RentReportService {
         rentReport.setRentInfo(rentInfo);
         checkIfCreatingRentReportIsPossible(rentInfoService.get(rentInfoId));
         rentReport.setAdditionalCost(calculateAdditionalCost(rentReport));
+        if (rentReport.getAdditionalCost() == 0) {
+            rentReport.setPaid(true);
+        } else {
+            rentReport.setPaid(false);
+        }
         calculateMileageInKm(rentReport);
+
         rentReport = rentReportRepository.save(rentReport);
         CreateRentReportResponse createRentReportResponse = rentReportClient.createRentReport(rentInfo.getMainAppId(), rentReport);
         RentReportDetails rentReportDetails = createRentReportResponse.getRentReportDetails();
-        if(rentReportDetails != null && rentReportDetails.getId() != null){
+        if (rentReportDetails != null && rentReportDetails.getId() != null) {
 
             rentReport.setMainAppId(rentReportDetails.getId());
         }

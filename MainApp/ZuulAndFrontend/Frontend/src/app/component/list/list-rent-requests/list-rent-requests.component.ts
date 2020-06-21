@@ -24,7 +24,7 @@ import { trigger, state, transition, style, animate } from '@angular/animations'
   ],
 })
 export class ListRentRequestsComponent implements OnInit {
-  
+
   displayedColumns: string[] = ['client', 'totalPrice', 'status', 'buttons'];
   expandedElement: RentRequest | null;
   rentRequestsDataSource: MatTableDataSource<RentRequest>;
@@ -63,9 +63,6 @@ export class ListRentRequestsComponent implements OnInit {
     );
   }
 
-  createRentReport(rentRequest: RentRequest, rentInfo: RentInfo) {
-    //this.dialog.open(AddRentReportComponent, { data: rentInfo });
-  }
 
   advertisementDetails(rentInfo: RentInfo) {
     this.router.navigate(['/advertisement/' + rentInfo.advertisement.id]);
