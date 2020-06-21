@@ -7,8 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.SearchService.config.RabbitMQConfiguration;
 import jvn.SearchService.dto.AdvertisementEditDTO;
 import jvn.SearchService.dto.PriceListDTO;
-import jvn.SearchService.dto.message.AdvertisementSignedDTO;
-import jvn.SearchService.dto.message.Log;
+import jvn.SearchService.dto.message.*;
 import jvn.SearchService.enumeration.LogicalStatus;
 import jvn.SearchService.model.Advertisement;
 import jvn.SearchService.model.PriceList;
@@ -42,9 +41,9 @@ public class AdvertisementConsumer {
 
     @RabbitListener(queues = RabbitMQConfiguration.ADVERTISEMENT_FOR_SEARCH)
     public void listen(String advertisementMessageStr) {
-        AdvertisementSignedDTO advertisementSignedDTO = stringToObject(advertisementMessageStr);
+        AdvertisementSignedDTO advertisementSignedDTO = stringToAdvSignedDTO(advertisementMessageStr);
         if (digitalSignatureService.decrypt(ADVERTISEMENTS_ALIAS, advertisementSignedDTO.getAdvertisementBytes(), advertisementSignedDTO.getDigitalSignature())) {
-            Advertisement advertisement = bytesToObject(advertisementSignedDTO.getAdvertisementBytes());
+            Advertisement advertisement = bytesToAdvertisement(advertisementSignedDTO.getAdvertisementBytes());
             advertisementRepository.save(advertisement);
             logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CAD", String.format("Successfully created advertisement %s", advertisement.getId())));
             logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CCA", String.format("Successfully created car %s", advertisement.getCar().getId())));
@@ -54,91 +53,124 @@ public class AdvertisementConsumer {
     }
 
     @RabbitListener(queues = RabbitMQConfiguration.DELETED_ADVERTISEMENT)
-    public void listen(Long advId) {
-        Advertisement advertisement = advertisementRepository.findOneById(advId);
-        advertisement.setLogicalStatus(LogicalStatus.DELETED);
-        advertisementRepository.save(advertisement);
-        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "DAD", String.format("Successfully deleted advertisement %s", advId)));
+    public void listenDeleteAdv(String advIdStr) {
+        AdvIdSignedDTO advIdSignedDTO = stringToAdvIdSignedDTO(advIdStr);
+        if (digitalSignatureService.decrypt(ADVERTISEMENTS_ALIAS, advIdSignedDTO.getAdvIdBytes(), advIdSignedDTO.getDigitalSignature())) {
+            Long advId = bytesToLong(advIdSignedDTO.getAdvIdBytes());
+            Advertisement advertisement = advertisementRepository.findOneById(advId);
+            advertisement.setLogicalStatus(LogicalStatus.DELETED);
+            advertisementRepository.save(advertisement);
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "DAD", String.format("Successfully deleted advertisement %s", advId)));
+        }
     }
 
     @RabbitListener(queues = RabbitMQConfiguration.EDIT_PARTIAL_ADVERTISEMENT)
     public void listenEditPartialAdv(String advertisementMessageStr) {
-        AdvertisementEditDTO advertisementEditDTO = stringToObjectAdvEditDTO(advertisementMessageStr);
-        Advertisement advertisement = advertisementRepository.findOneById(advertisementEditDTO.getId());
-        PriceList priceList = priceListRepository.findOneById(advertisementEditDTO.getPriceList().getId());
-        if (priceList == null) {
-            PriceListDTO priceListDTO = advertisementEditDTO.getPriceList();
-            priceList = new PriceList(priceListDTO.getId(), priceListDTO.getPricePerDay(), priceListDTO.getPricePerKm(), priceListDTO.getPriceForCDW());
-        }
-        advertisement.setPriceList(priceList);
-        if (priceList.getPricePerKm() == null) {
-            advertisement.setKilometresLimit(null);
-        } else {
-            advertisement.setKilometresLimit(advertisementEditDTO.getKilometresLimit());
-        }
-        if (priceList.getPriceForCDW() != null) {
-            advertisement.setCDW(true);
-        } else {
-            advertisement.setCDW(false);
-        }
+        AdvertisementEditSignedDTO advertisementEditSignedDTO = stringToAdvEditSignedDTO(advertisementMessageStr);
+        if (digitalSignatureService.decrypt(ADVERTISEMENTS_ALIAS, advertisementEditSignedDTO.getAdvertisementEditBytes(), advertisementEditSignedDTO.getDigitalSignature())) {
+            AdvertisementEditDTO advertisementEditDTO = bytesToAdvEditDTO(advertisementEditSignedDTO.getAdvertisementEditBytes());
+            Advertisement advertisement = advertisementRepository.findOneById(advertisementEditDTO.getId());
+            PriceList priceList = priceListRepository.findOneById(advertisementEditDTO.getPriceList().getId());
+            if (priceList == null) {
+                PriceListDTO priceListDTO = advertisementEditDTO.getPriceList();
+                priceList = new PriceList(priceListDTO.getId(), priceListDTO.getPricePerDay(), priceListDTO.getPricePerKm(), priceListDTO.getPriceForCDW());
+            }
+            advertisement.setPriceList(priceList);
+            if (priceList.getPricePerKm() == null) {
+                advertisement.setKilometresLimit(null);
+            } else {
+                advertisement.setKilometresLimit(advertisementEditDTO.getKilometresLimit());
+            }
+            if (priceList.getPriceForCDW() != null) {
+                advertisement.setCDW(true);
+            } else {
+                advertisement.setCDW(false);
+            }
 
-        advertisement.setDiscount(advertisementEditDTO.getDiscount());
-        advertisementRepository.save(advertisement);
-        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EAD", String.format("Successfully edited advertisement %s", advertisement.getId())));
+            advertisement.setDiscount(advertisementEditDTO.getDiscount());
+            advertisementRepository.save(advertisement);
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EAD", String.format("Successfully edited advertisement %s", advertisement.getId())));
+        }
     }
 
     @RabbitListener(queues = RabbitMQConfiguration.EDIT_PRICE_LIST_ADVERTISEMENT)
     public void listenEditPriceList(String message) {
-        PriceListDTO priceListDTO = stringToObjectPriceListDTO(message);
-        PriceList priceList = priceListRepository.findOneById(priceListDTO.getId());
-        if (priceList == null) {
-            priceList = new PriceList();
-            priceList.setId(priceListDTO.getId());
+        PriceListSignedDTO priceListSignedDTO = stringToPriceListSignedDTO(message);
+        if (digitalSignatureService.decrypt(ADVERTISEMENTS_ALIAS, priceListSignedDTO.getPriceListBytes(), priceListSignedDTO.getDigitalSignature())) {
+            PriceListDTO priceListDTO = bytesToPriceListDTO(priceListSignedDTO.getPriceListBytes());
+            PriceList priceList = priceListRepository.findOneById(priceListDTO.getId());
+            if (priceList == null) {
+                priceList = new PriceList();
+                priceList.setId(priceListDTO.getId());
+            }
+            priceList.setPricePerDay(priceListDTO.getPricePerDay());
+            priceList.setPricePerKm(priceListDTO.getPricePerKm());
+            priceList.setPriceForCDW(priceListDTO.getPriceForCDW());
+            priceListRepository.save(priceList);
+            logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EPL", String.format("Successfully edited price list %s", priceList.getId())));
         }
-        priceList.setPricePerDay(priceListDTO.getPricePerDay());
-        priceList.setPricePerKm(priceListDTO.getPricePerKm());
-        priceList.setPriceForCDW(priceListDTO.getPriceForCDW());
-        priceListRepository.save(priceList);
-        logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "EPL", String.format("Successfully edited price list %s", priceList.getId())));
     }
 
-    private AdvertisementSignedDTO stringToObject(String advertisementMessageStr) {
+    private AdvertisementSignedDTO stringToAdvSignedDTO(String message) {
         try {
-            return objectMapper.readValue(advertisementMessageStr, AdvertisementSignedDTO.class);
+            return objectMapper.readValue(message, AdvertisementSignedDTO.class);
         } catch (JsonProcessingException e) {
             return null;
         }
     }
 
-    private byte[] objectToBytes(Advertisement advertisementMessageDTO) {
+    private Advertisement bytesToAdvertisement(byte[] byteArray) {
         try {
-            return objectMapper.writeValueAsBytes(advertisementMessageDTO);
-        } catch (JsonProcessingException e) {
-            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping %s instance to byte array failed", Advertisement.class.getSimpleName())));
-            return null;
-        }
-    }
-
-    private Advertisement bytesToObject(byte[] advertisementBytes) {
-        try {
-            return objectMapper.readValue(advertisementBytes, Advertisement.class);
+            return objectMapper.readValue(byteArray, Advertisement.class);
         } catch (IOException e) {
             return null;
         }
     }
 
-    private AdvertisementEditDTO stringToObjectAdvEditDTO(String advertisementMessageStr) {
+    private AdvIdSignedDTO stringToAdvIdSignedDTO(String advIdStr) {
         try {
-            return objectMapper.readValue(advertisementMessageStr, AdvertisementEditDTO.class);
+            return objectMapper.readValue(advIdStr, AdvIdSignedDTO.class);
         } catch (JsonProcessingException e) {
             return null;
         }
     }
 
-    private PriceListDTO stringToObjectPriceListDTO(String message) {
+    private Long bytesToLong(byte[] byteArray) {
         try {
-            return objectMapper.readValue(message, PriceListDTO.class);
+            return objectMapper.readValue(byteArray, Long.class);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    private AdvertisementEditSignedDTO stringToAdvEditSignedDTO(String message) {
+        try {
+            return objectMapper.readValue(message, AdvertisementEditSignedDTO.class);
         } catch (JsonProcessingException e) {
+            return null;
+        }
+    }
+
+    private AdvertisementEditDTO bytesToAdvEditDTO(byte[] byteArray) {
+        try {
+            return objectMapper.readValue(byteArray, AdvertisementEditDTO.class);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    private PriceListSignedDTO stringToPriceListSignedDTO(String message) {
+        try {
+            return objectMapper.readValue(message, PriceListSignedDTO.class);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+    }
+
+    private PriceListDTO bytesToPriceListDTO(byte[] byteArray) {
+        try {
+            return objectMapper.readValue(byteArray, PriceListDTO.class);
+        } catch (IOException e) {
             return null;
         }
     }
