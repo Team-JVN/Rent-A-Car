@@ -39,5 +39,5 @@ public interface AdvertisementRepository extends JpaRepository<Advertisement, Lo
 
     List<Advertisement> findAllByLogicalStatusNotAndOwnerIdAndDateToLessThanEqual(LogicalStatus logicalStatus, Long id, LocalDate localDateToNow);
 
-    List<Advertisement> findByIdInAndLogicalStatus(Collection<Long> id, LogicalStatus logicalStatus);
+    List<Advertisement> findByIdIn(Collection<Long> id);
 }
