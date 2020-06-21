@@ -1,4 +1,5 @@
 package jvn.RentACar.config;
+
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -33,7 +34,8 @@ public class PriceListConfig {
     @Bean
     public PriceListClient pricelistClient(@Qualifier("marshallerPriceList") Jaxb2Marshaller marshallerPriceList) throws Exception {
         PriceListClient client = new PriceListClient();
-        client.setDefaultUri("http://advertisements:8081/ws/pricelist");
+//        client.setDefaultUri("http://advertisements:8081/ws/pricelist");
+        client.setDefaultUri("http://localhost:8081/ws/pricelist");
         client.setMarshaller(marshallerPriceList);
         client.setUnmarshaller(marshallerPriceList);
         return client;

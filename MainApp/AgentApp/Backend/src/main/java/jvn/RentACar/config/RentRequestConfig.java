@@ -19,7 +19,8 @@ public class RentRequestConfig {
     @Bean
     public RentRequestClient rentRequestClient(Jaxb2Marshaller marshallerRentRequest) {
         RentRequestClient client = new RentRequestClient();
-        client.setDefaultUri("http://zuul:8080/renting/rentrequest/ws");
+//        client.setDefaultUri("http://zuul:8080/renting/rentrequest/ws");
+        client.setDefaultUri("http://localhost:8080/renting/rentrequest/ws");
         client.setMarshaller(marshallerRentRequest);
         client.setUnmarshaller(marshallerRentRequest);
         return client;
