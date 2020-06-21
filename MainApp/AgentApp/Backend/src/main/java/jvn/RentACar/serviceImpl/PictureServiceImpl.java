@@ -116,6 +116,8 @@ public class PictureServiceImpl implements PictureService {
                         logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PDB",
                                 String.format("Picture %s successfully saved in DB", pic.getId())));
                     }
+                } else {
+                    removedPictures.remove(pictureData);
                 }
             } else {
                 removedPictures.remove(pictureData);
@@ -209,10 +211,12 @@ public class PictureServiceImpl implements PictureService {
                 logService.write(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PEX",
                         String.format("Picture \"%s\" not found on server", file.getName())));
             }
-            Long picId = picture.getId();
-            pictureRepository.deleteById(picId);
+
+            picture.setCar(null);
+            pictureRepository.save(picture);
+//            pictureRepository.deleteById(picId);
             logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PDB",
-                    String.format("Picture %s successfully deleted from DB", picId)));
+                    String.format("Picture %s successfully deleted from DB", picture.getId())));
         }
     }
 
