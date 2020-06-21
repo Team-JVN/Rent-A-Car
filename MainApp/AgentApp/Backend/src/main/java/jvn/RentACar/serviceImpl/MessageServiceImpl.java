@@ -49,17 +49,15 @@ public class MessageServiceImpl implements MessageService {
 //            throw new InvalidRentRequestDataException("Socket error", HttpStatus.BAD_REQUEST);
 //        }
 
-        rentRequestRepository.save(rentRequest);
+//        rentRequestRepository.save(rentRequest);
 
-//        CreateMessageResponse createMessageResponse = messageClient.createMessage(rentRequest.getMainAppId(), message);
-//        System.out.println("createMessageResponse impl");
+        CreateMessageResponse createMessageResponse = messageClient.createMessage(rentRequest.getMainAppId(), message);
 
-//        MessageDetails details = createMessageResponse.getMessageDetails();
-//        if(details != null && details.getId() != null){
-//            System.out.println("if impl");
-//
-//            message.setMainAppId(details.getId());
-//        }
+        MessageDetails details = createMessageResponse.getMessageDetails();
+        if(details != null && details.getId() != null){
+            message.setMainAppId(details.getId());
+        }
+        messageRepository.save(message);
 
         return message;
     }
@@ -73,6 +71,7 @@ public class MessageServiceImpl implements MessageService {
         List<Message> messages = new ArrayList<>();
         for(Message message: rentRequest.getMessages()){
             if(message.getSender().getId().equals(loggedInUser.getId()) || rentRequest.getCreatedBy().getId().equals(loggedInUser.getId()) || rentRequest.getClient().getId().equals(loggedInUser.getId())){
+
                 messages.add(message);
             }
         }

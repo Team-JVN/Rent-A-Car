@@ -64,6 +64,7 @@ export class ClientRentRequestDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.availibleLeavingFeedback = new Map();
     this.messageForm = this.formBuilder.group({
       text: new FormControl(null, Validators.required),
     });
@@ -72,6 +73,9 @@ export class ClientRentRequestDetailsComponent implements OnInit {
       this.rentRequestService.get(this.rentRequestId).subscribe(
         (data: RentRequest) => {
           this.rentRequest = data;
+          for (let rentInfo of this.rentRequest.rentInfos) {
+            this.availibleLeavingFeedback.set(rentInfo.id, true);
+          }
         },
         (httpErrorResponse: HttpErrorResponse) => {
           this.toastr.error(

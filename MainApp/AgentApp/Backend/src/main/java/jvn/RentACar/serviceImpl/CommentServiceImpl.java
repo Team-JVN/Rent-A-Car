@@ -76,15 +76,15 @@ public class CommentServiceImpl implements CommentService {
         rentInfo.getComments().add(comment);
         comment.setRentInfo(rentInfo);
 
-//        CreateCommentResponse commentResponse = commentClient.createComment(rentRequest.getMainAppId(), rentInfo.getMainAppId(), comment);
-//        System.out.println("commentResponse impl");
-//        CommentDetails commentDetails = commentResponse.getCommentDetails();
-//        if (commentDetails != null && commentDetails.getId() != null) {
-//            System.out.println("if impl");
-//            comment.setMainAppId(commentDetails.getId());
-//        }
-        rentRequestRepository.save(rentRequest);
-//        commentRepository.save(comment);
+        CreateCommentResponse commentResponse = commentClient.createComment(rentRequest.getMainAppId(), rentInfo.getMainAppId(), comment);
+
+        CommentDetails commentDetails = commentResponse.getCommentDetails();
+        if (commentDetails != null && commentDetails.getId() != null) {
+
+            comment.setMainAppId(commentDetails.getId());
+        }
+//        rentRequestRepository.save(rentRequest);
+        commentRepository.save(comment);
         return comment;
     }
 
@@ -106,18 +106,19 @@ public class CommentServiceImpl implements CommentService {
             comment.setStatus(CommentStatus.APPROVED);
             comment.setRentInfo(rentInfo);
             comment.setText(commentDTOS.get(0).getText());
+
+//            rentInfo.getComments().add(comment);
+//            rentInfo.setRating(feedbackDTO.getRating());
+//            rentRequest.setRentInfos(new HashSet<>(rentInfos));
+//            rentRequestRepository.save(rentRequest);
+            LeaveFeedbackResponse leaveFeedbackResponse = commentClient.leaveFeedback(rentRequest.getMainAppId(), rentInfo.getMainAppId(), feedbackDTO);
+
+            LeaveFeedbackDetails leaveFeedbackDetails = leaveFeedbackResponse.getLeaveFeedbackDetails();
+            if (leaveFeedbackDetails != null && leaveFeedbackDetails.getCommentDetails().get(0).getId() != null) {
+
+                comment.setMainAppId(leaveFeedbackDetails.getCommentDetails().get(0).getId());
+            }
             commentRepository.save(comment);
-            rentInfo.getComments().add(comment);
-            rentInfo.setRating(feedbackDTO.getRating());
-            rentRequest.setRentInfos(new HashSet<>(rentInfos));
-            rentRequestRepository.save(rentRequest);
-//            LeaveFeedbackResponse leaveFeedbackResponse = commentClient.leaveFeedback(rentRequest.getMainAppId(), rentInfo.getMainAppId(), feedbackDTO);
-//            System.out.println("leaveFeedbackResponse impl");
-//            LeaveFeedbackDetails leaveFeedbackDetails = leaveFeedbackResponse.getLeaveFeedbackDetails();
-//            if (leaveFeedbackDetails != null && leaveFeedbackDetails.getCommentDetails().get(0).getId() != null) {
-//                System.out.println("if impl");
-//                comment.setMainAppId(leaveFeedbackDetails.getCommentDetails().get(0).getId());
-//            }
         }else{
             throw new InvalidCommentDataException("There is already comment for this rent info.", HttpStatus.BAD_REQUEST);
         }

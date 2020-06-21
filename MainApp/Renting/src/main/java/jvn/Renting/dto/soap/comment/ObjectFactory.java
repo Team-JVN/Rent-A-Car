@@ -52,4 +52,92 @@ public class ObjectFactory {
         return new CheckIfCanCommentResponse();
     }
 
+    /**
+     * Create an instance of {@link CreateCommentRequest }
+     *
+     */
+    public CreateCommentRequest createCreateCommentRequest() {
+        return new CreateCommentRequest();
+    }
+
+    /**
+     * Create an instance of {@link CreateCommentResponse }
+     *
+     */
+    public CreateCommentResponse createCreateCommentResponse() {
+        return new CreateCommentResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetAllCommentsDetailsRequest }
+     *
+     */
+    public GetAllCommentsDetailsRequest createGetAllCommentsDetailsRequest() {
+        return new GetAllCommentsDetailsRequest();
+    }
+
+    /**
+     * Create an instance of {@link GetAllCommentsDetailsResponse }
+     *
+     */
+    public GetAllCommentsDetailsResponse createGetAllCommentsDetailsResponse() {
+        return new GetAllCommentsDetailsResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetFeedbackDetailsRequest }
+     *
+     */
+    public GetFeedbackDetailsRequest createGetFeedbackDetailsRequest() {
+        return new GetFeedbackDetailsRequest();
+    }
+
+    /**
+     * Create an instance of {@link GetFeedbackDetailsResponse }
+     *
+     */
+    public GetFeedbackDetailsResponse createGetFeedbackDetailsResponse() {
+        return new GetFeedbackDetailsResponse();
+    }
+
+    /**
+     * Create an instance of {@link LeaveFeedbackRequest }
+     *
+     */
+    public LeaveFeedbackRequest createLeaveFeedbackRequest() {
+        return new LeaveFeedbackRequest();
+    }
+
+    /**
+     * Create an instance of {@link LeaveFeedbackResponse }
+     *
+     */
+    public LeaveFeedbackResponse createLeaveFeedbackResponse() {
+        return new LeaveFeedbackResponse();
+    }
+
+    /**
+     * Create an instance of {@link CommentDetails }
+     *
+     */
+    public CommentDetails createCommentDetails() {
+        return new CommentDetails();
+    }
+
+    /**
+     * Create an instance of {@link FeedbackDetails }
+     *
+     */
+    public FeedbackDetails createFeedbackDetails() {
+        return new FeedbackDetails();
+    }
+
+    /**
+     * Create an instance of {@link LeaveFeedbackDetails }
+     *
+     */
+    public LeaveFeedbackDetails createLeaveFeedbackDetails() {
+        return new LeaveFeedbackDetails();
+    }
+
 }

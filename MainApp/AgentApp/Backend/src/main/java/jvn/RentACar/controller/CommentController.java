@@ -41,7 +41,7 @@ public class CommentController {
 
     @GetMapping("/{status}/status")
     public ResponseEntity<List<CommentDTO>> getAll(@PathVariable(value = "status") @Pattern(regexp = "(?i)(all|awaiting|approved)$", message = "Status is not valid.") String status){
-        System.out.println("getAll comments controller");
+
 
         List<CommentDTO> list;
         list = commentService.getAll(status).stream().map(commentDtoMapper::toDto).

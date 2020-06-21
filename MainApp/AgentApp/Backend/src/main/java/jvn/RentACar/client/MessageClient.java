@@ -20,18 +20,6 @@ public class MessageClient  extends WebServiceGatewaySupport {
     private UserService userService;
 
     @Autowired
-    private RentRequestDetailsMapper rentRequestDetailsMapper;
-
-    @Autowired
-    private CommentDetailsMapper commentDetailsMapper;
-
-    @Autowired
-    private CommentDtoMapper commentDtoMapper;
-
-    @Autowired
-    private RentInfoService rentInfoService;
-
-    @Autowired
     private MessageDetailsMapper messageDetailsMapper;
 
     public CreateMessageResponse createMessage (Long rentRequestId, Message message){

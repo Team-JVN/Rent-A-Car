@@ -46,6 +46,7 @@ public class CommentEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "createCommentRequest")
     @ResponsePayload
     public CreateCommentResponse createComment(@RequestPayload CreateCommentRequest request) {
+
         UserInfoDTO dto = userClient.getUser(request.getEmail());
         if (dto == null) {
             return null;
@@ -69,6 +70,7 @@ public class CommentEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "leaveFeedbackRequest")
     @ResponsePayload
     public LeaveFeedbackResponse leaveFeedback(@RequestPayload LeaveFeedbackRequest request) {
+
         UserInfoDTO dto = userClient.getUser(request.getEmail());
         LeaveFeedbackDetails newFeedback = new LeaveFeedbackDetails();
         if (dto == null) {

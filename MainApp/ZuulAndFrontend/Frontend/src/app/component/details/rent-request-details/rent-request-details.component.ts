@@ -65,6 +65,10 @@ export class RentRequestDetailsComponent implements OnInit {
       this.rentRequestService.get(this.rentRequestId).subscribe(
         (data: RentRequest) => {
           this.rentRequest = data;
+          for (let rentInfo of this.rentRequest.rentInfos) {
+            this.availableRentReport.set(rentInfo.id, true);
+            this.availableReviewFeedback.set(rentInfo.id, true);
+          }
         },
         (httpErrorResponse: HttpErrorResponse) => {
           this.toastr.error(

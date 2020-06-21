@@ -44,9 +44,7 @@ public class CommentServiceImpl implements CommentService {
         RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
         rentInfo.getComments().add(comment);
         comment.setRentInfo(rentInfo);
-        rentRequestRepository.save(rentRequest);
-
-//        commentRepository.save(comment);
+        commentRepository.save(comment);
         return comment;
     }
 
@@ -65,11 +63,14 @@ public class CommentServiceImpl implements CommentService {
             comment.setStatus(CommentStatus.AWAITING);
             comment.setRentInfo(rentInfo);
             comment.setText(commentDTOS.get(0).getText());
-            commentRepository.save(comment);
-            rentInfo.getComments().add(comment);
-            rentInfo.setRating(feedbackDTO.getRating());
-            rentRequest.setRentInfos(new HashSet<>(rentInfos));
-            rentRequestRepository.save(rentRequest);
+            comment = commentRepository.save(comment);
+            commentDTOS.set(0,commentDtoMapper.toDto(comment));
+            feedbackDTO.getComments().clear();
+            feedbackDTO.getComments().addAll(commentDTOS);
+//            rentInfo.getComments().add(comment);
+//            rentInfo.setRating(feedbackDTO.getRating());
+//            rentRequest.setRentInfos(new HashSet<>(rentInfos));
+//            rentRequestRepository.save(rentRequest);
 
         }else{
             throw new InvalidCommentDataException("There is already comment for this rent info.", HttpStatus.BAD_REQUEST);
@@ -133,6 +134,8 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void reject(Long id, Long userId) {
+        Comment comment = commentRepository.findOneById(id);
+        comment.setRentInfo(null);
         commentRepository.deleteById(id);
         //TODO:increase the number of rejected comments of User
         sendRejectedComment(userId);

@@ -60,4 +60,21 @@ public class ObjectFactory {
         return new MessageDetails();
     }
 
+
+    /**
+     * Create an instance of {@link CreateMessageRequest }
+     *
+     */
+    public CreateMessageRequest createCreateMessageRequest() {
+        return new CreateMessageRequest();
+    }
+
+    /**
+     * Create an instance of {@link CreateMessageResponse }
+     *
+     */
+    public CreateMessageResponse createCreateMessageResponse() {
+        return new CreateMessageResponse();
+    }
+
 }

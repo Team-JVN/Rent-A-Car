@@ -29,6 +29,6 @@ public class Comment {
     @Column(nullable = false)
     private CommentStatus status;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     private RentInfo rentInfo;
 }

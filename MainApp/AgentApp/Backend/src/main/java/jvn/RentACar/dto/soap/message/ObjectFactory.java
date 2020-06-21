@@ -53,6 +53,22 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link CreateMessageRequest }
+     *
+     */
+    public CreateMessageRequest createCreateMessageRequest() {
+        return new CreateMessageRequest();
+    }
+
+    /**
+     * Create an instance of {@link CreateMessageResponse }
+     *
+     */
+    public CreateMessageResponse createCreateMessageResponse() {
+        return new CreateMessageResponse();
+    }
+
+    /**
      * Create an instance of {@link MessageDetails }
      * 
      */

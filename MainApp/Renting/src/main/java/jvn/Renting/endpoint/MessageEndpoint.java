@@ -41,6 +41,7 @@ public class MessageEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "createMessageRequest")
     @ResponsePayload
     public CreateMessageResponse createMessage(@RequestPayload CreateMessageRequest request) {
+
         UserInfoDTO dto = userClient.getUser(request.getEmail());
         if (dto == null) {
             return null;

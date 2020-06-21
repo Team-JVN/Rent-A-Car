@@ -18,6 +18,7 @@ public class CommentDtoMapper implements MapperInterface<Comment, CommentDTO>{
     public Comment toEntity(CommentDTO dto) {
 //        Comment entity = modelMapper.map(dto, Comment.class);
         Comment entity = new Comment();
+        entity.setId(dto.getId());
         entity.setStatus(dto.getStatus());
         entity.setSenderId(dto.getSender().getId());
         entity.setSenderName(dto.getSender().getName());
@@ -33,6 +34,7 @@ public class CommentDtoMapper implements MapperInterface<Comment, CommentDTO>{
         UserDTO sender = new UserDTO();
         sender.setName(entity.getSenderName());
         sender.setId(entity.getSenderId());
+        dto.setId(entity.getId());
         dto.setSender(sender);
         dto.setStatus(entity.getStatus());
         dto.setText(entity.getText());

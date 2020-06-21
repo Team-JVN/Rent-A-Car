@@ -29,7 +29,7 @@ public class Message {
     @Column(nullable = false)
     private LocalDateTime dateAndTime;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     private RentRequest rentRequest;
     
 }

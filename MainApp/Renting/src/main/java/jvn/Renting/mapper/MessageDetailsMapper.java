@@ -22,7 +22,6 @@ public class MessageDetailsMapper implements MapperInterface<Message, MessageDet
     @Override
     public Message toEntity(MessageDetails dto) {
         Message message = new Message();
-        message.setId(null);
         message.setId(dto.getId());
         message.setText(dto.getText());
         message.setDateAndTime(getLocalDateTime(dto.getDateAndTime()));
