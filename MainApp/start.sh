@@ -51,8 +51,6 @@ MAIN_APP_CLIENT_NAME=${33:-mainapp_client}
 MAIN_APP_CLIENT_ALIAS=${34:-mainapp_client}
 MAIN_APP_CLIENT_KEYSTORE_PASSWORD=${35:-mainapp_client_pass}
 
-RMQ_NAME=${36:-rabbitmq}
-
 function generateDockerCompose() {
   # sed on MacOSX does not support -i flag with a null extension. We will use
   # 't' for our back-up's extension and delete it at the end of the function
@@ -96,7 +94,6 @@ function generateDockerCompose() {
       -e "s/USERS_NAME/${USERS_NAME}/g" \
       -e "s/USERS_ALIAS/${USERS_ALIAS}/g" \
       -e "s/USERS_KEYSTORE_PASSWORD/${USERS_KEYSTORE_PASSWORD}/g" \
-      -e "s/RMQ_NAME/${RMQ_NAME}/g" \
       "${DOCKER_COMPOSE}"
 
   if [[ "$ARCH" == "Darwin" ]]; then
@@ -126,13 +123,7 @@ function generateCertificates() {
         "${SEARCH_NAME}" "${SEARCH_ALIAS}" "${SEARCH_KEYSTORE_PASSWORD}" \
         "${USERS_NAME}" "${USERS_ALIAS}" "${USERS_KEYSTORE_PASSWORD}" \
         "${AGENT_APP_CLIENT_NAME}" "${AGENT_APP_CLIENT_ALIAS}" "${AGENT_APP_CLIENT_KEYSTORE_PASSWORD}" \
-        "${MAIN_APP_CLIENT_NAME}" "${MAIN_APP_CLIENT_ALIAS}" "${MAIN_APP_CLIENT_KEYSTORE_PASSWORD}"   \
-        "${RMQ_NAME}"
+        "${MAIN_APP_CLIENT_NAME}" "${MAIN_APP_CLIENT_ALIAS}" "${MAIN_APP_CLIENT_KEYSTORE_PASSWORD}"
 }
 
-if [ "${1}" == '-g' ]; then
-  generateCertificates
-  generateDockerCompose
-fi
-
-docker-compose up --build
+generateCertificates

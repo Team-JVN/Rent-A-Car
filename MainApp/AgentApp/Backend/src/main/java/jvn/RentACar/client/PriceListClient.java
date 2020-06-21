@@ -6,9 +6,6 @@ import jvn.RentACar.model.PriceList;
 import jvn.RentACar.model.User;
 import jvn.RentACar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
-import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 
 public class PriceListClient extends WebServiceGatewaySupport {
@@ -16,9 +13,6 @@ public class PriceListClient extends WebServiceGatewaySupport {
     @Autowired
     private UserService userService;
 
-    // @Autowired
-    // @Qualifier("webServiceTemplatePriceList")
-    // private WebServiceTemplate webServiceTemplate;
 
     @Autowired
     private PriceListDetailsMapper priceListDetailsMapper;
@@ -33,7 +27,7 @@ public class PriceListClient extends WebServiceGatewaySupport {
             return null;
         }
         request.setEmail(user.getEmail());
-        GetPriceListDetailsResponse response = (GetPriceListDetailsResponse)getWebServiceTemplate()
+        GetPriceListDetailsResponse response = (GetPriceListDetailsResponse) getWebServiceTemplate()
                 .marshalSendAndReceive(request);
         return response;
     }
@@ -47,7 +41,7 @@ public class PriceListClient extends WebServiceGatewaySupport {
             return null;
         }
         request.setEmail(user.getEmail());
-        DeletePriceListDetailsResponse response = (DeletePriceListDetailsResponse)getWebServiceTemplate()
+        DeletePriceListDetailsResponse response = (DeletePriceListDetailsResponse) getWebServiceTemplate()
                 .marshalSendAndReceive(request);
         return response;
     }
@@ -59,10 +53,8 @@ public class PriceListClient extends WebServiceGatewaySupport {
             return null;
         }
         request.setEmail(user.getEmail());
-        System.out.println("Hajssss1");
         GetAllPriceListDetailsResponse response = (GetAllPriceListDetailsResponse) getWebServiceTemplate()
                 .marshalSendAndReceive(request);
-        System.out.println("Haj2");
         return response;
     }
 }
