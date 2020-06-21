@@ -68,7 +68,8 @@ public class CommentServiceImpl implements CommentService {
             feedbackDTO.getComments().clear();
             feedbackDTO.getComments().addAll(commentDTOS);
 //            rentInfo.getComments().add(comment);
-//            rentInfo.setRating(feedbackDTO.getRating());
+            rentInfo.setRating(feedbackDTO.getRating());
+            rentInfoRepository.save(rentInfo);
 //            rentRequest.setRentInfos(new HashSet<>(rentInfos));
 //            rentRequestRepository.save(rentRequest);
 
