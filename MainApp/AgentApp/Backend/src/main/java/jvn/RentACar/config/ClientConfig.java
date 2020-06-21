@@ -1,6 +1,7 @@
 package jvn.RentACar.config;
 
 import jvn.RentACar.client.ClientClient;
+
 import javax.net.ssl.HostnameVerifier;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,7 +19,7 @@ import org.springframework.ws.transport.http.HttpsUrlConnectionMessageSender;
 
 @Configuration
 public class ClientConfig {
-    
+
     @Bean
     @Qualifier("marshallerClient")
     public Jaxb2Marshaller marshallerClient() {
@@ -30,7 +31,8 @@ public class ClientConfig {
     @Bean
     public ClientClient clientClient(@Qualifier("marshallerClient") Jaxb2Marshaller marshallerClient) {
         ClientClient client = new ClientClient();
-        client.setDefaultUri("http://users:8084/ws");
+       client.setDefaultUri("http://users:8084/ws");
+        // client.setDefaultUri("http://localhost:8084/ws");
         client.setMarshaller(marshallerClient);
         client.setUnmarshaller(marshallerClient);
         return client;

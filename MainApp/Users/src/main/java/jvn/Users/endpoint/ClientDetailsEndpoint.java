@@ -38,10 +38,19 @@ public class ClientDetailsEndpoint {
         }
 
         Client client = clientDetailsMapper.toEntity(clientDetails);
+        client.setCanceledReservationCounter(0);
+        client.setRejectedCommentsCounter(0);
+        client.setCanCreateRentRequests(true);
+        client.setCanCreateComments(true);
         if (clientDetails.getId() != null) {
             clientDetails = clientDetailsMapper.toDto(clientService.edit(client.getId(), client));
         } else {
-            clientDetails = clientDetailsMapper.toDto(clientService.create(client, true, user.getId()));
+            if (user != null) {
+                clientDetails = clientDetailsMapper.toDto(clientService.create(client, true, user.getId()));
+            } else {
+                clientDetails = clientDetailsMapper.toDto(clientService.create(client, true, null));
+            }
+
         }
 
         CreateOrEditClientResponse response = new CreateOrEditClientResponse();

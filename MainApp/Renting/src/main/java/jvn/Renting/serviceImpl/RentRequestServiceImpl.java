@@ -335,6 +335,7 @@ public class RentRequestServiceImpl implements RentRequestService {
             if (!advertisementDTO.getCDW()) {
                 rentInfo.setOptedForCDW(null);
             }
+            rentInfo.setCar(advertisementDTO.getCar());
             rentInfo.setRating(0);
             rentInfo.setKilometresLimit(advertisementDTO.getKilometresLimit());
             rentInfo.setPricePerKm(advertisementDTO.getPriceList().getPricePerKm());
