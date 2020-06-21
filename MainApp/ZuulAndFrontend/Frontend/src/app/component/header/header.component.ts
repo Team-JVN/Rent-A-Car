@@ -53,6 +53,10 @@ export class HeaderComponent implements OnInit {
     return this.authentificationService.hasPermission("MANAGE_USERS");
   }
 
+  hasPermissionManageComments() {
+    return this.authentificationService.hasPermission("MANAGE_COMMENTS");
+  }
+
   hasPermissionManageRoles() {
     return this.authentificationService.hasPermission("MANAGE_ROLES");
   }

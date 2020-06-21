@@ -66,15 +66,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/rent-request/{id}/message")
                 .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
 
-                .antMatchers(HttpMethod.POST, "/api/rent-report/{rentInfoId}")
-                .hasAnyAuthority("MANAGE_RENT_REPORTS")
+                .antMatchers(HttpMethod.POST, "/api/rent-report/{id}")
+                .hasAnyAuthority("MANAGE_ADVERTISEMENTS")
 
                 .antMatchers(HttpMethod.GET, "/api/comment/{id}")
-                .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
+                .hasAnyAuthority("MANAGE_COMMENTS")
 
                 .antMatchers(HttpMethod.GET, "/api/comment/{status}/status")
-                .hasAnyAuthority("MANAGE_ADVERTISEMENTS", "MY_RENT_REQUESTS")
-
+                .hasAnyAuthority("MANAGE_COMMENTS")
 
                 .anyRequest().authenticated().and()
 

@@ -58,10 +58,12 @@ public class RentRequestDtoMapper implements MapperInterface<RentRequest, RentRe
             rentInfo.setId(rentInfoDTO.getId());
 //            rentInfo.setComments(comments);
             Set<Comment> comments = new HashSet<Comment>();
-            for(CommentDTO commentDTO: rentInfoDTO.getComments()){
-                comments.add(commentDtoMapper.toEntity(commentDTO));
+            if (rentInfoDTO.getComments() != null) {
+                for (CommentDTO commentDTO : rentInfoDTO.getComments()) {
+                    comments.add(commentDtoMapper.toEntity(commentDTO));
+                }
+                rentInfo.setComments(comments);
             }
-            rentInfo.setComments(comments);
             entityRentInfos.add(rentInfo);
         }
         entity.setRentInfos(new HashSet<>(entityRentInfos));
@@ -73,7 +75,7 @@ public class RentRequestDtoMapper implements MapperInterface<RentRequest, RentRe
         RentRequestDTO dto = modelMapper.map(entity, RentRequestDTO.class);
         Set<RentInfoDTO> rentInfos = new HashSet<RentInfoDTO>();
 
-        for(RentInfo rentInfo: entity.getRentInfos()){
+        for (RentInfo rentInfo : entity.getRentInfos()) {
 
             rentInfos.add(rentInfoDtoMapper.toDto(rentInfo));
 
