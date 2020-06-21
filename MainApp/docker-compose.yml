@@ -23,14 +23,14 @@ services:
         - "8080:8080"
         environment:
             REGISTRY_HOST: eureka-serviceregistry
-            KEYSTORE: /etc/keystore/mainapp.keystore.p12
-            KEYSTORE_PASSWORD: mainapp_pass
-            KEYSTORE_ALIAS: mainapp
-            TRUSTSTORE: /etc/keystore/mainapp.truststore.p12
-            TRUSTSTORE_PASSWORD: mainapp_pass
+            KEYSTORE: /etc/keystore/zuul.keystore.p12
+            KEYSTORE_PASSWORD: zuul_pass
+            KEYSTORE_ALIAS: zuul
+            TRUSTSTORE: /etc/keystore/zuul.truststore.p12
+            TRUSTSTORE_PASSWORD: zuul_pass
             RMQ_HOST: rabbitmq-broker
         volumes:
-            - ./tls/certs/mainapp/keystore:/etc/keystore
+            - ./tls/certs/zuul/keystore:/etc/keystore
         depends_on:
             - eureka-serviceregistry
             - advertisements

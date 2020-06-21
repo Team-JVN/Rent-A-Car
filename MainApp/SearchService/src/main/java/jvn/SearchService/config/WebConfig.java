@@ -27,5 +27,5 @@ package jvn.SearchService.config;
 
 // }
 
-public class WebConfig {
-}
+//public class WebConfig {
+//}
