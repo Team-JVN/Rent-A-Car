@@ -83,7 +83,12 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     }
 
     @Override
+    public Advertisement getOne(Long advertisementId) {
+        return advertisementRepository.findById(advertisementId).orElse(null);
+    }
+
     public void delete(Long id, Long loggedInUserId) {
+
         Advertisement advertisement = get(id, LogicalStatus.EXISTING);
         checkOwner(advertisement, loggedInUserId);
 

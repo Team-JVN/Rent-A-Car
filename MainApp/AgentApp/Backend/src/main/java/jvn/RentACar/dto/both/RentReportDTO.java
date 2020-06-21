@@ -19,8 +19,8 @@ public class RentReportDTO {
     @Pattern(regexp = "^[\\p{N}\\p{L}\\p{Sc}@ !()-,.:;/'\"&*=+%]+$", message = "Comment is not valid.")
     private String comment;
 
-    @NotNull(message = "Rent request is null.")
-    private RentInfoDTO rentInfo;
+//    @NotNull(message = "Rent request is null.")
+//    private RentInfoDTO rentInfo;
 
     @Positive(message = "Additional cost is not a positive number.")
     private Double additionalCost;

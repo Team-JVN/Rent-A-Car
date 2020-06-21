@@ -89,7 +89,7 @@
         <div *ngIf="rentRequest.rentRequestStatus == 'PAID'">
             <div class="chat-page">
                 <div class="chat-box">
-                    <app-view-messages [messages]="messages" [client]="rentRequest.client"></app-view-messages>
+                    <app-view-messages [messages]="messages" [client]="rentRequest.client" [rentRequest]="rentRequest" ></app-view-messages>
                 </div>
             </div>
         </div>

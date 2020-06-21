@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:sch="http://www.soap.dto/message"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.message.dto/soap"
+                  targetNamespace="http://www.message.dto/soap">
+    <wsdl:types>
+        <xs:schema xmlns:tns="http://www.soap.dto/message" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   elementFormDefault="qualified" targetNamespace="http://www.soap.dto/message">
+            <xs:element name="getAllMessagesDetailsRequest">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="email" type="xs:string"/>
+                        <xs:element name="rentRequestId">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:long">
+                                    <xs:minInclusive value="1"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllMessagesDetailsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" name="messageDetails" type="tns:messageDetails"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:complexType name="messageDetails">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="id">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:long">
+                                <xs:minInclusive value="1"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="text" type="xs:string"/>
+                    <xs:element name="userId">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:long">
+                                <xs:minInclusive value="1"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="userName" type="xs:string"/>
+                    <xs:element name="dateAndTime" type="xs:dateTime"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="getAllMessagesDetailsRequest">
+        <wsdl:part element="sch:getAllMessagesDetailsRequest" name="getAllMessagesDetailsRequest">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllMessagesDetailsResponse">
+        <wsdl:part element="sch:getAllMessagesDetailsResponse" name="getAllMessagesDetailsResponse">
+        </wsdl:part>
+    </wsdl:message>
+
+    <wsdl:portType name="MessagesPort">
+        <wsdl:operation name="getAllMessagesDetails">
+            <wsdl:input message="tns:getAllMessagesDetailsRequest" name="getAllMessagesDetailsRequest">
+            </wsdl:input>
+            <wsdl:output message="tns:getAllMessagesDetailsResponse" name="getAllMessagesDetailsResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="MessagesPortSoap11" type="tns:MessagesPort">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="getAllMessagesDetails">
+            <soap:operation soapAction=""/>
+            <wsdl:input name="getAllMessagesDetailsRequest">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="getAllMessagesDetailsResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="MessagesPortService">
+        <wsdl:port binding="tns:MessagesPortSoap11" name="MessagesPortSoap11">
+            <soap:address location="http://192.168.56.1:8083/ws/message"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

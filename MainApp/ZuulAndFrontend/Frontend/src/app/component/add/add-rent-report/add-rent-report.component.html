@@ -1,0 +1,37 @@
+<h1 mat-dialog-title>Create Report</h1>
+<mat-dialog-content class="dialog-class">
+  <form [formGroup]="createForm" class="form-full-width">
+    <mat-form-field class="form-full-width">
+      <input matInput placeholder="Mileage" formControlName="mileage" />
+      <mat-error *ngIf="
+          createForm.get('mileage').errors &&
+          createForm.get('mileage').errors['required']
+        ">
+        Please enter made mileage.
+      </mat-error>
+      <mat-error *ngIf="
+          createForm.get('mileage').errors &&
+          createForm.get('mileage').errors['pattern']
+        ">
+        Phone number cannot begin with 0 and it must contain digits only.
+      </mat-error>
+    </mat-form-field>
+    <!-- TODO:add rent info -->
+    <mat-form-field class="form-full-width">
+      <textarea matInput placeholder="Comment" formControlName="comment">
+      </textarea>
+      <mat-error *ngIf="
+          createForm.get('comment').errors &&
+          createForm.get('comment').errors['required']
+        ">
+        Please enter comment.
+      </mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-raised-button color="primary" (click)="create()" class="mb-3" [disabled]="!createForm.valid">
+    Add
+  </button>
+</mat-dialog-actions>

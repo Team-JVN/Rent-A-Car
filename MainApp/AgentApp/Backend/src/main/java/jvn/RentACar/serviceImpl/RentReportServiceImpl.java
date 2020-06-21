@@ -1,6 +1,9 @@
 package jvn.RentACar.serviceImpl;
 
 
+import jvn.RentACar.client.RentReportClient;
+import jvn.RentACar.dto.soap.rentreport.CreateRentReportResponse;
+import jvn.RentACar.dto.soap.rentreport.RentReportDetails;
 import jvn.RentACar.enumeration.RentRequestStatus;
 import jvn.RentACar.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.RentACar.model.Car;
@@ -28,17 +31,29 @@ public class RentReportServiceImpl implements RentReportService {
 
     private CarRepository carRepository;
 
+    private RentReportClient rentReportClient;
+
     @Override
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-    public RentReport create(RentReport rentReport) {
-        rentReport.setRentInfo(rentInfoService.get(rentReport.getRentInfo().getId()));
-        checkIfCreatingRentReportIsPossible(rentInfoService.get(rentReport.getRentInfo().getId()));
+    public RentReport create(RentReport rentReport, Long rentInfoId) {
+        RentInfo rentInfo = rentInfoService.get(rentInfoId);
+        rentReport.setRentInfo(rentInfo);
+        checkIfCreatingRentReportIsPossible(rentInfoService.get(rentInfoId));
         rentReport.setAdditionalCost(calculateAdditionalCost(rentReport));
         calculateMileageInKm(rentReport);
-        return rentReportRepository.save(rentReport);
+        rentReport = rentReportRepository.save(rentReport);
+        CreateRentReportResponse createRentReportResponse = rentReportClient.createRentReport(rentInfo.getMainAppId(), rentReport);
+        RentReportDetails rentReportDetails = createRentReportResponse.getRentReportDetails();
+        if(rentReportDetails != null && rentReportDetails.getId() != null){
+
+            rentReport.setMainAppId(rentReportDetails.getId());
+        }
+        return rentReport;
+
     }
 
     public void checkIfCreatingRentReportIsPossible(RentInfo rentInfo) {
+
         if (!rentInfo.getRentRequest().getRentRequestStatus().equals(RentRequestStatus.PAID)) {
             throw new InvalidAdvertisementDataException("Cannot create rent report if rent request is not paid!", HttpStatus.BAD_REQUEST);
         }
@@ -54,6 +69,7 @@ public class RentReportServiceImpl implements RentReportService {
     }
 
     public Double calculateAdditionalCost(RentReport rentReport) {
+
         Double addCost = 0.0;
         if (rentReport.getRentInfo().getAdvertisement().getKilometresLimit() != null) {
             Integer extraMiles = rentReport.getMadeMileage() - rentReport.getRentInfo().getAdvertisement().getKilometresLimit();
@@ -65,6 +81,7 @@ public class RentReportServiceImpl implements RentReportService {
     }
 
     public void calculateMileageInKm(RentReport rentReport) {
+
         Car car = rentReport.getRentInfo().getAdvertisement().getCar();
 
         Integer previousMileageInKm = car.getMileageInKm();
@@ -82,9 +99,10 @@ public class RentReportServiceImpl implements RentReportService {
 
     @Autowired
     public RentReportServiceImpl(RentReportRepository rentReportRepository, RentInfoService rentInfoService,
-                                 CarRepository carRepository) {
+                                 CarRepository carRepository, RentReportClient rentReportClient) {
         this.rentReportRepository = rentReportRepository;
         this.rentInfoService = rentInfoService;
         this.carRepository = carRepository;
+        this.rentReportClient = rentReportClient;
     }
 }

@@ -1,12 +1,22 @@
 package jvn.RentACar.serviceImpl;
 
+import jvn.RentACar.dto.both.CommentDTO;
+import jvn.RentACar.dto.both.FeedbackDTO;
+import jvn.RentACar.dto.request.RentRequestStatusDTO;
+import jvn.RentACar.dto.soap.message.CreateMessageResponse;
+import jvn.RentACar.enumeration.CommentStatus;
 import jvn.RentACar.client.RentRequestClient;
 import jvn.RentACar.dto.request.RentRequestStatusDTO;
 import jvn.RentACar.dto.soap.rentrequest.*;
 import jvn.RentACar.enumeration.RentRequestStatus;
+import jvn.RentACar.exceptionHandler.InvalidCommentDataException;
 import jvn.RentACar.exceptionHandler.InvalidRentRequestDataException;
+import jvn.RentACar.mapper.CommentDtoMapper;
+import jvn.RentACar.mapper.MessageDetailsMapper;
 import jvn.RentACar.mapper.RentRequestDetailsMapper;
 import jvn.RentACar.model.*;
+import jvn.RentACar.repository.MessageRepository;
+import jvn.RentACar.repository.RentInfoRepository;
 import jvn.RentACar.repository.RentRequestRepository;
 import jvn.RentACar.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +60,7 @@ public class RentRequestServiceImpl implements RentRequestService {
     private RentRequestDetailsMapper rentRequestDetailsMapper;
 
     private LogService logService;
+
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -182,6 +193,7 @@ public class RentRequestServiceImpl implements RentRequestService {
         }
         rentRequestRepository.saveAll(rentRequests);
     }
+
 
     private RentRequest cancel(RentRequest rentRequest) {
         rentRequest.setRentRequestStatus(RentRequestStatus.CANCELED);
@@ -418,6 +430,23 @@ public class RentRequestServiceImpl implements RentRequestService {
         }
         rentRequest.setRentInfos(rentInfos);
         rentRequestRepository.saveAndFlush(rentRequest);
+    }
+
+    private void createSynchronizeMessages(Message message) {
+//        if (message.getSender() == null) {
+//            return;
+//        }
+//        Set<RentInfo> rentInfos = rentRequest.getRentInfos();
+//        rentRequest.setRentInfos(null);
+//        rentRequest = rentRequestRepository.saveAndFlush(rentRequest);
+//        for (RentInfo rentInfo : rentInfos) {
+//            if (rentInfo.getAdvertisement() == null) {
+//                return;
+//            }
+//            rentInfo.setRentRequest(rentRequest);
+//        }
+//        rentRequest.setRentInfos(rentInfos);
+//        rentRequestRepository.saveAndFlush(rentRequest);
     }
 
     private void editSynchronize(RentRequest rentRequest, RentRequest dbRentRequest) {

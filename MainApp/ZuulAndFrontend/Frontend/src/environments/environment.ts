@@ -17,14 +17,15 @@ export const environment = {
   auth: '/users/api/auth',
   agent: '/users/api/agent',
   admin: '/users/api/admin',
+  socket: "/renting",
   make: "/cars/api/make",
   model: "/cars/api/model",
   message: "/renting/api/message",
-  comment: '/renting/api/comment',
+  comment: "/renting/api/comment",
   rentReport: "/renting/api/rent-report",
   role: "/users/api/role",
   permission: "/users/api/permission",
-  searchAdvertisements: "/search/api/advertisement"
+  searchAdvertisements: "/search/api/advertisement",
 };
 
 /*

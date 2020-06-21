@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.*;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -28,9 +29,11 @@ public class RentInfoDTO {
     @NotNull(message = "Advertisement is null.")
     private AdvertisementWithPicturesDTO advertisement;
 
-//    private RentReportDTO rentReport;
+    private RentReportDTO rentReport;
 
     private Double additionalCost;
 
     private Boolean paid;
+
+    private Set<CommentDTO> comments;
 }

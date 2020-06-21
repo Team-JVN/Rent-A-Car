@@ -17,6 +17,10 @@ public class RabbitMQConfiguration {
 
     private static final String EDIT_PRICE_LIST_ADVERTISEMENT = "advertisements-for-search-edit-price-list";
 
+    public static final String MILEAGE = "mileage";
+
+    public static final String UPDATE_CAR_MILEAGE = "update-car-mileage";
+
     public static final String LOGS = "logs";
 
     @Bean
@@ -45,6 +49,11 @@ public class RabbitMQConfiguration {
     }
 
     @Bean
+    public Queue queueMileage(){ return new Queue(MILEAGE, false); }
+
+   @Bean
+   public Queue queueUpdateCarMileage(){ return new Queue(UPDATE_CAR_MILEAGE, false); }
+
     public Queue queueLogs() {
         return new Queue(LOGS, false);
     }

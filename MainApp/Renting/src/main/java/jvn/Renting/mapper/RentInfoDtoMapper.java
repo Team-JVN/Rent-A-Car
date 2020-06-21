@@ -1,6 +1,8 @@
 package jvn.Renting.mapper;
 
+import jvn.Renting.dto.both.CommentDTO;
 import jvn.Renting.dto.both.RentInfoDTO;
+import jvn.Renting.model.Comment;
 import jvn.Renting.model.RentInfo;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +13,14 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 public class RentInfoDtoMapper implements MapperInterface<RentInfo, RentInfoDTO> {
     private ModelMapper modelMapper;
+
+    private CommentDtoMapper commentDtoMapper;
 
     @Override
     public RentInfo toEntity(RentInfoDTO dto) {
@@ -24,6 +30,11 @@ public class RentInfoDtoMapper implements MapperInterface<RentInfo, RentInfoDTO>
         rentInfo.setAdvertisement(dto.getAdvertisement().getId());
         rentInfo.setOptedForCDW(dto.getOptedForCDW());
         rentInfo.setId(dto.getId());
+        Set<Comment> comments = new HashSet<Comment>();
+        for(CommentDTO commentDTO: dto.getComments()){
+            comments.add(commentDtoMapper.toEntity(commentDTO));
+        }
+        rentInfo.setComments(comments);
         return rentInfo;
     }
 
@@ -41,7 +52,8 @@ public class RentInfoDtoMapper implements MapperInterface<RentInfo, RentInfoDTO>
     }
 
     @Autowired
-    public RentInfoDtoMapper(ModelMapper modelMapper) {
+    public RentInfoDtoMapper(ModelMapper modelMapper, CommentDtoMapper commentDtoMapper) {
         this.modelMapper = modelMapper;
+        this.commentDtoMapper = commentDtoMapper;
     }
 }
