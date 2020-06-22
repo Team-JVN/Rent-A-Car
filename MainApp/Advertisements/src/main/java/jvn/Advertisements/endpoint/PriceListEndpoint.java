@@ -1,11 +1,14 @@
 package jvn.Advertisements.endpoint;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Advertisements.client.UserClient;
 import jvn.Advertisements.dto.message.Log;
+import jvn.Advertisements.dto.response.SignedMessageDTO;
 import jvn.Advertisements.dto.response.UserInfoDTO;
 import jvn.Advertisements.dto.soap.pricelist.*;
 import jvn.Advertisements.mapper.PriceListDetailsMapper;
 import jvn.Advertisements.producer.LogProducer;
+import jvn.Advertisements.service.DigitalSignatureService;
 import jvn.Advertisements.service.PriceListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
@@ -13,6 +16,7 @@ import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +25,8 @@ public class PriceListEndpoint {
 
     private final String CLASS_PATH = this.getClass().getCanonicalName();
     private final String CLASS_NAME = this.getClass().getSimpleName();
+
+    private final String USERS_ALIAS = "users";
 
     private static final String NAMESPACE_URI = "http://www.soap.dto/pricelist";
 
@@ -32,11 +38,15 @@ public class PriceListEndpoint {
 
     private LogProducer logProducer;
 
+    private ObjectMapper objectMapper;
+
+    private DigitalSignatureService digitalSignatureService;
+
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getPriceListDetailsRequest")
     @ResponsePayload
     public GetPriceListDetailsResponse createOrEdit(@RequestPayload GetPriceListDetailsRequest request) {
         System.out.println("aaaaHaj3");
-        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        UserInfoDTO dto = getUserInfo(request.getEmail());
         if (dto == null) {
             return null;
         }
@@ -59,7 +69,7 @@ public class PriceListEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "deletePriceListDetailsRequest")
     @ResponsePayload
     public DeletePriceListDetailsResponse deletePriceList(@RequestPayload DeletePriceListDetailsRequest request) {
-        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        UserInfoDTO dto = getUserInfo(request.getEmail());
         if (dto == null) {
             return null;
         }
@@ -76,7 +86,7 @@ public class PriceListEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getAllPriceListDetailsRequest")
     @ResponsePayload
     public GetAllPriceListDetailsResponse getAllPriceListDetails(@RequestPayload GetAllPriceListDetailsRequest request) {
-        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        UserInfoDTO dto = getUserInfo(request.getEmail());
         if (dto == null) {
             return null;
         }
@@ -88,12 +98,34 @@ public class PriceListEndpoint {
         return response;
     }
 
+    private UserInfoDTO getUserInfo(String email) {
+        UserInfoDTO userInfoDTO = null;
+        SignedMessageDTO signedEditType = userClient.getUser(email);
+        if (digitalSignatureService.decrypt(USERS_ALIAS, signedEditType.getMessageBytes(), signedEditType.getDigitalSignature())) {
+            userInfoDTO = bytesToObject(signedEditType.getMessageBytes());
+        } else {
+            logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SGN", "Invalid digital signature"));
+        }
+        return userInfoDTO;
+    }
+
+    private UserInfoDTO bytesToObject(byte[] byteArray) {
+        try {
+            return objectMapper.readValue(byteArray, UserInfoDTO.class);
+        } catch (IOException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping byte array to %s failed", UserInfoDTO.class.getSimpleName())));
+            return null;
+        }
+    }
+
     @Autowired
     public PriceListEndpoint(PriceListService priceListService, PriceListDetailsMapper priceListDetailsMapper, UserClient userClient,
-                             LogProducer logProducer) {
+                             LogProducer logProducer, ObjectMapper objectMapper, DigitalSignatureService digitalSignatureService) {
         this.priceListService = priceListService;
         this.userClient = userClient;
         this.priceListDetailsMapper = priceListDetailsMapper;
         this.logProducer = logProducer;
+        this.objectMapper = objectMapper;
+        this.digitalSignatureService = digitalSignatureService;
     }
 }
