@@ -1,11 +1,13 @@
 package jvn.Renting.serviceImpl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Renting.client.AdvertisementClient;
 import jvn.Renting.client.SearchClient;
 import jvn.Renting.client.UserClient;
 import jvn.Renting.dto.both.*;
 import jvn.Renting.dto.message.Log;
 import jvn.Renting.dto.request.RentRequestStatusDTO;
+import jvn.Renting.dto.response.SignedMessageDTO;
 import jvn.Renting.enumeration.EditType;
 import jvn.Renting.enumeration.RentRequestStatus;
 import jvn.Renting.exceptionHandler.InvalidRentRequestDataException;
@@ -14,6 +16,7 @@ import jvn.Renting.model.RentRequest;
 import jvn.Renting.producer.LogProducer;
 import jvn.Renting.producer.RentRequestProducer;
 import jvn.Renting.repository.RentRequestRepository;
+import jvn.Renting.service.DigitalSignatureService;
 import jvn.Renting.service.RentRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -42,6 +46,8 @@ public class RentRequestServiceImpl implements RentRequestService {
     private final String CLASS_PATH = this.getClass().getCanonicalName();
     private final String CLASS_NAME = this.getClass().getSimpleName();
 
+    private final String USERS_ALIAS = "users";
+
     private RentRequestRepository rentRequestRepository;
 
     private AdvertisementClient advertisementClient;
@@ -53,6 +59,10 @@ public class RentRequestServiceImpl implements RentRequestService {
     private RentRequestProducer rentRequestProducer;
 
     private LogProducer logProducer;
+
+    private DigitalSignatureService digitalSignatureService;
+
+    private ObjectMapper objectMapper;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -66,8 +76,18 @@ public class RentRequestServiceImpl implements RentRequestService {
             if (rentRequest.getClient() == null || rentRequest.getClient().equals(loggedInUserId)) {
                 throw new InvalidRentRequestDataException("Please choose client for which you create rent request.", HttpStatus.BAD_REQUEST);
             }
-            userClient.verify(rentRequest.getClient());
-            rentRequest.setRentRequestStatus(RentRequestStatus.PAID);
+
+            Boolean isVerified = false;
+            SignedMessageDTO signedMessageDTO = userClient.verify(rentRequest.getClient());
+            if (digitalSignatureService.decrypt(USERS_ALIAS, signedMessageDTO.getMessageBytes(), signedMessageDTO.getDigitalSignature())) {
+                isVerified = bytesToBoolean(signedMessageDTO.getMessageBytes());
+            } else {
+                logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SGN", "Invalid digital signature"));
+            }
+
+            if (isVerified != null && isVerified) {
+                rentRequest.setRentRequestStatus(RentRequestStatus.PAID);
+            }
         } else {
             if (!canCreateRentRequests) {
                 throw new InvalidRentRequestDataException("You are not allowed to create rent requests because you canceled your reservations many times. ", HttpStatus.BAD_REQUEST);
@@ -494,14 +514,26 @@ public class RentRequestServiceImpl implements RentRequestService {
         return rentRequestRepository.findAllByAdvertisementOwner(loggedInUserId);
     }
 
+    private Boolean bytesToBoolean(byte[] byteArray) {
+        try {
+            return objectMapper.readValue(byteArray, Boolean.class);
+        } catch (IOException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping byte array to %s failed", Boolean.class.getSimpleName())));
+            return null;
+        }
+    }
+
     @Autowired
     public RentRequestServiceImpl(RentRequestRepository rentRequestRepository, AdvertisementClient advertisementClient, UserClient userClient,
-                                  SearchClient searchClient, RentRequestProducer rentRequestProducer, LogProducer logProducer) {
+                                  SearchClient searchClient, RentRequestProducer rentRequestProducer, LogProducer logProducer,
+                                  ObjectMapper objectMapper, DigitalSignatureService digitalSignatureService) {
         this.rentRequestRepository = rentRequestRepository;
         this.advertisementClient = advertisementClient;
         this.userClient = userClient;
         this.searchClient = searchClient;
         this.rentRequestProducer = rentRequestProducer;
         this.logProducer = logProducer;
+        this.objectMapper = objectMapper;
+        this.digitalSignatureService = digitalSignatureService;
     }
 }

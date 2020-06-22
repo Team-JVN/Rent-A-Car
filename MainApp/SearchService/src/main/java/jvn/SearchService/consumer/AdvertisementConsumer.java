@@ -123,6 +123,7 @@ public class AdvertisementConsumer {
         try {
             return objectMapper.readValue(byteArray, Advertisement.class);
         } catch (IOException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping byte array to %s failed", Advertisement.class.getSimpleName())));
             return null;
         }
     }
@@ -139,6 +140,7 @@ public class AdvertisementConsumer {
         try {
             return objectMapper.readValue(byteArray, Long.class);
         } catch (IOException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping byte array to %s failed", Long.class.getSimpleName())));
             return null;
         }
     }
@@ -155,6 +157,7 @@ public class AdvertisementConsumer {
         try {
             return objectMapper.readValue(byteArray, AdvertisementEditDTO.class);
         } catch (IOException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping byte array to %s failed", AdvertisementEditDTO.class.getSimpleName())));
             return null;
         }
     }
@@ -171,6 +174,7 @@ public class AdvertisementConsumer {
         try {
             return objectMapper.readValue(byteArray, PriceListDTO.class);
         } catch (IOException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping byte array to %s failed", PriceListDTO.class.getSimpleName())));
             return null;
         }
     }

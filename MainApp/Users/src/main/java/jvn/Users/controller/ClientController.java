@@ -1,7 +1,11 @@
 package jvn.Users.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Users.dto.both.ClientDTO;
 import jvn.Users.dto.message.Log;
+import jvn.Users.dto.response.SignedMessageDTO;
+import jvn.Users.dto.response.UserDTO;
 import jvn.Users.enumeration.ClientStatus;
 import jvn.Users.exceptionHandler.InvalidClientDataException;
 import jvn.Users.exceptionHandler.InvalidTokenException;
@@ -10,6 +14,7 @@ import jvn.Users.model.Client;
 import jvn.Users.model.User;
 import jvn.Users.producer.LogProducer;
 import jvn.Users.service.ClientService;
+import jvn.Users.service.DigitalSignatureService;
 import jvn.Users.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,6 +46,8 @@ public class ClientController {
 
     private LogProducer logProducer;
 
+    private DigitalSignatureService digitalSignatureService;
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ClientDTO> create(@Valid @RequestBody ClientDTO clientDTO) {
         try {
@@ -65,8 +72,13 @@ public class ClientController {
     }
 
     @GetMapping(value = "/{clientId}/verify")
-    public ResponseEntity<?> verify(@PathVariable("clientId") @Positive(message = "Id must be positive.") Long clientId) {
-        return new ResponseEntity<>(clientService.verify(clientId), HttpStatus.OK);
+    public ResponseEntity<SignedMessageDTO> verify(@PathVariable("clientId") @Positive(message = "Id must be positive.") Long clientId) {
+        Boolean result = clientService.verify(clientId);
+        byte[] messageBytes = convertToBytes(result);
+        byte[] digitalSignature = digitalSignatureService.encrypt(messageBytes);
+        SignedMessageDTO signedMessageDTO = new SignedMessageDTO(messageBytes, digitalSignature);
+
+        return new ResponseEntity<>(signedMessageDTO, HttpStatus.OK);
     }
 
     @GetMapping("/all/{status}")
@@ -158,11 +170,23 @@ public class ClientController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
+    private byte[] convertToBytes(Boolean obj) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.writeValueAsBytes(obj);
+        } catch (JsonProcessingException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping %s instance to byte array failed", Boolean.class.getSimpleName())));
+            return null;
+        }
+    }
+
     @Autowired
-    public ClientController(ClientService clientService, ClientDtoMapper clientDtoMapper, UserService userService, LogProducer logProducer) {
+    public ClientController(ClientService clientService, ClientDtoMapper clientDtoMapper, UserService userService,
+                            LogProducer logProducer, DigitalSignatureService digitalSignatureService) {
         this.clientService = clientService;
         this.clientDtoMapper = clientDtoMapper;
         this.userService = userService;
         this.logProducer = logProducer;
+        this.digitalSignatureService = digitalSignatureService;
     }
 }

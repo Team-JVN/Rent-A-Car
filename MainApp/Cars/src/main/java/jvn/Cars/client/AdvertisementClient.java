@@ -1,5 +1,6 @@
 package jvn.Cars.client;
 
+import jvn.Cars.dto.response.SignedMessageDTO;
 import jvn.Cars.enumeration.EditType;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public interface AdvertisementClient {
 
     @RequestMapping(method = RequestMethod.GET, path = "/api/advertisement/car/{carId}/check-for-delete")
-    boolean canDeleteCar(@PathVariable("carId") Long carId);
+    SignedMessageDTO canDeleteCar(@PathVariable("carId") Long carId);
 
     @RequestMapping(method = RequestMethod.GET, path = "/api/advertisement/car/{carId}/check-for-partial-edit")
-    boolean canEditCarPartially( @PathVariable("carId") Long carId);
+    SignedMessageDTO canEditCarPartially(@PathVariable("carId") Long carId);
 
-    @RequestMapping(method = RequestMethod.GET, path = "/api/advertisement/car/{carId}/edit-type")
-    EditType getCarEditType( @PathVariable("carId") Long carId);
+    @RequestMapping(method = RequestMethod.GET, path = "/api/advertisement/car/{carId}/edit-type-feign")
+    SignedMessageDTO getCarEditTypeFeign(@PathVariable("carId") Long carId);
 }

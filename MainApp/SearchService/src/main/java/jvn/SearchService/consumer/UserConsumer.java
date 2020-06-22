@@ -59,6 +59,7 @@ public class UserConsumer {
         try {
             return objectMapper.readValue(byteArray, OwnerMessageDTO.class);
         } catch (IOException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping byte array to %s failed", OwnerMessageDTO.class.getSimpleName())));
             return null;
         }
     }

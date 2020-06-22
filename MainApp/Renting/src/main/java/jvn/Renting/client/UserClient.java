@@ -12,7 +12,7 @@ import java.util.List;
 public interface UserClient {
 
     @RequestMapping(method = RequestMethod.GET, path = "/api/client/{clientId}/verify")
-    Boolean verify(@PathVariable("clientId") Long clientId);
+    SignedMessageDTO verify(@PathVariable("clientId") Long clientId);
 
 
     @RequestMapping(method = RequestMethod.GET, path = "/api/client/by-ids/{clientIds}")

@@ -12,7 +12,6 @@ import jvn.RentACar.mapper.CarDtoMapper;
 import jvn.RentACar.model.Advertisement;
 import jvn.RentACar.model.Car;
 import jvn.RentACar.model.Log;
-import jvn.RentACar.model.Picture;
 import jvn.RentACar.repository.CarRepository;
 import jvn.RentACar.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Value;
 
-import javax.persistence.EntityManager;
-import java.io.File;
-import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -52,8 +47,6 @@ public class CarServiceImpl implements CarService {
     private GearboxTypeService gearboxTypeService;
 
     private PictureService pictureService;
-
-    private CarDtoMapper carMapper;
 
     private ModelService modelService;
 
@@ -312,14 +305,13 @@ public class CarServiceImpl implements CarService {
     @Autowired
     public CarServiceImpl(CarRepository carRepository, BodyStyleService bodyStyleService,
                           FuelTypeService fuelTypeService, GearboxTypeService gearboxTypeService,
-                          PictureService pictureService, CarDtoMapper carMapper, ModelService modelService, MakeService makeService,
+                          PictureService pictureService, ModelService modelService, MakeService makeService,
                           UserService userService, CarClient carClient, CarDetailsMapper carDetailsMapper, LogService logService) {
         this.carRepository = carRepository;
         this.bodyStyleService = bodyStyleService;
         this.fuelTypeService = fuelTypeService;
         this.gearboxTypeService = gearboxTypeService;
         this.pictureService = pictureService;
-        this.carMapper = carMapper;
         this.modelService = modelService;
         this.makeService = makeService;
         this.userService = userService;

@@ -1,9 +1,11 @@
 package jvn.Cars.serviceImpl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Cars.client.AdvertisementClient;
 import jvn.Cars.dto.message.Log;
 import jvn.Cars.dto.request.CarEditDTO;
 import jvn.Cars.dto.request.UserDTO;
+import jvn.Cars.dto.response.SignedMessageDTO;
 import jvn.Cars.enumeration.EditType;
 import jvn.Cars.enumeration.LogicalStatus;
 import jvn.Cars.exceptionHandler.InvalidCarDataException;
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -33,6 +36,8 @@ public class CarServiceImpl implements CarService {
 
     private final String CLASS_PATH = this.getClass().getCanonicalName();
     private final String CLASS_NAME = this.getClass().getSimpleName();
+
+    private final String ADVERTISEMENTS_ALIAS = "advertisements";
 
     private CarRepository carRepository;
 
@@ -53,6 +58,10 @@ public class CarServiceImpl implements CarService {
     private CarProducer carProducer;
 
     private LogProducer logProducer;
+
+    private DigitalSignatureService digitalSignatureService;
+
+    private ObjectMapper objectMapper;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -131,7 +140,15 @@ public class CarServiceImpl implements CarService {
         Car dbCar = get(id, LogicalStatus.EXISTING);
         checkOwner(dbCar, loggedInUserId);
 
-        if (advertisementClient.canDeleteCar(id)) {
+        Boolean canDelete = false;
+        SignedMessageDTO signedMessageDTO = advertisementClient.canDeleteCar(id);
+        if (digitalSignatureService.decrypt(ADVERTISEMENTS_ALIAS, signedMessageDTO.getMessageBytes(), signedMessageDTO.getDigitalSignature())) {
+            canDelete = bytesToBoolean(signedMessageDTO.getMessageBytes());
+        } else {
+            logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SGN", "Invalid digital signature"));
+        }
+
+        if (canDelete != null && canDelete) {
             dbCar.setLogicalStatus(LogicalStatus.DELETED);
             carRepository.save(dbCar);
         } else {
@@ -143,7 +160,16 @@ public class CarServiceImpl implements CarService {
     public boolean checkIfCanDeleteAndDelete(Long id, Long loggedInUser) {
         Car dbCar = get(id, LogicalStatus.EXISTING);
         checkOwner(dbCar, loggedInUser);
-        if (advertisementClient.canDeleteCar(id)) {
+
+        Boolean canDelete = false;
+        SignedMessageDTO signedMessageDTO = advertisementClient.canDeleteCar(id);
+        if (digitalSignatureService.decrypt(ADVERTISEMENTS_ALIAS, signedMessageDTO.getMessageBytes(), signedMessageDTO.getDigitalSignature())) {
+            canDelete = bytesToBoolean(signedMessageDTO.getMessageBytes());
+        } else {
+            logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SGN", "Invalid digital signature"));
+        }
+
+        if (canDelete != null && canDelete) {
             dbCar.setLogicalStatus(LogicalStatus.DELETED);
             carRepository.save(dbCar);
             return true;
@@ -162,7 +188,15 @@ public class CarServiceImpl implements CarService {
         Car dbCar = get(id, LogicalStatus.EXISTING);
         checkOwner(dbCar, loggedInUserId);
 
-        if (!advertisementClient.getCarEditType(id).equals(EditType.ALL)) {
+        EditType editType = null;
+        SignedMessageDTO signedEditType = advertisementClient.getCarEditTypeFeign(id);
+        if (digitalSignatureService.decrypt(ADVERTISEMENTS_ALIAS, signedEditType.getMessageBytes(), signedEditType.getDigitalSignature())) {
+            editType = bytesToEditType(signedEditType.getMessageBytes());
+        } else {
+            logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SGN", "Invalid digital signature"));
+        }
+
+        if (editType != null && !editType.equals(EditType.ALL)) {
             throw new InvalidCarDataException(
                     "This car is in use and therefore it cannot be edited.", HttpStatus.BAD_REQUEST);
         }
@@ -190,7 +224,15 @@ public class CarServiceImpl implements CarService {
         Car dbCar = get(id, LogicalStatus.EXISTING);
         checkOwner(dbCar, loggedInUserId);
 
-        if (advertisementClient.canEditCarPartially(id)) {
+        Boolean canEditCarPartially = false;
+        SignedMessageDTO signedMessageDTO = advertisementClient.canEditCarPartially(id);
+        if (digitalSignatureService.decrypt(ADVERTISEMENTS_ALIAS, signedMessageDTO.getMessageBytes(), signedMessageDTO.getDigitalSignature())) {
+            canEditCarPartially = bytesToBoolean(signedMessageDTO.getMessageBytes());
+        } else {
+            logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SGN", "Invalid digital signature"));
+        }
+
+        if (canEditCarPartially != null && canEditCarPartially) {
             dbCar.setMileageInKm(carDTO.getMileageInKm());
             dbCar.setKidsSeats(carDTO.getKidsSeats());
             dbCar.setAvailableTracking(carDTO.getAvailableTracking());
@@ -208,7 +250,15 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public String getCarEditType(Long id, Long loggedInUser) {
-        if (advertisementClient.getCarEditType(id).equals(EditType.ALL)) {
+        EditType editType = null;
+        SignedMessageDTO signedEditType = advertisementClient.getCarEditTypeFeign(id);
+        if (digitalSignatureService.decrypt(ADVERTISEMENTS_ALIAS, signedEditType.getMessageBytes(), signedEditType.getDigitalSignature())) {
+            editType = bytesToEditType(signedEditType.getMessageBytes());
+        } else {
+            logProducer.send(new Log(Log.WARN, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SGN", "Invalid digital signature"));
+        }
+
+        if (editType != null && editType.equals(EditType.ALL)) {
             return "ALL";
         }
         return "PARTIAL";
@@ -226,11 +276,30 @@ public class CarServiceImpl implements CarService {
         }
     }
 
+    private Boolean bytesToBoolean(byte[] byteArray) {
+        try {
+            return objectMapper.readValue(byteArray, Boolean.class);
+        } catch (IOException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping byte array to %s failed", Boolean.class.getSimpleName())));
+            return null;
+        }
+    }
+
+    private EditType bytesToEditType(byte[] byteArray) {
+        try {
+            return objectMapper.readValue(byteArray, EditType.class);
+        } catch (IOException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping byte array to %s failed", EditType.class.getSimpleName())));
+            return null;
+        }
+    }
+
     @Autowired
     public CarServiceImpl(CarRepository carRepository, BodyStyleService bodyStyleService, FuelTypeService fuelTypeService,
                           GearboxTypeService gearboxTypeService, PictureService pictureService,
                           ModelService modelService, MakeService makeService, AdvertisementClient advertisementClient,
-                          CarProducer carProducer, LogProducer logProducer) {
+                          CarProducer carProducer, LogProducer logProducer, ObjectMapper objectMapper,
+                          DigitalSignatureService digitalSignatureService) {
         this.carRepository = carRepository;
         this.bodyStyleService = bodyStyleService;
         this.fuelTypeService = fuelTypeService;
@@ -241,5 +310,7 @@ public class CarServiceImpl implements CarService {
         this.advertisementClient = advertisementClient;
         this.carProducer = carProducer;
         this.logProducer = logProducer;
+        this.objectMapper = objectMapper;
+        this.digitalSignatureService = digitalSignatureService;
     }
 }

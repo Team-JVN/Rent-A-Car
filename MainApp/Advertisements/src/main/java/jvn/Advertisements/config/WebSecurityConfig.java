@@ -40,7 +40,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .cors().and()
 
                 .addFilterBefore(new TokenAuthenticationFilter(), BasicAuthenticationFilter.class);
-                // .headers().contentSecurityPolicy("default-src 'self' https://localhost:8080/;img-src 'self' blob: data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-eval'; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;");
+        // .headers().contentSecurityPolicy("default-src 'self' https://localhost:8080/;img-src 'self' blob: data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-eval'; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;");
 
         http.csrf().disable();
     }
@@ -49,6 +49,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/ws/**");
         web.ignoring().antMatchers("/api/advertisement/car/{carId}/edit-type");
+        web.ignoring().antMatchers("/api/advertisement/car/{carId}/edit-type-feign");
         web.ignoring().antMatchers("/api/advertisement/by-ids/{advIds}");
         web.ignoring().antMatchers("/api/advertisement/car/{carId}/check-for-delete");
         web.ignoring().antMatchers("/api/advertisement/car/{carId}/check-for-partial-edit");

@@ -8,6 +8,7 @@ import jvn.Advertisements.dto.request.AdvertisementEditDTO;
 import jvn.Advertisements.dto.request.CreateAdvertisementDTO;
 import jvn.Advertisements.dto.request.UserDTO;
 import jvn.Advertisements.dto.response.AdvertisementDTO;
+import jvn.Advertisements.dto.response.SignedMessageDTO;
 import jvn.Advertisements.enumeration.EditType;
 import jvn.Advertisements.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.Advertisements.mapper.AdvertisementDtoMapper;
@@ -16,6 +17,7 @@ import jvn.Advertisements.mapper.CreateAdvertisementDtoMapper;
 import jvn.Advertisements.model.Advertisement;
 import jvn.Advertisements.producer.LogProducer;
 import jvn.Advertisements.service.AdvertisementService;
+import jvn.Advertisements.service.DigitalSignatureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -51,6 +53,8 @@ public class AdvertisementController {
     private AdvertisementEditAllInfoDtoMapper advertisementEditAllInfoDtoMapper;
 
     private LogProducer logProducer;
+
+    private DigitalSignatureService digitalSignatureService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AdvertisementDTO> create(@Valid @RequestBody CreateAdvertisementDTO createAdvertisementDTO) {
@@ -106,14 +110,34 @@ public class AdvertisementController {
         return new ResponseEntity<>(advertisementService.getCarEditType(id), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/car/{carId}/edit-type-feign", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SignedMessageDTO> getCarEditTypeFeign(@PathVariable("carId") @Positive(message = "Id must be positive.") Long id) {
+        EditType editType = advertisementService.getCarEditType(id);
+        byte[] messageBytes = convertToBytes(editType);
+        byte[] digitalSignature = digitalSignatureService.encrypt(messageBytes);
+        SignedMessageDTO signedMessageDTO = new SignedMessageDTO(messageBytes, digitalSignature);
+
+        return new ResponseEntity<>(signedMessageDTO, HttpStatus.OK);
+    }
+
     @GetMapping(value = "/car/{carId}/check-for-partial-edit", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> canEditCarPartially(@PathVariable("carId") @Positive(message = "Id must be positive.") Long carId) {
-        return new ResponseEntity<>(advertisementService.canEditCarPartially(carId), HttpStatus.OK);
+    public ResponseEntity<SignedMessageDTO> canEditCarPartially(@PathVariable("carId") @Positive(message = "Id must be positive.") Long carId) {
+        Boolean result = advertisementService.canEditCarPartially(carId);
+        byte[] messageBytes = convertToBytes(result);
+        byte[] digitalSignature = digitalSignatureService.encrypt(messageBytes);
+        SignedMessageDTO signedMessageDTO = new SignedMessageDTO(messageBytes, digitalSignature);
+
+        return new ResponseEntity<>(signedMessageDTO, HttpStatus.OK);
     }
 
     @GetMapping(value = "/car/{carId}/check-for-delete", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> canDeleteCar(@PathVariable("carId") @Positive(message = "Id must be positive.") Long carId) {
-        return new ResponseEntity<>(advertisementService.canDeleteCar(carId), HttpStatus.OK);
+    public ResponseEntity<SignedMessageDTO> canDeleteCar(@PathVariable("carId") @Positive(message = "Id must be positive.") Long carId) {
+        Boolean result = advertisementService.canDeleteCar(carId);
+        byte[] messageBytes = convertToBytes(result);
+        byte[] digitalSignature = digitalSignatureService.encrypt(messageBytes);
+        SignedMessageDTO signedMessageDTO = new SignedMessageDTO(messageBytes, digitalSignature);
+
+        return new ResponseEntity<>(signedMessageDTO, HttpStatus.OK);
     }
 
     private UserDTO stringToObject(String user) {
@@ -124,11 +148,29 @@ public class AdvertisementController {
         }
     }
 
+    private byte[] convertToBytes(Boolean obj) {
+        try {
+            return objectMapper.writeValueAsBytes(obj);
+        } catch (JsonProcessingException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping %s instance to byte array failed", Boolean.class.getSimpleName())));
+            return null;
+        }
+    }
+
+    private byte[] convertToBytes(EditType obj) {
+        try {
+            return objectMapper.writeValueAsBytes(obj);
+        } catch (JsonProcessingException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping %s instance to byte array failed", EditType.class.getSimpleName())));
+            return null;
+        }
+    }
 
     @Autowired
     public AdvertisementController(AdvertisementService advertisementService, CreateAdvertisementDtoMapper createAdvertisementDtoMapper,
                                    AdvertisementDtoMapper advertisementDtoMapper, ObjectMapper objectMapper, HttpServletRequest request,
-                                   AdvertisementEditAllInfoDtoMapper advertisementEditAllInfoDtoMapper, LogProducer logProducer) {
+                                   AdvertisementEditAllInfoDtoMapper advertisementEditAllInfoDtoMapper, LogProducer logProducer,
+                                   DigitalSignatureService digitalSignatureService) {
         this.advertisementService = advertisementService;
         this.createAdvertisementDtoMapper = createAdvertisementDtoMapper;
         this.advertisementDtoMapper = advertisementDtoMapper;
@@ -136,6 +178,7 @@ public class AdvertisementController {
         this.request = request;
         this.advertisementEditAllInfoDtoMapper = advertisementEditAllInfoDtoMapper;
         this.logProducer = logProducer;
+        this.digitalSignatureService = digitalSignatureService;
     }
 
 

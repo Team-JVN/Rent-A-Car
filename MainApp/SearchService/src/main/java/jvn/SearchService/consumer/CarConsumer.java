@@ -59,6 +59,7 @@ public class CarConsumer {
         try {
             return objectMapper.readValue(byteArray, CarMessageDTO.class);
         } catch (IOException e) {
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping byte array to %s failed", CarMessageDTO.class.getSimpleName())));
             return null;
         }
     }

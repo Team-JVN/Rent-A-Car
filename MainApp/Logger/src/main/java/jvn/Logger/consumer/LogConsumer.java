@@ -39,19 +39,6 @@ public class LogConsumer {
             }
         }
     }
-/*
-    @RabbitListener(queues = RabbitMQConfiguration.LOGS)
-    public void write(String logStr) {
-        System.out.println(logStr);
-        try {
-            repository.write(Paths.get(configuration.getLogStorage()), Log.parse(logStr));
-        } catch (IOException e) {
-            System.out.println("Cannot write log message to a file.");
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-*/
 
     private LogSignedDTO stringToObject(String logMessageStr) {
         ObjectMapper objectMapper = new ObjectMapper();
