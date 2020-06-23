@@ -204,7 +204,6 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public List<Car> getStatistics(String filter) {
-        synchronizeCars();
         String sortFilter = "";
         switch (filter) {
             case "most-km-made":
@@ -303,6 +302,7 @@ public class CarServiceImpl implements CarService {
         dbCar.setAvailableTracking(car.getAvailableTracking());
         dbCar.setAvgRating(car.getAvgRating());
         dbCar.setCommentsCount(car.getCommentsCount());
+        dbCar.setLogicalStatus(car.getLogicalStatus());
         Car newCar = carRepository.saveAndFlush(dbCar);
         if (!pictureInfos.isEmpty()) {
             pictureService.editCarPicturesSynchronize(pictureInfos, UPLOADED_PICTURES_PATH, newCar);
