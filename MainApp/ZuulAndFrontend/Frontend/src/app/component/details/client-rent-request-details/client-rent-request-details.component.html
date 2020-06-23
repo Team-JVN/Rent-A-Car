@@ -20,7 +20,8 @@
 
                             <div class="col-3 mt-0" align="end">
                                 <button mat-raised-button *ngIf="checkIfCanLeaveFeedback(rentInfo,rentRequest)"
-                                    color="primary" (click)="leaveFeedback(rentInfo)">Leave feedback
+                                    color="primary" (click)="leaveFeedback(rentInfo);$event.stopPropagation()">Leave
+                                    feedback
                                 </button>
                             </div>
 

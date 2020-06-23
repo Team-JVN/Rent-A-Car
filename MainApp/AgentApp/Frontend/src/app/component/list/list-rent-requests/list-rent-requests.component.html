@@ -36,11 +36,11 @@
         <th mat-header-cell *matHeaderCellDef class="buttons-width">&nbsp;</th>
         <td mat-cell *matCellDef="let element">
           <button mat-icon-button aria-label="Accept" *ngIf="element.rentRequestStatus == 'PENDING'" color="success"
-            matTooltip="Accept" (click)="accept(element)">
+            matTooltip="Accept" (click)="accept(element);$event.stopPropagation()">
             <mat-icon>done</mat-icon>
           </button>
           <button mat-icon-button aria-label="Accept" *ngIf="element.rentRequestStatus == 'PENDING'" color="warn"
-            matTooltip="Reject" (click)="reject(element)">
+            matTooltip="Reject" (click)="reject(element);$event.stopPropagation()">
             <mat-icon>clear</mat-icon>
           </button>
           <button mat-icon-button aria-label="View details" matTooltip="View details" (click)="viewDetails(element)">
@@ -59,7 +59,7 @@
                     <mat-card-header>
                       <mat-card-title>
                         Rent info for
-                        <span (click)="advertisementDetails(rentInfo)" class="btn-adv-details">
+                        <span (click)="advertisementDetails(rentInfo);$event.stopPropagation()" class="btn-adv-details">
                           {{rentInfo.advertisement.car.make.name }}
                           {{rentInfo.advertisement.car.model.name}}
                         </span>
@@ -69,7 +69,7 @@
 
                   <div class="col-3 mt-0" align="end">
                     <button mat-raised-button *ngIf="element.rentRequestStatus == 'PAID'" color="primary"
-                      (click)="createRentReport(rentInfo)">Create
+                      (click)="createRentReport(rentInfo);$event.stopPropagation()">Create
                       Report</button>
                   </div>
                 </div>

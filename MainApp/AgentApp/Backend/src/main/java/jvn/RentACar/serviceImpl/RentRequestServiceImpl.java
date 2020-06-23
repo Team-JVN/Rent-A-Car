@@ -121,7 +121,7 @@ public class RentRequestServiceImpl implements RentRequestService {
     public List<RentRequest> get(Long advertisementId, String status) {
         synchronize();
         Advertisement advertisement = advertisementService.get(advertisementId);
-        if (!userService.getLoginAgent().getEmail().equals(advertisement.getCar().getOwner().getEmail())) {
+        if (!userService.getLoginUser().getEmail().equals(advertisement.getCar().getOwner().getEmail())) {
             throw new InvalidRentRequestDataException("This rent request is not yours.", HttpStatus.BAD_REQUEST);
         }
         if (status.equals("all")) {
@@ -434,10 +434,10 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     @Autowired
     public RentRequestServiceImpl(ClientService clientService, AdvertisementService advertisementService,
-            UserService userService, RentRequestRepository rentRequestRepository,
-            EmailNotificationService emailNotificationService, Environment environment,
-            RentRequestClient rentRequestClient, RentRequestDetailsMapper rentRequestDetailsMapper,
-            LogService logService) {
+                                  UserService userService, RentRequestRepository rentRequestRepository,
+                                  EmailNotificationService emailNotificationService, Environment environment,
+                                  RentRequestClient rentRequestClient, RentRequestDetailsMapper rentRequestDetailsMapper,
+                                  LogService logService) {
         this.clientService = clientService;
         this.advertisementService = advertisementService;
         this.rentRequestRepository = rentRequestRepository;

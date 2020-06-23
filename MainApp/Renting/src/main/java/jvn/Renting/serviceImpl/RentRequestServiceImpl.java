@@ -133,7 +133,7 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     @Override
     public RentRequestDTO get(Long id, Long loggedInUserId, String jwt, String user) {
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, loggedInUserId, id, loggedInUserId);
+        RentRequest rentRequest = rentRequestRepository.findOneById(id);
         if (rentRequest == null) {
             throw new InvalidRentRequestDataException("Requested rent request does not exist.", HttpStatus.NOT_FOUND);
         }

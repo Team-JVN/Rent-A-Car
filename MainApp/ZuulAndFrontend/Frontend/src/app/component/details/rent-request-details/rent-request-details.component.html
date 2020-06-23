@@ -10,7 +10,8 @@
                                 <mat-card-header>
                                     <mat-card-title>
                                         Rent info for
-                                        <span (click)="advertisementDetails(rentInfo)" class="btn-adv-details">
+                                        <span (click)="advertisementDetails(rentInfo);$event.stopPropagation()"
+                                            class="btn-adv-details">
                                             {{rentInfo.advertisement.car.make}}
                                             {{rentInfo.advertisement.car.model}}
                                         </span>
@@ -20,12 +21,12 @@
 
                             <div class="col-3 mt-0" align="end">
                                 <button mat-raised-button *ngIf="checkIfCanCreateComment(rentInfo)" color="primary"
-                                    (click)="reviewFeedback(rentInfo)">Review feedback
+                                    (click)="reviewFeedback(rentInfo);$event.stopPropagation()">Review feedback
                                 </button>
                             </div>
                             <div class="col-3 mt-0" align="end">
                                 <button mat-raised-button *ngIf="checkIfCanCreateReport(rentInfo)" color="primary"
-                                    (click)="createRentReport()">Create
+                                    (click)="createRentReport();$event.stopPropagation()">Create
                                     Report</button>
                             </div>
                         </div>

@@ -231,7 +231,7 @@ public class CarServiceImpl implements CarService {
     }
 
     private void checkOwner(Car car) {
-        if (!userService.getLoginAgent().getEmail().equals(car.getOwner().getEmail())) {
+        if (!userService.getLoginUser().getEmail().equals(car.getOwner().getEmail())) {
             logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CHO", String.format("User %s is not the owner of car %s", userService.getLoginUser().getId(), car.getId())));
             throw new InvalidCarDataException("You are not owner of this car.", HttpStatus.BAD_REQUEST);
         }
