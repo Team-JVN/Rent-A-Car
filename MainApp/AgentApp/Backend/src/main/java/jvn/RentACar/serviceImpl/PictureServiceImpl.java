@@ -6,6 +6,7 @@ import jvn.RentACar.exceptionHandler.InvalidCarDataException;
 import jvn.RentACar.model.Car;
 import jvn.RentACar.model.Log;
 import jvn.RentACar.model.Picture;
+import jvn.RentACar.repository.CarRepository;
 import jvn.RentACar.repository.PictureRepository;
 import jvn.RentACar.service.LogService;
 import jvn.RentACar.service.PictureService;
@@ -27,10 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Transactional
@@ -42,6 +40,8 @@ public class PictureServiceImpl implements PictureService {
     private LogService logService;
 
     private PictureRepository pictureRepository;
+
+    private CarRepository carRepository;
 
     @Override
     public Resource loadFileAsResource(String fileName, String path) {
@@ -98,12 +98,13 @@ public class PictureServiceImpl implements PictureService {
     }
 
     @Override
-    public void editCarPictures(List<MultipartFile> multipartFiles, String path, Car car) {
+    public Set<Picture> editCarPictures(List<MultipartFile> multipartFiles, String path, Car car) {
         Set<Picture> removedPictures = car.getPictures();
+        Set<Picture> carPictures = new HashSet<>();
         List<String> uniquePictures = new ArrayList<>();
         Long carId = car.getId();
         for (MultipartFile picture : multipartFiles) {
-            String fileName = StringUtils.cleanPath(Objects.requireNonNull(picture.getOriginalFilename()));
+            String fileName = StringUtils.cleanPath(picture.getOriginalFilename());
             Picture pictureData = pictureRepository.findByDataAndCarId(fileName, carId);
             if (pictureData == null) {
                 fileName = carId + "_" + fileName;
@@ -115,20 +116,27 @@ public class PictureServiceImpl implements PictureService {
                         Picture pic = pictureRepository.saveAndFlush(pictureData);
                         logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PDB",
                                 String.format("Picture %s successfully saved in DB", pic.getId())));
+                        carPictures.add(pic);
                     }
                 } else {
+                    carPictures.add(pictureData);
                     removedPictures.remove(pictureData);
                 }
             } else {
+                carPictures.add(pictureData);
                 removedPictures.remove(pictureData);
             }
         }
+        car.setPictures(carPictures);
+        carRepository.saveAndFlush(car);
         deleteUnusedPictures(removedPictures, path);
+        return carPictures;
     }
 
     @Override
-    public void editCarPicturesSynchronize(List<PictureInfo> pictureInfos, String path, Car car) {
+    public Set<Picture> editCarPicturesSynchronize(List<PictureInfo> pictureInfos, String path, Car car) {
         Set<Picture> removedPictures = car.getPictures();
+        Set<Picture> carPictures = new HashSet<>();
         List<String> uniquePictures = new ArrayList<>();
         Long carId = car.getId();
         for (PictureInfo picture : pictureInfos) {
@@ -146,15 +154,22 @@ public class PictureServiceImpl implements PictureService {
                         pictureRepository.refresh(dbPicture);
                         logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PDB",
                                 String.format("Picture %s successfully saved in DB", dbPicture.getId())));
+                        carPictures.add(dbPicture);
                     }
                 } else {
+                    carPictures.add(pictureData);
                     removedPictures.remove(pictureData);
+
                 }
             } else {
+                carPictures.add(pictureData);
                 removedPictures.remove(pictureData);
             }
         }
+        car.setPictures(carPictures);
+        carRepository.saveAndFlush(car);
         deleteUnusedPictures(removedPictures, path);
+        return carPictures;
     }
 
     private String savePictureOnDisk(MultipartFile picture, String path, Long id) {
@@ -213,16 +228,16 @@ public class PictureServiceImpl implements PictureService {
             }
 
             picture.setCar(null);
-            pictureRepository.save(picture);
-//            pictureRepository.deleteById(picId);
+            pictureRepository.delete(picture);
             logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "PDB",
                     String.format("Picture %s successfully deleted from DB", picture.getId())));
         }
     }
 
     @Autowired
-    public PictureServiceImpl(PictureRepository pictureRepository, LogService logService) {
+    public PictureServiceImpl(PictureRepository pictureRepository, LogService logService, CarRepository carRepository) {
         this.pictureRepository = pictureRepository;
         this.logService = logService;
+        this.carRepository = carRepository;
     }
 }

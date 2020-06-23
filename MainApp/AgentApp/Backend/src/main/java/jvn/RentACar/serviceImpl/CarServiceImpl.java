@@ -12,6 +12,7 @@ import jvn.RentACar.mapper.CarDtoMapper;
 import jvn.RentACar.model.Advertisement;
 import jvn.RentACar.model.Car;
 import jvn.RentACar.model.Log;
+import jvn.RentACar.model.Picture;
 import jvn.RentACar.repository.CarRepository;
 import jvn.RentACar.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,8 +107,7 @@ public class CarServiceImpl implements CarService {
         }
         Car car = get(id);
         checkOwner(car);
-        Set<Advertisement> advertisements = get(id).getAdvertisements();
-        if (!getEditType(car.getMainAppId()).equals(EditType.ALL)) {
+        if (!getEditType(car).equals(EditType.ALL)) {
             throw new InvalidCarDataException("Car is in use and therefore can not be edited.", HttpStatus.BAD_REQUEST);
         }
         car.setMake(makeService.get(carDTO.getMake().getId()));
@@ -120,7 +120,7 @@ public class CarServiceImpl implements CarService {
         car.setAvailableTracking(carDTO.getAvailableTracking());
         Car newCar = carRepository.save(car);
         try {
-            carClient.createOrEdit(car, multipartFiles);
+            carClient.createOrEdit(car, multipartFiles, false);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -148,7 +148,7 @@ public class CarServiceImpl implements CarService {
 
         carDTO.setId(newCar.getMainAppId());
         carClient.editPartial(carDTO, multipartFiles);
-        pictureService.editCarPictures(multipartFiles, UPLOADED_PICTURES_PATH, car);
+        Set<Picture> carPictures = pictureService.editCarPictures(multipartFiles, UPLOADED_PICTURES_PATH, car);
         return newCar;
     }
 
@@ -169,6 +169,16 @@ public class CarServiceImpl implements CarService {
     @Override
     public EditType getEditType(Long id) {
         Car car = get(id);
+        GetCarEditTypeResponse response = carClient.getEditType(car);
+        if (response != null) {
+            if (response.getEditType().equals("ALL")) {
+                return EditType.ALL;
+            }
+        }
+        return EditType.PARTIAL;
+    }
+
+    private EditType getEditType(Car car) {
         GetCarEditTypeResponse response = carClient.getEditType(car);
         if (response != null) {
             if (response.getEditType().equals("ALL")) {
@@ -213,7 +223,7 @@ public class CarServiceImpl implements CarService {
 
     private Long saveInMainApp(Car car, List<MultipartFile> multipartFiles) {
         try {
-            CreateOrEditCarDetailsResponse response = carClient.createOrEdit(car, multipartFiles);
+            CreateOrEditCarDetailsResponse response = carClient.createOrEdit(car, multipartFiles, true);
             return response.getCreateCarDetails().getId();
         } catch (Exception e) {
             e.printStackTrace();

@@ -175,7 +175,8 @@ public class CarEndpoint {
         List<PictureInfo> pictureInfos = new ArrayList<>();
         for (Picture picture : pictures) {
             PictureInfo pictureInfo = new PictureInfo();
-            String name = picture.getData().split("_")[1];
+            int index = picture.getData().indexOf('_');
+            String name = picture.getData().substring(index + 1);
             pictureInfo.setFileName(name);
             pictureInfo.setMultiPartFile(loadImage(picture.getData(), UPLOADED_PICTURES_PATH));
             pictureInfos.add(pictureInfo);
