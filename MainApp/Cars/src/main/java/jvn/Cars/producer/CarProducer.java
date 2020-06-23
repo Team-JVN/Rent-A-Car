@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Cars.dto.message.CarEditSignedDTO;
 import jvn.Cars.dto.message.Log;
 import jvn.Cars.dto.request.CarEditDTO;
+import jvn.Cars.dto.request.CarEditForSearchDTO;
 import jvn.Cars.service.DigitalSignatureService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class CarProducer {
 
     private DigitalSignatureService digitalSignatureService;
 
-    public void sendMessageForSearch(CarEditDTO carEditDTO) {
+    public void sendMessageForSearch(CarEditForSearchDTO carEditDTO) {
         byte[] carBytes = convertToBytes(carEditDTO);
         byte[] digitalSignature = digitalSignatureService.encrypt(carBytes);
         CarEditSignedDTO carEditSignedDTO = new CarEditSignedDTO(carBytes, digitalSignature);
@@ -34,11 +35,11 @@ public class CarProducer {
     }
 
 
-    private byte[] convertToBytes(CarEditDTO obj) {
+    private byte[] convertToBytes(CarEditForSearchDTO obj) {
         try {
             return objectMapper.writeValueAsBytes(obj);
         } catch (JsonProcessingException e) {
-            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping %s instance to byte array failed", CarEditDTO.class.getSimpleName())));
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping %s instance to byte array failed", CarEditForSearchDTO.class.getSimpleName())));
             return null;
         }
     }

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.HashSet;
 
 @Service
 public class CarConsumer {
@@ -41,7 +42,7 @@ public class CarConsumer {
             car.setMileageInKm(carMessageDTO.getMileageInKm());
             car.setKidsSeats(carMessageDTO.getKidsSeats());
             car.setAvailableTracking(carMessageDTO.getAvailableTracking());
-
+            car.setPictures(new HashSet<>(carMessageDTO.getPictures()));
             carRepository.save(car);
             logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "ECA", String.format("Successfully edited car %s", car.getId())));
         }

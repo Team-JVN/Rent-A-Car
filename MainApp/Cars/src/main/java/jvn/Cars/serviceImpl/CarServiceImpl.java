@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Cars.client.AdvertisementClient;
 import jvn.Cars.dto.message.Log;
 import jvn.Cars.dto.request.CarEditDTO;
+import jvn.Cars.dto.request.CarEditForSearchDTO;
 import jvn.Cars.dto.request.UserDTO;
 import jvn.Cars.dto.response.SignedMessageDTO;
 import jvn.Cars.enumeration.EditType;
 import jvn.Cars.enumeration.LogicalStatus;
 import jvn.Cars.exceptionHandler.InvalidCarDataException;
 import jvn.Cars.model.Car;
+import jvn.Cars.model.Picture;
 import jvn.Cars.producer.CarProducer;
 import jvn.Cars.producer.LogProducer;
 import jvn.Cars.repository.CarRepository;
@@ -26,7 +28,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class CarServiceImpl implements CarService {
@@ -237,10 +241,10 @@ public class CarServiceImpl implements CarService {
             dbCar.setKidsSeats(carDTO.getKidsSeats());
             dbCar.setAvailableTracking(carDTO.getAvailableTracking());
             Car newCar = carRepository.save(dbCar);
-            pictureService.editCarPictures(multipartFiles, UPLOADED_PICTURES_PATH, dbCar);
+            Set<Picture> carPictures = pictureService.editCarPictures(multipartFiles, UPLOADED_PICTURES_PATH, dbCar);
 
             carDTO.setId(id);
-            editCar(carDTO);
+            editCar(carDTO, carPictures);
 
             return newCar;
         } else {
@@ -265,8 +269,18 @@ public class CarServiceImpl implements CarService {
     }
 
     @Async
-    public void editCar(CarEditDTO carEditDTO) {
-        carProducer.sendMessageForSearch(carEditDTO);
+    public void editCar(CarEditDTO carEditDTO, Set<Picture> carPicture) {
+        CarEditForSearchDTO carEditForSearchDTO = new CarEditForSearchDTO();
+        carEditForSearchDTO.setId(carEditDTO.getId());
+        carEditForSearchDTO.setMileageInKm(carEditDTO.getMileageInKm());
+        carEditForSearchDTO.setKidsSeats(carEditDTO.getKidsSeats());
+        carEditForSearchDTO.setAvailableTracking(carEditDTO.getAvailableTracking());
+        List<String> pictures = new ArrayList<>();
+        for (Picture picture : carPicture) {
+            pictures.add(picture.getData());
+        }
+        carEditForSearchDTO.setPictures(pictures);
+        carProducer.sendMessageForSearch(carEditForSearchDTO);
     }
 
     private void checkOwner(Car car, Long loggedInUserId) {
