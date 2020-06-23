@@ -23,7 +23,7 @@ public class ModelServiceImpl implements ModelService {
             throw new InvalidModelDataException("This Model already exist.", HttpStatus.BAD_REQUEST);
         }
         model.setMake(make);
-        return modelRepository.save(model);
+        return modelRepository.saveAndFlush(model);
     }
 
     @Override

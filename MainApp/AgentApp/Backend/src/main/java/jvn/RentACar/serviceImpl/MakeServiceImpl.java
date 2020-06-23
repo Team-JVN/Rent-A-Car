@@ -36,7 +36,7 @@ public class MakeServiceImpl implements MakeService {
         if (makeRepository.findByName(make.getName()) != null) {
             throw new InvalidMakeDataException("This Make already exist.", HttpStatus.BAD_REQUEST);
         }
-        return makeRepository.save(make);
+        return makeRepository.saveAndFlush(make);
     }
 
     @Override
