@@ -4,6 +4,7 @@ import jvn.RentACar.dto.request.CreateBodyStyleDTO;
 import jvn.RentACar.dto.request.CreateFuelTypeDTO;
 import jvn.RentACar.dto.request.CreateGearboxTypeDTO;
 import jvn.RentACar.dto.soap.car.CarDetails;
+import jvn.RentACar.enumeration.LogicalStatus;
 import jvn.RentACar.model.*;
 import jvn.RentACar.service.*;
 import org.modelmapper.ModelMapper;
@@ -39,6 +40,7 @@ public class CarDetailsMapper implements MapperInterface<Car, CarDetails> {
         car.setAvailableTracking(dto.isAvailableTracking());
         car.setAvgRating(dto.getAvgRating());
         car.setCommentsCount(dto.getCommentsCount());
+        car.setLogicalStatus(getLogicalStatus(dto.getStatus()));
         return car;
     }
 
@@ -115,6 +117,14 @@ public class CarDetailsMapper implements MapperInterface<Car, CarDetails> {
         CreateFuelTypeDTO create = new CreateFuelTypeDTO();
         create.setName(name);
         return fuelTypeService.create(create);
+    }
+
+    private LogicalStatus getLogicalStatus(String status) {
+        try {
+            return LogicalStatus.valueOf(status.toUpperCase());
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Autowired
