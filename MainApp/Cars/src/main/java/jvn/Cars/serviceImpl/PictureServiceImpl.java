@@ -110,9 +110,11 @@ public class PictureServiceImpl implements PictureService {
                 removedPictures.remove(pictureData);
             }
         }
-        car.setPictures(carPictures);
-        carRepository.saveAndFlush(car);
-        deleteUnusedPictures(removedPictures, path);
+        if (!removedPictures.isEmpty()) {
+            car.setPictures(carPictures);
+            carRepository.saveAndFlush(car);
+            deleteUnusedPictures(removedPictures, path);
+        }
         return carPictures;
     }
 

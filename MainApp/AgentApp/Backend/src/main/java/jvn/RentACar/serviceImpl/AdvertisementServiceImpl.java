@@ -75,7 +75,8 @@ public class AdvertisementServiceImpl implements AdvertisementService {
                     "This advertisement is in use and therefore it cannot be edited.", HttpStatus.BAD_REQUEST);
         }
         if (!dbAdvertisement.getCar().getId().equals(advertisement.getCar().getId())) {
-            dbAdvertisement.setCar(advertisement.getCar());
+            Car car = carService.get(advertisement.getCar().getId());
+            dbAdvertisement.setCar(car);
 
             CheckIfCarIsAvailableResponse response = advertisementClient.checkIfCarIsAvailable(
                     dbAdvertisement.getCar().getMainAppId(), dbAdvertisement.getDateFrom(),

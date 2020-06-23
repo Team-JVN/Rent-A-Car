@@ -41,20 +41,22 @@ public class AgentServiceImpl implements AgentService {
         return agent;
     }
 
-    private void synchronize(){
+    private void synchronize() {
         GetProfileAgentDetailsResponse response = agentClient.getProfile();
         AgentDetails agentDetails = response.getAgentDetails();
-        if(agentDetails != null){
-            Agent agent =agentRepository.findByEmail(agentDetails.getEmail());
-            if(agent != null){
+        if (agentDetails != null) {
+            Agent agent = agentRepository.findByEmail(agentDetails.getEmail());
+            if (agent != null) {
                 agent.setName(agentDetails.getName());
                 agent.setAddress(agentDetails.getAddress());
                 agent.setPhoneNumber(agentDetails.getPhoneNumber());
                 agent.setTaxIdNumber(agentDetails.getTaxIdNumber());
+                agentRepository.save(agent);
             }
         }
 
     }
+
     @Autowired
     public AgentServiceImpl(AgentRepository agentRepository, AgentClient agentClient) {
         this.agentRepository = agentRepository;
