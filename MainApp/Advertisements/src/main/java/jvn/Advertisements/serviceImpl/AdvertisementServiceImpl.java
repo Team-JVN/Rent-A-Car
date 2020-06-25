@@ -2,16 +2,19 @@ package jvn.Advertisements.serviceImpl;
 
 import jvn.Advertisements.client.CarClient;
 import jvn.Advertisements.client.RentingClient;
+import jvn.Advertisements.dto.both.PriceListDTO;
 import jvn.Advertisements.dto.message.AdvertisementMessageDTO;
 import jvn.Advertisements.dto.message.Log;
 import jvn.Advertisements.dto.message.OwnerMessageDTO;
 import jvn.Advertisements.dto.request.AdvertisementEditDTO;
 import jvn.Advertisements.dto.request.UserDTO;
+import jvn.Advertisements.dto.response.AdvertisementDTO;
 import jvn.Advertisements.dto.response.CarWithAllInformationDTO;
 import jvn.Advertisements.enumeration.EditType;
 import jvn.Advertisements.enumeration.LogicalStatus;
 import jvn.Advertisements.exceptionHandler.InvalidAdvertisementDataException;
 import jvn.Advertisements.mapper.AdvertisementMessageDtoMapper;
+import jvn.Advertisements.mapper.PriceListDtoMapper;
 import jvn.Advertisements.model.Advertisement;
 import jvn.Advertisements.model.PriceList;
 import jvn.Advertisements.producer.AdvertisementProducer;
@@ -40,6 +43,8 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     private AdvertisementRepository advertisementRepository;
 
     private AdvertisementMessageDtoMapper advertisementMessageMapper;
+
+    private PriceListDtoMapper priceListDtoMapper;
 
     private AdvertisementProducer advertisementProducer;
 
@@ -83,8 +88,14 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     }
 
     @Override
-    public Advertisement getOne(Long advertisementId) {
-        return advertisementRepository.findById(advertisementId).orElse(null);
+    public AdvertisementDTO getOne(Long advertisementId) {
+        System.out.println("ad service");
+        Advertisement ad = advertisementRepository.findOneById(advertisementId);
+        AdvertisementDTO adDTO = new AdvertisementDTO();
+        adDTO.setKilometresLimit(ad.getKilometresLimit());
+        PriceListDTO plDTO = priceListDtoMapper.toDto(ad.getPriceList());
+        adDTO.setPriceList(plDTO);
+        return adDTO;
     }
 
     public void delete(Long id, Long loggedInUserId) {
@@ -320,7 +331,8 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     @Autowired
     public AdvertisementServiceImpl(PriceListService priceListService, CarClient carClient,
                                     AdvertisementRepository advertisementRepository, AdvertisementMessageDtoMapper advertisementMessageMapper,
-                                    AdvertisementProducer advertisementProducer, RentingClient rentingClient, LogProducer logProducer) {
+                                    AdvertisementProducer advertisementProducer, RentingClient rentingClient, LogProducer logProducer,
+                                    PriceListDtoMapper priceListDtoMapper) {
         this.priceListService = priceListService;
         this.carClient = carClient;
         this.advertisementRepository = advertisementRepository;
@@ -328,5 +340,6 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         this.advertisementProducer = advertisementProducer;
         this.rentingClient = rentingClient;
         this.logProducer = logProducer;
+        this.priceListDtoMapper = priceListDtoMapper;
     }
 }

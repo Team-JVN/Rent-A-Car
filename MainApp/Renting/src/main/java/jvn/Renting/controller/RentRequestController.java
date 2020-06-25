@@ -156,7 +156,7 @@ public class RentRequestController {
     @PostMapping(value="/{id}/rent-info/{rentInfoId}/feedback")
     public ResponseEntity<FeedbackDTO> leaveFeedback(@PathVariable Long id, @PathVariable Long rentInfoId, @Valid @RequestBody FeedbackDTO feedbackDTO){
         UserDTO userDTO = stringToObject(request.getHeader("user"));
-        return new ResponseEntity<>(commentService.leaveFeedback(feedbackDTO, id, rentInfoId, userDTO.getId(), userDTO.getName()),
+        return new ResponseEntity<>(commentService.leaveFeedback(feedbackDTO, id, rentInfoId, userDTO.getId(), userDTO.getName(), userDTO.getCanCreateComments()),
                 HttpStatus.CREATED);
     }
 

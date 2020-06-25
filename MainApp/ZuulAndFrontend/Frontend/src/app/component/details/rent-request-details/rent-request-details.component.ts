@@ -21,6 +21,7 @@ import { Client } from "src/app/model/client";
 import { ReviewFeedbackComponent } from "../../review-feedback/review-feedback.component";
 import { AddRentReportComponent } from "../../add/add-rent-report/add-rent-report.component";
 import { Comment } from "./../../../model/comment";
+import { ListComments } from "../../list/list-comments/list-comments.component";
 
 @Component({
   selector: "app-rent-request-details",
@@ -176,5 +177,14 @@ export class RentRequestDetailsComponent implements OnInit {
     //     this.toastr.error(httpErrorResponse.error.message, 'Fetch messages');
     //   }
     // );
+  }
+  viewComments(rentInfo: RentInfo) {
+    let dialogRef = this.dialog.open(ListComments, {
+      data: {
+        feedback: null,
+        rentInfo: rentInfo,
+        rentRequestId: this.rentRequestId,
+      },
+    });
   }
 }

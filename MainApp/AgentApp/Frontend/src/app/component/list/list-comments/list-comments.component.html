@@ -1,16 +1,16 @@
-<h1 mat-dialog-title class="feedback-title">Review Feedback</h1>
+<h1 mat-dialog-title class="feedback-title">List Comments</h1>
 <mat-dialog-content class="dialog-class">
   <mat-card class="comment-rating-card">
     <mat-card-content>
       <div class="row">
-        <div class="col-3">
+        <div class="col-4">
           <label class="labelRaiting page-title">Rating</label>
         </div>
-        <div class="col-9">
+        <div class="col-8">
           <star-rating
             class="rating-style"
             totalstars="5"
-            checkedcolor="#009688"
+            checkedcolor="#87C7F3"
             uncheckedcolor="black"
             size="35px"
             [value]="feedback.rating"
@@ -19,17 +19,25 @@
         </div>
       </div>
       <div class="row" *ngIf="setUpComment">
-        <div class="col-3">
+        <div class="col-4">
           <label class="page-title">Comment</label>
         </div>
-        <div class="col-9">
+        <div class="col-8">
           {{ setUpComment.text }}
+        </div>
+      </div>
+      <div class="row" *ngIf="loggedInUserComment">
+        <div class="col-4">
+          <label class="page-title">Your Comment</label>
+        </div>
+        <div class="col-8">
+          {{ loggedInUserComment.text }}
         </div>
       </div>
     </mat-card-content>
   </mat-card>
 
-  <mat-card class="comment-rating-card" *ngIf="loggedInUserComment">
+  <!-- <mat-card class="comment-rating-card" *ngIf="loggedInUserComment">
     <mat-card-content>
       <div class="row">
         <div class="col-3">
@@ -40,9 +48,9 @@
         </div>
       </div>
     </mat-card-content>
-  </mat-card>
+  </mat-card> -->
 
-  <mat-card class="comment-rating-card" *ngIf="!loggedInUserComment">
+  <!-- <mat-card class="comment-rating-card" *ngIf="!loggedInUserComment">
     <mat-card-content>
       <table>
         <tr>
@@ -90,5 +98,5 @@
         </tr>
       </table>
     </mat-card-content>
-  </mat-card>
+  </mat-card> -->
 </mat-dialog-content>

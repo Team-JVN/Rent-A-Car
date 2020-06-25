@@ -93,7 +93,7 @@ public class CommentEndpoint {
             fdto.setComments(new HashSet<>(listDTO));
             FeedbackDTO feedbackDTO = commentService.leaveFeedback(fdto,
                     request.getRentRequestId(), request.getRentInfoId(), dto.getId(),
-                    leaveFeedbackDetails.getCommentDetails().get(0).getUserName());
+                    leaveFeedbackDetails.getCommentDetails().get(0).getUserName(), true);
             logProducer.send(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CRQ",
                     String.format("[SOAP] User %s successfully created comment %s", dto.getId(), leaveFeedbackDetails.getCommentDetails().get(0).getId())));
 

@@ -4,6 +4,7 @@ import jvn.RentACar.client.CommentClient;
 import jvn.RentACar.client.RentRequestClient;
 import jvn.RentACar.dto.both.CommentDTO;
 import jvn.RentACar.dto.both.FeedbackDTO;
+import jvn.RentACar.dto.both.UserDTO;
 import jvn.RentACar.dto.soap.comment.*;
 import jvn.RentACar.dto.soap.comment.CommentDetails;
 import jvn.RentACar.dto.soap.rentrequest.*;
@@ -11,6 +12,7 @@ import jvn.RentACar.enumeration.CommentStatus;
 import jvn.RentACar.exceptionHandler.InvalidCommentDataException;
 import jvn.RentACar.mapper.CommentDetailsMapper;
 import jvn.RentACar.mapper.CommentDtoMapper;
+import jvn.RentACar.mapper.UserDtoMapper;
 import jvn.RentACar.model.*;
 import jvn.RentACar.repository.*;
 import jvn.RentACar.service.CommentService;
@@ -51,6 +53,8 @@ public class CommentServiceImpl implements CommentService {
     private CommentDetailsMapper commentDetailsMapper;
 
     private LogService logService;
+
+    private UserDtoMapper userDtoMapper;
 
 
     @Override
@@ -139,7 +143,9 @@ public class CommentServiceImpl implements CommentService {
         feedbackDTO.setComments(new HashSet<>());
         for(Comment comment: rentInfo.getComments()){
             if(comment.getStatus().equals(CommentStatus.APPROVED)){
+                UserDTO sender = userDtoMapper.toDto(comment.getSender());
                 CommentDTO commentDTO = commentDtoMapper.toDto(comment);
+                commentDTO.setSender(sender);
                 feedbackDTO.getComments().add(commentDTO);
             }
 
@@ -248,7 +254,7 @@ public class CommentServiceImpl implements CommentService {
                               RentRequestRepository rentRequestRepository, RentInfoRepository rentInfoRepository,
                               ClientRepository clientRepository, UserRepository userRepository,
                               UserService userService, CommentClient commentClient,
-                              CommentDetailsMapper commentDetailsMapper, LogService logService) {
+                              CommentDetailsMapper commentDetailsMapper, LogService logService, UserDtoMapper userDtoMapper) {
         this.commentRepository = commentRepository;
         this.commentDtoMapper = commentDtoMapper;
         this.rentRequestRepository = rentRequestRepository;
@@ -259,5 +265,6 @@ public class CommentServiceImpl implements CommentService {
         this.commentDetailsMapper = commentDetailsMapper;
         this.logService = logService;
         this.commentClient = commentClient;
+        this.userDtoMapper = userDtoMapper;
     }
 }

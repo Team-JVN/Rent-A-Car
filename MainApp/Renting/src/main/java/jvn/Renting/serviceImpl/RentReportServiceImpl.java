@@ -47,8 +47,9 @@ public class RentReportServiceImpl implements RentReportService {
         RentReport rentReport = rentReportRepository.save(toEntity);
 
         sendUpdatesCar(rentReport);
-//        AdvertisementWithIdsDTO adWithDTO = advertisementClient.getOne(rentReport.getRentInfo().getAdvertisement());
-        return rentReport;
+        AdvertisementWithIdsDTO adWithDTO = advertisementClient.getOne(rentReport.getRentInfo().getAdvertisement());
+        rentReport.setAdditionalCost(calculateAdditionalCost(rentReport, adWithDTO));
+        return rentReportRepository.save(rentReport);
     }
 
     @Async
@@ -83,16 +84,16 @@ public class RentReportServiceImpl implements RentReportService {
 //        carRepository.save(car);
 //    }
 //
-//    public Double calculateAdditionalCost(RentReport rentReport) {
-//        Double addCost = 0.0;
-//        if (rentReport.getRentInfo().getAdvertisement().getKilometresLimit() != null) {
-//            Integer extraMiles = rentReport.getMadeMileage() - rentReport.getRentInfo().getAdvertisement().getKilometresLimit();
-//            if (extraMiles > 0) {
-//                addCost = extraMiles * rentReport.getRentInfo().getAdvertisement().getPriceList().getPricePerKm();
-//            }
-//        }
-//        return addCost;
-//    }
+    public Double calculateAdditionalCost(RentReport rentReport, AdvertisementWithIdsDTO advertisementWithIdsDTO) {
+        Double addCost = 0.0;
+        if (advertisementWithIdsDTO.getKilometresLimit() != null) {
+            Integer extraMiles = rentReport.getMadeMileage() - advertisementWithIdsDTO.getKilometresLimit();
+            if (extraMiles > 0) {
+                addCost = extraMiles * advertisementWithIdsDTO.getPriceList().getPricePerKm();
+            }
+        }
+        return addCost;
+    }
 
     @Autowired
     public RentReportServiceImpl(RentReportRepository rentReportRepository, RentInfoRepository rentInfoRepository,

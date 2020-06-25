@@ -17,6 +17,14 @@
                       {{ rentInfo.advertisement.car.make }}
                       {{ rentInfo.advertisement.car.model }}
                     </span>
+                    <button
+                      mat-icon-button
+                      aria-label="View comments"
+                      matTooltip="View comments"
+                      (click)="viewComments(rentInfo)"
+                    >
+                      <mat-icon>comment</mat-icon>
+                    </button>
                   </mat-card-title>
                 </mat-card-header>
               </div>

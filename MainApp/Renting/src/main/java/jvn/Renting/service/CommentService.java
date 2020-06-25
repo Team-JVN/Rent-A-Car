@@ -18,7 +18,7 @@ public interface CommentService {
 
     Comment createComment(Comment comment, Long id, Long rentInfoId, Long userId);
 
-    FeedbackDTO leaveFeedback(FeedbackDTO feedbackDTO, Long id, Long rentInfoId, Long userId, String userName);
+    FeedbackDTO leaveFeedback(FeedbackDTO feedbackDTO, Long id, Long rentInfoId, Long userId, String userName, Boolean canCreateComments);
 
     FeedbackDTO getFeedback(Long id, Long rentInfoId, Long userId);
 

@@ -15,9 +15,14 @@ public class CommentProducer {
 
     private ObjectMapper objectMapper;
 
-    public void sendRejectedComment(Long clientId) {
-        rabbitTemplate.convertAndSend(REJECTED_COMMENT, clientId);
+    public void sendRejectedComment(Long userId) {
+        rabbitTemplate.convertAndSend(REJECTED_COMMENT, userId);
     }
+
+//    public void sendUpdateCarAvgRating(Long rentInfoId, Integer rating) {
+//        rabbitTemplate.convertAndSend(REJECTED_COMMENT, jsonToString(new));
+//    }
+
     private String jsonToString(Long clientId) {
         try {
             return objectMapper.writeValueAsString(clientId);

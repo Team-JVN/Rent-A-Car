@@ -2,6 +2,7 @@ package jvn.Advertisements.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jvn.Advertisements.dto.both.PriceListDTO;
 import jvn.Advertisements.dto.message.Log;
 import jvn.Advertisements.dto.request.AdvertisementEditAllInfoDTO;
 import jvn.Advertisements.dto.request.AdvertisementEditDTO;
@@ -73,7 +74,11 @@ public class AdvertisementController {
 
     @GetMapping("/by-id/{advId}")
     public ResponseEntity<AdvertisementDTO> getOne(@PathVariable("advId") Long advertisement) {
-        return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.getOne(advertisement)), HttpStatus.OK);
+        AdvertisementDTO addto = advertisementService.getOne(advertisement);
+//        AdvertisementDTO addto = new AdvertisementDTO();
+//        addto.setKilometresLimit(ad.getKilometresLimit());
+        return new ResponseEntity<>(addto, HttpStatus.OK);
+//        return new ResponseEntity<>(advertisementDtoMapper.toDto(advertisementService.getOne(advertisement)), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

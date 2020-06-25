@@ -49,8 +49,11 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public FeedbackDTO leaveFeedback(FeedbackDTO feedbackDTO, Long id, Long rentInfoId, Long userId, String userName){
+    public FeedbackDTO leaveFeedback(FeedbackDTO feedbackDTO, Long id, Long rentInfoId, Long userId, String userName, Boolean canCreateComments){
 
+        if (!canCreateComments) {
+            throw new InvalidCommentDataException("You are not allowed to create comments. ", HttpStatus.BAD_REQUEST);
+        }
         RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
         Set<RentInfo> rentInfos = rentRequest.getRentInfos();
 //        RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
@@ -70,6 +73,7 @@ public class CommentServiceImpl implements CommentService {
 //            rentInfo.getComments().add(comment);
             rentInfo.setRating(feedbackDTO.getRating());
             rentInfoRepository.save(rentInfo);
+//            sendUpdateCarAvgRating(rentInfo.getId(), rentInfo.getRating());
 //            rentRequest.setRentInfos(new HashSet<>(rentInfos));
 //            rentRequestRepository.save(rentRequest);
 
@@ -139,7 +143,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setRentInfo(null);
         commentRepository.deleteById(id);
         //TODO:increase the number of rejected comments of User
-        sendRejectedComment(userId);
+        sendRejectedComment(comment.getSenderId());
 
     }
 
@@ -154,9 +158,14 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Async
-    public void sendRejectedComment(Long clientId) {
-        commentProducer.sendRejectedComment(clientId);
+    public void sendRejectedComment(Long userId) {
+        commentProducer.sendRejectedComment(userId);
     }
+
+//    @Async
+//    public void sendUpdateCarAvgRating(Long rentInfoId, Integer rating){
+//        commentProducer.sendRejectedComment(userId);
+//    }
 
     @Autowired
     public CommentServiceImpl(CommentRepository commentRepository, CommentProducer commentProducer,

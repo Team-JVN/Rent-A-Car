@@ -2,6 +2,7 @@ package jvn.Advertisements.service;
 
 import jvn.Advertisements.dto.request.AdvertisementEditDTO;
 import jvn.Advertisements.dto.request.UserDTO;
+import jvn.Advertisements.dto.response.AdvertisementDTO;
 import jvn.Advertisements.enumeration.EditType;
 import jvn.Advertisements.model.Advertisement;
 
@@ -13,7 +14,7 @@ public interface AdvertisementService {
 
     List<Advertisement> get(List<Long> advertisements);
 
-    Advertisement getOne (Long advertisementId);
+    AdvertisementDTO getOne (Long advertisementId);
 
     void delete(Long id, Long loggedInUserId);
 

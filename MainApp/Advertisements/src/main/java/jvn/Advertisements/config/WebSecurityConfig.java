@@ -50,6 +50,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers("/ws/**");
         web.ignoring().antMatchers("/api/advertisement/car/{carId}/edit-type");
         web.ignoring().antMatchers("/api/advertisement/by-ids/{advIds}");
+        web.ignoring().antMatchers("/api/advertisement/by-id/{advId}");
         web.ignoring().antMatchers("/api/advertisement/car/{carId}/check-for-delete");
         web.ignoring().antMatchers("/api/advertisement/car/{carId}/check-for-partial-edit");
     }
