@@ -15,6 +15,8 @@ public interface RentReportRepository extends JpaRepository<RentReport, Long> {
 
     List<RentReport> findAll();
 
+    RentReport findByMainAppId(Long mainAppId);
+
 
 
 }

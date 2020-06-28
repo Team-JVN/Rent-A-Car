@@ -52,6 +52,7 @@ public class RentReportServiceImpl implements RentReportService {
         return rentReportRepository.save(rentReport);
     }
 
+
     @Async
     public void sendUpdatesCar(RentReport rentReport) {
 
@@ -59,6 +60,7 @@ public class RentReportServiceImpl implements RentReportService {
 
     }
 
+    @Override
     public void checkIfCreatingRentReportIsPossible(RentInfo rentInfo) {
         if (!rentInfo.getRentRequest().getRentRequestStatus().equals(RentRequestStatus.PAID)) {
             throw new InvalidRentReportDataException("Cannot create rent report if rent request is not paid!", HttpStatus.BAD_REQUEST);
@@ -73,7 +75,18 @@ public class RentReportServiceImpl implements RentReportService {
             throw new InvalidRentReportDataException("There is already rent report linked to this rent info!", HttpStatus.BAD_REQUEST);
         }
     }
-//
+
+    @Override
+    public RentReport getRentReports(Long rentInfoId) {
+        RentInfo rentInfo = rentInfoRepository.findOneById(rentInfoId);
+        RentReport rentReport = null;
+        if(rentInfo.getRentReport() != null){
+            rentReport = rentInfo.getRentReport();
+        }
+        return rentReport;
+    }
+
+    //
 //    public void calculateMileageInKm(RentReport rentReport) {
 //        Car car = rentReport.getRentInfo().getAdvertisement().getCar();
 //

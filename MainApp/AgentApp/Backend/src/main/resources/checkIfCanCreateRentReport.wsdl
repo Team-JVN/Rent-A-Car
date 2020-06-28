@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:sch="http://www.soap.dto/rentreport"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.rentreport.dto/soap"
+                  targetNamespace="http://www.rentreport.dto/soap">
+    <wsdl:types>
+        <xs:schema xmlns:tns="http://www.soap.dto/rentreport" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   elementFormDefault="qualified" targetNamespace="http://www.soap.dto/rentreport">
+            <xs:element name="checkIfCanCreateRentReportRequest">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="email" type="xs:string"/>
+                        <xs:element name="rentInfoId">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:long">
+                                    <xs:minInclusive value="1"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="checkIfCanCreateRentReportResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="value" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="checkIfCanCreateRentReportRequest">
+        <wsdl:part element="sch:checkIfCanCreateRentReportRequest" name="checkIfCanCreateRentReportRequest">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="checkIfCanCreateRentReportResponse">
+        <wsdl:part element="sch:checkIfCanCreateRentReportResponse" name="checkIfCanCreateRentReportResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="RentReportsPort">
+        <wsdl:operation name="checkIfCanCreateRentReport">
+            <wsdl:input message="tns:checkIfCanCreateRentReportRequest" name="checkIfCanCreateRentReportRequest">
+            </wsdl:input>
+            <wsdl:output message="tns:checkIfCanCreateRentReportResponse" name="checkIfCanCreateRentReportResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="RentReportsPortSoap11" type="tns:RentReportsPort">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="checkIfCanCreateRentReport">
+            <soap:operation soapAction=""/>
+            <wsdl:input name="checkIfCanCreateRentReportRequest">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="checkIfCanCreateRentReportResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="RentReportsPortService">
+        <wsdl:port binding="tns:RentReportsPortSoap11" name="RentReportsPortSoap11">
+            <soap:address location="http://192.168.56.1:8083/ws/rentreport"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

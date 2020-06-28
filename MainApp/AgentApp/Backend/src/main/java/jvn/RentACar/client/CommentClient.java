@@ -33,21 +33,21 @@ public class CommentClient  extends WebServiceGatewaySupport {
     private RentInfoService rentInfoService;
 
 
-//    public CheckIfCanCommentResponse checkIfCanComment(Long rentRequestId, Long rentInfoId){
-//        System.out.println("checkIfCanComment client");
-//        CheckIfCanCommentRequest request = new CheckIfCanCommentRequest();
-//        request.setRentRequestId(rentRequestId);
-//        request.setRentInfoId(rentInfoId);
-//        User user = userService.getLoginUser();
-//        if (user == null) {
-//            return null;
-//        }
-//        request.setEmail(user.getEmail());
-////        CheckIfCanCommentResponse response = (CheckIfCanCommentResponse) getWebServiceTemplate()
-////                .marshalSendAndReceive(request);
-//        System.out.println("CheckIfCanCommentResponse client");
-//        return response;
-//    }
+    public CheckIfCanCommentResponse checkIfCanComment(Long rentRequestId, Long rentInfoId){
+
+        CheckIfCanCommentRequest request = new CheckIfCanCommentRequest();
+        request.setRentRequestId(rentRequestId);
+        request.setRentInfoId(rentInfoId);
+        User user = userService.getLoginUser();
+        if (user == null) {
+            return null;
+        }
+        request.setEmail(user.getEmail());
+        CheckIfCanCommentResponse response = (CheckIfCanCommentResponse) getWebServiceTemplate()
+                .marshalSendAndReceive(request);
+
+        return response;
+    }
 
     public CreateCommentResponse createComment(Long rentRequestId, Long rentInfoId, Comment comment){
         comment.setRentInfo(rentInfoService.get(rentInfoId));

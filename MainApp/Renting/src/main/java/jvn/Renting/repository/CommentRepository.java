@@ -18,4 +18,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     List<Comment> findBySenderIdAndRentInfoId(Long userId, Long rentInfoId);
 
+    List<Comment> findByRentInfoId(Long rentInfoId);
+
+
+
 }

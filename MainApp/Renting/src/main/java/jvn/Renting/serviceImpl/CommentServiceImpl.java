@@ -42,6 +42,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setStatus(CommentStatus.APPROVED);
         RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
         RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
+        checkIfCanComment(rentInfo);
         rentInfo.getComments().add(comment);
         comment.setRentInfo(rentInfo);
         commentRepository.save(comment);
@@ -87,7 +88,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public FeedbackDTO getFeedback(Long id, Long rentInfoId, Long userId) {
         FeedbackDTO feedbackDTO = new FeedbackDTO();
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
+        RentRequest rentRequest = rentRequestRepository.findOneById(id);
         RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
         feedbackDTO.setRating(rentInfo.getRating());
         feedbackDTO.setComments(new HashSet<>());
@@ -103,6 +104,27 @@ public class CommentServiceImpl implements CommentService {
 
 
         return feedbackDTO;
+    }
+
+    @Override
+    public void checkIfCanComment(RentInfo rentInfo) {
+        List<Comment> comments = commentRepository.findByRentInfoId(rentInfo.getId());
+        if (comments != null) {
+            if (comments.size() > 1) {
+                throw new InvalidCommentDataException("Cannon crete comment.",
+                        HttpStatus.BAD_REQUEST);
+            } else {
+                for (Comment comment : comments) {
+                    if (comment.getStatus().equals("AWAITING")) {
+                        throw new InvalidCommentDataException("Cannon crete comment.",
+                                HttpStatus.BAD_REQUEST);
+                    }
+                }
+            }
+        }else{
+            throw new InvalidCommentDataException("Cannon crete comment.",
+                    HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Override

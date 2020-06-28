@@ -89,7 +89,6 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     @Override
     public AdvertisementDTO getOne(Long advertisementId) {
-        System.out.println("ad service");
         Advertisement ad = advertisementRepository.findOneById(advertisementId);
         AdvertisementDTO adDTO = new AdvertisementDTO();
         adDTO.setKilometresLimit(ad.getKilometresLimit());

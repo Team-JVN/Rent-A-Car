@@ -8,10 +8,15 @@ import jvn.Renting.dto.response.UserInfoDTO;
 import jvn.Renting.dto.soap.comment.*;
 import jvn.Renting.dto.soap.rentrequest.*;
 import jvn.Renting.dto.soap.comment.CommentDetails;
+import jvn.Renting.exceptionHandler.InvalidCommentDataException;
+import jvn.Renting.exceptionHandler.InvalidRentRequestDataException;
 import jvn.Renting.mapper.CommentDetailsMapper;
 import jvn.Renting.mapper.CommentDtoMapper;
 import jvn.Renting.model.Comment;
+import jvn.Renting.model.RentInfo;
 import jvn.Renting.producer.LogProducer;
+import jvn.Renting.repository.CommentRepository;
+import jvn.Renting.repository.RentInfoRepository;
 import jvn.Renting.service.CommentService;
 import jvn.Renting.service.RentRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +47,33 @@ public class CommentEndpoint {
     private LogProducer logProducer;
 
     private CommentService commentService;
+
+    private RentInfoRepository rentInfoRepository;
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "checkIfCanCommentRequest")
+    @ResponsePayload
+    public CheckIfCanCommentResponse checkIfCanComment(@RequestPayload CheckIfCanCommentRequest request) {
+
+        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        if (dto == null) {
+            return null;
+        }
+        boolean status = true;
+        try {
+            RentInfo rentInfo = rentInfoRepository.findOneById(request.getRentInfoId());
+            if (rentInfo == null) {
+                status = false;
+            } else {
+                commentService.checkIfCanComment(rentInfo);
+            }
+        } catch (InvalidCommentDataException e) {
+            status = false;
+        }
+
+        CheckIfCanCommentResponse response = new CheckIfCanCommentResponse();
+        response.setValue(status);
+        return response;
+    }
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "createCommentRequest")
     @ResponsePayload
@@ -113,7 +145,7 @@ public class CommentEndpoint {
     }
 
 
-    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getAllCommentsRequest")
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getAllCommentsDetailsRequest")
     @ResponsePayload
     public GetAllCommentsDetailsResponse getAllComments(@RequestPayload GetAllCommentsDetailsRequest request) {
         UserInfoDTO dto = userClient.getUser(request.getEmail());
@@ -128,11 +160,13 @@ public class CommentEndpoint {
         return response;
     }
     @Autowired
-    public CommentEndpoint(CommentDetailsMapper commentDetailsMapper, CommentDtoMapper commentDtoMapper, UserClient userClient, LogProducer logProducer, CommentService commentService) {
+    public CommentEndpoint(CommentDetailsMapper commentDetailsMapper, CommentDtoMapper commentDtoMapper, UserClient userClient,
+                           LogProducer logProducer, CommentService commentService, RentInfoRepository rentInfoRepository) {
         this.commentDetailsMapper = commentDetailsMapper;
         this.commentDtoMapper = commentDtoMapper;
         this.userClient = userClient;
         this.logProducer = logProducer;
         this.commentService = commentService;
+        this.rentInfoRepository = rentInfoRepository;
     }
 }

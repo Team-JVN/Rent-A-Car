@@ -2,16 +2,20 @@ package jvn.RentACar.serviceImpl;
 
 import jvn.RentACar.client.MessageClient;
 import jvn.RentACar.dto.soap.message.CreateMessageResponse;
+import jvn.RentACar.dto.soap.message.GetAllMessagesDetailsResponse;
 import jvn.RentACar.dto.soap.message.MessageDetails;
 import jvn.RentACar.mapper.MessageDetailsMapper;
+import jvn.RentACar.model.Log;
 import jvn.RentACar.model.Message;
 import jvn.RentACar.model.RentRequest;
 import jvn.RentACar.model.User;
 import jvn.RentACar.repository.MessageRepository;
 import jvn.RentACar.repository.RentRequestRepository;
+import jvn.RentACar.service.LogService;
 import jvn.RentACar.service.MessageService;
 import jvn.RentACar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.xml.ws.ServiceMode;
@@ -33,6 +37,8 @@ public class MessageServiceImpl implements MessageService {
     private RentRequestRepository rentRequestRepository;
 
     private MessageClient messageClient;
+
+    private LogService logService;
 
     @Override
     public Message createMessage(Message message, Long id) {
@@ -64,7 +70,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<Message> getMessages(Long id) {
-
+        synchronize();
         User loggedInUser = userService.getLoginUser();
         RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByIdOrIdAndClientId(id, loggedInUser.getId(), id, loggedInUser.getId());
 //        synchronizeMessages(rentRequest.getMainAppId());
@@ -77,42 +83,66 @@ public class MessageServiceImpl implements MessageService {
         }
         return messages;
     }
-//    @Scheduled(cron = "0 40 0/3 * * ?")
-//    public void synchronizeMessages(Long rentRequestId) {
-//        try {
-//            GetAllMessagesDetailsResponse response = rentRequestClient.getAllMessages(rentRequestId);
-//            if (response == null) {
-//                return;
-//            }
-//            List<MessageDetails> messageDetails = response.getMessageDetails();
-//            if (messageDetails == null || messageDetails.isEmpty()) {
-//                return;
-//            }
-//
-//            for (MessageDetails current : messageDetails) {
-//                Message message = messageDetailsMapper.toEntity(current);
-//                Message dbMessage = messageRepository.findByMainAppId(message.getMainAppId());
-//                if (dbMessage == null) {
-//                    createSynchronizeMessages(message);
-//                } else {
-////                    editSynchronize(rentRequest, dbRentRequest);
-//                }
-//            }
-//            logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SYN",
-//                    "[SOAP] Messages are successfully synchronized"));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//    }
+    @Scheduled(cron = "0 40 0/3 * * ?")
+    public void synchronize() {
+        try {
+            List<RentRequest> rentRequests = rentRequestRepository.findAll();
+            for(RentRequest rentRequest: rentRequests){
+                GetAllMessagesDetailsResponse response = messageClient.getAllMessages(rentRequest.getMainAppId());
+                if (response == null) {
+                    continue;
+                }
+                List<MessageDetails> messageDetails = response.getMessageDetails();
+                if (messageDetails == null || messageDetails.isEmpty()) {
+                    continue;
+                }
 
+                for (MessageDetails current : messageDetails) {
+                    Message message = messageDetailsMapper.toEntity(current);
+                    Message dbMessage = messageRepository.findByMainAppId(message.getMainAppId());
+                    if (dbMessage == null) {
+                        createSynchronize(message, rentRequest);
+                    } else {
+                        editSynchronize(message, dbMessage, rentRequest);
+                    }
+                }
+                logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "SYN",
+                        "[SOAP] Messages are successfully synchronized"));
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+    private void createSynchronize(Message message, RentRequest rentRequest) {
+        if (message.getSender() == null) {
+            return;
+        }
+        message.setRentRequest(rentRequest);
+        messageRepository.saveAndFlush(message);
+    }
+    private void editSynchronize(Message message, Message dbMessage, RentRequest rentRequest) {
+        if (message.getSender() == null) {
+            return;
+        }
+        dbMessage.setDateAndTime(message.getDateAndTime());
+        dbMessage.setText(message.getText());
+        dbMessage.setSender(message.getSender());
+        dbMessage.setRentRequest(rentRequest);
+
+        messageRepository.save(dbMessage);
+    }
     @Autowired
     public MessageServiceImpl(MessageDetailsMapper messageDetailsMapper, MessageRepository messageRepository,
-                              UserService userService, RentRequestRepository rentRequestRepository, MessageClient messageClient) {
+                              UserService userService, RentRequestRepository rentRequestRepository, MessageClient messageClient,
+                              LogService logService) {
         this.messageDetailsMapper = messageDetailsMapper;
         this.messageRepository = messageRepository;
         this.userService = userService;
         this.rentRequestRepository = rentRequestRepository;
         this.messageClient = messageClient;
+        this.logService = logService;
     }
 }
