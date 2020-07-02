@@ -23,7 +23,7 @@
 
 .rating-list li:hover,
 .rating-list li:hover ~ li {
-  color: #87c7f3;
+  color: #009688;
 }
 
 .rating-list {
@@ -31,5 +31,5 @@
   list-style: none;
 }
 .rating-list li.selected {
-  color: #87c7f3;
+  color: #009688;
 }

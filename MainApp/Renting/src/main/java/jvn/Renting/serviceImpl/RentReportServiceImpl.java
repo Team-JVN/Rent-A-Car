@@ -41,15 +41,19 @@ public class RentReportServiceImpl implements RentReportService {
         checkIfCreatingRentReportIsPossible(rentInfo);
         toEntity.setRentInfo(rentInfo);
         rentInfo.setRentReport(toEntity);
-
-        //TODO:update addtional cost
-//        toEntity.setAdditionalCost(calculateAdditionalCost(rentReport));
         RentReport rentReport = rentReportRepository.save(toEntity);
 
         sendUpdatesCar(rentReport);
-//        AdvertisementWithIdsDTO adWithDTO = advertisementClient.getOne(rentReport.getRentInfo().getAdvertisement());
-        return rentReport;
+        AdvertisementWithIdsDTO adWithDTO = advertisementClient.getOne(rentReport.getRentInfo().getAdvertisement());
+        rentReport.setAdditionalCost(calculateAdditionalCost(rentReport, adWithDTO));
+        if (toEntity.getAdditionalCost() > 0) {
+            toEntity.setPaid(false);
+        } else {
+            toEntity.setPaid(true);
+        }
+        return rentReportRepository.save(rentReport);
     }
+
 
     @Async
     public void sendUpdatesCar(RentReport rentReport) {
@@ -58,6 +62,7 @@ public class RentReportServiceImpl implements RentReportService {
 
     }
 
+    @Override
     public void checkIfCreatingRentReportIsPossible(RentInfo rentInfo) {
         if (!rentInfo.getRentRequest().getRentRequestStatus().equals(RentRequestStatus.PAID)) {
             throw new InvalidRentReportDataException("Cannot create rent report if rent request is not paid!", HttpStatus.BAD_REQUEST);
@@ -72,7 +77,18 @@ public class RentReportServiceImpl implements RentReportService {
             throw new InvalidRentReportDataException("There is already rent report linked to this rent info!", HttpStatus.BAD_REQUEST);
         }
     }
-//
+
+    @Override
+    public RentReport getRentReports(Long rentInfoId) {
+        RentInfo rentInfo = rentInfoRepository.findOneById(rentInfoId);
+        RentReport rentReport = null;
+        if (rentInfo.getRentReport() != null) {
+            rentReport = rentInfo.getRentReport();
+        }
+        return rentReport;
+    }
+
+    //
 //    public void calculateMileageInKm(RentReport rentReport) {
 //        Car car = rentReport.getRentInfo().getAdvertisement().getCar();
 //
@@ -83,16 +99,16 @@ public class RentReportServiceImpl implements RentReportService {
 //        carRepository.save(car);
 //    }
 //
-//    public Double calculateAdditionalCost(RentReport rentReport) {
-//        Double addCost = 0.0;
-//        if (rentReport.getRentInfo().getAdvertisement().getKilometresLimit() != null) {
-//            Integer extraMiles = rentReport.getMadeMileage() - rentReport.getRentInfo().getAdvertisement().getKilometresLimit();
-//            if (extraMiles > 0) {
-//                addCost = extraMiles * rentReport.getRentInfo().getAdvertisement().getPriceList().getPricePerKm();
-//            }
-//        }
-//        return addCost;
-//    }
+    public Double calculateAdditionalCost(RentReport rentReport, AdvertisementWithIdsDTO advertisementWithIdsDTO) {
+        Double addCost = 0.0;
+        if (advertisementWithIdsDTO.getKilometresLimit() != null) {
+            Integer extraMiles = rentReport.getMadeMileage() - advertisementWithIdsDTO.getKilometresLimit();
+            if (extraMiles > 0) {
+                addCost = extraMiles * advertisementWithIdsDTO.getPriceList().getPricePerKm();
+            }
+        }
+        return addCost;
+    }
 
     @Autowired
     public RentReportServiceImpl(RentReportRepository rentReportRepository, RentInfoRepository rentInfoRepository,

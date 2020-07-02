@@ -1,7 +1,6 @@
 package jvn.RentACar.client;
 
-import jvn.RentACar.dto.soap.rentreport.CreateRentReportRequest;
-import jvn.RentACar.dto.soap.rentreport.CreateRentReportResponse;
+import jvn.RentACar.dto.soap.rentreport.*;
 import jvn.RentACar.mapper.RentReportDetailsMapper;
 import jvn.RentACar.model.RentReport;
 import jvn.RentACar.model.User;
@@ -29,6 +28,34 @@ public class RentReportClient extends WebServiceGatewaySupport {
 
         CreateRentReportResponse response = (CreateRentReportResponse) getWebServiceTemplate()
                 .marshalSendAndReceive(request);
+        return response;
+    }
+
+    public CheckIfCanCreateRentReportResponse checkIfCanCreateRentReport(Long rentInfoId){
+        CheckIfCanCreateRentReportRequest request = new CheckIfCanCreateRentReportRequest();
+        request.setRentInfoId(rentInfoId);
+        User user = userService.getLoginUser();
+        if (user == null) {
+            return null;
+        }
+        request.setEmail(user.getEmail());
+        CheckIfCanCreateRentReportResponse response = (CheckIfCanCreateRentReportResponse) getWebServiceTemplate()
+                .marshalSendAndReceive(request);
+
+        return response;
+    }
+
+    public GetAllRentReportsDetailsResponse getRentReports(Long rentInfoId){
+        GetAllRentReportsDetailsRequest request = new GetAllRentReportsDetailsRequest();
+        request.setRentInfoId(rentInfoId);
+        User user = userService.getLoginUser();
+        if (user == null) {
+            return null;
+        }
+        request.setEmail(user.getEmail());
+        GetAllRentReportsDetailsResponse response = (GetAllRentReportsDetailsResponse) getWebServiceTemplate()
+                .marshalSendAndReceive(request);
+
         return response;
     }
 }

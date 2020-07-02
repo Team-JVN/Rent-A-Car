@@ -152,6 +152,38 @@ public class WebServiceConfig {
         return new SimpleXsdSchema(new ClassPathResource("createRentReport.xsd"));
     }
 
+    @Bean(name = "rentReports")
+    public DefaultWsdl11Definition defaultWsdl11DefinitionRentReports(@Qualifier("rentReports") XsdSchema rentReports) {
+        DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
+        wsdl11Definition.setPortTypeName("RentReportsPort");
+        wsdl11Definition.setLocationUri("/ws/rentreport");
+        wsdl11Definition.setTargetNamespace("http://www.rentreport.dto/soap");
+        wsdl11Definition.setSchema(rentReports);
+        return wsdl11Definition;
+    }
+
+    @Bean
+    @Qualifier("rentReports")
+    public XsdSchema rentReportsSchema() {
+        return new SimpleXsdSchema(new ClassPathResource("rentReports.xsd"));
+    }
+
+    @Bean(name = "checkIfCanCreateRentReport")
+    public DefaultWsdl11Definition defaultWsdl11DefinitionCheckIfCanCreateRentReport(@Qualifier("checkIfCanCreateRentReport") XsdSchema checkIfCanCreateRentReport) {
+        DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
+        wsdl11Definition.setPortTypeName("RentReportsPort");
+        wsdl11Definition.setLocationUri("/ws/rentreport");
+        wsdl11Definition.setTargetNamespace("http://www.rentreport.dto/soap");
+        wsdl11Definition.setSchema(checkIfCanCreateRentReport);
+        return wsdl11Definition;
+    }
+
+    @Bean
+    @Qualifier("checkIfCanCreateRentReport")
+    public XsdSchema checkIfCanCreateRentReportSchema() {
+        return new SimpleXsdSchema(new ClassPathResource("checkIfCanCreateRentReport.xsd"));
+    }
+
     @Bean(name = "checkIfCanComment")
     public DefaultWsdl11Definition defaultWsdl11DefinitionCheckIfCanComment(@Qualifier("checkIfCanComment") XsdSchema checkIfCanComment) {
         DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();

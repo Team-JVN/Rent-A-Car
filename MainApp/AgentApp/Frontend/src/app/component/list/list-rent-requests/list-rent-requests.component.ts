@@ -64,8 +64,26 @@ export class ListRentRequestsComponent implements OnInit {
     );
   }
 
-  createRentReport(rentInfo: RentInfo) {
-    this.dialog.open(AddRentReportComponent, { data: rentInfo });
+  createRentReport(rentInfo: RentInfo, rentRequest: RentRequest) {
+    let dialogRef = this.dialog.open(AddRentReportComponent, {
+      data: {
+        rentReport: null,
+        rentInfo: rentInfo,
+        rentRequestId: rentRequest.id,
+      },
+    });
+  }
+
+  checkIfCanCreateReport(rentInfo: RentInfo, rentRequest: RentRequest) {
+    const dateTimeTo = new Date(rentInfo.dateTimeTo.substring(0, 10));
+    if (
+      rentRequest.rentRequestStatus == "PAID" &&
+      dateTimeTo < new Date() &&
+      rentInfo.rentReport == null
+    ) {
+      return true;
+    }
+    return false;
   }
 
   advertisementDetails(rentInfo: RentInfo) {

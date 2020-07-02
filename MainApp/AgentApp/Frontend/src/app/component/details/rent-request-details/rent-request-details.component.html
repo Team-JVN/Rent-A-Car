@@ -17,10 +17,17 @@
                       {{ rentInfo.advertisement.car.make.name }}
                       {{ rentInfo.advertisement.car.model.name }}
                     </span>
+                    <button
+                      mat-icon-button
+                      aria-label="View comments"
+                      matTooltip="View comments"
+                      (click)="viewComments(rentInfo)"
+                    >
+                      <mat-icon>comment</mat-icon>
+                    </button>
                   </mat-card-title>
                 </mat-card-header>
               </div>
-
               <div class="col-3 mt-0" align="end">
                 <button
                   mat-raised-button

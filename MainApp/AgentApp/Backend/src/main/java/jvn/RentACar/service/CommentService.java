@@ -20,4 +20,6 @@ public interface CommentService {
     Comment approve(Long id);
 
     void reject(Long id, Long userID);
+
+    void synchronize();
 }

@@ -31,8 +31,10 @@ public class RentInfoDtoMapper implements MapperInterface<RentInfo, RentInfoDTO>
         rentInfo.setOptedForCDW(dto.getOptedForCDW());
         rentInfo.setId(dto.getId());
         Set<Comment> comments = new HashSet<Comment>();
-        for(CommentDTO commentDTO: dto.getComments()){
-            comments.add(commentDtoMapper.toEntity(commentDTO));
+        if(dto.getComments() != null){
+            for(CommentDTO commentDTO: dto.getComments()){
+                comments.add(commentDtoMapper.toEntity(commentDTO));
+            }
         }
         rentInfo.setComments(comments);
         return rentInfo;

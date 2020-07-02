@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:sch="http://www.soap.dto/rentreport"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.rentreport.dto/soap"
+                  targetNamespace="http://www.rentreport.dto/soap">
+    <wsdl:types>
+        <xs:schema xmlns:tns="http://www.soap.dto/rentreport" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   elementFormDefault="qualified" targetNamespace="http://www.soap.dto/rentreport">
+            <xs:element name="getAllRentReportsDetailsRequest">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="email" type="xs:string"/>
+                        <xs:element name="rentInfoId">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:long">
+                                    <xs:minInclusive value="1"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllRentReportsDetailsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="rentReportDetails" type="tns:rentReportDetails"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:complexType name="rentReportDetails">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="id">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:long">
+                                <xs:minInclusive value="1"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="comment" type="xs:string"/>
+                    <xs:element name="additionalCost" nillable="false">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:double">
+                                <xs:minInclusive value="0.0"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="madeMileage">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:int">
+                                <xs:minInclusive value="0"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="paid" type="xs:boolean"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="getAllRentReportsDetailsRequest">
+        <wsdl:part element="sch:getAllRentReportsDetailsRequest" name="getAllRentReportsDetailsRequest">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAllRentReportsDetailsResponse">
+        <wsdl:part element="sch:getAllRentReportsDetailsResponse" name="getAllRentReportsDetailsResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="RentReportsPort">
+        <wsdl:operation name="getAllRentReportsDetails">
+            <wsdl:input message="tns:getAllRentReportsDetailsRequest" name="getAllRentReportsDetailsRequest">
+            </wsdl:input>
+            <wsdl:output message="tns:getAllRentReportsDetailsResponse" name="getAllRentReportsDetailsResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="RentReportsPortSoap11" type="tns:RentReportsPort">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="getAllRentReportsDetails">
+            <soap:operation soapAction=""/>
+            <wsdl:input name="getAllRentReportsDetailsRequest">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="getAllRentReportsDetailsResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="RentReportsPortService">
+        <wsdl:port binding="tns:RentReportsPortSoap11" name="RentReportsPortSoap11">
+            <soap:address location="http://192.168.56.1:8083/ws/rentreport"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

@@ -21,7 +21,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Message createMessage(Message message, Long id, Long userId, String userEmail) {
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
+        RentRequest rentRequest = rentRequestRepository.findOneById(id);
         message.setRentRequest(rentRequest);
         message.setSenderId(userId);
         message.setSenderEmail(userEmail);

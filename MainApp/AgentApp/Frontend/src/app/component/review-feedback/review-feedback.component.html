@@ -6,15 +6,9 @@
         <div class="col-3">
           <label class="labelRaiting page-title">Rating</label>
         </div>
-        <div class="col-9">
-          <star-rating
-            class="rating-style"
-            totalstars="5"
-            checkedcolor="#87C7F3"
-            uncheckedcolor="black"
-            size="35px"
-            [value]="feedback.rating"
-          >
+        <div class="col-9" *ngIf="feedback != null">
+          <star-rating class="rating-style" totalstars="5" checkedcolor="#87C7F3" uncheckedcolor="black" size="35px"
+            [value]="feedback.rating">
           </star-rating>
         </div>
       </div>
@@ -52,18 +46,11 @@
           <td>
             <form [formGroup]="commentForm" class="form-full-width">
               <mat-form-field>
-                <textarea
-                  matInput
-                  formControlName="comment"
-                  rows="3"
-                  cols="50"
-                ></textarea>
-                <mat-error
-                  *ngIf="
+                <textarea matInput formControlName="comment" rows="3" cols="50"></textarea>
+                <mat-error *ngIf="
                     commentForm.get('comment').errors &&
                     commentForm.get('comment').errors['required']
-                  "
-                >
+                  ">
                   Please enter comment.
                 </mat-error>
               </mat-form-field>
@@ -77,13 +64,8 @@
             &nbsp;
           </td>
           <td class="your-comment">
-            <button
-              align="end"
-              mat-raised-button
-              color="primary"
-              (click)="createComment()"
-              [disabled]="!commentForm.valid"
-            >
+            <button align="end" mat-raised-button color="primary" (click)="createComment()"
+              [disabled]="!commentForm.valid">
               Create comment
             </button>
           </td>
