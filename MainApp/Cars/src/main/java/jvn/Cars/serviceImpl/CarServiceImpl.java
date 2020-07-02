@@ -214,6 +214,19 @@ public class CarServiceImpl implements CarService {
         return "PARTIAL";
     }
 
+    @Override
+    public void updateCarRating(Long carId, Integer rating) {
+        Car car = carRepository.findOneById(carId);
+        if (car != null) {
+            car.setSumRating(car.getSumRating() + rating);
+            car.setCountRating(car.getCountRating() + 1);
+            Double avgRating = car.getSumRating() * 1.0 / car.getCountRating();
+            car.setAvgRating(avgRating);
+            carRepository.save(car);
+            carProducer.sendMessageForSearchToUpdateRating(carId, avgRating);
+        }
+    }
+
     @Async
     public void editCar(CarEditDTO carEditDTO) {
         carProducer.sendMessageForSearch(carEditDTO);

@@ -21,6 +21,8 @@ public class RabbitMQConfiguration {
 
     public static final String LOGS = "logs";
 
+    public static final String CAR_RATING_FOR_SEARCH_SERVICE = "car-rating-for-search-service";
+
     @Bean
     public Queue queueCreatedAdvertisement() {
         return new Queue(ADVERTISEMENT_FOR_SEARCH, false);
@@ -54,6 +56,11 @@ public class RabbitMQConfiguration {
     @Bean
     public Queue queueLogs() {
         return new Queue(LOGS, false);
+    }
+
+    @Bean
+    public Queue queueCarRatingForSearchService() {
+        return new Queue(CAR_RATING_FOR_SEARCH_SERVICE, false);
     }
 }
 

@@ -2,6 +2,8 @@ package jvn.Renting.producer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jvn.Renting.config.RabbitMQConfiguration;
+import jvn.Renting.dto.message.UpdateCarRatingDTO;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,15 +21,15 @@ public class CommentProducer {
         rabbitTemplate.convertAndSend(REJECTED_COMMENT, userId);
     }
 
-//    public void sendUpdateCarAvgRating(Long rentInfoId, Integer rating) {
-//        rabbitTemplate.convertAndSend(REJECTED_COMMENT, jsonToString(new));
-//    }
+    public void sendUpdateCarRating(Long carId, Integer rating) {
+        UpdateCarRatingDTO updateCarRatingDTO = new UpdateCarRatingDTO(carId, rating);
+        rabbitTemplate.convertAndSend(RabbitMQConfiguration.CAR_RATING, jsonToString(updateCarRatingDTO));
+    }
 
-    private String jsonToString(Long clientId) {
+    private String jsonToString(UpdateCarRatingDTO updateCarRatingDTO) {
         try {
-            return objectMapper.writeValueAsString(clientId);
+            return objectMapper.writeValueAsString(updateCarRatingDTO);
         } catch (JsonProcessingException e) {
-            //TODO: Add to log and delete return null;
             return null;
         }
     }
