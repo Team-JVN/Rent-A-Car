@@ -41,14 +41,16 @@ public class RentReportServiceImpl implements RentReportService {
         checkIfCreatingRentReportIsPossible(rentInfo);
         toEntity.setRentInfo(rentInfo);
         rentInfo.setRentReport(toEntity);
-
-        //TODO:update addtional cost
-//        toEntity.setAdditionalCost(calculateAdditionalCost(rentReport));
         RentReport rentReport = rentReportRepository.save(toEntity);
 
         sendUpdatesCar(rentReport);
         AdvertisementWithIdsDTO adWithDTO = advertisementClient.getOne(rentReport.getRentInfo().getAdvertisement());
         rentReport.setAdditionalCost(calculateAdditionalCost(rentReport, adWithDTO));
+        if (toEntity.getAdditionalCost() > 0) {
+            toEntity.setPaid(false);
+        } else {
+            toEntity.setPaid(true);
+        }
         return rentReportRepository.save(rentReport);
     }
 
@@ -80,7 +82,7 @@ public class RentReportServiceImpl implements RentReportService {
     public RentReport getRentReports(Long rentInfoId) {
         RentInfo rentInfo = rentInfoRepository.findOneById(rentInfoId);
         RentReport rentReport = null;
-        if(rentInfo.getRentReport() != null){
+        if (rentInfo.getRentReport() != null) {
             rentReport = rentInfo.getRentReport();
         }
         return rentReport;
