@@ -96,7 +96,7 @@ import { CarsStatisticsComponent } from "./component/list/cars-statistics/cars-s
 import { LeaveFeedbackComponent } from "./component/add/leave-feedback/leave-feedback.component";
 import { ReviewFeedbackComponent } from "./component/review-feedback/review-feedback.component";
 import { ViewMessagesComponent } from "./component/view-messages/view-messages.component";
-
+import { RentReportDetailsComponent } from "./component/details/rent-report-details/rent-report-details.component";
 @NgModule({
   declarations: [
     ReplacePipe,
@@ -143,6 +143,7 @@ import { ViewMessagesComponent } from "./component/view-messages/view-messages.c
     ListComments,
     ConfirmDialogDeleteMakeComponent,
     RentRequestDetailsComponent,
+    RentReportDetailsComponent,
     ClientRentRequestDetailsComponent,
     EditAdvertisementPartialComponent,
     ListRentReportsComponent,
@@ -206,6 +207,7 @@ import { ViewMessagesComponent } from "./component/view-messages/view-messages.c
     AddClientComponent,
     AddRentRequestComponent,
     AddRentReportComponent,
+    RentReportDetailsComponent,
     AddMakeComponent,
     EditModelComponent,
     EditMakeComponent,

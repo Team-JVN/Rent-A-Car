@@ -46,10 +46,10 @@ public class RentReportServiceImpl implements RentReportService {
         sendUpdatesCar(rentReport);
         AdvertisementWithIdsDTO adWithDTO = advertisementClient.getOne(rentReport.getRentInfo().getAdvertisement());
         rentReport.setAdditionalCost(calculateAdditionalCost(rentReport, adWithDTO));
-        if (toEntity.getAdditionalCost() > 0) {
-            toEntity.setPaid(false);
+        if (rentReport.getAdditionalCost() > 0) {
+            rentReport.setPaid(false);
         } else {
-            toEntity.setPaid(true);
+            rentReport.setPaid(true);
         }
         return rentReportRepository.save(rentReport);
     }

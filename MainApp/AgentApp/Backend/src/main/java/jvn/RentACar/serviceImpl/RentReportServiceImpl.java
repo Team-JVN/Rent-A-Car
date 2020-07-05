@@ -174,6 +174,13 @@ public class RentReportServiceImpl implements RentReportService {
     }
 
     @Override
+    public RentReport get(Long rentInfoId) {
+        RentInfo rentInfo = rentInfoService.get(rentInfoId);
+        RentReport rentReport = rentInfo.getRentReport();
+        return rentReport;
+    }
+
+    @Override
     public void synchronize() {
         synchronizeRentReports();
     }

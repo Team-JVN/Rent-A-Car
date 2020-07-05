@@ -19,11 +19,21 @@
                     </span>
                     <button
                       mat-icon-button
+                      *ngIf="checkIfCanShowComments(rentInfo)"
                       aria-label="View comments"
                       matTooltip="View comments"
                       (click)="viewComments(rentInfo)"
                     >
                       <mat-icon>comment</mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      *ngIf="checkIfCanShowRentReport(rentInfo)"
+                      aria-label="View rent report"
+                      matTooltip="View rent report"
+                      (click)="viewRentReport(rentInfo)"
+                    >
+                      <mat-icon>assignment</mat-icon>
                     </button>
                   </mat-card-title>
                 </mat-card-header>

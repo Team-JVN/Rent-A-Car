@@ -5,10 +5,7 @@ import jvn.RentACar.dto.soap.message.CreateMessageResponse;
 import jvn.RentACar.dto.soap.message.GetAllMessagesDetailsResponse;
 import jvn.RentACar.dto.soap.message.MessageDetails;
 import jvn.RentACar.mapper.MessageDetailsMapper;
-import jvn.RentACar.model.Log;
-import jvn.RentACar.model.Message;
-import jvn.RentACar.model.RentRequest;
-import jvn.RentACar.model.User;
+import jvn.RentACar.model.*;
 import jvn.RentACar.repository.MessageRepository;
 import jvn.RentACar.repository.RentRequestRepository;
 import jvn.RentACar.service.LogService;
@@ -43,7 +40,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public Message createMessage(Message message, Long id) {
         User loggedInUser = userService.getLoginUser();
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByIdOrIdAndClientId(id, loggedInUser.getId(), id, loggedInUser.getId());
+        RentRequest rentRequest = rentRequestRepository.findOneById(id);
         message.setRentRequest(rentRequest);
         message.setSender(loggedInUser);
         rentRequest.getMessages().add(message);
@@ -72,11 +69,14 @@ public class MessageServiceImpl implements MessageService {
     public List<Message> getMessages(Long id) {
         synchronize();
         User loggedInUser = userService.getLoginUser();
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByIdOrIdAndClientId(id, loggedInUser.getId(), id, loggedInUser.getId());
+        RentRequest rentRequest = rentRequestRepository.findOneById(id);
 //        synchronizeMessages(rentRequest.getMainAppId());
         List<Message> messages = new ArrayList<>();
+        List<RentInfo> rentInfos = new ArrayList<>(rentRequest.getRentInfos());
+        Long rentInfoId = rentInfos.get(0).getId();
         for(Message message: rentRequest.getMessages()){
-            if(message.getSender().getId().equals(loggedInUser.getId()) || rentRequest.getCreatedBy().getId().equals(loggedInUser.getId()) || rentRequest.getClient().getId().equals(loggedInUser.getId())){
+            if(message.getSender().getId().equals(loggedInUser.getId()) || rentRequest.getCreatedBy().getId().equals(loggedInUser.getId())
+                    || rentRequest.getClient().getId().equals(loggedInUser.getId()) || loggedInUser.getRole().getName().equals("ROLE_AGENT")){
 
                 messages.add(message);
             }

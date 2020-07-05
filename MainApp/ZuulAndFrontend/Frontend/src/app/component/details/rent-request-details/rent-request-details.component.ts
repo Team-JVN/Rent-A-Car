@@ -22,6 +22,7 @@ import { ReviewFeedbackComponent } from "../../review-feedback/review-feedback.c
 import { AddRentReportComponent } from "../../add/add-rent-report/add-rent-report.component";
 import { Comment } from "./../../../model/comment";
 import { ListComments } from "../../list/list-comments/list-comments.component";
+import { RentReportDetailsComponent } from "../rent-report-details/rent-report-details.component";
 
 @Component({
   selector: "app-rent-request-details",
@@ -146,6 +147,22 @@ export class RentRequestDetailsComponent implements OnInit {
     return false;
   }
 
+  checkIfCanShowComments(rentInfo: RentInfo) {
+    if (
+      rentInfo.comments.length > 0 ||
+      (rentInfo.rating != undefined && rentInfo.rating != 0)
+    ) {
+      return true;
+    }
+    return false;
+  }
+  checkIfCanShowRentReport(rentInfo: RentInfo) {
+    if (rentInfo.rentReport != null) {
+      return true;
+    }
+    return false;
+  }
+
   checkIfCanCreateReport(rentInfo: RentInfo) {
     const dateTimeTo = new Date(rentInfo.dateTimeTo.substring(0, 10));
     if (
@@ -184,6 +201,13 @@ export class RentRequestDetailsComponent implements OnInit {
         feedback: null,
         rentInfo: rentInfo,
         rentRequestId: this.rentRequestId,
+      },
+    });
+  }
+  viewRentReport(rentInfo: RentInfo) {
+    let dialogRef = this.dialog.open(RentReportDetailsComponent, {
+      data: {
+        rentInfo: rentInfo,
       },
     });
   }

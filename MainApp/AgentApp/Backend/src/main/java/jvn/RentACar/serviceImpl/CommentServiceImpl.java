@@ -61,7 +61,7 @@ public class CommentServiceImpl implements CommentService {
     public Comment createComment(Comment comment, Long id, Long rentInfoId) {
 
         User user = userService.getLoginUser();
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByIdOrIdAndClientId(id, user.getId(), id, user.getId());
+        RentRequest rentRequest = rentRequestRepository.findOneById(id);
         RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
         User loggedInUser = userService.getLoginUser();
 
@@ -93,7 +93,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public FeedbackDTO leaveFeedback(FeedbackDTO feedbackDTO, Long id, Long rentInfoId){
         User loggedInUser = userService.getLoginUser();
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByIdOrIdAndClientId(id, loggedInUser.getId(), id, loggedInUser.getId());
+        RentRequest rentRequest = rentRequestRepository.findOneById(id);
         RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
         Set<RentInfo> rentInfos = rentRequest.getRentInfos();
         for(CommentDTO commentDTO: feedbackDTO.getComments()){
@@ -133,7 +133,7 @@ public class CommentServiceImpl implements CommentService {
     public FeedbackDTO getFeedback(Long id, Long rentInfoId) {
         synchronizeComments();
         User user = userService.getLoginUser();
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByIdOrIdAndClientId(id, user.getId(), id, user.getId());
+        RentRequest rentRequest = rentRequestRepository.findOneById(id);
         RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
 //        synchronizeComments(rentRequest.getMainAppId(), rentInfo.getMainAppId());
         FeedbackDTO feedbackDTO = new FeedbackDTO();

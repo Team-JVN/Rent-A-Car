@@ -12,4 +12,5 @@ public interface RentReportService {
     void checkIfCreatingRentReportIsPossible(RentInfo rentInfo);
 
     RentReport getRentReports(Long rentInfoId);
+
 }

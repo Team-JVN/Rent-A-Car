@@ -40,7 +40,7 @@ public class CommentServiceImpl implements CommentService {
     public Comment createComment(Comment comment, Long id, Long rentInfoId, Long userId) {
         //TODO: which status has the comment made by agent
         comment.setStatus(CommentStatus.APPROVED);
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
+        RentRequest rentRequest = rentRequestRepository.findOneById(id);
         RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
         checkIfCanComment(rentInfo);
         rentInfo.getComments().add(comment);
@@ -55,7 +55,7 @@ public class CommentServiceImpl implements CommentService {
         if (!canCreateComments) {
             throw new InvalidCommentDataException("You are not allowed to create comments. ", HttpStatus.BAD_REQUEST);
         }
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
+        RentRequest rentRequest = rentRequestRepository.findOneById(id);
         Set<RentInfo> rentInfos = rentRequest.getRentInfos();
 //        RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
         if(commentRepository.findBySenderIdAndRentInfoId(userId, rentInfoId).isEmpty()){
@@ -64,7 +64,11 @@ public class CommentServiceImpl implements CommentService {
             Comment comment = new Comment();
             comment.setSenderId(userId);
             comment.setSenderName(userName);
-            comment.setStatus(CommentStatus.AWAITING);
+            if(commentDTOS.get(0).getStatus().equals(CommentStatus.APPROVED)){
+                comment.setStatus(CommentStatus.APPROVED);
+            }else{
+                comment.setStatus(CommentStatus.AWAITING);
+            }
             comment.setRentInfo(rentInfo);
             comment.setText(commentDTOS.get(0).getText());
             comment = commentRepository.save(comment);
