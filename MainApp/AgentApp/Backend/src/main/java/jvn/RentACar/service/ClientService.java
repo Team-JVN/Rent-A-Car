@@ -20,4 +20,6 @@ public interface ClientService {
     void delete(Long id);
 
     Client activateAccount(String token) throws NoSuchAlgorithmException;
+
+    void synchronize();
 }

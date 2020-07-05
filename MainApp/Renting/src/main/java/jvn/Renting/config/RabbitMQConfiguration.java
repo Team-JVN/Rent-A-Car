@@ -17,8 +17,10 @@ public class RabbitMQConfiguration {
 
     public static final String REJECTED_COMMENT = "rejected-comment";
 
+    public static final String CAR_RATING = "car-rating";
+
     public static final String MILEAGE = "mileage";
-    
+
     public static final String LOGS = "logs";
 
     @Bean
@@ -42,9 +44,17 @@ public class RabbitMQConfiguration {
     }
 
     @Bean
-    public Queue queueRejectedComment(){ return new Queue(REJECTED_COMMENT, false); }
+    public Queue queueRejectedComment() {
+        return new Queue(REJECTED_COMMENT, false);
+    }
 
     @Bean
-    public Queue queueMileage(){ return new Queue(MILEAGE, false); }
+    public Queue queueMileage() {
+        return new Queue(MILEAGE, false);
+    }
 
+    @Bean
+    public Queue queueCarRating() {
+        return new Queue(CAR_RATING, false);
+    }
 }

@@ -57,6 +57,12 @@ public class Car {
     private Double avgRating;
 
     @Column
+    private Integer sumRating = 0;
+
+    @Column
+    private Integer countRating = 0;
+
+    @Column
     private Integer commentsCount;
 
 }

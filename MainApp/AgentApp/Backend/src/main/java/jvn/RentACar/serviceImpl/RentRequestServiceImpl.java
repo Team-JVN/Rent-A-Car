@@ -460,10 +460,10 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     @Autowired
     public RentRequestServiceImpl(ClientService clientService, AdvertisementService advertisementService,
-            UserService userService, RentRequestRepository rentRequestRepository,
-            EmailNotificationService emailNotificationService, Environment environment,
-            RentRequestClient rentRequestClient, RentRequestDetailsMapper rentRequestDetailsMapper,
-            LogService logService, RentReportService rentReportService,CommentService commentService) {
+                                  UserService userService, RentRequestRepository rentRequestRepository,
+                                  EmailNotificationService emailNotificationService, Environment environment,
+                                  RentRequestClient rentRequestClient, RentRequestDetailsMapper rentRequestDetailsMapper,
+                                  LogService logService, RentReportService rentReportService, CommentService commentService) {
         this.clientService = clientService;
         this.advertisementService = advertisementService;
         this.rentRequestRepository = rentRequestRepository;
