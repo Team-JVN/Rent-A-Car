@@ -26,10 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Value;
 
-import javax.persistence.EntityManager;
-import java.io.File;
-import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -52,8 +48,6 @@ public class CarServiceImpl implements CarService {
     private GearboxTypeService gearboxTypeService;
 
     private PictureService pictureService;
-
-    private CarDtoMapper carMapper;
 
     private ModelService modelService;
 
@@ -114,7 +108,7 @@ public class CarServiceImpl implements CarService {
         Car car = get(id);
         checkOwner(car);
         Set<Advertisement> advertisements = get(id).getAdvertisements();
-        if (!getEditType(car.getMainAppId()).equals(EditType.ALL)) {
+        if (!getEditType(car).equals(EditType.ALL)) {
             throw new InvalidCarDataException("Car is in use and therefore can not be edited.", HttpStatus.BAD_REQUEST);
         }
         car.setMake(makeService.get(carDTO.getMake().getId()));
@@ -127,7 +121,7 @@ public class CarServiceImpl implements CarService {
         car.setAvailableTracking(carDTO.getAvailableTracking());
         Car newCar = carRepository.save(car);
         try {
-            carClient.createOrEdit(car, multipartFiles);
+            carClient.createOrEdit(car, multipartFiles, false);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -185,6 +179,16 @@ public class CarServiceImpl implements CarService {
         return EditType.PARTIAL;
     }
 
+    private EditType getEditType(Car car) {
+        GetCarEditTypeResponse response = carClient.getEditType(car);
+        if (response != null) {
+            if (response.getEditType().equals("ALL")) {
+                return EditType.ALL;
+            }
+        }
+        return EditType.PARTIAL;
+    }
+
     @Override
     public Car get(Long id) {
         Car car = carRepository.findOneByIdAndLogicalStatusNot(id, LogicalStatus.DELETED);
@@ -220,7 +224,7 @@ public class CarServiceImpl implements CarService {
 
     private Long saveInMainApp(Car car, List<MultipartFile> multipartFiles) {
         try {
-            CreateOrEditCarDetailsResponse response = carClient.createOrEdit(car, multipartFiles);
+            CreateOrEditCarDetailsResponse response = carClient.createOrEdit(car, multipartFiles, true);
             return response.getCreateCarDetails().getId();
         } catch (Exception e) {
             e.printStackTrace();
@@ -229,7 +233,7 @@ public class CarServiceImpl implements CarService {
     }
 
     private void checkOwner(Car car) {
-        if (!userService.getLoginAgent().getEmail().equals(car.getOwner().getEmail())) {
+        if (!userService.getLoginUser().getEmail().equals(car.getOwner().getEmail())) {
             logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CHO", String.format("User %s is not the owner of car %s", userService.getLoginUser().getId(), car.getId())));
             throw new InvalidCarDataException("You are not owner of this car.", HttpStatus.BAD_REQUEST);
         }
@@ -300,6 +304,7 @@ public class CarServiceImpl implements CarService {
         dbCar.setAvailableTracking(car.getAvailableTracking());
         dbCar.setAvgRating(car.getAvgRating());
         dbCar.setCommentsCount(car.getCommentsCount());
+        dbCar.setLogicalStatus(car.getLogicalStatus());
         Car newCar = carRepository.saveAndFlush(dbCar);
         if (!pictureInfos.isEmpty()) {
             pictureService.editCarPicturesSynchronize(pictureInfos, UPLOADED_PICTURES_PATH, newCar);
@@ -312,14 +317,13 @@ public class CarServiceImpl implements CarService {
     @Autowired
     public CarServiceImpl(CarRepository carRepository, BodyStyleService bodyStyleService,
                           FuelTypeService fuelTypeService, GearboxTypeService gearboxTypeService,
-                          PictureService pictureService, CarDtoMapper carMapper, ModelService modelService, MakeService makeService,
+                          PictureService pictureService, ModelService modelService, MakeService makeService,
                           UserService userService, CarClient carClient, CarDetailsMapper carDetailsMapper, LogService logService) {
         this.carRepository = carRepository;
         this.bodyStyleService = bodyStyleService;
         this.fuelTypeService = fuelTypeService;
         this.gearboxTypeService = gearboxTypeService;
         this.pictureService = pictureService;
-        this.carMapper = carMapper;
         this.modelService = modelService;
         this.makeService = makeService;
         this.userService = userService;

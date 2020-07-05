@@ -75,7 +75,8 @@ public class AdvertisementServiceImpl implements AdvertisementService {
                     "This advertisement is in use and therefore it cannot be edited.", HttpStatus.BAD_REQUEST);
         }
         if (!dbAdvertisement.getCar().getId().equals(advertisement.getCar().getId())) {
-            dbAdvertisement.setCar(advertisement.getCar());
+            Car car = carService.get(advertisement.getCar().getId());
+            dbAdvertisement.setCar(car);
 
             CheckIfCarIsAvailableResponse response = advertisementClient.checkIfCarIsAvailable(
                     dbAdvertisement.getCar().getMainAppId(), dbAdvertisement.getDateFrom(),
@@ -296,7 +297,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     }
 
     private void checkOwner(Car car) {
-        if (!userService.getLoginAgent().getEmail().equals(car.getOwner().getEmail())) {
+        if (!userService.getLoginUser().getEmail().equals(car.getOwner().getEmail())) {
             logService.write(new Log(Log.INFO, Log.getServiceName(CLASS_PATH), CLASS_NAME, "CHO", String.format(
                     "User %s is not the owner of advertisement %s", userService.getLoginUser().getId(), car.getId())));
             throw new InvalidCarDataException("You are not owner of this car.", HttpStatus.BAD_REQUEST);
