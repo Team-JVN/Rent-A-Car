@@ -29,14 +29,12 @@ public class MakeServiceImpl implements MakeService {
 
     private LogService logService;
 
-    private UserService userService;
-
     @Override
     public Make create(Make make) {
         if (makeRepository.findByName(make.getName()) != null) {
             throw new InvalidMakeDataException("This Make already exist.", HttpStatus.BAD_REQUEST);
         }
-        return makeRepository.save(make);
+        return makeRepository.saveAndFlush(make);
     }
 
     @Override
@@ -90,10 +88,9 @@ public class MakeServiceImpl implements MakeService {
     }
 
     @Autowired
-    public MakeServiceImpl(MakeRepository makeRepository, ModelService modelService, LogService logService, UserService userService) {
+    public MakeServiceImpl(MakeRepository makeRepository, ModelService modelService, LogService logService) {
         this.makeRepository = makeRepository;
         this.modelService = modelService;
         this.logService = logService;
-        this.userService = userService;
     }
 }

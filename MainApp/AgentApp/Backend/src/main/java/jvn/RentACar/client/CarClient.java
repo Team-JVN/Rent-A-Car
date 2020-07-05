@@ -15,6 +15,7 @@ import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class CarClient extends WebServiceGatewaySupport {
 
@@ -27,18 +28,30 @@ public class CarClient extends WebServiceGatewaySupport {
     @Autowired
     private CarEditDetailsMapper carEditDetailsMapper;
 
-    public CreateOrEditCarDetailsResponse createOrEdit(Car car, List<MultipartFile> multipartFiles) {
+    public CreateOrEditCarDetailsResponse createOrEdit(Car car, List<MultipartFile> multipartFiles, Boolean create) {
 
         CreateOrEditCarDetailsRequest request = new CreateOrEditCarDetailsRequest();
         request.setCreateCarDetails(carDetailsMapper.toDto(car));
         try {
-            request.getPictureInfo().addAll(getPicturesInfo(multipartFiles));
+            if (create) {
+                List<PictureInfo> pictureInfos = new ArrayList<>();
+
+                for (MultipartFile multipartFile : multipartFiles) {
+                    PictureInfo pictureInfo = new PictureInfo();
+                    pictureInfo.setMultiPartFile(multipartFile.getBytes());
+                    pictureInfo.setFileName(multipartFile.getOriginalFilename());
+                    pictureInfos.add(pictureInfo);
+                }
+                request.getPictureInfo().addAll(pictureInfos);
+            } else {
+                request.getPictureInfo().addAll(getPicturesInfo(multipartFiles));
+            }
         } catch (IOException e) {
             return null;
         }
 
         User user = userService.getLoginUser();
-        if(user == null){
+        if (user == null) {
             return null;
         }
         request.setEmail(user.getEmail());
@@ -49,10 +62,15 @@ public class CarClient extends WebServiceGatewaySupport {
 
     private List<PictureInfo> getPicturesInfo(List<MultipartFile> multipartFiles) throws IOException {
         List<PictureInfo> pictureInfos = new ArrayList<>();
-        for(MultipartFile multipartFile:multipartFiles){
+        for (MultipartFile multipartFile : multipartFiles) {
             PictureInfo pictureInfo = new PictureInfo();
             pictureInfo.setMultiPartFile(multipartFile.getBytes());
-            pictureInfo.setFileName(multipartFile.getOriginalFilename());
+            int index = Objects.requireNonNull(multipartFile.getOriginalFilename()).indexOf('_');
+            if (index != -1) {
+                pictureInfo.setFileName(multipartFile.getOriginalFilename().substring(index + 1));
+            } else {
+                pictureInfo.setFileName(multipartFile.getOriginalFilename());
+            }
             pictureInfos.add(pictureInfo);
         }
         return pictureInfos;
@@ -63,7 +81,7 @@ public class CarClient extends WebServiceGatewaySupport {
         DeleteCarDetailsRequest request = new DeleteCarDetailsRequest();
         request.setId(car.getMainAppId());
         User user = userService.getLoginUser();
-        if(user == null){
+        if (user == null) {
             return null;
         }
         request.setEmail(user.getEmail());
@@ -76,7 +94,7 @@ public class CarClient extends WebServiceGatewaySupport {
         GetCarEditTypeRequest request = new GetCarEditTypeRequest();
         request.setId(car.getMainAppId());
         User user = userService.getLoginUser();
-        if(user == null){
+        if (user == null) {
             return null;
         }
         request.setEmail(user.getEmail());
@@ -90,14 +108,14 @@ public class CarClient extends WebServiceGatewaySupport {
 
         EditPartialCarDetailsRequest request = new EditPartialCarDetailsRequest();
         request.setEditPartialCarDetails(carEditDetailsMapper.toDto(carEditDTO));
-        try{
+        try {
             request.getPictureInfo().addAll(getPicturesInfo(multipartFiles));
         } catch (IOException e) {
             return null;
         }
 
         User user = userService.getLoginUser();
-        if(user == null){
+        if (user == null) {
             return null;
         }
         request.setEmail(user.getEmail());
@@ -109,7 +127,7 @@ public class CarClient extends WebServiceGatewaySupport {
     public GetAllCarDetailsResponse getAll() {
         GetAllCarDetailsRequest request = new GetAllCarDetailsRequest();
         User user = userService.getLoginUser();
-        if(user == null){
+        if (user == null) {
             return null;
         }
         request.setEmail(user.getEmail());
