@@ -1,6 +1,5 @@
-package jvn.SearchService.dto.message;
+package jvn.Cars.dto.request;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,13 +10,12 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-public class CarMessageDTO {
-
+public class CarEditForSearchDTO {
+    @NotNull(message = "Id is null.")
     @Positive(message = "Id must be positive.")
     private Long id;
 
-    @NotNull(message = "Mileage is null.")
+    @NotNull(message = "Mileage in km is null.")
     @Min(value = 0, message = "Mileage must be positive number.")
     private Integer mileageInKm;
 
@@ -31,4 +29,5 @@ public class CarMessageDTO {
 
     @NotEmpty(message = "Pictures are null.")
     private List<String> pictures;
+
 }

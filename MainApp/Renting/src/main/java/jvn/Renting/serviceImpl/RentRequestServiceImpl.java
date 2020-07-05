@@ -137,7 +137,7 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     @Override
     public RentRequestDTO get(Long id, Long loggedInUserId, String jwt, String user) {
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, loggedInUserId, id, loggedInUserId);
+        RentRequest rentRequest = rentRequestRepository.findOneById(id);
         if (rentRequest == null) {
             throw new InvalidRentRequestDataException("Requested rent request does not exist.", HttpStatus.NOT_FOUND);
         }
@@ -325,11 +325,11 @@ public class RentRequestServiceImpl implements RentRequestService {
             rentInfoDTO.setOptedForCDW(rentInfo.getOptedForCDW());
             rentInfoDTO.setAdvertisement(advertisementsMap.get(rentInfo.getAdvertisement()));
             Set<CommentDTO> commentsDTO = new HashSet<CommentDTO>();
-            for(Comment comment: rentInfo.getComments()){
+            for (Comment comment : rentInfo.getComments()) {
                 commentsDTO.add(commentDtoMapper.toDto(comment));
             }
             rentInfoDTO.setComments(commentsDTO);
-            if(rentInfo.getRentReport() != null ){
+            if (rentInfo.getRentReport() != null) {
                 rentInfoDTO.setRentReport(rentReportDtoMapper.toDto(rentInfo.getRentReport()));
             }
             rentInfoDTOS.add(rentInfoDTO);
@@ -376,6 +376,7 @@ public class RentRequestServiceImpl implements RentRequestService {
             rentInfo.setKilometresLimit(advertisementDTO.getKilometresLimit());
             rentInfo.setPricePerKm(advertisementDTO.getPriceList().getPricePerKm());
             rentInfo.setComments(new HashSet<>());
+            rentInfo.setCar(advertisementDTO.getCar());
             totalPrice += countPrice(rentInfo, advertisementDTO);
         }
         rentRequest.setTotalPrice(totalPrice);

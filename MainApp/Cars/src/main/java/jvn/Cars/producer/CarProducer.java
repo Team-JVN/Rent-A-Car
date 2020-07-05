@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jvn.Cars.dto.message.Log;
 import jvn.Cars.dto.request.CarEditDTO;
+import jvn.Cars.dto.request.CarEditForSearchDTO;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,15 +23,15 @@ public class CarProducer {
 
     private LogProducer logProducer;
 
-    public void sendMessageForSearch(CarEditDTO carEditDTO) {
+    public void sendMessageForSearch(CarEditForSearchDTO carEditDTO) {
         rabbitTemplate.convertAndSend(EDIT_PARTIAL_CAR, jsonToString(carEditDTO));
     }
 
-    private String jsonToString(CarEditDTO carEditDTO) {
+    private String jsonToString(CarEditForSearchDTO carEditDTO) {
         try {
             return objectMapper.writeValueAsString(carEditDTO);
         } catch (JsonProcessingException e) {
-            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping %s instance to string failed", CarEditDTO.class.getSimpleName())));
+            logProducer.send(new Log(Log.ERROR, Log.getServiceName(CLASS_PATH), CLASS_NAME, "OMP", String.format("Mapping %s instance to string failed", CarEditForSearchDTO.class.getSimpleName())));
             return null;
         }
     }

@@ -60,7 +60,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     @Override
     public List<Advertisement> get(List<Long> advertisements) {
-        return advertisementRepository.findByIdInAndLogicalStatus(advertisements, LogicalStatus.EXISTING);
+        return advertisementRepository.findByIdIn(advertisements);
     }
 
     @Override
