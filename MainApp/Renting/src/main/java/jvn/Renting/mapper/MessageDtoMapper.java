@@ -21,13 +21,12 @@ public class MessageDtoMapper implements MapperInterface<Message, MessageDTO>{
 
     @Override
     public Message toEntity(MessageDTO dto) {
-//        Message entity = modelMapper.map(dto, Message.class);
+
         Message entity = new Message();
         entity.setId(dto.getId());
         entity.setText(dto.getText());
         entity.setSenderId(dto.getSender().getId());
         entity.setSenderEmail(dto.getSender().getEmail());
-//        entity.setRentRequest(rentRequestDtoMapper.toEntity(dto.getRentRequest()));
         entity.setDateAndTime(getLocalDateTime(dto.getDateAndTime()));
         return entity;
     }

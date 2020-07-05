@@ -41,22 +41,13 @@ public class RentRequestDtoMapper implements MapperInterface<RentRequest, RentRe
         List<RentInfo> entityRentInfos = new ArrayList<>(dto.getRentInfos().size());
         for (RentInfoDTO rentInfoDTO : dto.getRentInfos()) {
 
-            //TODO: add mapping comments
-//            Set<Comment> comments = new HashSet<>();
-//            if(!rentInfoDTO.getComments().isEmpty() && rentInfoDTO.getComments() != null){
-//                for(CommentDTO commentDTO: rentInfoDTO.getComments()){
-//
-//                    Comment comment = commentDtoMapper.toEntity(commentDTO);
-//                    comments.add(comment);
-//                }
-//            }
             RentInfo rentInfo = new RentInfo();
             rentInfo.setDateTimeFrom(getLocalDateTime(rentInfoDTO.getDateTimeFrom()));
             rentInfo.setDateTimeTo(getLocalDateTime(rentInfoDTO.getDateTimeTo()));
             rentInfo.setAdvertisement(rentInfoDTO.getAdvertisement().getId());
             rentInfo.setOptedForCDW(rentInfoDTO.getOptedForCDW());
             rentInfo.setId(rentInfoDTO.getId());
-//            rentInfo.setComments(comments);
+
             Set<Comment> comments = new HashSet<Comment>();
             if (rentInfoDTO.getComments() != null) {
                 for (CommentDTO commentDTO : rentInfoDTO.getComments()) {

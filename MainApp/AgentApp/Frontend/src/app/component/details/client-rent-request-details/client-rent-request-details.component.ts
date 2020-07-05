@@ -19,6 +19,7 @@ import { Message } from "./../../../model/message";
 import { Client } from "src/app/model/client";
 import { MessageService } from "src/app/service/message.service";
 import { LeaveFeedbackComponent } from "../../add/leave-feedback/leave-feedback.component";
+import { ListComments } from "../../list/list-comments/list-comments.component";
 
 @Component({
   selector: "app-client-rent-request-details",
@@ -37,6 +38,7 @@ export class ClientRentRequestDetailsComponent implements OnInit {
   loggedInUserEmail: string;
   messages: Message[];
   availibleLeavingFeedback: Map<number, boolean>;
+  availableViewComment: Map<number, boolean>;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -52,6 +54,7 @@ export class ClientRentRequestDetailsComponent implements OnInit {
 
   ngOnInit() {
     this.availibleLeavingFeedback = new Map();
+    this.availableViewComment = new Map();
     this.messageForm = this.formBuilder.group({
       text: new FormControl(null, Validators.required),
     });
@@ -113,6 +116,7 @@ export class ClientRentRequestDetailsComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result == true) {
         this.availibleLeavingFeedback.set(rentInfo.id, false);
+        this.availableViewComment.set(rentInfo.id, true);
       }
     });
   }
@@ -141,5 +145,24 @@ export class ClientRentRequestDetailsComponent implements OnInit {
         this.location.back();
       }
     );
+  }
+  checkIfCanShowComments(rentInfo: RentInfo) {
+    if (
+      rentInfo.comments.length > 0 ||
+      (rentInfo.rating != undefined && rentInfo.rating != 0) ||
+      this.availableViewComment.get(rentInfo.id) == true
+    ) {
+      return true;
+    }
+    return false;
+  }
+  viewComments(rentInfo: RentInfo) {
+    let dialogRef = this.dialog.open(ListComments, {
+      data: {
+        feedback: null,
+        rentInfo: rentInfo,
+        rentRequestId: this.rentRequestId,
+      },
+    });
   }
 }

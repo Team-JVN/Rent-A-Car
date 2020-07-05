@@ -58,12 +58,9 @@ export class ManageCommentsComponent implements OnInit {
   fetchAllComments(status: string) {
     this.commentService.getAll(status).subscribe(
       (data: Comment[]) => {
-        console.log(data);
-        console.log(data.length);
         this.commentsDataSource = new MatTableDataSource(data);
       },
       (httpErrorResponse: HttpErrorResponse) => {
-        console.log("greska");
         const data: Comment[] = [];
         this.commentsDataSource = new MatTableDataSource(data);
         this.toastr.error(httpErrorResponse.error.message, "Show comments");
@@ -84,8 +81,6 @@ export class ManageCommentsComponent implements OnInit {
   }
 
   approve(element: Comment) {
-    console.log(element);
-    console.log("element id: " + element.id);
     this.commentService.approve(element, element.id).subscribe(
       () => {
         this.toastr.success("Success.", "Approve comment");

@@ -51,7 +51,6 @@ export class ListComments implements OnInit {
   ngOnInit() {
     this.loggedInUserEmail = this.authentificationService.getLoggedInUserEmail();
     this.fetchFeedback();
-    console.log(this.loggedInUserEmail);
   }
   fetchFeedback() {
     this.rentRequestService
@@ -59,7 +58,7 @@ export class ListComments implements OnInit {
       .subscribe(
         (data: Feedback) => {
           this.feedback = data;
-          console.log(data);
+
           this.feedback.comments.forEach((comment) => {
             if (comment.sender.email != this.loggedInUserEmail) {
               this.setUpComment = comment;

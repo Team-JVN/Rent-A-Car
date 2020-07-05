@@ -36,7 +36,7 @@ public class RentReportServiceImpl implements RentReportService {
         if (rentReportRepository.findByRentInfoId(rentInfoId) != null) {
             throw new InvalidRentReportDataException("Rent report for this rent info already exist.", HttpStatus.BAD_REQUEST);
         }
-        //TODO:change mileage to the car and additional cost
+
         RentInfo rentInfo = rentInfoRepository.findOneById(rentInfoId);
         checkIfCreatingRentReportIsPossible(rentInfo);
         toEntity.setRentInfo(rentInfo);
@@ -88,17 +88,6 @@ public class RentReportServiceImpl implements RentReportService {
         return rentReport;
     }
 
-    //
-//    public void calculateMileageInKm(RentReport rentReport) {
-//        Car car = rentReport.getRentInfo().getAdvertisement().getCar();
-//
-//        Integer previousMileageInKm = car.getMileageInKm();
-//        Integer currentMileageInKm = previousMileageInKm + rentReport.getMadeMileage();
-//        car.setMileageInKm(currentMileageInKm);
-//
-//        carRepository.save(car);
-//    }
-//
     public Double calculateAdditionalCost(RentReport rentReport, AdvertisementWithIdsDTO advertisementWithIdsDTO) {
         Double addCost = 0.0;
         if (advertisementWithIdsDTO.getKilometresLimit() != null) {

@@ -178,7 +178,7 @@ public class RentRequestController {
 
     @GetMapping(value="/{id}/message")
     public ResponseEntity<List<MessageDTO>> getMessages(@PathVariable Long id){
-        //TODO: need to handle exception when there is no messages
+
         UserDTO userDTO = stringToObject(request.getHeader("user"));
         List<MessageDTO> list;
         list= messageService.getMessages(id, userDTO.getId()).stream().map(messageDtoMapper::toDto).

@@ -41,14 +41,14 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     public User getUser(HttpServletRequest request) {
-//        System.out.println("get USER: ");
+
         UserDTO userDTO = stringToObject(request.getHeader("user"));
         User user = new User();
         user.setId(userDTO.getId());
         user.setEmail(userDTO.getEmail());
         user.setRole(userDTO.getRole());
         user.setPermissions(userDTO.getPermissions());
-//        System.out.println("got USER..");
+
         return user;
     }
 

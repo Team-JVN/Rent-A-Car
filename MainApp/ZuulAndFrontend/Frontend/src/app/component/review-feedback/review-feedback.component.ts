@@ -43,8 +43,8 @@ export class ReviewFeedbackComponent implements OnInit {
     // const comments = [new Comment("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")];
     // this.data.feedback = new Feedback(4, comments);
     this.loggedInUser = this.authentificationService.getLoggedInUserEmail();
-    console.log(this.data.rentInfo.id);
-    console.log(this.data.rentInfo);
+    
+    
 
     this.fetchFeedback();
 
@@ -59,9 +59,9 @@ export class ReviewFeedbackComponent implements OnInit {
       .subscribe(
         (data: Feedback) => {
           this.feedback = data;
-          console.log(data);
+          
           this.feedback.comments.forEach((comment) => {
-            console.log(comment);
+            
             if (comment.sender.name != this.loggedInUser.name) {
               this.setUpComment = comment;
             }
@@ -75,7 +75,7 @@ export class ReviewFeedbackComponent implements OnInit {
   }
 
   createComment() {
-    console.log(this.commentForm.value.comment);
+    
     const comment = new Comment(
       this.commentForm.value.comment,
       this.data.rentInfo

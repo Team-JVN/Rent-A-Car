@@ -59,7 +59,7 @@ public class RentReportServiceImpl implements RentReportService {
         CheckIfCanCreateRentReportResponse response = rentReportClient.checkIfCanCreateRentReport(rentInfo.getMainAppId());
 
         if (response == null || !response.isValue()) {
-            System.out.println("null impl");
+
 
             throw new InvalidCommentDataException("Cannot create rent report.",
                     HttpStatus.BAD_REQUEST);

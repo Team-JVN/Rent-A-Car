@@ -38,7 +38,6 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comment createComment(Comment comment, Long id, Long rentInfoId, Long userId) {
-        //TODO: which status has the comment made by agent
         comment.setStatus(CommentStatus.APPROVED);
         RentRequest rentRequest = rentRequestRepository.findOneById(id);
         RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
@@ -57,7 +56,7 @@ public class CommentServiceImpl implements CommentService {
         }
         RentRequest rentRequest = rentRequestRepository.findOneById(id);
         Set<RentInfo> rentInfos = rentRequest.getRentInfos();
-//        RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
+
         if (commentRepository.findBySenderIdAndRentInfoId(userId, rentInfoId).isEmpty()) {
             RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
             List<CommentDTO> commentDTOS = new ArrayList<>(feedbackDTO.getComments());
@@ -75,13 +74,11 @@ public class CommentServiceImpl implements CommentService {
             commentDTOS.set(0, commentDtoMapper.toDto(comment));
             feedbackDTO.getComments().clear();
             feedbackDTO.getComments().addAll(commentDTOS);
-//            rentInfo.getComments().add(comment);
+
             rentInfo.setRating(feedbackDTO.getRating());
             commentProducer.sendUpdateCarRating(rentInfo.getCar(), feedbackDTO.getRating());
             rentInfoRepository.save(rentInfo);
-//            sendUpdateCarAvgRating(rentInfo.getId(), rentInfo.getRating());
-//            rentRequest.setRentInfos(new HashSet<>(rentInfos));
-//            rentRequestRepository.save(rentRequest);
+
 
         } else {
             throw new InvalidCommentDataException("There is already comment for this rent info.", HttpStatus.BAD_REQUEST);
@@ -167,7 +164,6 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentRepository.findOneById(id);
         comment.setRentInfo(null);
         commentRepository.deleteById(id);
-        //TODO:increase the number of rejected comments of User
         sendRejectedComment(comment.getSenderId());
 
     }
@@ -187,10 +183,6 @@ public class CommentServiceImpl implements CommentService {
         commentProducer.sendRejectedComment(userId);
     }
 
-//    @Async
-//    public void sendUpdateCarAvgRating(Long rentInfoId, Integer rating){
-//        commentProducer.sendRejectedComment(userId);
-//    }
 
     @Autowired
     public CommentServiceImpl(CommentRepository commentRepository, CommentProducer commentProducer,

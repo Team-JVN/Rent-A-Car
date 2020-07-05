@@ -72,7 +72,7 @@ export class AddRentReportComponent implements OnInit {
       this.createForm.value.mileage,
       this.createForm.value.comment
     );
-    console.log(rentReport);
+
     this.rentReportService.create(rentReport, this.data.rentInfo.id).subscribe(
       (data: RentReport) => {
         this.createForm.reset();

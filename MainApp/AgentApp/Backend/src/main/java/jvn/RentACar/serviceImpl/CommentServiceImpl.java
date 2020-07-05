@@ -85,7 +85,7 @@ public class CommentServiceImpl implements CommentService {
 
             comment.setMainAppId(commentDetails.getId());
         }
-//        rentRequestRepository.save(rentRequest);
+
         commentRepository.save(comment);
         return comment;
     }
@@ -99,7 +99,7 @@ public class CommentServiceImpl implements CommentService {
         for(CommentDTO commentDTO: feedbackDTO.getComments()){
             commentDTO.setStatus(CommentStatus.APPROVED);
         }
-//        RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
+
         if(commentRepository.findBySenderIdAndRentInfoId(loggedInUser.getId(), rentInfoId).isEmpty()){
             List<CommentDTO> commentDTOS = new ArrayList<>(feedbackDTO.getComments());
             Comment comment = new Comment();
@@ -110,10 +110,7 @@ public class CommentServiceImpl implements CommentService {
             comment.setText(commentDTOS.get(0).getText());
             rentInfo.setRating(feedbackDTO.getRating());
             rentInfoRepository.save(rentInfo);
-//            rentInfo.getComments().add(comment);
-//            rentInfo.setRating(feedbackDTO.getRating());
-//            rentRequest.setRentInfos(new HashSet<>(rentInfos));
-//            rentRequestRepository.save(rentRequest);
+
             LeaveFeedbackResponse leaveFeedbackResponse = commentClient.leaveFeedback(rentRequest.getMainAppId(), rentInfo.getMainAppId(), feedbackDTO);
 
             LeaveFeedbackDetails leaveFeedbackDetails = leaveFeedbackResponse.getLeaveFeedbackDetails();
