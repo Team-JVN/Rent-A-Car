@@ -8,11 +8,7 @@ import { Component, OnInit, Input, ElementRef } from "@angular/core";
 import { UserInfo } from "src/app/model/userInfo";
 import { RentRequest } from "src/app/model/rentRequest";
 import { formatDate } from "@angular/common";
-import { ActivatedRoute, Router, Params } from "@angular/router";
-
-import * as Stomp from "stompjs";
-import * as SockJS from "sockjs-client";
-import { environment } from "./../../../environments/environment";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "app-view-messages",
@@ -24,24 +20,18 @@ export class ViewMessagesComponent implements OnInit {
   @Input() client: Client;
   @Input() rentRequest: RentRequest;
 
-  private stompClient;
-  // private serverUrl = environment.baseUrl + environment.socket + "socket";
-  // private serverUrl = "http://localhost:8083/socket";
   isLoaded: boolean = false;
-
   messagesContainer: ElementRef<HTMLDivElement>;
-  senderName = "Pera";
-  loggedInUser;
+  loggedInUser: string;
+
   constructor(
     private toastr: ToastrService,
     private messageService: MessageService,
-    private router: Router,
     private authentificationService: AuthentificationService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.getMessages();
-    // this.initializeWebSocketConnection();
     this.loggedInUser = this.authentificationService.getLoggedInUserEmail();
   }
 
@@ -58,15 +48,6 @@ export class ViewMessagesComponent implements OnInit {
       dateAndTime
     );
     console.log(message);
-
-    // Primer slanja poruke preko web socketa sa klijenta. URL je
-    //  - ApplicationDestinationPrefix definisan u config klasi na serveru (configureMessageBroker() metoda)
-    //  - vrednost @MessageMapping anotacije iz kontrolera na serveru
-    // this.stompClient.send(
-    //   "/socket-subscriber/message",
-    //   {},
-    //   JSON.stringify(message)
-    // );
 
     this.messageService.send(message, this.rentRequest.id).subscribe(
       (data: Message) => {
@@ -101,49 +82,4 @@ export class ViewMessagesComponent implements OnInit {
     }
   }
 
-  initializeWebSocketConnection() {
-    // otvaranje konekcije sa serverom
-    // serverUrl je vrednost koju smo definisali u registerStompEndpoints() metodi na serveru
-    // let ws = new SockJS(this.serverUrl);
-    // this.stompClient = Stomp.over(ws);
-    // let that = this;
-    // this.stompClient.connect(
-    //   {},
-    //   function () {
-    //     console.log("connecting");
-    //     that.isLoaded = true;
-    //     that.openGlobalSocket();
-    //   },
-    //   function () {
-    //     console.log("error");
-    //   }
-    // );
-  }
-  openGlobalSocket() {
-    if (this.isLoaded) {
-      // pretplata na topic /socket-publisher (definise se u configureMessageBroker() metodi)
-
-      this.stompClient.subscribe(
-        "/socket-publisher",
-        (message: { body: string }) => {
-          console.log("handle result");
-          this.handleResult(message);
-        }
-      );
-    }
-  }
-  // funkcija koja se poziva kada server posalje poruku na topic na koji se klijent pretplatio
-  handleResult(message: { body: string }) {
-    if (message.body) {
-      let messageResult: Message = JSON.parse(message.body);
-      this.messages.push(messageResult);
-      this.toastr
-        .success("New message recieved", null, {
-          timeOut: 3000,
-        })
-        .onTap.subscribe((action) => {
-          this.router.navigate(["/rent-request/" + this.rentRequest.id]);
-        });
-    }
-  }
 }

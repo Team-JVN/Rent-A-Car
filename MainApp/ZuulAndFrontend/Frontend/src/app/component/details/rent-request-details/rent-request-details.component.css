@@ -95,3 +95,13 @@ mat-card {
 .form-full-width {
     width: 100%;
 }
+
+.view-icons {
+    padding-right: 0px;
+    padding-left: 0px;
+}
+
+.report-feedback {
+    padding-right: 0px;
+    padding-left: 0px;
+}

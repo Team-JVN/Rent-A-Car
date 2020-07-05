@@ -1,13 +1,13 @@
 <h1 mat-dialog-title class="feedback-title">Rent Reports</h1>
 <mat-dialog-content class="dialog-class">
   <mat-card class="comment-rating-card">
-    <mat-card-content>
-      <div class="row" *ngIf="rentReport.madeMileage">
+    <mat-card-content *ngIf="rentReport">
+      <div class="row">
         <div class="col-4">
           <label class="page-title">Mileage</label>
         </div>
         <div class="col-8">
-          {{ rentReport.madeMileage }}
+          {{ rentReport.madeMileage }} km
         </div>
       </div>
       <div class="row" *ngIf="rentReport.comment">

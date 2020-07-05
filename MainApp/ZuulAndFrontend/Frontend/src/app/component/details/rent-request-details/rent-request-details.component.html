@@ -6,58 +6,45 @@
         <div *ngFor="let rentInfo of rentRequest.rentInfos">
           <mat-card class="item-card">
             <div class="row">
-              <div class="col-6">
+              <div class="col-7">
                 <mat-card-header>
                   <mat-card-title>
-                    Rent info for
-                    <span
-                      (click)="advertisementDetails(rentInfo)"
-                      class="btn-adv-details"
-                    >
-                      {{ rentInfo.advertisement.car.make }}
-                      {{ rentInfo.advertisement.car.model }}
-                    </span>
-                    <button
-                      mat-icon-button
-                      *ngIf="checkIfCanShowComments(rentInfo)"
-                      aria-label="View comments"
-                      matTooltip="View comments"
-                      (click)="viewComments(rentInfo)"
-                    >
-                      <mat-icon>comment</mat-icon>
-                    </button>
-                    <button
-                      mat-icon-button
-                      *ngIf="checkIfCanShowRentReport(rentInfo)"
-                      aria-label="View rent report"
-                      matTooltip="View rent report"
-                      (click)="viewRentReport(rentInfo)"
-                    >
-                      <mat-icon>assignment</mat-icon>
-                    </button>
+                    Rent info for<br>
+                    <span (click)="advertisementDetails(rentInfo)"
+                      class="btn-adv-details">{{ rentInfo.advertisement.car.make }}
+                      {{ rentInfo.advertisement.car.model }}</span>
                   </mat-card-title>
                 </mat-card-header>
               </div>
 
-              <div class="col-3 mt-0" align="end">
-                <button
-                  mat-raised-button
-                  *ngIf="checkIfCanCreateComment(rentInfo)"
-                  color="primary"
-                  (click)="reviewFeedback(rentInfo)"
-                >
-                  Review feedback
-                </button>
+              <div class="row col-2 view-icons">
+                <div>
+                  <button mat-icon-button aria-label="View rent report" *ngIf="checkIfCanShowRentReport(rentInfo)"
+                    matTooltip="View rent report" (click)="viewRentReport(rentInfo)">
+                    <mat-icon>assignment</mat-icon>
+                  </button>
+                </div>
+                <div>
+                  <button mat-icon-button aria-label="View comments" *ngIf="checkIfCanShowComments(rentInfo)"
+                    matTooltip="View comments" (click)="viewComments(rentInfo)">
+                    <mat-icon>comment</mat-icon>
+                  </button>
+                </div>
               </div>
-              <div class="col-3 mt-0" align="end">
-                <button
-                  mat-raised-button
-                  *ngIf="checkIfCanCreateReport(rentInfo)"
-                  color="primary"
-                  (click)="createRentReport(rentInfo)"
-                >
-                  Create Report
-                </button>
+
+              <div class="col-3 report-feedback">
+                <div align="end">
+                  <button mat-raised-button color="primary" *ngIf="checkIfCanCreateReport(rentInfo)"
+                    (click)="createRentReport(rentInfo)">
+                    Create report
+                  </button>
+                </div>
+                <div align="end" class="mt-2 mb-2">
+                  <button mat-raised-button color="primary" *ngIf="checkIfCanCreateComment(rentInfo)"
+                    (click)="reviewFeedback(rentInfo)">
+                    Review feedback
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -117,11 +104,8 @@
     <div *ngIf="rentRequest.rentRequestStatus == 'PAID'">
       <div class="chat-page">
         <div class="chat-box">
-          <app-view-messages
-            [messages]="messages"
-            [client]="rentRequest.client"
-            [rentRequest]="rentRequest"
-          ></app-view-messages>
+          <app-view-messages [messages]="messages" [client]="rentRequest.client" [rentRequest]="rentRequest">
+          </app-view-messages>
         </div>
       </div>
     </div>

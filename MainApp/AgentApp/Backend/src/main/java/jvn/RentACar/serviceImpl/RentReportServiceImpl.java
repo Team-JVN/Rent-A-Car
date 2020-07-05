@@ -65,11 +65,16 @@ public class RentReportServiceImpl implements RentReportService {
                     HttpStatus.BAD_REQUEST);
         }
         rentReport.setAdditionalCost(calculateAdditionalCost(rentReport));
+        if (rentReport.getAdditionalCost() > 0) {
+            rentReport.setPaid(false);
+        } else {
+            rentReport.setPaid(true);
+        }
         calculateMileageInKm(rentReport);
         rentReport = rentReportRepository.save(rentReport);
         CreateRentReportResponse createRentReportResponse = rentReportClient.createRentReport(rentInfo.getMainAppId(), rentReport);
         RentReportDetails rentReportDetails = createRentReportResponse.getRentReportDetails();
-        if(rentReportDetails != null && rentReportDetails.getId() != null){
+        if (rentReportDetails != null && rentReportDetails.getId() != null) {
 
             rentReport.setMainAppId(rentReportDetails.getId());
         }
@@ -120,16 +125,15 @@ public class RentReportServiceImpl implements RentReportService {
     @Scheduled(cron = "0 40 0/3 * * ?")
     public void synchronizeRentReports() {
         try {
-            for(RentInfo rentInfo: rentInfoRepository.findAll())
-            {
+            for (RentInfo rentInfo : rentInfoRepository.findAll()) {
                 GetAllRentReportsDetailsResponse response = rentReportClient.getRentReports(rentInfo.getMainAppId());
                 if (response == null) {
                     continue;
-                }else{
+                } else {
                     RentReportDetails rentReportDetails = response.getRentReportDetails();
                     if (rentReportDetails == null) {
                         continue;
-                    }else{
+                    } else {
                         RentReport rentReport = rentReportDetailsMapper.toEntity(rentReportDetails);
                         RentReport dbRentReport = rentReportRepository.findByMainAppId(rentReport.getMainAppId());
                         if (dbRentReport == null) {

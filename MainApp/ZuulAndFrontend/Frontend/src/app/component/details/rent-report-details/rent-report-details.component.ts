@@ -3,16 +3,7 @@ import { MatDialog, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Component, OnInit, Inject } from "@angular/core";
 import { ToastrService } from "ngx-toastr";
 import { HttpErrorResponse } from "@angular/common/http";
-import { Location } from "@angular/common";
-import {
-  FormGroup,
-  FormBuilder,
-  FormControl,
-  Validators,
-} from "@angular/forms";
-
 import { RentReport } from "./../../../model/rentReport";
-
 import { RentReportService } from "src/app/service/rent-report.service";
 
 @Component({
@@ -26,14 +17,14 @@ export class RentReportDetailsComponent implements OnInit {
   constructor(
     private toastr: ToastrService,
     private rentReportService: RentReportService,
-
     public dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.fetchRentReport();
   }
+
   fetchRentReport() {
     this.rentReportService.get(this.data.rentInfo.id).subscribe(
       (data: RentReport) => {

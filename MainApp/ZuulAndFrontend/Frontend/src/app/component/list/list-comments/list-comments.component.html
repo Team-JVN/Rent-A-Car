@@ -2,19 +2,13 @@
 <mat-dialog-content class="dialog-class">
   <mat-card class="comment-rating-card">
     <mat-card-content>
-      <div class="row">
+      <div class="row" *ngIf="feedback">
         <div class="col-4">
           <label class="labelRaiting page-title">Rating</label>
         </div>
         <div class="col-8">
-          <star-rating
-            class="rating-style"
-            totalstars="5"
-            checkedcolor="#009688"
-            uncheckedcolor="black"
-            size="35px"
-            [value]="feedback.rating"
-          >
+          <star-rating class="rating-style" totalstars="5" checkedcolor="#009688" uncheckedcolor="black" size="35px"
+            [value]="feedback.rating">
           </star-rating>
         </div>
       </div>

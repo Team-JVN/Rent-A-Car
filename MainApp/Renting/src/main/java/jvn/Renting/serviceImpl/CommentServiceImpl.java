@@ -64,9 +64,9 @@ public class CommentServiceImpl implements CommentService {
             Comment comment = new Comment();
             comment.setSenderId(userId);
             comment.setSenderName(userName);
-            if(commentDTOS.get(0).getStatus().equals(CommentStatus.APPROVED)){
+            if (commentDTOS.get(0).getStatus() != null && commentDTOS.get(0).getStatus().equals(CommentStatus.APPROVED)) {
                 comment.setStatus(CommentStatus.APPROVED);
-            }else{
+            } else {
                 comment.setStatus(CommentStatus.AWAITING);
             }
             comment.setRentInfo(rentInfo);
