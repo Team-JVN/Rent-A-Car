@@ -162,10 +162,13 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void reject(Long id, Long userId) {
         Comment comment = commentRepository.findOneById(id);
+        RentInfo rentInfo = comment.getRentInfo();
+        rentInfo.getComments().remove(comment);
+        rentInfoRepository.save(rentInfo);
         comment.setRentInfo(null);
-        commentRepository.deleteById(id);
-        sendRejectedComment(comment.getSenderId());
-
+        Long user = comment.getSenderId();
+        commentRepository.deleteById(comment.getId());
+        sendRejectedComment(user);
     }
 
 

@@ -47,7 +47,7 @@ public class RentRequestDtoMapper implements MapperInterface<RentRequest, RentRe
             rentInfo.setAdvertisement(rentInfoDTO.getAdvertisement().getId());
             rentInfo.setOptedForCDW(rentInfoDTO.getOptedForCDW());
             rentInfo.setId(rentInfoDTO.getId());
-
+            rentInfo.setRating(rentInfoDTO.getRating());
             Set<Comment> comments = new HashSet<Comment>();
             if (rentInfoDTO.getComments() != null) {
                 for (CommentDTO commentDTO : rentInfoDTO.getComments()) {

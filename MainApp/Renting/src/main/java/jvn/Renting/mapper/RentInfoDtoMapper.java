@@ -37,6 +37,7 @@ public class RentInfoDtoMapper implements MapperInterface<RentInfo, RentInfoDTO>
             }
         }
         rentInfo.setComments(comments);
+        rentInfo.setRating(dto.getRating());
         return rentInfo;
     }
 

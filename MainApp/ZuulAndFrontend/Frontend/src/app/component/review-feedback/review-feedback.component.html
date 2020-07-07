@@ -13,10 +13,10 @@
         </div>
       </div>
       <div class="row" *ngIf="setUpComment">
-        <div class="col-3">
+        <div class="col-4">
           <label class="page-title">Comment</label>
         </div>
-        <div class="col-9">
+        <div class="col-8">
           {{ setUpComment.text }}
         </div>
       </div>
@@ -26,10 +26,10 @@
   <mat-card class="comment-rating-card" *ngIf="loggedInUserComment">
     <mat-card-content>
       <div class="row">
-        <div class="col-3">
+        <div class="col-4">
           <label class="page-title">Your comment</label>
         </div>
-        <div class="col-9">
+        <div class="col-8">
           {{ loggedInUserComment.text }}
         </div>
       </div>

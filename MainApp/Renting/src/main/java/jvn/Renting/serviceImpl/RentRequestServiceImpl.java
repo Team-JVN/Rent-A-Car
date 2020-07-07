@@ -324,6 +324,7 @@ public class RentRequestServiceImpl implements RentRequestService {
             rentInfoDTO.setDateTimeTo(rentInfo.getDateTimeTo().toString());
             rentInfoDTO.setOptedForCDW(rentInfo.getOptedForCDW());
             rentInfoDTO.setAdvertisement(advertisementsMap.get(rentInfo.getAdvertisement()));
+            rentInfoDTO.setRating(rentInfo.getRating());
             Set<CommentDTO> commentsDTO = new HashSet<CommentDTO>();
             for (Comment comment : rentInfo.getComments()) {
                 commentsDTO.add(commentDtoMapper.toDto(comment));

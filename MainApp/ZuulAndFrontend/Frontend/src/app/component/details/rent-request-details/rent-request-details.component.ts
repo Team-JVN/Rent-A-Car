@@ -147,6 +147,7 @@ export class RentRequestDetailsComponent implements OnInit {
   }
 
   checkIfCanShowComments(rentInfo: RentInfo) {
+    
     if (
       rentInfo.comments.length > 0 ||
       (rentInfo.rating != undefined && rentInfo.rating != 0) ||

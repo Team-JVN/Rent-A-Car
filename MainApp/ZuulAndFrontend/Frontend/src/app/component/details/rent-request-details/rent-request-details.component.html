@@ -6,7 +6,7 @@
         <div *ngFor="let rentInfo of rentRequest.rentInfos">
           <mat-card class="item-card">
             <div class="row">
-              <div class="col-7">
+              <div class="col-6">
                 <mat-card-header>
                   <mat-card-title>
                     Rent info for<br />
@@ -16,46 +16,29 @@
                       >{{ rentInfo.advertisement.car.make }}
                       {{ rentInfo.advertisement.car.model }}</span
                     >
+                    <button
+                      mat-icon-button
+                      aria-label="View comments"
+                      *ngIf="checkIfCanShowComments(rentInfo)"
+                      matTooltip="View comments"
+                      (click)="viewComments(rentInfo)"
+                    >
+                      <mat-icon>comment</mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      aria-label="View rent report"
+                      *ngIf="checkIfCanShowRentReport(rentInfo)"
+                      matTooltip="View rent report"
+                      (click)="viewRentReport(rentInfo)"
+                    >
+                      <mat-icon>assessment</mat-icon>
+                    </button>
                   </mat-card-title>
                 </mat-card-header>
               </div>
 
-              <div class="row col-2 view-icons">
-                <div>
-                  <button
-                    mat-icon-button
-                    aria-label="View rent report"
-                    *ngIf="checkIfCanShowRentReport(rentInfo)"
-                    matTooltip="View rent report"
-                    (click)="viewRentReport(rentInfo)"
-                  >
-                    <mat-icon>assessment</mat-icon>
-                  </button>
-                </div>
-                <div>
-                  <button
-                    mat-icon-button
-                    aria-label="View comments"
-                    *ngIf="checkIfCanShowComments(rentInfo)"
-                    matTooltip="View comments"
-                    (click)="viewComments(rentInfo)"
-                  >
-                    <mat-icon>comment</mat-icon>
-                  </button>
-                </div>
-              </div>
-
-              <div class="col-3 report-feedback">
-                <div align="end">
-                  <button
-                    mat-raised-button
-                    color="primary"
-                    *ngIf="checkIfCanCreateReport(rentInfo)"
-                    (click)="createRentReport(rentInfo)"
-                  >
-                    Create report
-                  </button>
-                </div>
+              <div class="col-6 report-feedback">
                 <div align="end" class="mt-2 mb-2">
                   <button
                     mat-raised-button
@@ -64,6 +47,14 @@
                     (click)="reviewFeedback(rentInfo)"
                   >
                     Review feedback
+                  </button>
+                  <button
+                    mat-raised-button
+                    color="primary"
+                    *ngIf="checkIfCanCreateReport(rentInfo)"
+                    (click)="createRentReport(rentInfo)"
+                  >
+                    Create report
                   </button>
                 </div>
               </div>

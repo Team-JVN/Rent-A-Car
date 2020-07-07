@@ -101,7 +101,8 @@ export class ClientRentRequestDetailsComponent implements OnInit {
       rentRequest.rentRequestStatus == "PAID" &&
       dateTimeTo < new Date() &&
       rentInfo.comments.length < 1 &&
-      this.availibleLeavingFeedback.get(rentInfo.id) != false
+      this.availibleLeavingFeedback.get(rentInfo.id) != false &&
+      (rentInfo.rating == 0 || rentInfo.rating == undefined)
     ) {
       return true;
     }
