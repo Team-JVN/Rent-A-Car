@@ -261,4 +261,4 @@ import { ManageCommentsGuard } from "./guard/manage.coments.guard";
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

@@ -110,7 +110,6 @@ export class AuthentificationService {
     this.role = decodedJwtJsonData.role;
     this.permissions = decodedJwtJsonData.permissions;
     this.loggedInUserEmail = decodedJwtJsonData.sub;
-    console.log(this.permissions);
     return decodedJwtJsonData;
   }
 

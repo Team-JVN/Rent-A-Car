@@ -216,6 +216,7 @@ import { RentReportDetailsComponent } from "./component/details/rent-report-deta
     LeaveFeedbackComponent,
     ReviewFeedbackComponent,
     AddToCartComponent,
+    ConfirmDialogDeleteMakeComponent,
   ],
   providers: [
     {
@@ -240,4 +241,4 @@ import { RentReportDetailsComponent } from "./component/details/rent-report-deta
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

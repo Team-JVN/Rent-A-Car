@@ -8,9 +8,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RentInfoRepository extends JpaRepository<RentInfo, Long> {
 
-    RentInfo findByIdAndRentRequestIdAndRentRequestRentRequestStatusAndRentReportPaidAndRentRequestClient(
-            Long rentInfoId, Long rentRequestId, RentRequestStatus status, boolean paid, Long client
+    RentInfo findByIdAndRentRequestIdAndRentRequestRentRequestStatusAndRentRequestClient(
+            Long rentInfoId, Long rentRequestId, RentRequestStatus status, Long client
     );
+
     RentInfo findByIdAndRentRequestId(Long rentInfoId, Long rentRequestId);
 
     RentInfo findOneById(Long id);

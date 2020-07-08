@@ -10,28 +10,15 @@
                 <mat-card-header>
                   <mat-card-title>
                     Rent info for<br />
-                    <span
-                      (click)="advertisementDetails(rentInfo)"
-                      class="btn-adv-details"
-                      >{{ rentInfo.advertisement.car.make }}
-                      {{ rentInfo.advertisement.car.model }}</span
-                    >
-                    <button
-                      mat-icon-button
-                      aria-label="View comments"
-                      *ngIf="checkIfCanShowComments(rentInfo)"
-                      matTooltip="View comments"
-                      (click)="viewComments(rentInfo)"
-                    >
+                    <span (click)="advertisementDetails(rentInfo);$event.stopPropagation()"
+                      class="btn-adv-details">{{ rentInfo.advertisement.car.make }}
+                      {{ rentInfo.advertisement.car.model }}</span>
+                    <button mat-icon-button aria-label="View comments" *ngIf="checkIfCanShowComments(rentInfo)"
+                      matTooltip="View comments" (click)="viewComments(rentInfo);$event.stopPropagation()">
                       <mat-icon>comment</mat-icon>
                     </button>
-                    <button
-                      mat-icon-button
-                      aria-label="View rent report"
-                      *ngIf="checkIfCanShowRentReport(rentInfo)"
-                      matTooltip="View rent report"
-                      (click)="viewRentReport(rentInfo)"
-                    >
+                    <button mat-icon-button aria-label="View rent report" *ngIf="checkIfCanShowRentReport(rentInfo)"
+                      matTooltip="View rent report" (click)="viewRentReport(rentInfo);$event.stopPropagation()">
                       <mat-icon>assessment</mat-icon>
                     </button>
                   </mat-card-title>
@@ -40,20 +27,12 @@
 
               <div class="col-6 report-feedback">
                 <div align="end" class="mt-2 mb-2">
-                  <button
-                    mat-raised-button
-                    color="primary"
-                    *ngIf="checkIfCanCreateComment(rentInfo)"
-                    (click)="reviewFeedback(rentInfo)"
-                  >
+                  <button mat-raised-button color="primary" *ngIf="checkIfCanCreateComment(rentInfo)"
+                    (click)="reviewFeedback(rentInfo);$event.stopPropagation()">
                     Review feedback
                   </button>
-                  <button
-                    mat-raised-button
-                    color="primary"
-                    *ngIf="checkIfCanCreateReport(rentInfo)"
-                    (click)="createRentReport(rentInfo)"
-                  >
+                  <button mat-raised-button color="primary" *ngIf="checkIfCanCreateReport(rentInfo)"
+                    (click)="createRentReport(rentInfo);$event.stopPropagation()">
                     Create report
                   </button>
                 </div>
@@ -116,11 +95,7 @@
     <div *ngIf="rentRequest.rentRequestStatus == 'PAID'">
       <div class="chat-page">
         <div class="chat-box">
-          <app-view-messages
-            [messages]="messages"
-            [client]="rentRequest.client"
-            [rentRequest]="rentRequest"
-          >
+          <app-view-messages [messages]="messages" [client]="rentRequest.client" [rentRequest]="rentRequest">
           </app-view-messages>
         </div>
       </div>

@@ -28,6 +28,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(error);
     }
 
+    @ExceptionHandler(InvalidCommentDataException.class)
+    protected ResponseEntity<Object> handleInvalidCommentDataException(InvalidCommentDataException ex) {
+        ErrorResponse error = new ErrorResponse(ex.getHttpStatus(), ex.getMessage());
+        return buildResponseEntity(error);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleOtherExceptions() {
         ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST, "Unknown error occurred. Please try again.");

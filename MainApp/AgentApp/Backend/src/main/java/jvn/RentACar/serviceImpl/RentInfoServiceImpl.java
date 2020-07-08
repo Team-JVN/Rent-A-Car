@@ -32,8 +32,8 @@ public class RentInfoServiceImpl implements RentInfoService {
 
     @Override
     public RentInfo pay(Long rentRequestId, Long rentInfoId, Long loggedInUserId) {
-        RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestIdAndRentRequestRentRequestStatusAndRentReportPaidAndRentRequestClientId(
-                rentInfoId, rentRequestId, RentRequestStatus.PAID, false, loggedInUserId);
+        RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestIdAndRentRequestRentRequestStatusAndRentRequestClientId(
+                rentInfoId, rentRequestId, RentRequestStatus.PAID, loggedInUserId);
         if (rentInfo == null) {
             throw new InvalidRentRequestDataException("This rent info is already paid.", HttpStatus.BAD_REQUEST);
         }

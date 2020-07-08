@@ -25,7 +25,7 @@ export class LeaveFeedbackComponent implements OnInit {
     private toastr: ToastrService,
     private rentRequestService: RentRequestService,
     private authentificationService: AuthentificationService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loggedInUser = this.authentificationService.getLoggedInUserEmail();
@@ -59,6 +59,7 @@ export class LeaveFeedbackComponent implements OnInit {
         },
         (httpErrorResponse: HttpErrorResponse) => {
           this.toastr.error(httpErrorResponse.error.message, "Leave feedback");
+          this.dialogRef.close();
         }
       );
   }

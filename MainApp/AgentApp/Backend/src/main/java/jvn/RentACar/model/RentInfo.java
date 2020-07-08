@@ -36,7 +36,7 @@ public class RentInfo {
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private RentRequest rentRequest;
 
-    @OneToOne(mappedBy = "rentInfo", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "rentInfo")
     private RentReport rentReport;
 
     @Column

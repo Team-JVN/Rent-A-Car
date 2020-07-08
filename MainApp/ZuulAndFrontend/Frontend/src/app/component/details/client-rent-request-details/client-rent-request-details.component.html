@@ -10,20 +10,12 @@
                 <mat-card-header>
                   <mat-card-title>
                     Rent info for
-                    <span
-                      (click)="advertisementDetails(rentInfo)"
-                      class="btn-adv-details"
-                    >
+                    <span (click)="advertisementDetails(rentInfo);$event.stopPropagation()" class="btn-adv-details">
                       {{ rentInfo.advertisement.car.make }}
                       {{ rentInfo.advertisement.car.model }}
                     </span>
-                    <button
-                      mat-icon-button
-                      *ngIf="checkIfCanShowComments(rentInfo)"
-                      aria-label="View comments"
-                      matTooltip="View comments"
-                      (click)="viewComments(rentInfo)"
-                    >
+                    <button mat-icon-button *ngIf="checkIfCanShowComments(rentInfo)" aria-label="View comments"
+                      matTooltip="View comments" (click)="viewComments(rentInfo);$event.stopPropagation()">
                       <mat-icon>comment</mat-icon>
                     </button>
                   </mat-card-title>
@@ -31,12 +23,8 @@
               </div>
 
               <div class="col-3 mt-0" align="end">
-                <button
-                  mat-raised-button
-                  *ngIf="checkIfCanLeaveFeedback(rentInfo, rentRequest)"
-                  color="primary"
-                  (click)="leaveFeedback(rentInfo)"
-                >
+                <button mat-raised-button *ngIf="checkIfCanLeaveFeedback(rentInfo, rentRequest)" color="primary"
+                  (click)="leaveFeedback(rentInfo);$event.stopPropagation()">
                   Leave feedback
                 </button>
               </div>
@@ -80,15 +68,8 @@
                     <th class="first first-column">Aditional cost:</th>
                     <td>{{ rentInfo.additionalCost | number: "1.2-2" }} €</td>
                     <td>
-                      <button
-                        mat-raised-button
-                        color="primary"
-                        class="pay-btn"
-                        (click)="
-                          pay(rentInfo, rentRequest); $event.stopPropagation()
-                        "
-                        *ngIf="!rentInfo.paid"
-                      >
+                      <button mat-raised-button color="primary" class="pay-btn"
+                        (click)="pay(rentInfo, rentRequest);$event.stopPropagation()" *ngIf="!rentInfo.paid">
                         Pay!
                       </button>
                     </td>
@@ -115,11 +96,8 @@
     <div *ngIf="rentRequest.rentRequestStatus == 'PAID'">
       <div class="chat-page">
         <div class="chat-box">
-          <app-view-messages
-            [messages]="messages"
-            [client]="rentRequest.client"
-            [rentRequest]="rentRequest"
-          ></app-view-messages>
+          <app-view-messages [messages]="messages" [client]="rentRequest.client" [rentRequest]="rentRequest">
+          </app-view-messages>
         </div>
       </div>
     </div>

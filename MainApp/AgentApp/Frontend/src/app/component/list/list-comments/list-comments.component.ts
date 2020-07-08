@@ -46,7 +46,7 @@ export class ListComments implements OnInit {
     private messageService: MessageService,
     public dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loggedInUserEmail = this.authentificationService.getLoggedInUserEmail();

@@ -4,10 +4,7 @@
     <div class="status-filter">
       <span class="filter-span">Filter by status:</span>
       <mat-form-field>
-        <mat-select
-          [(ngModel)]="status"
-          (selectionChange)="fetchRentRequests(status)"
-        >
+        <mat-select [(ngModel)]="status" (selectionChange)="fetchRentRequests(status)">
           <mat-option value="all" selected>- All -</mat-option>
           <mat-option value="pending">Pending</mat-option>
           <mat-option value="reserved">Reserved</mat-option>
@@ -16,13 +13,8 @@
         </mat-select>
       </mat-form-field>
     </div>
-    <table
-      mat-table
-      [dataSource]="rentRequestsDataSource"
-      multiTemplateDataRows
-      class="mat-elevation-z8 expendable-table mt-3"
-      matSort
-    >
+    <table mat-table [dataSource]="rentRequestsDataSource" multiTemplateDataRows
+      class="mat-elevation-z8 expendable-table mt-3" matSort>
       <ng-container matColumnDef="client">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Client</th>
         <td mat-cell *matCellDef="let element">
@@ -45,49 +37,26 @@
       <ng-container matColumnDef="buttons">
         <th mat-header-cell *matHeaderCellDef class="buttons-width">&nbsp;</th>
         <td mat-cell *matCellDef="let element">
-          <button
-            mat-icon-button
-            aria-label="Accept"
-            *ngIf="element.rentRequestStatus == 'PENDING'"
-            color="success"
-            matTooltip="Accept"
-            (click)="accept(element)"
-          >
+          <button mat-icon-button aria-label="Accept" *ngIf="element.rentRequestStatus == 'PENDING'" color="success"
+            matTooltip="Accept" (click)="accept(element);$event.stopPropagation()">
             <mat-icon>done</mat-icon>
           </button>
-          <button
-            mat-icon-button
-            aria-label="Accept"
-            *ngIf="element.rentRequestStatus == 'PENDING'"
-            color="warn"
-            matTooltip="Reject"
-            (click)="reject(element)"
-          >
+          <button mat-icon-button aria-label="Accept" *ngIf="element.rentRequestStatus == 'PENDING'" color="warn"
+            matTooltip="Reject" (click)="reject(element);$event.stopPropagation()">
             <mat-icon>clear</mat-icon>
           </button>
-          <button
-            mat-icon-button
-            aria-label="View details"
-            matTooltip="View details"
-            (click)="viewDetails(element)"
-          >
+          <button mat-icon-button aria-label="View details" matTooltip="View details"
+            (click)="viewDetails(element);$event.stopPropagation()">
             <mat-icon>open_in_new</mat-icon>
           </button>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="expandedDetail">
-        <td
-          mat-cell
-          *matCellDef="let element"
-          [attr.colspan]="displayedColumns.length"
-        >
-          <div
-            class="element-detail"
-            [@detailExpand]="
+        <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+          <div class="element-detail" [@detailExpand]="
               element == expandedElement ? 'expanded' : 'collapsed'
-            "
-          >
+            ">
             <div *ngFor="let rentInfo of element.rentInfos">
               <mat-card class="item-card">
                 <div class="row">
@@ -95,10 +64,7 @@
                     <mat-card-header>
                       <mat-card-title>
                         Rent info for
-                        <span
-                          (click)="advertisementDetails(rentInfo)"
-                          class="btn-adv-details"
-                        >
+                        <span (click)="advertisementDetails(rentInfo);$event.stopPropagation()" class="btn-adv-details">
                           {{ rentInfo.advertisement.car.make }}
                           {{ rentInfo.advertisement.car.model }}
                         </span>
@@ -108,7 +74,7 @@
                   <!-- 
                                     <div class="col-3 mt-0" align="end">
                                         <button mat-raised-button *ngIf="element.rentRequestStatus == 'PAID'"
-                                            color="primary" (click)="createRentReport()">Create
+                                            color="primary" (click)="createRentReport();$event.stopPropagation()">Create
                                             Report</button>
                                     </div> -->
                 </div>
@@ -157,18 +123,10 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-      <tr
-        mat-row
-        *matRowDef="let element; columns: displayedColumns"
-        class="element-row"
+      <tr mat-row *matRowDef="let element; columns: displayedColumns" class="element-row"
         [class.expanded-row]="expandedElement === element"
-        (click)="expandedElement = expandedElement === element ? null : element"
-      ></tr>
-      <tr
-        mat-row
-        *matRowDef="let row; columns: ['expandedDetail']"
-        class="detail-row"
-      ></tr>
+        (click)="expandedElement = expandedElement === element ? null : element"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
     </table>
   </mat-card-content>
 </mat-card>
