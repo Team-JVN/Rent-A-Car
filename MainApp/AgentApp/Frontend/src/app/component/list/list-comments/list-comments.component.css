@@ -1,0 +1,49 @@
+.dialog-class {
+  width: 600px;
+}
+
+.form-full-width {
+  width: 100%;
+}
+
+.labelRaiting {
+  margin-top: 15px;
+}
+
+.page-title {
+  color: black;
+  text-align: center;
+  font-weight: 550;
+}
+
+.feedback-title {
+  color: black;
+  font-weight: 550;
+}
+
+.rating-style {
+  pointer-events: none;
+}
+
+.comment-rating-card {
+  width: 100%;
+  display: inline-flex;
+  background-color: #e8f5e9;
+  margin: 0.7em auto;
+  align-items: center;
+  transition: all 0.1s ease-in-out;
+}
+
+:host ::ng-deep .mat-form-field-infix {
+  width: inherit;
+  border-top: 0;
+}
+
+.your-comment {
+  width: 26%;
+  vertical-align: top;
+}
+
+.your-comment-label {
+  margin-top: 0.3em;
+}

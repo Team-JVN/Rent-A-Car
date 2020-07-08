@@ -58,9 +58,7 @@ public class AdvertisementProducer {
     }
 
     public void sendUpdateCarMileage(Long carId, Integer madeMileage){
-//        System.out.println("sending car mileage");
         rabbitTemplate.convertAndSend(UPDATE_CAR_MILEAGE, jsonToString(new UpdateCarMileageDTO(carId, madeMileage)));
-        System.out.println("sending car mileage2");
 
     }
 

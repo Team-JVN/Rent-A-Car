@@ -5,6 +5,7 @@ import { ReplacePipe } from "./util/replace.pipe";
 import { ErrorInterceptor } from "./interceptor/error.interceptor";
 import { AddRentReportComponent } from "./component/add/add-rent-report/add-rent-report.component";
 import { ListRentReportsComponent } from "./component/list/list-rent-reports/list-rent-reports.component";
+import { ListComments } from "./component/list/list-comments/list-comments.component";
 import { AgentGuard } from "./guard/agent.guard";
 import { TokenInterceptor } from "./interceptor/token.interceptor";
 import { AddRentRequestComponent } from "./component/add/add-rent-request/add-rent-request.component";
@@ -139,6 +140,7 @@ import { ViewMessagesComponent } from "./component/view-messages/view-messages.c
     EditMakeComponent,
     ListMakesComponent,
     ListModelsComponent,
+    ListComments,
     ConfirmDialogDeleteMakeComponent,
     RentRequestDetailsComponent,
     ClientRentRequestDetailsComponent,
@@ -208,6 +210,7 @@ import { ViewMessagesComponent } from "./component/view-messages/view-messages.c
     EditModelComponent,
     EditMakeComponent,
     AddModelComponent,
+    ListComments,
     LeaveFeedbackComponent,
     ReviewFeedbackComponent,
     AddToCartComponent,

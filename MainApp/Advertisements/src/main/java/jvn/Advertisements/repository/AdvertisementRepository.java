@@ -32,4 +32,6 @@ public interface AdvertisementRepository extends JpaRepository<Advertisement, Lo
 
     List<Advertisement> findAllByOwner(Long loggedInUser);
 
+    Advertisement findOneById(Long id);
+
 }

@@ -68,6 +68,7 @@ import { EditModelComponent } from "./component/edit/edit-model/edit-model.compo
 import { EditMakeComponent } from "./component/edit/edit-make/edit-make.component";
 import { AddMakeComponent } from "./component/add/add-make/add-make.component";
 import { ListMakesComponent } from "./component/list/list-makes/list-makes.component";
+import { ListComments } from "./component/list/list-comments/list-comments.component";
 import { ListModelsComponent } from "./component/list/list-models/list-models.component";
 import { ConfirmDialogDeleteMakeComponent } from "./component/confirm-dialog/confirm-dialog-delete-make/confirm-dialog-delete-make.component";
 import { SearchAdvertisementsComponent } from "./component/list/search-advertisements/search-advertisements.component";
@@ -99,7 +100,7 @@ import { ConfirmDeleteClientComponent } from "./component/confirm-dialog/confirm
 import { ConfirmDialogDeleteAgentComponent } from "./component/confirm-dialog/confirm-dialog-delete-agent/confirm-dialog-delete-agent.component";
 import { ConfirmDialogDeleteAdminComponent } from "./component/confirm-dialog/confirm-dialog-delete-admin/confirm-dialog-delete-admin.component";
 import { AddToCartComponent } from "./component/add/add-to-cart/add-to-cart.component";
-import { ManageCommentsGuard } from './guard/manage.coments.guard';
+import { ManageCommentsGuard } from "./guard/manage.coments.guard";
 
 @NgModule({
   declarations: [
@@ -146,6 +147,7 @@ import { ManageCommentsGuard } from './guard/manage.coments.guard';
     EditModelComponent,
     EditMakeComponent,
     ListMakesComponent,
+    ListComments,
     ListModelsComponent,
     ConfirmDialogDeleteMakeComponent,
     SearchAdvertisementsComponent,
@@ -222,6 +224,7 @@ import { ManageCommentsGuard } from './guard/manage.coments.guard';
     ConfirmDialogDeleteMakeComponent,
     EditModelComponent,
     EditMakeComponent,
+    ListComments,
     ReviewFeedbackComponent,
     LeaveFeedbackComponent,
     EditClientInfoComponent,
@@ -251,8 +254,8 @@ import { ManageCommentsGuard } from './guard/manage.coments.guard';
     ManageAdvertisementsGuard,
     ManagePriceListsGuard,
     MyRentRequestsGuard,
-    ManageCommentsGuard
+    ManageCommentsGuard,
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

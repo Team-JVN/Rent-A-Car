@@ -46,9 +46,7 @@ public class PriceListServiceImpl implements PriceListService {
 
     @Override
     public List<PriceList> getAll() {
-        System.out.println("Haj3");
         synchronizePriceLists();
-        System.out.println("Haj4");
         return priceListRepository.findByStatus(LogicalStatus.EXISTING);
     }
 

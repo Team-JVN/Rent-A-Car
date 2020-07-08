@@ -35,7 +35,7 @@ public class PriceListEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getPriceListDetailsRequest")
     @ResponsePayload
     public GetPriceListDetailsResponse createOrEdit(@RequestPayload GetPriceListDetailsRequest request) {
-        System.out.println("aaaaHaj3");
+
         UserInfoDTO dto = userClient.getUser(request.getEmail());
         if (dto == null) {
             return null;
@@ -51,7 +51,7 @@ public class PriceListEndpoint {
         }
         GetPriceListDetailsResponse response = new GetPriceListDetailsResponse();
         response.setPriceListDetails(priceListDetails);
-        System.out.println("ssssHaj4");
+
         return response;
     }
 

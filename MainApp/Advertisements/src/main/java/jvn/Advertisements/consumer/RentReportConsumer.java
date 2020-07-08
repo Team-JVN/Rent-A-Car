@@ -24,12 +24,12 @@ public class RentReportConsumer {
 
     @RabbitListener(queues = RabbitMQConfiguration.MILEAGE)
     public void listenCarUpdates(String message) {
-        System.out.println("*********************LISTEN TO SOUND HERE IN MY HEART*********************");
+
         RentReportMessageDTO rentReportMessageDTO = stringToObject(message);
         if (rentReportMessageDTO.getAdvertisementId() != null) {
             Advertisement advertisement = advertisementRepository.findById(rentReportMessageDTO.getAdvertisementId()).orElse(null);
             if (advertisement != null) {
-                System.out.println("sending car mileage rent report consumer");
+
 
                 sendCarUpdates(advertisement.getCar(), rentReportMessageDTO.getMadeMileage());
             }

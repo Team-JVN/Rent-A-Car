@@ -20,7 +20,7 @@ export const environment = {
   make: "/api/make",
   model: "/api/model",
   message: "/api/message",
-  comment: '/api/comment',
+  comment: "/api/comment",
   rentReport: "/api/rent-report",
   role: "/api/role",
   permission: "/api/permission",

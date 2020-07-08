@@ -26,15 +26,17 @@ public class CommentConsumer {
     @RabbitListener(queues = RabbitMQConfiguration.REJECTED_COMMENT)
     public void listenRejectedComment(Long clientId) {
 //        Long clientId = stringToObject(message);
-        System.out.println("listenRejectedComment");
         if (clientId != null) {
+
             Client client = clientRepository.findOneByIdAndStatusNot(clientId, ClientStatus.DELETED);
+
             if(client != null){
+
                 Integer count = client.getRejectedCommentsCounter() + 1;
                 client.setRejectedCommentsCounter(count);
-                System.out.println("UPDATING REJECTED COMMENTS COUNTER>>>");
+
                 clientRepository.save(client);
-                System.out.println("UPDATED REJECTED COMMENTS COUNTER<<<<");
+
             }
 
         }

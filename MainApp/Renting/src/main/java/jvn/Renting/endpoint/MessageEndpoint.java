@@ -63,7 +63,7 @@ public class MessageEndpoint {
         return response;
     }
 
-    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getAllMessagesRequest")
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getAllMessagesDetailsRequest")
     @ResponsePayload
     public GetAllMessagesDetailsResponse getAllMessages(@RequestPayload GetAllMessagesDetailsRequest request) {
         UserInfoDTO dto = userClient.getUser(request.getEmail());

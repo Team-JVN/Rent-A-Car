@@ -1,22 +1,12 @@
 package jvn.RentACar.serviceImpl;
 
-import jvn.RentACar.dto.both.CommentDTO;
-import jvn.RentACar.dto.both.FeedbackDTO;
 import jvn.RentACar.dto.request.RentRequestStatusDTO;
-import jvn.RentACar.dto.soap.message.CreateMessageResponse;
-import jvn.RentACar.enumeration.CommentStatus;
 import jvn.RentACar.client.RentRequestClient;
-import jvn.RentACar.dto.request.RentRequestStatusDTO;
 import jvn.RentACar.dto.soap.rentrequest.*;
 import jvn.RentACar.enumeration.RentRequestStatus;
-import jvn.RentACar.exceptionHandler.InvalidCommentDataException;
 import jvn.RentACar.exceptionHandler.InvalidRentRequestDataException;
-import jvn.RentACar.mapper.CommentDtoMapper;
-import jvn.RentACar.mapper.MessageDetailsMapper;
 import jvn.RentACar.mapper.RentRequestDetailsMapper;
 import jvn.RentACar.model.*;
-import jvn.RentACar.repository.MessageRepository;
-import jvn.RentACar.repository.RentInfoRepository;
 import jvn.RentACar.repository.RentRequestRepository;
 import jvn.RentACar.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +51,9 @@ public class RentRequestServiceImpl implements RentRequestService {
 
     private LogService logService;
 
+    private RentReportService rentReportService;
+
+    private CommentService commentService;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -120,6 +113,8 @@ public class RentRequestServiceImpl implements RentRequestService {
     @Override
     public List<RentRequest> getMine(String status) {
         synchronize();
+        rentReportService.synchronize();
+        commentService.synchronize();
         User loggedInUser = userService.getLoginUser();
         if (status.equals("all")) {
             return rentRequestRepository.findByClientEmail(loggedInUser.getEmail());
@@ -131,6 +126,8 @@ public class RentRequestServiceImpl implements RentRequestService {
     @Override
     public List<RentRequest> get(Long advertisementId, String status) {
         synchronize();
+        rentReportService.synchronize();
+        commentService.synchronize();
         Advertisement advertisement = advertisementService.get(advertisementId);
         if (!userService.getLoginUser().getEmail().equals(advertisement.getCar().getOwner().getEmail())) {
             throw new InvalidRentRequestDataException("This rent request is not yours.", HttpStatus.BAD_REQUEST);
@@ -466,7 +463,7 @@ public class RentRequestServiceImpl implements RentRequestService {
                                   UserService userService, RentRequestRepository rentRequestRepository,
                                   EmailNotificationService emailNotificationService, Environment environment,
                                   RentRequestClient rentRequestClient, RentRequestDetailsMapper rentRequestDetailsMapper,
-                                  LogService logService) {
+                                  LogService logService, RentReportService rentReportService, CommentService commentService) {
         this.clientService = clientService;
         this.advertisementService = advertisementService;
         this.rentRequestRepository = rentRequestRepository;
@@ -476,5 +473,7 @@ public class RentRequestServiceImpl implements RentRequestService {
         this.rentRequestClient = rentRequestClient;
         this.rentRequestDetailsMapper = rentRequestDetailsMapper;
         this.logService = logService;
+        this.rentReportService = rentReportService;
+        this.commentService = commentService;
     }
 }
