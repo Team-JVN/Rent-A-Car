@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.text.ParseException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,6 +37,11 @@ public class RentReportController {
         List<RentReportDTO> list = rentReportService.getAll().stream().map(rentReportDtoMapper::toDto).
                 collect(Collectors.toList());
         return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @GetMapping("/{rentInfoId}")
+    public ResponseEntity<RentReportDTO> getOne(@PathVariable @Positive(message = "Id must be positive.") Long rentInfoId) {
+        return new ResponseEntity<>(rentReportDtoMapper.toDto(rentReportService.get(rentInfoId)), HttpStatus.OK);
     }
 
     @Autowired

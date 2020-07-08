@@ -74,6 +74,7 @@ import { ConfirmDialogDeleteMakeComponent } from "./component/confirm-dialog/con
 import { SearchAdvertisementsComponent } from "./component/list/search-advertisements/search-advertisements.component";
 import { RatingModule } from "ng-starrating";
 import { RentRequestDetailsComponent } from "./component/details/rent-request-details/rent-request-details.component";
+import { RentReportDetailsComponent } from "./component/details/rent-report-details/rent-report-details.component";
 import { ViewMessagesComponent } from "./component/view-messages/view-messages.component";
 import { ReviewFeedbackComponent } from "./component/review-feedback/review-feedback.component";
 import { ListClientRentRequestsComponent } from "./component/list/list-client-rent-requests/list-client-rent-requests.component";
@@ -152,6 +153,7 @@ import { ManageCommentsGuard } from "./guard/manage.coments.guard";
     ConfirmDialogDeleteMakeComponent,
     SearchAdvertisementsComponent,
     RentRequestDetailsComponent,
+    RentReportDetailsComponent,
     ViewMessagesComponent,
     ReviewFeedbackComponent,
     ListClientRentRequestsComponent,
@@ -217,6 +219,7 @@ import { ManageCommentsGuard } from "./guard/manage.coments.guard";
     EditClientComponent,
     AddRentRequestComponent,
     AddRentReportComponent,
+    RentReportDetailsComponent,
     AddAgentComponent,
     AddAdminComponent,
     AddMakeComponent,

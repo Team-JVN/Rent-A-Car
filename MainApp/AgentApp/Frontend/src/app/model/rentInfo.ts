@@ -14,6 +14,7 @@ export class RentInfo {
   paid: boolean;
   comments: Comment[];
   rentReport: RentReport;
+  rating: number;
   constructor(
     dateTimeFrom: string,
     dateTimeTo: string,
@@ -23,7 +24,8 @@ export class RentInfo {
     id?: number,
     additionalCost?: number,
     paid?: boolean,
-    rentReport?: RentReport
+    rentReport?: RentReport,
+    rating?: number
   ) {
     this.dateTimeFrom = dateTimeFrom;
     this.dateTimeTo = dateTimeTo;
@@ -35,5 +37,6 @@ export class RentInfo {
     this.additionalCost = additionalCost;
     this.paid = paid;
     this.rentReport = rentReport;
+    this.rating = rating;
   }
 }

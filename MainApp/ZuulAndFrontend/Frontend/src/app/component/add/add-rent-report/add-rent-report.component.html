@@ -18,7 +18,7 @@
     </mat-form-field>
     <!-- TODO:add rent info -->
     <mat-form-field class="form-full-width">
-      <textarea matInput placeholder="Comment" formControlName="comment">
+      <textarea matInput placeholder="Comment" formControlName="comment" rows="5">
       </textarea>
       <mat-error *ngIf="
           createForm.get('comment').errors &&

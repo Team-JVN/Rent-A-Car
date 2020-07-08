@@ -38,9 +38,8 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comment createComment(Comment comment, Long id, Long rentInfoId, Long userId) {
-        //TODO: which status has the comment made by agent
         comment.setStatus(CommentStatus.APPROVED);
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
+        RentRequest rentRequest = rentRequestRepository.findOneById(id);
         RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
         checkIfCanComment(rentInfo);
         rentInfo.getComments().add(comment);
@@ -50,35 +49,38 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public FeedbackDTO leaveFeedback(FeedbackDTO feedbackDTO, Long id, Long rentInfoId, Long userId, String userName, Boolean canCreateComments){
+    public FeedbackDTO leaveFeedback(FeedbackDTO feedbackDTO, Long id, Long rentInfoId, Long userId, String userName, Boolean canCreateComments) {
 
         if (!canCreateComments) {
             throw new InvalidCommentDataException("You are not allowed to create comments. ", HttpStatus.BAD_REQUEST);
         }
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
+        RentRequest rentRequest = rentRequestRepository.findOneById(id);
         Set<RentInfo> rentInfos = rentRequest.getRentInfos();
-//        RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
-        if(commentRepository.findBySenderIdAndRentInfoId(userId, rentInfoId).isEmpty()){
+
+        if (commentRepository.findBySenderIdAndRentInfoId(userId, rentInfoId).isEmpty()) {
             RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
             List<CommentDTO> commentDTOS = new ArrayList<>(feedbackDTO.getComments());
             Comment comment = new Comment();
             comment.setSenderId(userId);
             comment.setSenderName(userName);
-            comment.setStatus(CommentStatus.AWAITING);
+            if (commentDTOS.get(0).getStatus() != null && commentDTOS.get(0).getStatus().equals(CommentStatus.APPROVED)) {
+                comment.setStatus(CommentStatus.APPROVED);
+            } else {
+                comment.setStatus(CommentStatus.AWAITING);
+            }
             comment.setRentInfo(rentInfo);
             comment.setText(commentDTOS.get(0).getText());
             comment = commentRepository.save(comment);
-            commentDTOS.set(0,commentDtoMapper.toDto(comment));
+            commentDTOS.set(0, commentDtoMapper.toDto(comment));
             feedbackDTO.getComments().clear();
             feedbackDTO.getComments().addAll(commentDTOS);
-//            rentInfo.getComments().add(comment);
-            rentInfo.setRating(feedbackDTO.getRating());
-            rentInfoRepository.save(rentInfo);
-//            sendUpdateCarAvgRating(rentInfo.getId(), rentInfo.getRating());
-//            rentRequest.setRentInfos(new HashSet<>(rentInfos));
-//            rentRequestRepository.save(rentRequest);
 
-        }else{
+            rentInfo.setRating(feedbackDTO.getRating());
+            commentProducer.sendUpdateCarRating(rentInfo.getCar(), feedbackDTO.getRating());
+            rentInfoRepository.save(rentInfo);
+
+
+        } else {
             throw new InvalidCommentDataException("There is already comment for this rent info.", HttpStatus.BAD_REQUEST);
         }
 
@@ -92,12 +94,10 @@ public class CommentServiceImpl implements CommentService {
         RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
         feedbackDTO.setRating(rentInfo.getRating());
         feedbackDTO.setComments(new HashSet<>());
-        for(Comment comment: rentInfo.getComments()){
-            if(comment.getStatus().equals(CommentStatus.APPROVED)){
-
+        for (Comment comment : rentInfo.getComments()) {
+            if (comment.getStatus().equals(CommentStatus.APPROVED)) {
                 CommentDTO commentDTO = commentDtoMapper.toDto(comment);
                 feedbackDTO.getComments().add(commentDTO);
-
             }
 
         }
@@ -121,7 +121,7 @@ public class CommentServiceImpl implements CommentService {
                     }
                 }
             }
-        }else{
+        } else {
             throw new InvalidCommentDataException("Cannon crete comment.",
                     HttpStatus.BAD_REQUEST);
         }
@@ -151,7 +151,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Comment approve(Long id) {
         Comment comment = commentRepository.findOneById(id);
-        if(comment.getStatus().equals(CommentStatus.APPROVED)){
+        if (comment.getStatus().equals(CommentStatus.APPROVED)) {
             throw new InvalidCommentDataException("Comment is already approved.",
                     HttpStatus.NOT_FOUND);
         }
@@ -162,11 +162,13 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void reject(Long id, Long userId) {
         Comment comment = commentRepository.findOneById(id);
+        RentInfo rentInfo = comment.getRentInfo();
+        rentInfo.getComments().remove(comment);
+        rentInfoRepository.save(rentInfo);
         comment.setRentInfo(null);
-        commentRepository.deleteById(id);
-        //TODO:increase the number of rejected comments of User
-        sendRejectedComment(comment.getSenderId());
-
+        Long user = comment.getSenderId();
+        commentRepository.deleteById(comment.getId());
+        sendRejectedComment(user);
     }
 
 
@@ -184,10 +186,6 @@ public class CommentServiceImpl implements CommentService {
         commentProducer.sendRejectedComment(userId);
     }
 
-//    @Async
-//    public void sendUpdateCarAvgRating(Long rentInfoId, Integer rating){
-//        commentProducer.sendRejectedComment(userId);
-//    }
 
     @Autowired
     public CommentServiceImpl(CommentRepository commentRepository, CommentProducer commentProducer,

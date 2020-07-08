@@ -92,6 +92,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         Advertisement ad = advertisementRepository.findOneById(advertisementId);
         AdvertisementDTO adDTO = new AdvertisementDTO();
         adDTO.setKilometresLimit(ad.getKilometresLimit());
+        adDTO.setOwner(ad.getOwner());
         PriceListDTO plDTO = priceListDtoMapper.toDto(ad.getPriceList());
         adDTO.setPriceList(plDTO);
         return adDTO;

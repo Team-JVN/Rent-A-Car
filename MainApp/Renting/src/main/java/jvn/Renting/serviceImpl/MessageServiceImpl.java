@@ -1,6 +1,9 @@
 package jvn.Renting.serviceImpl;
 
+import jvn.Renting.client.AdvertisementClient;
+import jvn.Renting.dto.both.AdvertisementWithIdsDTO;
 import jvn.Renting.model.Message;
+import jvn.Renting.model.RentInfo;
 import jvn.Renting.model.RentRequest;
 import jvn.Renting.repository.MessageRepository;
 import jvn.Renting.repository.RentRequestRepository;
@@ -18,6 +21,8 @@ public class MessageServiceImpl implements MessageService {
     private RentRequestRepository rentRequestRepository;
 
     private MessageRepository messageRepository;
+
+    private AdvertisementClient advertisementClient;
 
     @Override
     public Message createMessage(Message message, Long id, Long userId, String userEmail) {
@@ -43,11 +48,14 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<Message> getMessages(Long id, Long userId) {
-        RentRequest rentRequest = rentRequestRepository.findOneByIdAndCreatedByOrIdAndClient(id, userId, id, userId);
+        RentRequest rentRequest = rentRequestRepository.findOneById(id);
         List<Message> messages = new ArrayList<>();
         List<Message>currMessages = messageRepository.findByRentRequestId(id);
+        List<RentInfo> rentInfos = new ArrayList<>(rentRequest.getRentInfos());
+        AdvertisementWithIdsDTO advertisementWithIdsDTO = advertisementClient.getOne(rentInfos.get(0).getAdvertisement());
         for(Message message: currMessages){
-            if(message.getSenderId().equals(userId) || rentRequest.getCreatedBy().equals(userId) || rentRequest.getClient().equals(userId)){
+            if(message.getSenderId().equals(userId) || rentRequest.getCreatedBy().equals(userId)
+                    || rentRequest.getClient().equals(userId) || advertisementWithIdsDTO.getOwner().equals(userId)){
                 messages.add(message);
             }
         }
@@ -55,8 +63,10 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Autowired
-    public MessageServiceImpl(RentRequestRepository rentRequestRepository, MessageRepository messageRepository) {
+    public MessageServiceImpl(RentRequestRepository rentRequestRepository, MessageRepository messageRepository,
+                              AdvertisementClient advertisementClient) {
         this.rentRequestRepository = rentRequestRepository;
         this.messageRepository = messageRepository;
+        this.advertisementClient = advertisementClient;
     }
 }

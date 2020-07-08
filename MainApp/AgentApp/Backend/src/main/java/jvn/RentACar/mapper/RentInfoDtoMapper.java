@@ -29,6 +29,7 @@ public class RentInfoDtoMapper implements MapperInterface<RentInfo, RentInfoDTO>
         rentInfo.setDateTimeTo(getLocalDateTime(dto.getDateTimeTo()));
         rentInfo.setOptedForCDW(dto.getOptedForCDW());
         rentInfo.setId(dto.getId());
+        rentInfo.setRating(dto.getRating());
         Set<Comment> comments = new HashSet<Comment>();
         if(dto.getComments() != null){
             for(CommentDTO commentDTO: dto.getComments()){

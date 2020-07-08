@@ -1,0 +1,29 @@
+<h1 mat-dialog-title class="feedback-title">Rent Reports</h1>
+<mat-dialog-content class="dialog-class">
+  <mat-card class="comment-rating-card">
+    <mat-card-content *ngIf="rentReport">
+      <div class="row">
+        <div class="col-5">
+          <label class="page-title">Mileage</label>
+        </div>
+        <div class="col-7">{{ rentReport.madeMileage }} km</div>
+      </div>
+      &nbsp;
+      <div class="row" *ngIf="rentReport">
+        <div class="col-5">
+          <label class="page-title">Comment</label>
+        </div>
+        <div class="col-7">
+          {{ rentReport.comment }}
+        </div>
+      </div>
+      &nbsp;
+      <div class="row" *ngIf="rentReport">
+        <div class="col-5">
+          <label class="page-title">Additional Cost</label>
+        </div>
+        <div class="col-7">{{ rentReport.additionalCost }} €</div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</mat-dialog-content>

@@ -9,6 +9,8 @@ public interface RentReportService {
 
     List<RentReport> getAll();
 
+    RentReport get(Long rentInfoId);
+
     void synchronize();
 }
 

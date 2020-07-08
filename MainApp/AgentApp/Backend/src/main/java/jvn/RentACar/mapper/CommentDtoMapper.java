@@ -20,20 +20,19 @@ public class CommentDtoMapper implements MapperInterface<Comment, CommentDTO>{
 
     @Override
     public Comment toEntity(CommentDTO dto) {
-//        Comment entity = modelMapper.map(dto, Comment.class);
+
         Comment entity = new Comment();
         entity.setStatus(dto.getStatus());
         entity.setSender(userService.findByEmail(dto.getSender().getEmail()));
-//        entity.setSenderName(dto.getSender().getName());
-//        entity.setSender(userDtoMapper.toEntity(dto.getSender()));
+
         entity.setText(dto.getText());
-//        entity.setRentInfo(rentInfoDtoMapper.toEntity(dto.getRentInfo()));
+
         return entity;
     }
 
     @Override
     public CommentDTO toDto(Comment entity) {
-//        CommentDTO dto = modelMapper.map(entity, CommentDTO.class);
+
         CommentDTO dto = new CommentDTO();
         UserDTO sender = new UserDTO();
         sender.setName(entity.getSender().getName());

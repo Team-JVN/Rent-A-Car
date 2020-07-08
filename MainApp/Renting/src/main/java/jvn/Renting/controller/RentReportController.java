@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 
 @Validated
 @RestController
@@ -30,6 +31,12 @@ public class RentReportController {
         return new ResponseEntity<>(rentReportDtoMapper.toDto(rentReportService.create(rentReportDtoMapper.toEntity(rentReport), rentInfoId)),
                 HttpStatus.CREATED);
     }
+
+    @GetMapping("/{rentInfoId}")
+    public ResponseEntity<RentReportDTO> getOne(@PathVariable @Positive(message = "Id must be positive.") Long rentInfoId) {
+        return new ResponseEntity<>(rentReportDtoMapper.toDto(rentReportService.getRentReports(rentInfoId)), HttpStatus.OK);
+    }
+
 
     @Autowired
     public RentReportController(RentReportService rentReportService, RentReportDtoMapper rentReportDtoMapper,

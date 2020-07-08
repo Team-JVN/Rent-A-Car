@@ -57,7 +57,6 @@ export class ViewMessagesComponent implements OnInit {
       new UserInfo(this.loggedInUser),
       dateAndTime
     );
-    console.log(message);
 
     // Primer slanja poruke preko web socketa sa klijenta. URL je
     //  - ApplicationDestinationPrefix definisan u config klasi na serveru (configureMessageBroker() metoda)
@@ -81,7 +80,6 @@ export class ViewMessagesComponent implements OnInit {
   }
 
   getMessages() {
-    console.log(this.client.email);
     this.messageService.getMessages(this.rentRequest.id).subscribe(
       (data: Message[]) => {
         this.toastr.success("Success!", "Fetch messages");
@@ -126,7 +124,6 @@ export class ViewMessagesComponent implements OnInit {
       this.stompClient.subscribe(
         "/socket-publisher",
         (message: { body: string }) => {
-          console.log("handle result");
           this.handleResult(message);
         }
       );

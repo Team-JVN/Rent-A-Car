@@ -37,4 +37,6 @@ public class RentInfoDTO {
     private Boolean paid;
 
     private RentReportDTO rentReport;
+
+    private Integer rating;
 }

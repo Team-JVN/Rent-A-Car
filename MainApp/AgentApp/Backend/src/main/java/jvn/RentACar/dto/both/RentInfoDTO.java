@@ -36,4 +36,6 @@ public class RentInfoDTO {
     private Boolean paid;
 
     private Set<CommentDTO> comments;
+
+    private Integer rating;
 }

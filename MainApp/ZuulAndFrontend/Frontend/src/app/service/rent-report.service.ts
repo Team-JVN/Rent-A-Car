@@ -18,6 +18,10 @@ export class RentReportService {
     return this.httpClient.post(this.url + "/" + rentInfoId, rentReport);
   }
 
+  public get(rentInfoId: number): any {
+    return this.httpClient.get(this.url + "/" + rentInfoId);
+  }
+
   public edit(rentReport: RentReport): any {
     // return this.httpClient.put(this.url + '/' + rentRequest.id, rentRequest);
   }

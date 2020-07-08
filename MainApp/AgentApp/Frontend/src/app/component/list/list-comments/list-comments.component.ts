@@ -51,7 +51,6 @@ export class ListComments implements OnInit {
   ngOnInit() {
     this.loggedInUserEmail = this.authentificationService.getLoggedInUserEmail();
     this.fetchFeedback();
-    console.log(this.loggedInUserEmail);
   }
   fetchFeedback() {
     this.rentRequestService
@@ -59,14 +58,9 @@ export class ListComments implements OnInit {
       .subscribe(
         (data: Feedback) => {
           this.feedback = data;
-          console.log(data);
-          this.feedback.comments.forEach((comment) => {
-            if (comment.sender.email != this.loggedInUserEmail) {
-              this.setUpComment = comment;
-            } else {
-              this.loggedInUserComment = comment;
-            }
-          });
+          data.comments.sort((a, b) => a.id - b.id);
+          this.setUpComment = this.feedback.comments[0];
+          this.loggedInUserComment = this.feedback.comments[1];
           this.toastr.success("Success!", "Fetch feedback");
         },
         (httpErrorResponse: HttpErrorResponse) => {

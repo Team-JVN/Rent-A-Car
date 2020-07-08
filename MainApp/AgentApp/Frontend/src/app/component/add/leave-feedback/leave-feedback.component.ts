@@ -33,7 +33,6 @@ export class LeaveFeedbackComponent implements OnInit {
       .getRentInfoFeedback(this.data.rentInfo.id, this.data.rentRequest.id)
       .subscribe(
         (data: Feedback) => {
-          console.log(data);
           this.toastr.success("Success!", "Fetch feedback");
         },
         (httpErrorResponse: HttpErrorResponse) => {
@@ -44,14 +43,13 @@ export class LeaveFeedbackComponent implements OnInit {
 
   setRating(star: number) {
     this.rating = star;
-    console.log("RATING: " + star);
   }
 
   leaveFeedback() {
     const feedback = new Feedback(this.rating, [
       new Comment(this.comment, new UserInfo(this.loggedInUser)),
     ]);
-    console.log(feedback);
+
     this.rentRequestService
       .leaveFeedback(feedback, this.data.rentInfo.id, this.data.rentRequest.id)
       .subscribe(

@@ -59,17 +59,22 @@ public class RentReportServiceImpl implements RentReportService {
         CheckIfCanCreateRentReportResponse response = rentReportClient.checkIfCanCreateRentReport(rentInfo.getMainAppId());
 
         if (response == null || !response.isValue()) {
-            System.out.println("null impl");
+
 
             throw new InvalidCommentDataException("Cannot create rent report.",
                     HttpStatus.BAD_REQUEST);
         }
         rentReport.setAdditionalCost(calculateAdditionalCost(rentReport));
+        if (rentReport.getAdditionalCost() > 0) {
+            rentReport.setPaid(false);
+        } else {
+            rentReport.setPaid(true);
+        }
         calculateMileageInKm(rentReport);
         rentReport = rentReportRepository.save(rentReport);
         CreateRentReportResponse createRentReportResponse = rentReportClient.createRentReport(rentInfo.getMainAppId(), rentReport);
         RentReportDetails rentReportDetails = createRentReportResponse.getRentReportDetails();
-        if(rentReportDetails != null && rentReportDetails.getId() != null){
+        if (rentReportDetails != null && rentReportDetails.getId() != null) {
 
             rentReport.setMainAppId(rentReportDetails.getId());
         }
@@ -120,16 +125,15 @@ public class RentReportServiceImpl implements RentReportService {
     @Scheduled(cron = "0 40 0/3 * * ?")
     public void synchronizeRentReports() {
         try {
-            for(RentInfo rentInfo: rentInfoRepository.findAll())
-            {
+            for (RentInfo rentInfo : rentInfoRepository.findAll()) {
                 GetAllRentReportsDetailsResponse response = rentReportClient.getRentReports(rentInfo.getMainAppId());
                 if (response == null) {
                     continue;
-                }else{
+                } else {
                     RentReportDetails rentReportDetails = response.getRentReportDetails();
                     if (rentReportDetails == null) {
                         continue;
-                    }else{
+                    } else {
                         RentReport rentReport = rentReportDetailsMapper.toEntity(rentReportDetails);
                         RentReport dbRentReport = rentReportRepository.findByMainAppId(rentReport.getMainAppId());
                         if (dbRentReport == null) {
@@ -171,6 +175,13 @@ public class RentReportServiceImpl implements RentReportService {
     public List<RentReport> getAll() {
         return rentReportRepository.findAll();
 
+    }
+
+    @Override
+    public RentReport get(Long rentInfoId) {
+        RentInfo rentInfo = rentInfoService.get(rentInfoId);
+        RentReport rentReport = rentInfo.getRentReport();
+        return rentReport;
     }
 
     @Override

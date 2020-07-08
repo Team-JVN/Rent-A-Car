@@ -9,45 +9,54 @@
               <div class="col-6">
                 <mat-card-header>
                   <mat-card-title>
-                    Rent info for
+                    Rent info for<br />
                     <span
                       (click)="advertisementDetails(rentInfo)"
                       class="btn-adv-details"
+                      >{{ rentInfo.advertisement.car.make }}
+                      {{ rentInfo.advertisement.car.model }}</span
                     >
-                      {{ rentInfo.advertisement.car.make }}
-                      {{ rentInfo.advertisement.car.model }}
-                    </span>
                     <button
                       mat-icon-button
                       aria-label="View comments"
+                      *ngIf="checkIfCanShowComments(rentInfo)"
                       matTooltip="View comments"
                       (click)="viewComments(rentInfo)"
                     >
                       <mat-icon>comment</mat-icon>
                     </button>
+                    <button
+                      mat-icon-button
+                      aria-label="View rent report"
+                      *ngIf="checkIfCanShowRentReport(rentInfo)"
+                      matTooltip="View rent report"
+                      (click)="viewRentReport(rentInfo)"
+                    >
+                      <mat-icon>assessment</mat-icon>
+                    </button>
                   </mat-card-title>
                 </mat-card-header>
               </div>
 
-              <div class="col-3 mt-0" align="end">
-                <button
-                  mat-raised-button
-                  *ngIf="checkIfCanCreateComment(rentInfo)"
-                  color="primary"
-                  (click)="reviewFeedback(rentInfo)"
-                >
-                  Review feedback
-                </button>
-              </div>
-              <div class="col-3 mt-0" align="end">
-                <button
-                  mat-raised-button
-                  *ngIf="checkIfCanCreateReport(rentInfo)"
-                  color="primary"
-                  (click)="createRentReport(rentInfo)"
-                >
-                  Create Report
-                </button>
+              <div class="col-6 report-feedback">
+                <div align="end" class="mt-2 mb-2">
+                  <button
+                    mat-raised-button
+                    color="primary"
+                    *ngIf="checkIfCanCreateComment(rentInfo)"
+                    (click)="reviewFeedback(rentInfo)"
+                  >
+                    Review feedback
+                  </button>
+                  <button
+                    mat-raised-button
+                    color="primary"
+                    *ngIf="checkIfCanCreateReport(rentInfo)"
+                    (click)="createRentReport(rentInfo)"
+                  >
+                    Create report
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -111,7 +120,8 @@
             [messages]="messages"
             [client]="rentRequest.client"
             [rentRequest]="rentRequest"
-          ></app-view-messages>
+          >
+          </app-view-messages>
         </div>
       </div>
     </div>

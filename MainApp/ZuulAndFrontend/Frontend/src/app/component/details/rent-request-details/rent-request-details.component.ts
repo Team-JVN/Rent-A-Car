@@ -22,6 +22,7 @@ import { ReviewFeedbackComponent } from "../../review-feedback/review-feedback.c
 import { AddRentReportComponent } from "../../add/add-rent-report/add-rent-report.component";
 import { Comment } from "./../../../model/comment";
 import { ListComments } from "../../list/list-comments/list-comments.component";
+import { RentReportDetailsComponent } from "../rent-report-details/rent-report-details.component";
 
 @Component({
   selector: "app-rent-request-details",
@@ -41,6 +42,8 @@ export class RentRequestDetailsComponent implements OnInit {
   loggedInUserEmail: string;
   availableRentReport: Map<number, boolean>;
   availableReviewFeedback: Map<number, boolean>;
+  availableViewRentReport: Map<number, boolean>;
+  availableViewComment: Map<number, boolean>;
   messages: Message[];
 
   constructor(
@@ -58,6 +61,8 @@ export class RentRequestDetailsComponent implements OnInit {
   ngOnInit() {
     this.availableRentReport = new Map();
     this.availableReviewFeedback = new Map();
+    this.availableViewRentReport = new Map();
+    this.availableViewComment = new Map();
     this.messageForm = this.formBuilder.group({
       text: new FormControl(null, Validators.required),
     });
@@ -81,13 +86,6 @@ export class RentRequestDetailsComponent implements OnInit {
       );
     });
     this.loggedInUserEmail = this.authentificationService.getLoggedInUserEmail();
-
-    // this.getMessages();
-
-    //Delete this
-    // this.messages = [new Message("Cao sta radi,kako si, da li si dorbo.Kako su tvoji. sta radis", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 1), new Message("Kako si", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 2),
-    // new Message("Dobro", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 1), new Message("To?", new UserInfo("pera@gamil.com", "Miroslav Mirosavljevic"), 2)];
-    // this.rentRequestId = 2;
   }
 
   advertisementDetails(rentInfo: RentInfo) {
@@ -106,6 +104,7 @@ export class RentRequestDetailsComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result == true) {
         this.availableRentReport.set(rentInfo.id, false);
+        this.availableViewRentReport.set(rentInfo.id, true);
       }
     });
   }
@@ -122,6 +121,7 @@ export class RentRequestDetailsComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result == true) {
         this.availableReviewFeedback.set(rentInfo.id, false);
+        this.availableViewComment.set(rentInfo.id, true);
       }
     });
   }
@@ -140,6 +140,27 @@ export class RentRequestDetailsComponent implements OnInit {
       rentInfo.comments.length < 2 &&
       comm.status == "APPROVED" &&
       this.availableReviewFeedback.get(rentInfo.id) != false
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  checkIfCanShowComments(rentInfo: RentInfo) {
+    
+    if (
+      rentInfo.comments.length > 0 ||
+      (rentInfo.rating != undefined && rentInfo.rating != 0) ||
+      this.availableViewComment.get(rentInfo.id) == true
+    ) {
+      return true;
+    }
+    return false;
+  }
+  checkIfCanShowRentReport(rentInfo: RentInfo) {
+    if (
+      rentInfo.rentReport != null ||
+      this.availableViewRentReport.get(rentInfo.id) == true
     ) {
       return true;
     }
@@ -184,6 +205,13 @@ export class RentRequestDetailsComponent implements OnInit {
         feedback: null,
         rentInfo: rentInfo,
         rentRequestId: this.rentRequestId,
+      },
+    });
+  }
+  viewRentReport(rentInfo: RentInfo) {
+    let dialogRef = this.dialog.open(RentReportDetailsComponent, {
+      data: {
+        rentInfo: rentInfo,
       },
     });
   }

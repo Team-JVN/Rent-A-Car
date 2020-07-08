@@ -58,7 +58,7 @@ export class ListComments implements OnInit {
       .subscribe(
         (data: Feedback) => {
           this.feedback = data;
-          console.log(data);
+
           data.comments.sort((a, b) => a.id - b.id);
           this.setUpComment = this.feedback.comments[0];
           this.loggedInUserComment = this.feedback.comments[1];

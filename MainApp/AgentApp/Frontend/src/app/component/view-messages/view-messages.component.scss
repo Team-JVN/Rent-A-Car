@@ -36,7 +36,7 @@
 .title {
   font-family: 'Abril Fatface', cursive;
   font-size: 26px;
-  color: #009688;
+  color: #3f51b5;
   letter-spacing: 0;
   text-align: center;
   margin-top: 10px;
@@ -155,7 +155,7 @@ li {
 
 .speech-bubble-own {
   position: relative;
-  background: #009688;
+  background: #3f51b5;
   color: #FFF;
   border-radius: 4px;
   box-shadow: 0px 1px 2px #BDCCD7;
@@ -181,7 +181,7 @@ li {
   z-index: 1;
   transform: skew(0, 30deg);
   right: 0;
-  border-left-color: #009688;
+  border-left-color: #a0aaa9;
   border-right: 0;
   margin-right: -11px;
 }
@@ -198,7 +198,7 @@ li {
   margin-top: -10px;
   transform: skew(0, 30deg);
   right: 0;
-  border-left-color: #009688;
+  border-left-color: #3f51b5;
   border-right: 0;
   margin-right: -11px;
   border-right-color: rgba(0, 0, 0, 0.2);
