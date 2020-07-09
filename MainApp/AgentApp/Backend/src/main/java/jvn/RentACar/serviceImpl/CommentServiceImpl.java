@@ -19,6 +19,7 @@ import jvn.RentACar.service.CommentService;
 import jvn.RentACar.service.LogService;
 import jvn.RentACar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -67,7 +68,7 @@ public class CommentServiceImpl implements CommentService {
 
         CheckIfCanCommentResponse response = commentClient.checkIfCanComment(rentRequest.getMainAppId(), rentInfo.getMainAppId());
 
-           if (response == null || !response.isValue()) {
+        if (response == null || !response.isValue()) {
 
             throw new InvalidCommentDataException("Cannot create comment.",
                     HttpStatus.BAD_REQUEST);
@@ -91,16 +92,16 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public FeedbackDTO leaveFeedback(FeedbackDTO feedbackDTO, Long id, Long rentInfoId){
+    public FeedbackDTO leaveFeedback(FeedbackDTO feedbackDTO, Long id, Long rentInfoId) {
         User loggedInUser = userService.getLoginUser();
         RentRequest rentRequest = rentRequestRepository.findOneById(id);
         RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestId(rentInfoId, id);
         Set<RentInfo> rentInfos = rentRequest.getRentInfos();
-        for(CommentDTO commentDTO: feedbackDTO.getComments()){
+        for (CommentDTO commentDTO : feedbackDTO.getComments()) {
             commentDTO.setStatus(CommentStatus.APPROVED);
         }
 
-        if(commentRepository.findBySenderIdAndRentInfoId(loggedInUser.getId(), rentInfoId).isEmpty()){
+        if (commentRepository.findBySenderIdAndRentInfoId(loggedInUser.getId(), rentInfoId).isEmpty()) {
             List<CommentDTO> commentDTOS = new ArrayList<>(feedbackDTO.getComments());
             Comment comment = new Comment();
             Client client = clientRepository.findById(loggedInUser.getId()).orElse(null);
@@ -119,7 +120,7 @@ public class CommentServiceImpl implements CommentService {
                 comment.setMainAppId(leaveFeedbackDetails.getCommentDetails().get(0).getId());
             }
             commentRepository.save(comment);
-        }else{
+        } else {
             throw new InvalidCommentDataException("There is already comment for this rent info.", HttpStatus.BAD_REQUEST);
         }
 
@@ -137,8 +138,8 @@ public class CommentServiceImpl implements CommentService {
 
         feedbackDTO.setRating(rentInfo.getRating());
         feedbackDTO.setComments(new HashSet<>());
-        for(Comment comment: rentInfo.getComments()){
-            if(comment.getStatus().equals(CommentStatus.APPROVED)){
+        for (Comment comment : rentInfo.getComments()) {
+            if (comment.getStatus().equals(CommentStatus.APPROVED)) {
                 UserDTO sender = userDtoMapper.toDto(comment.getSender());
                 CommentDTO commentDTO = commentDtoMapper.toDto(comment);
                 commentDTO.setSender(sender);
@@ -146,7 +147,6 @@ public class CommentServiceImpl implements CommentService {
             }
 
         }
-
 
 
         return feedbackDTO;
@@ -178,7 +178,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Comment approve(Long id) {
         Comment comment = commentRepository.findOneById(id);
-        if(comment.getStatus().equals(CommentStatus.APPROVED)){
+        if (comment.getStatus().equals(CommentStatus.APPROVED)) {
             throw new InvalidCommentDataException("Comment is already approved.",
                     HttpStatus.NOT_FOUND);
         }
@@ -210,7 +210,7 @@ public class CommentServiceImpl implements CommentService {
     public void synchronizeComments() {
         try {
             List<RentInfo> rentInfos = rentInfoRepository.findAll();
-            for(RentInfo rentInfo: rentInfos){
+            for (RentInfo rentInfo : rentInfos) {
                 GetAllCommentsDetailsResponse response = commentClient.getAllCommentsDetails(rentInfo.getRentRequest().getMainAppId(), rentInfo.getMainAppId());
                 if (response == null) {
                     continue;
@@ -239,13 +239,20 @@ public class CommentServiceImpl implements CommentService {
         }
 
     }
+
     private void createSynchronize(Comment comment, RentInfo rentInfo) {
-        if (comment.getSender() == null) {
-            return;
+        try {
+            if (comment.getSender() == null) {
+                return;
+            }
+            comment.setRentInfo(rentInfo);
+            commentRepository.saveAndFlush(comment);
+        } catch (DataIntegrityViolationException ex) {
+
         }
-        comment.setRentInfo(rentInfo);
-        commentRepository.saveAndFlush(comment);
+
     }
+
     private void editSynchronize(Comment comment, Comment dbComment, RentInfo rentInfo) {
         if (comment.getSender() == null) {
             return;

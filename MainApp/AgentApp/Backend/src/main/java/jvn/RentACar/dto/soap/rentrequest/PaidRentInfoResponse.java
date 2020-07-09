@@ -10,6 +10,7 @@ package jvn.RentACar.dto.soap.rentrequest;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -24,7 +25,14 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="value" type="{http://www.w3.org/2001/XMLSchema}boolean"/&gt;
+ *         &lt;element name="status"&gt;
+ *           &lt;simpleType&gt;
+ *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *               &lt;enumeration value="SUCCESS"/&gt;
+ *               &lt;enumeration value="ERROR"/&gt;
+ *             &lt;/restriction&gt;
+ *           &lt;/simpleType&gt;
+ *         &lt;/element&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -35,27 +43,36 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "value"
+    "status"
 })
-@XmlRootElement(name = "hasDebtResponse")
-public class HasDebtResponse {
+@XmlRootElement(name = "paidRentInfoResponse")
+public class PaidRentInfoResponse {
 
-    protected boolean value;
+    @XmlElement(required = true)
+    protected String status;
 
     /**
-     * Gets the value of the value property.
+     * Gets the value of the status property.
      * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public boolean isValue() {
-        return value;
+    public String getStatus() {
+        return status;
     }
 
     /**
-     * Sets the value of the value property.
+     * Sets the value of the status property.
      * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setValue(boolean value) {
-        this.value = value;
+    public void setStatus(String value) {
+        this.status = value;
     }
 
 }

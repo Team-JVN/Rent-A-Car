@@ -115,7 +115,7 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.5.12</version>
-         </dependency>
+        </dependency>
         <dependency>
             <groupId>org.springframework.ws</groupId>
             <artifactId>spring-ws-security</artifactId>
@@ -131,29 +131,29 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-                        <!-- <plugin>
-                            <groupId>org.jvnet.jaxb2.maven2</groupId>
-                            <artifactId>maven-jaxb2-plugin</artifactId>
-                            <version>0.14.0</version>
-                            <executions>
-                                <execution>
-                                    <goals>
-                                        <goal>generate</goal>
-                                    </goals>
-                                </execution>
-                            </executions>
-                            <configuration>
-                                <schemaLanguage>WSDL</schemaLanguage>
-                                <generateDirectory>${project.basedir}/src/main/java</generateDirectory>
-                                <generatePackage>jvn.RentACar.dto.soap.pricelist</generatePackage>
-                                <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>
-                                <schemaIncludes>
-                                    <include>priceLists.wsdl</include>
-                                    <include>deletePriceLists.wsdl</include>
-                                    <include>listPriceList.wsdl</include>
-                                </schemaIncludes>
-                            </configuration>
-                        </plugin> -->
+            <!-- <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.14.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <schemaLanguage>WSDL</schemaLanguage>
+                    <generateDirectory>${project.basedir}/src/main/java</generateDirectory>
+                    <generatePackage>jvn.RentACar.dto.soap.pricelist</generatePackage>
+                    <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>
+                    <schemaIncludes>
+                        <include>priceLists.wsdl</include>
+                        <include>deletePriceLists.wsdl</include>
+                        <include>listPriceList.wsdl</include>
+                    </schemaIncludes>
+                </configuration>
+            </plugin> -->
             <!-- <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
@@ -185,6 +185,7 @@
                         <include>checkIfCanComment.wsdl</include>
                         <include>getFeedback.wsdl</include>
                         <include>getAllComments.wsdl</include>
+                        <include>paidRentInfo.wsdl</include>
                     </schemaIncludes>
                 </configuration>
             </plugin>
@@ -264,6 +265,42 @@
                     </schemaIncludes>
                 </configuration>
             </plugin> -->
+
+            <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.14.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <schemaLanguage>WSDL</schemaLanguage>
+                    <generateDirectory>${project.basedir}/src/main/java</generateDirectory>
+                    <generatePackage>jvn.RentACar.dto.soap.rentrequest</generatePackage>
+                    <schemaDirectory>${project.basedir}/src/main/resources</schemaDirectory>
+                    <schemaIncludes>
+                        <include>rentRequests.wsdl</include>
+                        <include>changeRentRequestStatus.wsdl</include>
+                        <include>checkDate.wsdl</include>
+                        <include>checkIfCanAcceptRentRequest.wsdl</include>
+                        <include>hasDebt.wsdl</include>
+                        <include>listRentRequest.wsdl</include>
+                        <!--                        <include>listMessages.wsdl</include>-->
+                        <!--                        <include>createMessage.wsdl</include>-->
+                        <!--                        <include>createRentReport.wsdl</include>-->
+                        <!--                        <include>createComment.wsdl</include>-->
+                        <!--                        <include>leaveFeedback.wsdl</include>-->
+                        <!--                        <include>checkIfCanComment.wsdl</include>-->
+                        <!--                        <include>getFeedback.wsdl</include>-->
+                        <!--                        <include>getAllComments.wsdl</include>-->
+                        <include>paidRentInfo.wsdl</include>
+                    </schemaIncludes>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

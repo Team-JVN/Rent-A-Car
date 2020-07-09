@@ -1,5 +1,7 @@
 package jvn.RentACar.serviceImpl;
 
+import jvn.RentACar.client.RentRequestClient;
+import jvn.RentACar.dto.soap.rentrequest.PaidRentInfoResponse;
 import jvn.RentACar.enumeration.RentRequestStatus;
 import jvn.RentACar.exceptionHandler.InvalidCarDataException;
 import jvn.RentACar.exceptionHandler.InvalidRentRequestDataException;
@@ -17,6 +19,8 @@ import java.util.Set;
 public class RentInfoServiceImpl implements RentInfoService {
 
     private RentInfoRepository rentInfoRepository;
+
+    private RentRequestClient rentRequestClient;
 
     @Override
     public List<RentInfo> getPaidRentInfos(Long carId) {
@@ -38,6 +42,8 @@ public class RentInfoServiceImpl implements RentInfoService {
             throw new InvalidRentRequestDataException("This rent info is already paid.", HttpStatus.BAD_REQUEST);
         }
         rentInfo.getRentReport().setPaid(true);
+
+        PaidRentInfoResponse response = rentRequestClient.paidRentInfo(rentInfo.getRentRequest().getMainAppId(), rentInfo.getMainAppId());
         return rentInfoRepository.save(rentInfo);
     }
 
@@ -56,7 +62,8 @@ public class RentInfoServiceImpl implements RentInfoService {
     }
 
     @Autowired
-    public RentInfoServiceImpl(RentInfoRepository rentInfoRepository) {
+    public RentInfoServiceImpl(RentInfoRepository rentInfoRepository, RentRequestClient rentRequestClient) {
         this.rentInfoRepository = rentInfoRepository;
+        this.rentRequestClient = rentRequestClient;
     }
 }

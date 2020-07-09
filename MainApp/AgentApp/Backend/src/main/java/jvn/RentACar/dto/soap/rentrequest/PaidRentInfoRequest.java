@@ -33,13 +33,10 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;/restriction&gt;
  *           &lt;/simpleType&gt;
  *         &lt;/element&gt;
- *         &lt;element name="status"&gt;
+ *         &lt;element name="rentInfoId"&gt;
  *           &lt;simpleType&gt;
- *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
- *               &lt;enumeration value="PENDING"/&gt;
- *               &lt;enumeration value="RESERVED"/&gt;
- *               &lt;enumeration value="PAID"/&gt;
- *               &lt;enumeration value="CANCELED"/&gt;
+ *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}long"&gt;
+ *               &lt;minInclusive value="1"/&gt;
  *             &lt;/restriction&gt;
  *           &lt;/simpleType&gt;
  *         &lt;/element&gt;
@@ -55,16 +52,15 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "", propOrder = {
     "email",
     "rentRequestId",
-    "status"
+    "rentInfoId"
 })
-@XmlRootElement(name = "changeRentRequestStatusRequest")
-public class ChangeRentRequestStatusRequest {
+@XmlRootElement(name = "paidRentInfoRequest")
+public class PaidRentInfoRequest {
 
     @XmlElement(required = true)
     protected String email;
     protected long rentRequestId;
-    @XmlElement(required = true)
-    protected String status;
+    protected long rentInfoId;
 
     /**
      * Gets the value of the email property.
@@ -107,27 +103,19 @@ public class ChangeRentRequestStatusRequest {
     }
 
     /**
-     * Gets the value of the status property.
+     * Gets the value of the rentInfoId property.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
-    public String getStatus() {
-        return status;
+    public long getRentInfoId() {
+        return rentInfoId;
     }
 
     /**
-     * Sets the value of the status property.
+     * Sets the value of the rentInfoId property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
-    public void setStatus(String value) {
-        this.status = value;
+    public void setRentInfoId(long value) {
+        this.rentInfoId = value;
     }
 
 }

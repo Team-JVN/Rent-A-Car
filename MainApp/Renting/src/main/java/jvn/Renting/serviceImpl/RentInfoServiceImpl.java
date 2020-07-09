@@ -25,6 +25,18 @@ public class RentInfoServiceImpl implements RentInfoService {
         return rentInfoRepository.save(rentInfo);
     }
 
+
+    @Override
+    public RentInfo pay(Long rentRequestId, Long rentInfoId) {
+        RentInfo rentInfo = rentInfoRepository.findByIdAndRentRequestIdAndRentRequestRentRequestStatus(
+                rentInfoId, rentRequestId, RentRequestStatus.PAID);
+        if (rentInfo != null) {
+            rentInfo.getRentReport().setPaid(true);
+            return rentInfoRepository.save(rentInfo);
+        }
+        return null;
+    }
+
     @Autowired
     public RentInfoServiceImpl(RentInfoRepository rentInfoRepository) {
         this.rentInfoRepository = rentInfoRepository;

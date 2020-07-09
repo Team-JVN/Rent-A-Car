@@ -47,34 +47,34 @@
                                 minOccurs="0"/>
                 </xs:sequence>
             </xs:complexType>
-            <xs:complexType name="commentDetails">
-                <xs:sequence>
-                    <xs:element minOccurs="0" name="id">
-                        <xs:simpleType>
-                            <xs:restriction base="xs:long">
-                                <xs:minInclusive value="1"/>
-                            </xs:restriction>
-                        </xs:simpleType>
-                    </xs:element>
-                    <xs:element name="text" type="xs:string"/>
-                    <xs:element name="userId">
-                        <xs:simpleType>
-                            <xs:restriction base="xs:long">
-                                <xs:minInclusive value="1"/>
-                            </xs:restriction>
-                        </xs:simpleType>
-                    </xs:element>
-                    <xs:element name="userName" type="xs:string"/>
-                    <xs:element name="status">
-                        <xs:simpleType>
-                            <xs:restriction base="xs:string">
-                                <xs:enumeration value="AWAITING"/>
-                                <xs:enumeration value="APPROVED"/>
-                            </xs:restriction>
-                        </xs:simpleType>
-                    </xs:element>
-                </xs:sequence>
-            </xs:complexType>
+            <!--            <xs:complexType name="commentDetails">-->
+            <!--                <xs:sequence>-->
+            <!--                    <xs:element minOccurs="0" name="id">-->
+            <!--                        <xs:simpleType>-->
+            <!--                            <xs:restriction base="xs:long">-->
+            <!--                                <xs:minInclusive value="1"/>-->
+            <!--                            </xs:restriction>-->
+            <!--                        </xs:simpleType>-->
+            <!--                    </xs:element>-->
+            <!--                    <xs:element name="text" type="xs:string"/>-->
+            <!--                    <xs:element name="userId">-->
+            <!--                        <xs:simpleType>-->
+            <!--                            <xs:restriction base="xs:long">-->
+            <!--                                <xs:minInclusive value="1"/>-->
+            <!--                            </xs:restriction>-->
+            <!--                        </xs:simpleType>-->
+            <!--                    </xs:element>-->
+            <!--                    <xs:element name="userName" type="xs:string"/>-->
+            <!--                    <xs:element name="status">-->
+            <!--                        <xs:simpleType>-->
+            <!--                            <xs:restriction base="xs:string">-->
+            <!--                                <xs:enumeration value="AWAITING"/>-->
+            <!--                                <xs:enumeration value="APPROVED"/>-->
+            <!--                            </xs:restriction>-->
+            <!--                        </xs:simpleType>-->
+            <!--                    </xs:element>-->
+            <!--                </xs:sequence>-->
+            <!--            </xs:complexType>-->
         </xs:schema>
     </wsdl:types>
     <wsdl:message name="leaveFeedbackRequest">

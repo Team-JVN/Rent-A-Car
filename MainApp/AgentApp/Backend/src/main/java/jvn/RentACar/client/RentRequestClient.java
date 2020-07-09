@@ -142,6 +142,20 @@ public class RentRequestClient extends WebServiceGatewaySupport {
         return response;
     }
 
+    public PaidRentInfoResponse paidRentInfo(Long rentRequestId, Long rentInfoId) {
+        PaidRentInfoRequest request = new PaidRentInfoRequest();
+        request.setRentRequestId(rentRequestId);
+        request.setRentInfoId(rentInfoId);
+        User user = userService.getLoginUser();
+        if (user == null) {
+            return null;
+        }
+        request.setEmail(user.getEmail());
+        PaidRentInfoResponse response = (PaidRentInfoResponse) getWebServiceTemplate()
+                .marshalSendAndReceive(request);
+        return response;
+    }
+
     private XMLGregorianCalendar getXMLGregorianCalendar(LocalDateTime localDateTime) {
         try {
             String dateTimeStr = localDateTime.toString();
@@ -161,4 +175,5 @@ public class RentRequestClient extends WebServiceGatewaySupport {
             return null;
         }
     }
+
 }

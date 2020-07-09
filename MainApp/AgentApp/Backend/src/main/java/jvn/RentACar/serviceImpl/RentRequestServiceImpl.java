@@ -11,6 +11,7 @@ import jvn.RentACar.repository.RentRequestRepository;
 import jvn.RentACar.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Async;
@@ -418,32 +419,20 @@ public class RentRequestServiceImpl implements RentRequestService {
         }
         Set<RentInfo> rentInfos = rentRequest.getRentInfos();
         rentRequest.setRentInfos(null);
-        rentRequest = rentRequestRepository.saveAndFlush(rentRequest);
-        for (RentInfo rentInfo : rentInfos) {
-            if (rentInfo.getAdvertisement() == null) {
-                return;
+        try {
+            rentRequest = rentRequestRepository.saveAndFlush(rentRequest);
+            for (RentInfo rentInfo : rentInfos) {
+                if (rentInfo.getAdvertisement() == null) {
+                    return;
+                }
+                rentInfo.setRentRequest(rentRequest);
             }
-            rentInfo.setRentRequest(rentRequest);
-        }
-        rentRequest.setRentInfos(rentInfos);
-        rentRequestRepository.saveAndFlush(rentRequest);
-    }
+            rentRequest.setRentInfos(rentInfos);
+            rentRequestRepository.saveAndFlush(rentRequest);
+        } catch (DataIntegrityViolationException e) {
 
-    private void createSynchronizeMessages(Message message) {
-//        if (message.getSender() == null) {
-//            return;
-//        }
-//        Set<RentInfo> rentInfos = rentRequest.getRentInfos();
-//        rentRequest.setRentInfos(null);
-//        rentRequest = rentRequestRepository.saveAndFlush(rentRequest);
-//        for (RentInfo rentInfo : rentInfos) {
-//            if (rentInfo.getAdvertisement() == null) {
-//                return;
-//            }
-//            rentInfo.setRentRequest(rentRequest);
-//        }
-//        rentRequest.setRentInfos(rentInfos);
-//        rentRequestRepository.saveAndFlush(rentRequest);
+        }
+
     }
 
     private void editSynchronize(RentRequest rentRequest, RentRequest dbRentRequest) {
@@ -451,6 +440,16 @@ public class RentRequestServiceImpl implements RentRequestService {
             return;
         }
         dbRentRequest.setRentRequestStatus(rentRequest.getRentRequestStatus());
+        Set<RentInfo> dbRentInfos = dbRentRequest.getRentInfos();
+        for (RentInfo rentInfo : rentRequest.getRentInfos()) {
+            for (RentInfo dbRentInfo : dbRentInfos) {
+                if (dbRentInfo.getId().equals(rentInfo.getId())) {
+                    dbRentInfo.setRating(rentInfo.getRating());
+                    break;
+                }
+
+            }
+        }
         rentRequestRepository.saveAndFlush(dbRentRequest);
     }
 

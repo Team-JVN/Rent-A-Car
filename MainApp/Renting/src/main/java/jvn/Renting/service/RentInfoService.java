@@ -4,4 +4,6 @@ import jvn.Renting.model.RentInfo;
 
 public interface RentInfoService {
     RentInfo pay(Long rentRequestId, Long rentInfoId, Long loggedInUserId);
+
+    RentInfo pay(Long rentRequestId, Long rentInfoId);
 }

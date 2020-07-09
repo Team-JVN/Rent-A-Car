@@ -276,4 +276,21 @@ public class WebServiceConfig {
     public XsdSchema getFeedbackSchema() {
         return new SimpleXsdSchema(new ClassPathResource("getFeedback.xsd"));
     }
+
+
+    @Bean(name = "paidRentInfo")
+    public DefaultWsdl11Definition defaultWsdl11DefinitionGetPaidRentInfo(@Qualifier("paidRentInfo") XsdSchema paidRentInfo) {
+        DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
+        wsdl11Definition.setPortTypeName("RentRequestsPort");
+        wsdl11Definition.setLocationUri("/ws/rentrequest");
+        wsdl11Definition.setTargetNamespace("http://www.rentrequest.dto/soap");
+        wsdl11Definition.setSchema(paidRentInfo);
+        return wsdl11Definition;
+    }
+
+    @Bean
+    @Qualifier("paidRentInfo")
+    public XsdSchema paidRentInfoSchema() {
+        return new SimpleXsdSchema(new ClassPathResource("paidRentInfo.xsd"));
+    }
 }

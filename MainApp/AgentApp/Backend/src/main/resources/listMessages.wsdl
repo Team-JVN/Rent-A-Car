@@ -26,27 +26,27 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:complexType name="messageDetails">
-                <xs:sequence>
-                    <xs:element minOccurs="0" name="id">
-                        <xs:simpleType>
-                            <xs:restriction base="xs:long">
-                                <xs:minInclusive value="1"/>
-                            </xs:restriction>
-                        </xs:simpleType>
-                    </xs:element>
-                    <xs:element name="text" type="xs:string"/>
-                    <xs:element name="userId">
-                        <xs:simpleType>
-                            <xs:restriction base="xs:long">
-                                <xs:minInclusive value="1"/>
-                            </xs:restriction>
-                        </xs:simpleType>
-                    </xs:element>
-                    <xs:element name="userName" type="xs:string"/>
-                    <xs:element name="dateAndTime" type="xs:dateTime"/>
-                </xs:sequence>
-            </xs:complexType>
+            <!--            <xs:complexType name="messageDetails">-->
+            <!--                <xs:sequence>-->
+            <!--                    <xs:element minOccurs="0" name="id">-->
+            <!--                        <xs:simpleType>-->
+            <!--                            <xs:restriction base="xs:long">-->
+            <!--                                <xs:minInclusive value="1"/>-->
+            <!--                            </xs:restriction>-->
+            <!--                        </xs:simpleType>-->
+            <!--                    </xs:element>-->
+            <!--                    <xs:element name="text" type="xs:string"/>-->
+            <!--                    <xs:element name="userId">-->
+            <!--                        <xs:simpleType>-->
+            <!--                            <xs:restriction base="xs:long">-->
+            <!--                                <xs:minInclusive value="1"/>-->
+            <!--                            </xs:restriction>-->
+            <!--                        </xs:simpleType>-->
+            <!--                    </xs:element>-->
+            <!--                    <xs:element name="userName" type="xs:string"/>-->
+            <!--                    <xs:element name="dateAndTime" type="xs:dateTime"/>-->
+            <!--                </xs:sequence>-->
+            <!--            </xs:complexType>-->
         </xs:schema>
     </wsdl:types>
     <wsdl:message name="getAllMessagesDetailsRequest">

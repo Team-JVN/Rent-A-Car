@@ -21,6 +21,7 @@ import jvn.RentACar.service.LogService;
 import jvn.RentACar.service.RentInfoService;
 import jvn.RentACar.service.RentReportService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -158,8 +159,13 @@ public class RentReportServiceImpl implements RentReportService {
     }
 
     private void createSynchronize(RentReport rentReport, RentInfo rentInfo) {
-        rentReport.setRentInfo(rentInfo);
-        rentReportRepository.saveAndFlush(rentReport);
+        try {
+            rentReport.setRentInfo(rentInfo);
+            rentReportRepository.saveAndFlush(rentReport);
+        } catch (DataIntegrityViolationException ex) {
+
+        }
+
     }
 
     private void editSynchronize(RentReport rentReport, RentReport dbRentReport, RentInfo rentInfo) {

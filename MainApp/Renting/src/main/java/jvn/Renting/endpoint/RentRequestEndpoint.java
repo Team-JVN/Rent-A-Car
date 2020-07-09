@@ -20,6 +20,7 @@ import jvn.Renting.model.RentInfo;
 import jvn.Renting.model.RentRequest;
 import jvn.Renting.producer.LogProducer;
 import jvn.Renting.service.CommentService;
+import jvn.Renting.service.RentInfoService;
 import jvn.Renting.service.RentRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
@@ -54,7 +55,7 @@ public class RentRequestEndpoint {
 
     private LogProducer logProducer;
 
-
+    private RentInfoService rentInfoService;
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "createRentRequestRequest")
     @ResponsePayload
@@ -180,13 +181,30 @@ public class RentRequestEndpoint {
         if (dto == null) {
             return null;
         }
-
         List<RentRequestDetails> list = rentRequestService.getAll(dto.getId()).stream().map(rentRequestDetailsMapper::toDto).
                 collect(Collectors.toList());
         GetAllRentRequestDetailsResponse response = new GetAllRentRequestDetailsResponse();
         response.getRentRequestDetails().addAll(list);
         return response;
     }
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "paidRentInfoRequest")
+    @ResponsePayload
+    public PaidRentInfoResponse paidRentInfoRequest(@RequestPayload PaidRentInfoRequest request) {
+        UserInfoDTO dto = userClient.getUser(request.getEmail());
+        if (dto == null) {
+            return null;
+        }
+        RentInfo rentInfo = rentInfoService.pay(request.getRentRequestId(), request.getRentInfoId());
+        PaidRentInfoResponse response = new PaidRentInfoResponse();
+        if (rentInfo == null) {
+            response.setStatus("ERROR");
+        } else {
+            response.setStatus("SUCCESS");
+        }
+        return response;
+    }
+
 
     private LocalDate getLocalDate(XMLGregorianCalendar xmlGregorianCalendar) {
         LocalDate localDate = LocalDate.of(
@@ -202,10 +220,11 @@ public class RentRequestEndpoint {
 
     @Autowired
     public RentRequestEndpoint(RentRequestService rentRequestService, RentRequestDetailsMapper rentRequestDetailsMapper,
-                               UserClient userClient, LogProducer logProducer) {
+                               UserClient userClient, LogProducer logProducer, RentInfoService rentInfoService) {
         this.rentRequestService = rentRequestService;
         this.userClient = userClient;
         this.rentRequestDetailsMapper = rentRequestDetailsMapper;
         this.logProducer = logProducer;
+        this.rentInfoService = rentInfoService;
     }
 }
