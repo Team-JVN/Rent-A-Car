@@ -176,6 +176,8 @@ services:
         restart: always
         networks:
             - main-app-tls
+        ports:
+            - 9000:3306
         environment:
             MYSQL_ROOT_PASSWORD: team29VJN
             MYSQL_USER: rentacar
@@ -227,6 +229,8 @@ services:
         restart: always
         networks:
             - main-app-tls
+        ports:
+            - 9001:3306
         environment:
             MYSQL_ROOT_PASSWORD: team29VJN
             MYSQL_USER: rentacar

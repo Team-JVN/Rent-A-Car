@@ -20,7 +20,7 @@ public class RentReportConfig {
     public RentReportClient rentReportClient(Jaxb2Marshaller marshallerRentReport) {
         RentReportClient client = new RentReportClient();
 //        client.setDefaultUri("http://localhost:8080/renting/ws/rentreport");
-        client.setDefaultUri("http://renting:8083/renting/ws/rentreport");
+        client.setDefaultUri("http://renting:8083/ws/rentreport");
         client.setMarshaller(marshallerRentReport);
         client.setUnmarshaller(marshallerRentReport);
         return client;
